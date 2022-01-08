@@ -16,6 +16,10 @@ function log() {
     echo "[Mount] ${1}"
 }
 umask 022
+
+chown -cR abc:abc /app /system/*
+chmod -cR 755 /app /system/*
+
 log "-> Starting mounts <-"
 startup="/app/startup.sh"
 sleep 2
@@ -33,6 +37,7 @@ exec s6-setuidgid abc $startup \
  $lpurge \
  $vfsrefresh \
  $nzb
+
 #<EOF>#
 
 
