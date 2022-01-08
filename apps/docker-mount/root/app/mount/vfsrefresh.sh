@@ -40,7 +40,7 @@ while true; do
    if [[ ! "${VFS_REFRESH}" ]]; then
       break
    else
-      drivecheck && sleep "${VFS_REFRESH}" && continue
+      drivecheck && sleep "${VFS_REFRESH}"
    fi
 done
 #<EOF>#
