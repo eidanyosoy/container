@@ -17,16 +17,30 @@
 function log() {
    echo "[Mount] ${1}"
 }
+
+CONFIG=/app/rclone/rclone.conf
+REMOTE=/mnt/unionfs
+SMOUNT=/app/mount
+JSONDIR=/system/mount/keys
+GDSAMIN=4
+ARRAY=$(ls -A ${JSONDIR} | egrep -c '*.json')
+FDISCORD=/app/discord
+LFOLDER=/app/language/mount
+SDISCORD=/app/discord/discord.sh
+LOG=/tmp/discord.dead
+MLOG=/system/mount/logs/rclone-union.log
+SMOUNT=/app/mount
+SROTATE=/app/mount/rotation.sh
+SCRIPT=/app/mount/mount.sh
+
 function run() {
    bash "${1}"
 }
 
 function checkban() {
-   GDSAARRAY=$(ls -l ${JSONDIR} | egrep -c '*.json')
-   MLOG=/system/mount/logs/rclone-union.log
-   tail -n 1 "${MLOG}" | grep --line-buffered 'googleapi: Error' | while read; do
-      if [[ ! ${DISCORD_SEND} != "null" ]]; then discord ; else log "${startuphitlimit}" ; fi
-     if [[ ${GDSAARRAY} != 0 ]]; then run "${SROTATE}" && log "${startuprotate}" ; fi
+  tail -n 1 "${MLOG}" | grep --line-buffered 'googleapi: Error' | while read; do
+     if [[ ! ${DISCORD_SEND} != "null" ]]; then discord ; else log "${startuphitlimit}" ; fi
+     if [[ ${ARRAY} != 0 ]]; then run "${SROTATE}" && log "${startuprotate}" ; fi
    done
 }
 
@@ -42,7 +56,7 @@ function rckill() {
 function discord() {
    source /system/mount/mount.env
    DATE=$(date "+%Y-%m-%d")
-   if [[ ${GDSAARRAY} != 0 ]]; then
+   if [[ ${ARRAY} -gt 0 ]]; then
       MSG1=${startuphitlimit}
       MSG2=${startuprotate}
       MSGSEND="${MSG1} and ${MSG2}"
@@ -58,7 +72,7 @@ function discord() {
          chmod 755 "${SDISCORD}"
       fi
    if [[ ! -f "${LOG}" ]]; then
-      bash "${SDISCORD}" \
+      run "${SDISCORD}" \
       --webhook-url=${DISCORD_WEBHOOK_URL} \
       --title "${DISCORD_EMBED_TITEL}" \
       --avatar "${DISCORD_ICON_OVERRIDE}" \
@@ -78,11 +92,10 @@ function envrenew() {
    file1=/system/mount/mount.env
    file2=/tmp/mount.env
    diff -q "$file1" "$file2"
-   RESULT=$?
-   if [ $RESULT -gt 0 ]; then
-      log "${startupnewchanges}" && rckill && run "${SCRIPT}"
+   if [ $? -gt 0 ]; then
+      rckill && run "${SCRIPT}"
     else
-      rm -f /tmp/dead.lock && echo "no changes" | tee /tmp/dead.lock > /dev/null
+      echo "no changes" > /tmp/dead.lock
    fi
 }
 
@@ -96,9 +109,11 @@ function lang() {
    startuprcloneworks=$(grep -Po '"startup.rcloneworks": *\K"[^"]*"' "${LFOLDER}/${LANGUAGE}.json" | sed 's/"\|,//g')
    currenttime=$(date +%H:%M)
    if [[ "$currenttime" > "23:59" ]] || [[ "$currenttime" < "00:01" ]]; then
-      if [[ -d "/app/language" ]]; then git -C /app/language/ stash --quiet && git -C /app/language/ pull --quiet && cd /app/language/ && git stash clear ; fi
+      if [[ -d "/app/language" ]]; then
+         git -C "${LFOLDER}/" stash --quiet && git -C "${LFOLDER}/" pull --quiet && cd "${LFOLDER}/" && git stash clear
+      fi
    fi
-   if [[ ! -d "/app/language" ]]; then mkdir -p /app/language && git -C /app clone https://github.com/dockserver/language.git ; fi
+   if [[ ! -d "/app/language" ]]; then mkdir -p "${LFOLDER}/" && git -C /app clone https://github.com/dockserver/language.git ; fi
 }
 
 function startup() {
@@ -106,21 +121,7 @@ function startup() {
    rckill && run "${SCRIPT}"
 }
 
-#<COMMANDS>#
 source /system/mount/mount.env
-CONFIG=/app/rclone/rclone.conf
-REMOTE=/mnt/unionfs
-SMOUNT=/app/mount
-JSONDIR=/system/mount/keys
-GDSAMIN=1
-FDISCORD=/app/discord
-LFOLDER=/app/language/mount
-SDISCORD=/app/discord/discord.sh
-LOG=/tmp/discord.dead
-SMOUNT=/app/mount
-SROTATE=/app/mount/rotation.sh
-SCRIPT=/app/mount/mount.sh
-
 lang
 LANGUAGE=${LANGUAGE}
 startupmount=$(grep -Po '"startup.mount": *\K"[^"]*"' "${LFOLDER}/${LANGUAGE}.json" | sed 's/"\|,//g')
@@ -134,7 +135,7 @@ while true; do
    else
       startup
    fi
-   envrenew && lang && sleep 360 && checkban && continue
+   envrenew && lang && sleep 360 && checkban
 done
 
 #<EOF>#
