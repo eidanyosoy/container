@@ -22,26 +22,22 @@ config=/app/rclone/rclone.conf
 log=/system/mount/logs/vfs-refresh.log
 
 function drivecheck() {
-   while true; do
-     if [ "$(ls -A /mnt/unionfs)" ] && [ "$(ps aux | grep -i 'rclone rc mount/mount' | grep -v grep)" != "" ]; then
-        rclone rc fscache/clear --fast-list --rc-user=${RC_USER} --rc-pass=${RC_PASSWORD} \
+  if [ "$(ls -A /mnt/unionfs)" ] && [ "$(ps aux | grep -i 'rclone rc mount/mount' | grep -v grep)" != "" ]; then
+     rclone rc fscache/clear --fast-list --rc-user=${RC_USER} --rc-pass=${RC_PASSWORD} \
         --rc-addr=localhost:${RC_ADDRESS} --config=${config} --log-file=${log} --log-level=${LOGLEVEL_RC}
-        sleep 5
-        rclone rc vfs/refresh recursive=true --fast-list \
+     sleep 5
+     rclone rc vfs/refresh recursive=true --fast-list \
         --rc-user=${RC_USER} --rc-pass=${RC_PASSWORD} --rc-addr=localhost:${RC_ADDRESS} \
         --config=${config} --log-file=${log} --log-level=${LOGLEVEL_RC}
         truncate -s 0 ${log} && break
-     else
-        sleep 60 && break
-     fi
-   done
+  fi
 }
+
 while true; do
    if [[ ! "${VFS_REFRESH}" ]]; then
-      break
+      sleep 60
    else
       drivecheck && sleep "${VFS_REFRESH}"
    fi
 done
-#<EOF>#
 #<EOF>#
