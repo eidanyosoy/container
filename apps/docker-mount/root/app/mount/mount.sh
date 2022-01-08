@@ -16,14 +16,16 @@ if pidof -o %PPID -x "$0"; then
     exit 1
 fi
 
-function rcx() {
-# environment
 source /system/mount/mount.env
+
 CONFIG=/app/rclone/rclone.conf
 REMOTE=/mnt/unionfs
 MLOG=/system/mount/logs/rclone-union.log
 RLOG=/system/mount/logs/vfs-refresh.log
-mkdir -p /home/rclonecache ${REMOTE}
+
+mkdir -p ${TMPRCLONE} ${REMOTE}
+
+function rcx() {
 
 rclone rcd --rc-user=${RC_USER} \
   --rc-pass=${RC_PASSWORD} \
@@ -41,11 +43,9 @@ rclone rc mount/mount \
    }'
    mainOpt='{
    "BufferSize": ${BUFFER_SIZE},
-   "Checkers": 8,
+   "Checkers": 32,
    "TPSLimit": $[TPSLIMIT},
    "TPSLimitBurst": ${TPSBURST},
-   "Timeout": 300000000000,
-   "Transfers": 4,
    "UseListR": true,
    "UseMmap": true,
    "UseServerModTime": true,
@@ -54,17 +54,18 @@ rclone rc mount/mount \
    }'
    vfsOpt='{
    "CacheMaxAge": ${VFS_CACHE_MAX_AGE},
-   "CacheMaxSize": $[VFS_CACHE_MAX_SIZE},
+   "CacheMaxSize": ${VFS_CACHE_MAX_SIZE},
    "CacheMode": 3,
-   "CachePollInterval": ${VFS_CACHE_POLL_INTERVAL},"CaseInsensitive": false,
+   "CachePollInterval": ${VFS_CACHE_POLL_INTERVAL},
+   "CaseInsensitive": false,
    "ChunkSize": ${VFS_READ_CHUNK_SIZE},
    "ChunkSizeLimit": ${VFS_READ_CHUNK_SIZE_LIMIT},
-   "DirCacheTime": $DIR_CACHE_TIME},
-   "GID": $[PGID},
+   "DirCacheTime": ${DIR_CACHE_TIME},
+   "GID": ${PGID},
    "NoChecksum": false,
-   "NoModTime": false,
-   "NoSeek": false,
-   "PollInterval": $[POLL_INTERVAL},
+   "NoModTime": true,
+   "NoSeek": true,
+   "PollInterval": ${POLL_INTERVAL},
    "UID": ${PUID},
    "Umask": ${UMASK}
    }' 
@@ -83,24 +84,23 @@ rclone rc mount/mount \
    --config=${CONFIG} \
    --log-file=${RLLOG} \
    --log-level=${LOGLEVEL_RC}
-
 }
 
 function rckill() {
    rclone rc mount/unmount \
    mountPoint=${REMOTE} \
-   --config=${CONFIG}
+   --config=${CONFIG} \
    --rc-user=${RC_USER} \
    --rc-pass=${RC_PASSWORD} \
    --rc-addr=${RC_ADDRESS}
 }
 
 while true; do
-   if [ "$(ls -A /mnt/unionfs)" ] && [ $(ps aux | grep -i 'rclone rc mount/mount' | grep -v grep) != "" ]; then
-   sleep 120 && continue
-else
-    rckill && rcx && sleep 240 && continue
-fi
+   if [ "$(ls -A /mnt/unionfs)" ] && [ "$(ps aux | grep -i 'rclone rc mount/mount' | grep -v grep)" != "" ]; then
+      sleep 360 && continue
+   else
+      rckill && rcx && sleep 240 && continue
+   fi
 done
 
 #EOF
