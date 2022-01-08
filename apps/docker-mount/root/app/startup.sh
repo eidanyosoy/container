@@ -20,6 +20,7 @@ function log() {
 function run() {
    bash "${1}"
 }
+
 function checkban() {
    GDSAARRAY=$(ls -l ${JSONDIR} | egrep -c '*.json')
    MLOG=/system/mount/logs/rclone-union.log
@@ -28,14 +29,15 @@ function checkban() {
      if [[ ${GDSAARRAY} != 0 ]]; then run "${SROTATE}" && log "${startuprotate}" ; fi
    done
 }
+
 function rckill() {
    rclone rc mount/unmount \
    mountPoint=${REMOTE} \
-   --config=${CONFIG}
+   --config=${CONFIG} \
    --rc-user=${RC_USER} \
    --rc-pass=${RC_PASSWORD} \
    --rc-addr=${RC_ADDRESS}
-}}
+}
 
 function discord() {
    source /system/mount/mount.env
@@ -113,8 +115,8 @@ JSONDIR=/system/mount/keys
 GDSAMIN=1
 FDISCORD=/app/discord
 LFOLDER=/app/language/mount
-SDISCORD=${FDISCORD}/discord.sh
-LOG="/tmp/discord.dead"
+SDISCORD=/app/discord/discord.sh
+LOG=/tmp/discord.dead
 SMOUNT=/app/mount
 SROTATE=/app/mount/rotation.sh
 SCRIPT=/app/mount/mount.sh
@@ -124,14 +126,15 @@ LANGUAGE=${LANGUAGE}
 startupmount=$(grep -Po '"startup.mount": *\K"[^"]*"' "${LFOLDER}/${LANGUAGE}.json" | sed 's/"\|,//g')
 log "${startupmount}"
 run "${SCRIPT}"
+sleep 120
 
 while true; do
-   if [ "$(ls -A /mnt/unionfs)" ] && [ $(ps aux | grep -i 'rclone rc mount/mount' | grep -v grep) != "" ]; then
+   if [ "$(ls -A /mnt/unionfs)" ] && [ "$(ps aux | grep -i 'rclone rc mount/mount' | grep -v grep)" != "" ]; then
       log "${startuprcloneworks}"
    else
       startup
    fi
-   envrenew && lang && sleep 15 && checkban && continue
+   envrenew && lang && sleep 360 && checkban && continue
 done
 
 #<EOF>#
