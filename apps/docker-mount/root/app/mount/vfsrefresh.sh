@@ -16,28 +16,24 @@
 # shellcheck disable=SC2002
 # shellcheck disable=SC2006
 ENV="/system/mount/mount.env"
-VFS_REFRESH=$(grep -e "VFS_REFRESH" "$ENV" | sed "s#.*=##")
+VFS_REFRESH=${VFS_REFRESH}
+source /system/mount/mount.env
+config=/app/rclone/rclone.conf
+log=/system/mount/logs/vfs-refresh.log
 
 function drivecheck() {
    while true; do
-      MERGERFS_PID=$(pgrep mergerfs)
-      if [ ! "${MERGERFS_PID}" ]; then
-         sleep 5 && continue
-      else
-         break
-      fi
-   done
-   ###
-   while true; do
-      SMOUNT=/app/vfs/refresh.sh
-      if [[ -f ${SMOUNT} ]]; then
-         log=$(grep -e "log" "${SMOUNT}" | sed "s#.*=##")
-         bash ${SMOUNT}
-         chmod a+x ${SMOUNT}
-         chown -hR abc:abc ${SMOUNT}
-         truncate -s 0 ${log}
-         break
-      fi
+     if [ "$(ls -A /mnt/unionfs)" ] && [ "$(ps aux | grep -i 'rclone rc mount/mount' | grep -v grep)" != "" ]; then
+        rclone rc fscache/clear --fast-list --rc-user=${RC_USER} --rc-pass=${RC_PASSWORD} \
+        --rc-addr=localhost:${RC_ADDRESS} --config=${config} --log-file=${log} --log-level=${LOGLEVEL_RC}
+        sleep 5
+        rclone rc vfs/refresh recursive=true --fast-list \
+        --rc-user=${RC_USER} --rc-pass=${RC_PASSWORD} --rc-addr=localhost:${RC_ADDRESS} \
+        --config=${config} --log-file=${log} --log-level=${LOGLEVEL_RC}
+        truncate -s 0 ${log} && break
+     else
+        sleep 60 && break
+     fi
    done
 }
 while true; do
@@ -47,4 +43,5 @@ while true; do
       drivecheck && sleep "${VFS_REFRESH}" && continue
    fi
 done
+#<EOF>#
 #<EOF>#

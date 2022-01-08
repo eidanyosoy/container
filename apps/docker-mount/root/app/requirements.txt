@@ -11,14 +11,7 @@ ca-certificates
 findutils
 coreutils
 openssl
-libxml2-utils
 tzdata
-openntpd
 grep
-logrotate
-mergerfs
 rclone
-libattr
-libgcc
-libstdc++
 musl

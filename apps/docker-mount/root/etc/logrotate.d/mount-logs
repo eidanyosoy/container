@@ -1,9 +1,0 @@
-/system/mount/logs/*.log {
-  size 10M
-  rotate 7
-  copytruncate
-  daily
-  compress
-  missingok
-  notifempty
-}

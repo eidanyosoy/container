@@ -16,7 +16,23 @@ function log() {
     echo "[Mount] ${1}"
 }
 umask 022
-startup="/app/startup.sh"
 log "-> Starting mounts <-"
-exec $startup
+startup="/app/startup.sh"
+sleep 2
+log "-> Starting log purging in auto mode <-"
+lpurge="/app/mount/log.sh"
+sleep 2
+log "-> Starting vfs refresh auto mode <-"
+vfsrefresh="/app/mount/vfsrefresh.sh"
+sleep 2
+log "-> Starting nzb cleanup in auto mode <-"
+nzb="/app/mount/nzbcleanup.sh"
+sleep 2
+log "-> Starting System <-"
+exec s6-setuidgid abc $startup \
+ $lpurge \
+ $vfsrefresh \
+ $nzb
 #<EOF>#
+
+

@@ -17,29 +17,25 @@
 function log() {
    echo "[Mount] ${1}"
 }
-function ismounted() {
-   mountpoint -q "${1}"
-}
-function fusercommand() {
-   fusermount -uzq "${1}"
-}
 function run() {
    bash "${1}"
 }
 function checkban() {
    GDSAARRAY=$(ls -l ${JSONDIR} | egrep -c '*.json')
-   logfile=$(grep -e "log" "${SCRIPT}" | sed "s#.*=##" | head -n1)
-   tail -n 1 "${logfile}" | grep --line-buffered 'googleapi: Error' | while read; do
-      if [[ ! ${DISCORD_SEND} != "null" ]]; then
-         discord
-      else
-         log "${startuphitlimit}"
-      fi
-     if [[ ${GDSAARRAY} != 0 ]]; then
-        run "${SROTATE}" && log "${startuprotate}"
-     fi
+   MLOG=/system/mount/logs/rclone-union.log
+   tail -n 1 "${MLOG}" | grep --line-buffered 'googleapi: Error' | while read; do
+      if [[ ! ${DISCORD_SEND} != "null" ]]; then discord ; else log "${startuphitlimit}" ; fi
+     if [[ ${GDSAARRAY} != 0 ]]; then run "${SROTATE}" && log "${startuprotate}" ; fi
    done
 }
+function rckill() {
+   rclone rc mount/unmount \
+   mountPoint=${REMOTE} \
+   --config=${CONFIG}
+   --rc-user=${RC_USER} \
+   --rc-pass=${RC_PASSWORD} \
+   --rc-addr=${RC_ADDRESS}
+}}
 
 function discord() {
    source /system/mount/mount.env
@@ -75,23 +71,19 @@ function discord() {
       --timestamp >${LOG}
    fi
 }
+
 function envrenew() {
    file1=/system/mount/mount.env
    file2=/tmp/mount.env
    diff -q "$file1" "$file2"
    RESULT=$?
    if [ $RESULT -gt 0 ]; then
-      log "${startupnewchanges}"
-      pkill -9 -f rclone
-      ismounted /mnt/unionfs && fusercommand /mnt/unionfs
-      ismounted /mnt/remotes && fusercommand /mnt/remotes
-      run "${SCRIPT}" &
-      ismounted ${TMPRCLONE} && fusercommand ${TMPRCLONE}
-      sleep 3 && run "${SMERG}"
+      log "${startupnewchanges}" && rckill && run "${SCRIPT}"
     else
       rm -f /tmp/dead.lock && echo "no changes" | tee /tmp/dead.lock > /dev/null
    fi
 }
+
 function lang() {
    source /system/mount/mount.env
    LANGUAGE=${LANGUAGE}
@@ -100,73 +92,44 @@ function lang() {
    startuprotate=$(grep -Po '"startup.rotate": *\K"[^"]*"' "${LFOLDER}/${LANGUAGE}.json" | sed 's/"\|,//g')
    startupnewchanges=$(grep -Po '"startup.newchanges": *\K"[^"]*"' "${LFOLDER}/${LANGUAGE}.json" | sed 's/"\|,//g')
    startuprcloneworks=$(grep -Po '"startup.rcloneworks": *\K"[^"]*"' "${LFOLDER}/${LANGUAGE}.json" | sed 's/"\|,//g')
-   startupmergerfsworks=$(grep -Po '"startup.mergerfsworks": *\K"[^"]*"' "${LFOLDER}/${LANGUAGE}.json" | sed 's/"\|,//g')
-
-   if [[ ! $(which git) ]]; then apk --quiet --no-cache --no-progress add git; fi
    currenttime=$(date +%H:%M)
    if [[ "$currenttime" > "23:59" ]] || [[ "$currenttime" < "00:01" ]]; then
-      if [[ -d "/app/language" ]]; then
-         git -C /app/language/ stash --quiet
-         git -C /app/language/ pull --quiet
-         cd /app/language/ && git stash clear
-      fi
+      if [[ -d "/app/language" ]]; then git -C /app/language/ stash --quiet && git -C /app/language/ pull --quiet && cd /app/language/ && git stash clear ; fi
    fi
-   if [[ ! -d "/app/language" ]]; then
-       mkdir -p /app/language && git -C /app clone https://github.com/dockserver/language.git
-   fi
+   if [[ ! -d "/app/language" ]]; then mkdir -p /app/language && git -C /app clone https://github.com/dockserver/language.git ; fi
 }
+
 function startup() {
    source /system/mount/mount.env
-   ADDITIONAL_MOUNT=${ADDITIONAL_MOUNT}
-   if [[ ${ADDITIONAL_MOUNT} != 'null' ]]; then
-      if [[ -d ${ADDITIONAL_MOUNT} ]]; then fusercommand ${ADDITIONAL_MOUNT}; fi
-   fi
-   ismounted /mnt/unionfs && fusercommand /mnt/unionfs
-   ismounted /mnt/remotes && fusercommand /mnt/remotes
-   run "${SCRIPT}" &
-   ismounted ${TMPRCLONE} && fusercommand ${TMPRCLONE}
-   sleep 3 && run "${SMERG}"
+   rckill && run "${SCRIPT}"
 }
 
 #<COMMANDS>#
-export SMOUNT=/app/mount \
-   JSONDIR=/system/mount/keys \
-   GDSAMIN=0 \
-   FDISCORD=/app/discord \
-   LFOLDER=/app/language/mount \
-   SDISCORD=${FDISCORD}/discord.sh \
-   LOG="/tmp/discord.dead" \
-   SMOUNT=/app/mount \
-   SROTATE=/app/mount/rotation.sh \
-   SCRIPT=/app/mount/mount.sh \
-   SMERG=/app/mount/mergerfs.sh
+source /system/mount/mount.env
+CONFIG=/app/rclone/rclone.conf
+REMOTE=/mnt/unionfs
+SMOUNT=/app/mount
+JSONDIR=/system/mount/keys
+GDSAMIN=1
+FDISCORD=/app/discord
+LFOLDER=/app/language/mount
+SDISCORD=${FDISCORD}/discord.sh
+LOG="/tmp/discord.dead"
+SMOUNT=/app/mount
+SROTATE=/app/mount/rotation.sh
+SCRIPT=/app/mount/mount.sh
 
-   source /system/mount/mount.env
-   lang
-   LANGUAGE=${LANGUAGE}
-   startupmount=$(grep -Po '"startup.mount": *\K"[^"]*"' "${LFOLDER}/${LANGUAGE}.json" | sed 's/"\|,//g')
-   log "${startupmount}"
-   mkdir -p /mnt/{remotes,unionfs}
-   ADDITIONAL_MOUNT=${ADDITIONAL_MOUNT}
-   if [[ ${ADDITIONAL_MOUNT} != 'null' ]]; then
-      if [[ -d ${ADDITIONAL_MOUNT} ]]; then fusercommand ${ADDITIONAL_MOUNT}; fi
-   fi
-   ismounted /mnt/unionfs && fusercommand /mnt/unionfs
-   ismounted /mnt/remotes && fusercommand /mnt/remotes
-   run "${SCRIPT}" &
-   ismounted ${TMPRCLONE} && fusercommand ${TMPRCLONE}
-   sleep 3 && run "${SMERG}"
+lang
+LANGUAGE=${LANGUAGE}
+startupmount=$(grep -Po '"startup.mount": *\K"[^"]*"' "${LFOLDER}/${LANGUAGE}.json" | sed 's/"\|,//g')
+log "${startupmount}"
+run "${SCRIPT}"
 
 while true; do
-   if [[ "$(ls -A /mnt/remotes)" ]]; then
+   if [ "$(ls -A /mnt/unionfs)" ] && [ $(ps aux | grep -i 'rclone rc mount/mount' | grep -v grep) != "" ]; then
       log "${startuprcloneworks}"
    else
-      pkill -9 -f rclone && startup
-   fi
-   if [[ "$(ls -A /mnt/unionfs)" ]]; then
-      log "${startupmergerfsworks}"
-   else
-      pkill -9 -f mergerfs && startup
+      startup
    fi
    envrenew && lang && sleep 15 && checkban && continue
 done
