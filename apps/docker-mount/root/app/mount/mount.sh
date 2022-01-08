@@ -97,9 +97,9 @@ function rckill() {
 
 while true; do
    if [ "$(ls -A /mnt/unionfs)" ] && [ "$(ps aux | grep -i 'rclone rc mount/mount' | grep -v grep)" != "" ]; then
-      sleep 360 && continue
+      sleep 360
    else
-      rckill && rcx && sleep 240 && continue
+      rckill && sleep 10 && rcx && sleep 360
    fi
 done
 
