@@ -17,8 +17,8 @@ function log() {
 }
 
 cat > /etc/apk/repositories << EOF; $(echo)
-https://dl-cdn.alpinelinux.org/alpine/edge/main
-https://dl-cdn.alpinelinux.org/alpine/edge/community
+https://dl-cdn.alpinelinux.org/alpine/3.15/main
+https://dl-cdn.alpinelinux.org/alpine/3.15/community
 https://dl-cdn.alpinelinux.org/alpine/edge/testing
 EOF
 
@@ -51,7 +51,7 @@ else
    sleep infinity
 fi
 rootfc=/root/.config/rclone/rclone.conf
-if [[ ! -f "${rootfc}" ]]; then mkdir -p /root/.config/rclone/ && ln -s ${CONF} ${rootfc}; fi
+if [[ ! -f "${rootfc}" ]]; then mkdir -p /root/.config/rclone/ && ln -s "${CONF}" "${rootfc}" ; fi
 
 rm -rf /var/cache/apk/* \
        /etc/nginx/nginx.conf
