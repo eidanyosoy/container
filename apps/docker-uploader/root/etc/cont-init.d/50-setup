@@ -16,11 +16,10 @@ function log() {
      echo "${1}"
 }
 
-
 cat > /etc/apk/repositories << EOF; $(echo)
-http://dl-cdn.alpinelinux.org/alpine/v3.15/main
-http://dl-cdn.alpinelinux.org/alpine/v3.15/community
-http://dl-cdn.alpinelinux.org/alpine/edge/testing
+https://dl-cdn.alpinelinux.org/alpine/edge/main
+https://dl-cdn.alpinelinux.org/alpine/edge/community
+https://dl-cdn.alpinelinux.org/alpine/edge/testing
 EOF
 
 log "**** update system packages ****" && \
@@ -28,7 +27,7 @@ log "**** update system packages ****" && \
    apk --quiet --no-progress upgrade
 
 log "**** install build packages from requirements ****"
-cat  /app/requirements.txt | while IFS=$'\n' read -r -a myArray; do apk add --quiet --no-progress ${myArray[0]};done
+cat /app/requirements.txt | while IFS=$'\n' read -r -a myArray; do apk add --quiet --no-progress ${myArray[0]};done
 
 if [[ ! -f "/system/servicekeys/rclonegdsa.conf" ]]; then
    log "-->> [ WARNING ] ----------------------------- [ WARNING ] <<--"
