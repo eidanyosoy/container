@@ -69,8 +69,9 @@ deluge/**
 EOF
 fi
 
-ARRAY=$(ls -1v ${KEYLOCAL} | wc -l )
+ARRAY=$(ls -A ${KEYLOCAL} | wc -l )
 MAXSA=${ARRAY}
+if [[ ! -f "${LTKEY}" ]]; then touch "${LTKEY}" ; fi
 USED=$(cat ${LTKEY})
 if [[ "${USED}" != "" ]]; then USED=${USED} && echo "${USED}" > "${LTKEY}" ; else USED=${MINSA} && echo "${MINSA}" > "${LTKEY}" ; fi
 if [[ "${USED}" -eq "${MAXSA}" ]]; then USED=$MINSA && DIFF=1 && echo "${USED}" > "${LTKEY}" ; fi
@@ -108,6 +109,7 @@ while true;do
             echo "{\"filedir\": \"${DIR}\",\"filebase\": \"${FILE}\",\"filesize\": \"${SIZE}\",\"gdsa\": \"${KEY}$[USED]${CRYPTED}\",\"starttime\": \"${STARTZ}\",\"endtime\": \"${ENDZ}\"}" > "${DONE}/${FILE}.json"
          FILEGB=$(( $UPFILE/1024**3 ))
          DIFF=$(( $DIFF+$FILEGB ))
+         source /system/uploader/uploader.env
          LCT=$(df --output=pcent ${DLFOLDER} | tail -n 1 | cut -d'%' -f1)
             if [[ "${DRIVEUSEDSPACE}" =~ ^[0-9][0-9]+([.][0-9]+)?$ ]]; then
                if [ $DRIVEUSEDSPACE \> $LCT ]; then rm -rf "${CHK}" && DIFF=1 && sleep 5 && break ; fi
