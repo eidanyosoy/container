@@ -17,20 +17,11 @@ if pidof -o %PPID -x "$0"; then
 fi
 
 source /system/mount/mount.env
-
-CONFIG=/app/rclone/rclone.conf
-REMOTE=/mnt/unionfs
-MLOG=/system/mount/logs/rclone-union.log
-RLOG=/system/mount/logs/vfs-refresh.log
+source /app/mount/function.sh
 
 mkdir -p ${TMPRCLONE} ${REMOTE}
 
 function rcx() {
-
-rclone rcd --rc-user=${RC_USER} \
-  --rc-pass=${RC_PASSWORD} \
-  --rc-addr=localhost:${RC_ADDRESS} \
-  --cache-dir=${TMPRCLONE}
 
 rclone rc mount/mount \
    --rc-user=${RC_USER} --rc-pass=${RC_PASSWORD} \
@@ -94,6 +85,11 @@ function rckill() {
    --rc-pass=${RC_PASSWORD} \
    --rc-addr=${RC_ADDRESS}
 }
+
+rclone rcd --rc-user=${RC_USER} \
+  --rc-pass=${RC_PASSWORD} \
+  --rc-addr=localhost:${RC_ADDRESS} \
+  --cache-dir=${TMPRCLONE}
 
 while true; do
    if [ "$(ls -A /mnt/unionfs)" ] && [ "$(ps aux | grep -i 'rclone rc mount/mount' | grep -v grep)" != "" ]; then
