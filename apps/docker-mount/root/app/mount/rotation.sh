@@ -15,6 +15,8 @@
 function log() {
    echo "[ROTATION] ${1}"
 }
+source /app/mount/function.sh
+
 if pidof -o %PPID -x "$0"; then
    exit 1
 fi
@@ -29,12 +31,12 @@ if [[ ! -f /system/mount/.keys/lastkey ]]; then
 else
    FMINJS=$(cat /system/mount/.keys/lastkey)
 fi
-JSONDIR=/system/mount/keys
+
 ARRAY=$(ls -l ${JSONDIR} | egrep -c '*.json')
 MINJS=${FMINJS}
 MAXJS=${ARRAY}
 COUNT=$MINJS
-CONFIG=/app/rclone/rclone.conf
+
 if `ls -A ${JSONDIR} | grep "GDSA" &>/dev/null`;then
     export KEY=GDSA
 elif `ls -A ${JSONDIR} | head -n1 | grep -Po '\[.*?]' | sed 's/.*\[\([^]]*\)].*/\1/' | sed '/GDSA/d'`;then
