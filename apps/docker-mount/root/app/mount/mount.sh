@@ -12,6 +12,7 @@
 # NO REBRANDING IS ALLOWED          #
 # NO CODE MIRRORING IS ALLOWED      #
 #####################################
+
 if pidof -o %PPID -x "$0"; then
     exit 1
 fi
@@ -19,12 +20,9 @@ fi
 source /system/mount/mount.env
 source /app/mount/function.sh
 
-mkdir -p ${TMPRCLONE} ${REMOTE}
+mkdir -p "${TMPRCLONE}" "${REMOTE}"
 
-rclone rcd --rc-user=${RC_USER} \
-  --rc-pass=${RC_PASSWORD} \
-  --rc-addr=localhost:${RC_ADDRESS} \
-  --cache-dir=${TMPRCLONE}
+rcdWAKEUP
 
 while true; do
    if [ "$(ls -A /mnt/unionfs)" ] && [ "$(ps aux | grep -i 'rclone rc mount/mount' | grep -v grep)" != "" ]; then
