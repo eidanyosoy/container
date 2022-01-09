@@ -15,8 +15,9 @@
 # shellcheck disable=SC2086
 # shellcheck disable=SC2002
 # shellcheck disable=SC2006
-## FUNCTIONS SOURCECONFIG
+## FUNCTIONS SOURCECONFIG ##
 
+### D0 NOT CHANGE ANY LINES ###
 source /system/mount/mount.env
 
 CONFIG=/app/rclone/rclone.conf
@@ -37,22 +38,31 @@ SCRIPT=/app/mount/mount.sh
 GDSAMIN=4
 ARRAY=$(ls -A ${JSONDIR} | egrep -c '*.json')
 
+### D0 NOT CHANGE ANY LINES ###
+
 function log() {
+
    echo "[Mount] ${1}"
+
 }
 
 function run() {
+
    bash "${1}"
+
 }
 
 function checkban() {
+
   tail -n 1 "${MLOG}" | grep --line-buffered 'googleapi: Error' | while read; do
      if [[ ! ${DISCORD_SEND} != "null" ]]; then discord ; else log "${startuphitlimit}" ; fi
      if [[ ${ARRAY} != 0 ]]; then run "${SROTATE}" && log "${startuprotate}" ; fi
    done
+
 }
 
 function discord() {
+
    source /system/mount/mount.env
    DATE=$(date "+%Y-%m-%d")
    if [[ ${ARRAY} -gt 0 ]]; then
@@ -85,9 +95,11 @@ function discord() {
       --footer-icon "https://www.freeiconspng.com/uploads/error-icon-4.png" \
       --timestamp >${LOG}
    fi
+
 }
 
 function envrenew() {
+
    file1=/system/mount/mount.env
    file2=/tmp/mount.env
    diff -q "$file1" "$file2"
@@ -96,9 +108,11 @@ function envrenew() {
     else
       echo "no changes" > /tmp/dead.lock
    fi
+
 }
 
 function lang() {
+
    source /system/mount/mount.env
    LANGUAGE=${LANGUAGE}
    startupmount=$(grep -Po '"startup.mount": *\K"[^"]*"' "${LFOLDER}/${LANGUAGE}.json" | sed 's/"\|,//g')
@@ -113,14 +127,18 @@ function lang() {
       fi
    fi
    if [[ ! -d "/app/language" ]]; then mkdir -p "${LFOLDER}/" && git -C /app clone https://github.com/dockserver/language.git ; fi
+
 }
 
 function startup() {
+
    source /system/mount/mount.env
    rckill && run "${SCRIPT}"
+
 }
 
 function rcx() {
+
   rclone rc mount/mount \
    --rc-user=${RC_USER} --rc-pass=${RC_PASSWORD} \
    --config=${CONFIG} --cache-dir=${TMPRCLONE} \
@@ -165,9 +183,11 @@ function rcx() {
    "Daemon": true,
    "AllowOther": true
    }'
+
 }
 
 function refreshVFS() {
+
    rclone rc vfs/refresh recursive=true --fast-list \
    --rc-user=${RC_USER} \
    --rc-pass=${RC_PASSWORD} \
@@ -175,18 +195,22 @@ function refreshVFS() {
    --config=${CONFIG} \
    --log-file=${RLLOG} \
    --log-level=${LOGLEVEL_RC}
+
 }
 
 function rckill() {
+
    rclone rc mount/unmount \
    mountPoint=${REMOTE} \
    --config=${CONFIG} \
    --rc-user=${RC_USER} \
    --rc-pass=${RC_PASSWORD} \
    --rc-addr=${RC_ADDRESS}
+
 }
 
 function drivecheck() {
+
   if [ "$(ls -A /mnt/unionfs)" ] && [ "$(ps aux | grep -i 'rclone rc mount/mount' | grep -v grep)" != "" ]; then
      rclone rc fscache/clear --fast-list --rc-user=${RC_USER} --rc-pass=${RC_PASSWORD} \
         --rc-addr=localhost:${RC_ADDRESS} --config=${CONFIG} --log-file=${RLOG} --log-level=${LOGLEVEL_RC}
@@ -195,7 +219,7 @@ function drivecheck() {
         --rc-user=${RC_USER} --rc-pass=${RC_PASSWORD} --rc-addr=localhost:${RC_ADDRESS} \
         --config=${CONFIG} --log-file=${RLOG} --log-level=${LOGLEVEL_RC}
   fi
+
 }
 
-
-
+### D0 NOT CHANGE ANY LINES ###
