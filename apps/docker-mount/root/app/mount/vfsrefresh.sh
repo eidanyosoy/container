@@ -18,25 +18,16 @@
 
 source /system/mount/mount.env
 source /app/mount/function.sh
-VFS_REFRESH=${VFS_REFRESH}
 
-function drivecheck() {
-  if [ "$(ls -A /mnt/unionfs)" ] && [ "$(ps aux | grep -i 'rclone rc mount/mount' | grep -v grep)" != "" ]; then
-     rclone rc fscache/clear --fast-list --rc-user=${RC_USER} --rc-pass=${RC_PASSWORD} \
-        --rc-addr=localhost:${RC_ADDRESS} --config=${CONFIG} --log-file=${RLOG} --log-level=${LOGLEVEL_RC}
-     sleep 5
-     rclone rc vfs/refresh recursive=true --fast-list \
-        --rc-user=${RC_USER} --rc-pass=${RC_PASSWORD} --rc-addr=localhost:${RC_ADDRESS} \
-        --config=${CONFIG} --log-file=${RLOG} --log-level=${LOGLEVEL_RC}
-     truncate -s 0 ${RLOG}
-  fi
-}
+VFS_REFRESH=${VFS_REFRESH}
 
 while true; do
    if [[ ! "${VFS_REFRESH}" ]]; then
-      sleep 60
+      sleep 360
    else
-      drivecheck && sleep "${VFS_REFRESH}"
+      drivecheck
+      truncate -s 0 ${RLOG}
+      sleep "${VFS_REFRESH}"
    fi
 done
 #<EOF>#
