@@ -15,28 +15,22 @@
 
 export DEBIAN_FRONTEND=noninteractive
 echo "**** update system  ****" && \
-   apt-get -yqq update 1>/dev/null 2>&1 && \
-   apt-get -yqq upgrade 1>/dev/null 2>&1
+  apt-get -yqq update 1>/dev/null 2>&1 && \
+  apt-get -yqq upgrade 1>/dev/null 2>&1
 
-sed '/^\s*#.*$/d' /requirements.txt | \
-   while IFS=$'\n' read -r -a myArray; do
-       apt-get install -yqq ${myArray[0]} 1>/dev/null 2>&1
-   done
+  cat /requirements.txt | while IFS=$'\n' read -r -a myArray; do
+      apt-get install -yqq ${myArray[0]} 1>/dev/null 2>&1
+  done
 
 echo "**** set permissions ****" && \
-   if [[ ! -d "/app" ]]; then mkdir -p /app 1>/dev/null 2>&1;fi && \
-   if [[ ! -d "/config" ]]; then  mkdir -p /config 1>/dev/null 2>&1;fi && \
-   if [[ -d "/app" ]]; then chown -cR abc:abc /app 1>/dev/null 2>&1;fi && \
-   if [[ -d "/config" ]]; then chown -cR abc:abc /config 1>/dev/null 2>&1;fi
+  if [[ ! -d "/app" ]]; then mkdir -p /app 1>/dev/null 2>&1;fi && \
+  if [[ ! -d "/config" ]]; then  mkdir -p /config 1>/dev/null 2>&1;fi && \
+  if [[ -d "/app" ]]; then chown -cR abc:abc /app 1>/dev/null 2>&1;fi && \
+  if [[ -d "/config" ]]; then chown -cR abc:abc /config 1>/dev/null 2>&1;fi
 
-if [ "${DEBUG,,}" = "true" ]; then
-   set -x
-fi
+  if [ "${DEBUG,,}" = "true" ]; then set -x ; fi
 
 PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR="/config/Library/Application Support"
-
-## Give the user the freedom to patch his docker self
-###if [[ -f $FILE ]];then rm -rf $FILE; fi
 
 FILE="/config/plex.env"
 if [[ ! -f $FILE ]]; then
@@ -60,36 +54,33 @@ GenerateIntroMarkerBehavior|never" >"${FILE}"
 fi
 
 function getPref {
-  local key="${1}"
-  xmlstarlet sel -T -t -m "/Preferences" -v "@${key}" -n "${prefFile}"
+   local key="${1}"
+   xmlstarlet sel -T -t -m "/Preferences" -v "@${key}" -n "${prefFile}"
 }
 
 function setPref {
-  local key="${1}"
-  local value="${2}"
-  count="$(xmlstarlet sel -t -v "count(/Preferences/@${key})" "${prefFile}")"
-  count=$(($count + 0))
-  xmlstarlet ed --inplace --delete "/Preferences/@${key}" -v "${value}" "${prefFile}"
-  xmlstarlet ed --inplace --insert "/Preferences/@${key}" -v "${value}" "${prefFile}"
+   local key="${1}"
+   local value="${2}"
+   count="$(xmlstarlet sel -t -v "count(/Preferences/@${key})" "${prefFile}")"
+   count=$(($count + 0))
+   xmlstarlet ed --inplace --delete "/Preferences/@${key}" -v "${value}" "${prefFile}"
+   xmlstarlet ed --inplace --insert "/Preferences/@${key}" -v "${value}" "${prefFile}"
 }
 
 prefFile="${PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR}/Plex Media Server/Preferences.xml"
 serial="$(getPref "MachineIdentifier")"
-
 if [ -z "${serial}" ]; then
    serial="$(uuidgen)"
    setPref "MachineIdentifier" "${serial}"
 fi
 
 clientId="$(getPref "ProcessedMachineIdentifier")"
-
 if [ -z "${clientId}" ]; then
    clientId="$(echo -n "${serial}- Plex Media Server" | sha1sum | cut -b 1-40)"
    setPref "ProcessedMachineIdentifier" "${clientId}"
 fi
 
 token="$(getPref "PlexOnlineToken")"
-## RECLAIM
 if [ ! -z "${PLEX_CLAIM}" ] && [ -z "${token}" ]; then
    echo "Attempting to obtain server token from claim token"
    loginInfo="$(curl -X POST \
@@ -113,29 +104,27 @@ if [ -n "${ADVERTISE_IP}" ]; then
    setPref "customConnections" "${ADVERTISE_IP}"
 fi
 
-##########
 FILE="/config/plex.env"
-sed '/^\s*#.*$/d' $FILE | \
-while IFS=$'|' read -r -a myArray; do
+sed '/^\s*#.*$/d' $FILE | while IFS=$'|' read -r -a myArray; do
    if [ -z "$(getPref "${myArray[0]}")" ]; then
       setPref "${myArray[0]}" "${myArray[1]}"
    fi
 done
-##########
+
 PUID=${PUID:-911}
-RAM=$(grep MemTotal /proc/meminfo | awk '{print $2 / 1024}')
+RAM=$(grep MemTotal /proc/meminfo | awk '{$1=$2/(1024); print $1;}')
 if [ -z "$(getPref "TranscoderTempDirectory")" ]; then
    if [ "${RAM}" -ge "69000" ]; then
-      setPref "TranscoderTempDirectory" "/transcode"
-      if [[ ! -d "/transcode" ]]; then mkdir -p /transcode;fi
-      if [ ! "$(stat -c %u /transcode)" = "$PUID" ]; then chown abc:abc -R /transcode ; fi
+      setPref "TranscoderTempDirectory" "/config/transcode"
+      if [[ ! -d "/config/transcode" ]]; then mkdir -p /config/transcode;fi
+      if [ ! "$(stat -c %u /config/transcode)" = "$PUID" ]; then chown abc:abc -R /config/transcode ; fi
    else
       setPref "TranscoderTempDirectory" "/ram_transcode"
       if [[ ! -d "/ram_transcode" ]]; then mkdir -p /ram_transcode;fi
       if [ ! "$(stat -c %u /ram_transcode)" = "$PUID" ]; then chown abc:abc -R /ram_transcode ; fi
    fi
 fi
-##########
+
 FILES=$(find /dev/dri /dev/dvb -type c -print 2>/dev/null)
 for i in $FILES ; do
     VIDEO_GID=$(stat -c '%g' "$i")
