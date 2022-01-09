@@ -248,6 +248,16 @@ function rckill() {
 
 }
 
+function rcdWAKEUP() {
+
+   rclone rcd \
+      --rc-user=${RC_USER} \
+      --rc-pass=${RC_PASSWORD} \
+      --rc-addr=localhost:${RC_ADDRESS} \
+      --cache-dir=${TMPRCLONE}
+
+}
+
 function drivecheck() {
 
    if [ "$(ls -A /mnt/unionfs)" ] && [ "$(ps aux | grep -i 'rclone rc mount/mount' | grep -v grep)" != "" ]; then
