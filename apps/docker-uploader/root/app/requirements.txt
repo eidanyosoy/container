@@ -23,6 +23,7 @@ musl
 wget
 rclone
 jq
+opcache
 s6-ipcserver
 php8
 php8-dev
