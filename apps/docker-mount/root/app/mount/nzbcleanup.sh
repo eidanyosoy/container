@@ -33,14 +33,14 @@ while true; do
 
    if [[ ${NZBCLEANUP} != "false" ]]; then
       if [[ ! ${DRIVEPERCENT} -ge ${DRIVEUSEDPERCENT} ]]; then
-         sleep 120 && continue
+         sleep 120
       else
          $(command -v find) ${NZBBACKUPFOLDER}/* -type d -mmin +${NZBBACKUPTIME} -exec rm -rf {} \; >/dev/null 2>&1
          $(command -v find) ${NZBDOWNLOADFOLDER}/* -type f -mmin +${NZBDOWNLOADTIME} -exec rm -rf {} \; >/dev/null 2>&1
-         sleep 120 && break
+         sleep 120
       fi
    else
-      sleep 120 && continue
+      sleep 120
    fi
 done
 #<EOF>#
