@@ -17,9 +17,9 @@ function log() {
 }
 
 cat > /etc/apk/repositories << EOF; $(echo)
-http://dl-cdn.alpinelinux.org/alpine/v3.15/main
-http://dl-cdn.alpinelinux.org/alpine/v3.15/community
-http://dl-cdn.alpinelinux.org/alpine/edge/testing
+https://dl-cdn.alpinelinux.org/alpine/edge/main
+https://dl-cdn.alpinelinux.org/alpine/edge/community
+https://dl-cdn.alpinelinux.org/alpine/edge/testing
 EOF
 
 log "**** update system packages ****" && \
