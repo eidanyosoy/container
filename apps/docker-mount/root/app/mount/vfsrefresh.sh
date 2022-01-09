@@ -15,21 +15,20 @@
 # shellcheck disable=SC2086
 # shellcheck disable=SC2002
 # shellcheck disable=SC2006
-ENV="/system/mount/mount.env"
-VFS_REFRESH=${VFS_REFRESH}
+
 source /system/mount/mount.env
-config=/app/rclone/rclone.conf
-log=/system/mount/logs/vfs-refresh.log
+source /app/mount/function.sh
+VFS_REFRESH=${VFS_REFRESH}
 
 function drivecheck() {
   if [ "$(ls -A /mnt/unionfs)" ] && [ "$(ps aux | grep -i 'rclone rc mount/mount' | grep -v grep)" != "" ]; then
      rclone rc fscache/clear --fast-list --rc-user=${RC_USER} --rc-pass=${RC_PASSWORD} \
-        --rc-addr=localhost:${RC_ADDRESS} --config=${config} --log-file=${log} --log-level=${LOGLEVEL_RC}
+        --rc-addr=localhost:${RC_ADDRESS} --config=${CONFIG} --log-file=${RLOG} --log-level=${LOGLEVEL_RC}
      sleep 5
      rclone rc vfs/refresh recursive=true --fast-list \
         --rc-user=${RC_USER} --rc-pass=${RC_PASSWORD} --rc-addr=localhost:${RC_ADDRESS} \
-        --config=${config} --log-file=${log} --log-level=${LOGLEVEL_RC}
-        truncate -s 0 ${log} && break
+        --config=${CONFIG} --log-file=${RLOG} --log-level=${LOGLEVEL_RC}
+     truncate -s 0 ${RLOG}
   fi
 }
 
