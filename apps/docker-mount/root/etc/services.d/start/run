@@ -39,5 +39,3 @@ exec s6-setuidgid abc $startup \
  $nzb
 
 #<EOF>#
-
-
