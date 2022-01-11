@@ -4,6 +4,10 @@ openssl
 icu-libs
 ca-certificates
 libxml2-dev
+libstdc++
+gettext-dev
+attr-dev
+linux-headers
 shadow
 findutils
 coreutils
