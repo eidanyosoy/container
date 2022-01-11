@@ -4,10 +4,6 @@ openssl
 icu-libs
 ca-certificates
 libxml2-dev
-libstdc++
-gettext-dev
-attr-dev
-linux-headers
 shadow
 findutils
 coreutils
@@ -15,6 +11,7 @@ libxml2-utils
 tzdata
 fuse3
 fuse3-libs
+fuse-common
 musl
 musl-dev
 rclone
