@@ -80,12 +80,9 @@ echo "
 ----------------------------------------------------
 "
 log "-> Setting Permissions || start <-"
-folder="/system/rclone /app /root"
-for i in ${folder}; do
-   find $i -exec chmod a=rx,u+w {} \;
-   find $i -exec chown -hR abc:abc {} \;
-   chown -cf abc:abc /root
-done
+chmod -cR 755 /system/rclone /app /root &>/dev/null
+chown -cR abc:abc /system/rclone /app /root &>/dev/null
+chown -cf abc:abc /root &>/dev/null
 log "-> Setting Permissions & Folder || done <-"
 
 drivespace=$(df -BG /mnt --local | tail -n +2 | awk '{print $4}' | sed -e 's/G//g')
@@ -197,7 +194,7 @@ source ${rcloneenv}
 if [[ ! -d ${TMPRCLONE} ]]; then mkdir -p ${TMPRCLONE} && chown -hR abc:abc ${TMPRCLONE} && chmod -R 775 ${TMPRCLONE}; fi
 if [[ ! -d "/mnt/unionfs" ]]; then mkdir -p ${SUNION} && chown -hR abc:abc ${SUNION} && chmod -R 775 ${SUNION}; fi
 if [[ ! -d "/mnt/downloads" ]]; then mkdir -p ${SDOWN} && chown -hR abc:abc ${SDOWN} && chmod -R 775 ${SDOWN}; fi
-if [[ -d "/mnt/remotes" ]]; then fusermount -uzq /mnt/remotes && rm -rf /mnt/remotes ; fi
+if [[ -d "/mnt/remotes" ]]; then fusermount3 -uzq /mnt/remotes && rm -rf /mnt/remotes ; fi
 
 source /system/mount/mount.env
 
@@ -316,16 +313,16 @@ if [[ -f ${value} ]]; then rm -rf ${value}; fi
 
 if ! `rclone config show --config=${CONFIG} | grep "local" &>/dev/null`;then
    rclone config create download local nunc 'true' --config=${CONFIG}
-   echo -n "download=/mnt/downloads:RW " >>${value}
+   echo -n "download:/mnt/downloads:RW " >>${value}
 fi
 
 ADDITIONAL_MOUNT=${ADDITIONAL_MOUNT}
 if [[ ${ADDITIONAL_MOUNT} != 'null' ]]; then
    if [[ ! -d ${ADDITIONAL_MOUNT} ]]; then mkdir -p ${ADDITIONAL_MOUNT}; fi
-   if [[ -d ${ADDITIONAL_MOUNT} ]]; then fusermount -uzq ${ADDITIONAL_MOUNT}; fi
+   if [[ -d ${ADDITIONAL_MOUNT} ]]; then fusermount3 -uzq ${ADDITIONAL_MOUNT}; fi
    if ! `rclone config show --config=${CONFIG} | grep "ADDITIONAL" &>/dev/null`;then
       rclone config create ADDITIONAL local nunc 'true' --config=${CONFIG}
-   echo -n "ADDITIONAL=${ADDITIONAL_MOUNT}:RW " >>${value}
+   echo -n "ADDITIONAL:${ADDITIONAL_MOUNT}:RW " >>${value}
    fi
 fi
 
