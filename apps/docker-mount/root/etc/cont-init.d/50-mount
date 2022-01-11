@@ -28,25 +28,35 @@ ENDFILE=/system/mount/drive.csv
 TMPCONFIG=/app/rclone/rclonegd.conf
 
 cat > /etc/apk/repositories << EOF; $(echo)
-https://dl-cdn.alpinelinux.org/alpine/3.15/main
-https://dl-cdn.alpinelinux.org/alpine/3.15/community
+https://dl-cdn.alpinelinux.org/alpine/v3.15/main
+https://dl-cdn.alpinelinux.org/alpine/v3.15/community
 https://dl-cdn.alpinelinux.org/alpine/edge/testing
+EOF
+
+cat > /etc/fuse.conf << EOF; $(echo)
+# Set the maximum number of FUSE mounts allowed to non-root users.
+mount_max = 20
+# mount options.
+user_allow_other
 EOF
 
 log "**** update system packages ****" && \
    apk --quiet --no-cache --no-progress update && \
    apk --quiet --no-cache --no-progress upgrade
 
-apk del --quiet --no-cache nginx
-rm -rf /var/cache/apk/*
-rm -rf /etc/nginx/*
+apk del --quiet --no-cache nginx && \
+rm -rf /var/cache/apk/* /etc/nginx/*
 
 log "**** install build packages from packages.lock ****"
-cat /app/requirements.txt | while IFS=$'\n' read -r -a myArray; do apk add --quiet --no-cache --no-progress ${myArray[0]} ; done
+cat /app/requirements.txt | while IFS=$'\n' read -ra myArray; do
+   apk add --update --quiet --no-cache --no-progress ${myArray[@]}
+done
 
-mkdir -p /app/rclone
-mkdir -p /system/mount/{logs,env,rclone,keys}
+cat /app/requirements-virtual.txt | while IFS=$'\n' read -ra myArray; do 
+   apk add --update --quiet --no-cache --no-progress --virtual .build-deps ${myArray[@]}
+done
 
+mkdir -p /app/rclone /system/mount/{logs,env,rclone,keys}
 truncate -s 0 /system/mount/logs/*.log
 
 PUID=${PUID:-1000}
