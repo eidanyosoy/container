@@ -1,0 +1,8 @@
+curl
+git
+bc
+tar
+grep
+logrotate
+wget
+jq
