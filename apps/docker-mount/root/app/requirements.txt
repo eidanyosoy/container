@@ -1,4 +1,3 @@
-curl
 bash
 xz
 openssl
@@ -6,18 +5,13 @@ icu-libs
 ca-certificates
 libxml2-dev
 shadow
-bc
-tar
 findutils
 coreutils
-logrotate
-git
 libxml2-utils
 tzdata
-grep
-fuse
+fuse3
+fuse3-libs
 musl
-wget
+musl-dev
 rclone
-jq
 s6-ipcserver
