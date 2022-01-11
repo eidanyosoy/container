@@ -17,8 +17,8 @@ function log() {
 }
 
 cat > /etc/apk/repositories << EOF; $(echo)
-https://dl-cdn.alpinelinux.org/alpine/3.15/main
-https://dl-cdn.alpinelinux.org/alpine/3.15/community
+https://dl-cdn.alpinelinux.org/alpine/v3.15/main
+https://dl-cdn.alpinelinux.org/alpine/v3.15/community
 https://dl-cdn.alpinelinux.org/alpine/edge/testing
 EOF
 
