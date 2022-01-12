@@ -1,6 +1,13 @@
 #!/usr/bin/with-contenv bash
 # shellcheck shell=bash
 
+while true; do
+   if mountpoint -q "/mnt/unionfs"; then
+      break
+   else
+     sleep 5
+   fi
+done
 
 cd /app/prowlarr/bin || exit
 
