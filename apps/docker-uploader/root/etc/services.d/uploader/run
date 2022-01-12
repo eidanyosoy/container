@@ -11,16 +11,16 @@
 # NO REBRANDING IS ALLOWED          #
 # NO CODE MIRRORING IS ALLOWED      #
 #####################################
-
 umask 022
-
-chown -cR abc:abc \
-	/app \
-	/system/*
-
-chmod -cR 755 /app \
-        /system/*
-
+while true; do
+   if mountpoint -q "/mnt/unionfs"; then
+      break
+   else
+     sleep 5
+   fi
+done
+chown -cR abc:abc /app /system/* &>/dev/null
+chmod -cR 755 /app /system/* &>/dev/null
 command="/app/uploader/uploader.sh"
 echo "-> Starting Multi Thread Uploader <-"
 exec s6-setuidgid abc $command
