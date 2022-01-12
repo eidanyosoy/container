@@ -1,12 +1,11 @@
 #!/usr/bin/with-contenv bash
 
 # cd /app/lidarr/bin || exit
-
 while true; do
-  if [ "$(ls -A /mnt/remotes)" ] && [ "$(ls -A /mnt/unionfs)" ]; then
-      break 
+   if mountpoint -q "/mnt/unionfs"; then
+      break
    else
-      sleep 5 && continue 
+     sleep 5
    fi
 done
 
