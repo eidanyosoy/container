@@ -48,9 +48,10 @@ CLEANUP="apt-get -yqq autoremove && \\
     rm -r /var/www/html && \\
     rm -rf /tmp/"
 
-SETPERM="chmod -R 775 /var/www/spotweb && \
+SETPERM="chmod -R 775 /var/www/spotweb && \\
     chown -R www-data:www-data /var/www/spotweb"
 
+APPFOLDER="./$FOLDER/$APP"
 PORT="EXPOSE 80"
 VOLUMEN="VOLUME /config"
 SETENTRY="RUN chmod u+x /entrypoint.sh"
