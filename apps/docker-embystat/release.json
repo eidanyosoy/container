@@ -1,0 +1,11 @@
+{
+   "appname": "docker-embystat",
+   "apppic": "./images/docker-embystat.png",
+   "appfolder": "./apps/docker-embystat",
+   "newversion": "0.2.0-beta.27",
+   "appbranch": "master",
+   "baseimage": "ghcr.io/linuxserver/baseimage-ubuntu:bionic",
+   "description": "null",
+   "body": "Upgrading docker-embystat to 0.2.0-beta.27",
+   "user": "github-actions[bot]"
+}

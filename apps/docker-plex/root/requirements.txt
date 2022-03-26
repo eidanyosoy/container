@@ -1,0 +1,10 @@
+beignet-opencl-icd
+jq
+ocl-icd-libopencl1
+udev
+unrar
+wget
+git
+curl
+xmlstarlet
+sqlite

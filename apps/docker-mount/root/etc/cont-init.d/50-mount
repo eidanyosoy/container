@@ -1,0 +1,381 @@
+#!/command/with-contenv bash
+# shellcheck shell=bash
+#####################################
+# All rights reserved.              #
+# started from Zero                 #
+# Docker owned dockserver           #
+# Docker Maintainer dockserver      #
+#####################################
+#####################################
+# THIS DOCKER IS UNDER LICENSE      #
+# NO CUSTOMIZING IS ALLOWED         #
+# NO REBRANDING IS ALLOWED          #
+# NO CODE MIRRORING IS ALLOWED      #
+#####################################
+function log() {
+   echo "[Mount] ${1}"
+}
+
+SDOWN=/mnt/downloads
+SMOUNT=/app/mount
+SUNION=/mnt/unionfs
+TMPRCLONE=${TMPRCLONE}
+LOGS=/system/mount/logs
+JSONDIR=/system/mount/keys
+CONFIG=/app/rclone/rclone.conf
+CSV=/system/mount/drive.csv
+ENDCONFIG=/app/rclone/rclone.conf
+SOURCECONFIG=/system/rclone/rclone.conf
+ENDFILE=/system/mount/drive.csv
+TMPCONFIG=/app/rclone/rclonegd.conf
+
+## ADD USER
+addgroup -S abc &>/dev/null
+adduser -S abc -G abc &>/dev/null
+PGID=${PGID:-1000} &>/dev/null
+PUID=${PUID:-1000} &>/dev/null
+
+groupmod -o -g "$PGID" abc &>/dev/null
+usermod -o -u "$PUID" abc &>/dev/null
+
+if [[ -f /donate.txt ]]; then cat /donate.txt ; fi
+
+   cat > /etc/apk/repositories << EOF; $(echo)
+http://dl-cdn.alpinelinux.org/alpine/v$(cat /etc/alpine-release | cut -d'.' -f1,2)/main
+http://dl-cdn.alpinelinux.org/alpine/v$(cat /etc/alpine-release | cut -d'.' -f1,2)/community
+http://dl-cdn.alpinelinux.org/alpine/edge/testing
+EOF
+
+cat > /etc/fuse.conf << EOF; $(echo)
+# Set the maximum number of FUSE mounts allowed to non-root users.
+mount_max = 20
+# mount options.
+user_allow_other
+EOF
+
+log "**** update system packages ****" && \
+   apk --quiet --no-progress update && \
+   apk --quiet --no-progress upgrade
+
+log "**** install build packages from requirements ****" && \
+   cat /app/requirements.txt | while IFS=$'\n' read -ra myArray; do
+      apk add --quiet --no-progress --update ${myArray[@]}
+   done
+
+mkdir -p /app/rclone /system/mount/{logs,env,rclone,keys}
+
+echo "----------------------------------------------------
+ ____             _                                 
+|  _ \  ___   ___| | _____  ___ _ ____   _____ _ __ 
+| | | |/ _ \ / __| |/ / __|/ _ \ '__\ \ / / _ \ '__|
+| |_| | (_) | (__|   <\__ \  __/ |   \ V /  __/ |   
+|____/ \___/ \___|_|\_\___/\___|_|    \_/ \___|_|
+
+
+----------------------------------------------------
+     GID/UID
+----------------------------------------------------
+     User uid:    ${PUID}
+     User gid:    ${PGID}
+----------------------------------------------------
+"
+drivespace=$(df -BG /mnt --local | tail -n +2 | awk '{print $4}' | sed -e 's/G//g')
+checkspace=$(echo $(((${drivespace}) / 4 | bc)) | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/')
+VFS_CACHE_MAX_SIZE=${VFS_CACHE_MAX_SIZE:-null}
+rcloneenv=/system/mount/mount.env
+rclonetmp=/tmp/mount.env
+rclonesample=/app/env/sample.env
+if [[ ${VFS_CACHE_MAX_SIZE} == 'null' ]]; then
+   VFS_CACHE_MAX_SIZE=${checkspace}G
+else
+   VFS_CACHE_MAX_SIZE=${VFS_CACHE_MAX_SIZE}
+   sed -i "s#VFS_CACHE_MAX_SIZE=G#VFS_CACHE_MAX_SIZE=50G#g" ${rcloneenv}
+fi
+UAGENT=${UAGENT:-null}
+if [[ ${UAGENT} == 'null' ]]; then
+   UAGENT=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
+else
+   UAGENT=${UAGENT}
+fi
+RC_PASSWORD=${RC_PASSWORD:-null}
+if [[ ${RC_PASSWORD} == 'null' ]]; then
+   RC_PASSWORD=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 8 | head -n 1)
+else
+   RC_PASSWORD=${RC_PASSWORD}
+fi
+if [[ ! -f ${rcloneenv} ]]; then
+   mv ${rclonesample} ${rclonetmp}
+else
+   mv ${rcloneenv} ${rclonetmp}
+fi
+
+source ${rclonetmp}
+echo -e "#!/command/with-contenv bash
+#-------------------------------------------------------
+#   MOUNT ENVIRONMENT
+#-------------------------------------------------------
+## USER VALUES
+PUID=${PUID:-1000}
+PGID=${PGID:-1000}
+TIMEZONE=${TZ:-UTC}
+
+## CRITICAL SETUP FOR CRYPT USER
+HASHPASSWORD=${HASHPASSWORD:-hashed}
+
+## MERGERFS ADDITIONAL FOLDER
+ADDITIONAL_MOUNT=${ADDITIONAL_MOUNT:-null}
+ADDITIONAL_MOUNT_PERMISSION=${ADDITIONAL_MOUNT_PERMISSION:-RW}
+
+## RCLONE - SETTINGS
+CACHE_INFO_AGE=${CACHE_INFO_AGE:-6h}
+POLL_INTERVAL=${POLL_INTERVAL:-1m}
+UMASK=${UMASK:-022}
+DRIVETRASH=${DRIVETRASH:-false}
+DIR_CACHE_TIME=${DIR_CACHE_TIME:-12h}
+DRIVE_CHUNK_SIZE=${DRIVE_CHUNK_SIZE:-128M}
+BUFFER_SIZE=${BUFFER_SIZE:-32M}
+TMPRCLONE=${TMPRCLONE:-/mnt/rclone_cache}
+UAGENT=${UAGENT}
+TPSLIMIT=${TPSLIMIT:-10}
+TPSBURST=${TPSBURST:-10}
+
+## VFS - SETTINGS
+VFS_CACHE_POLL_INTERVAL=${VFS_CACHE_POLL_INTERVAL:-2m}
+VFS_READ_CHUNK_SIZE=${VFS_READ_CHUNK_SIZE:-128M}
+VFS_CACHE_MAX_AGE=${VFS_CACHE_MAX_AGE:-6h}
+VFS_READ_CHUNK_SIZE_LIMIT=${VFS_READ_CHUNK_SIZE_LIMIT:-4096M}
+VFS_CACHE_MODE=${VFS_CACHE_MODE:-full}
+VFS_CACHE_MAX_SIZE=${VFS_CACHE_MAX_SIZE}
+VFS_REFRESH=${VFS_REFRESH:-12h}
+
+## LOG - SETTINGS
+LOGLEVEL=${LOGLEVEL:-INFO}
+LOGLEVEL_RC=${LOGLEVEL_RC:-INFO}
+
+## RC-CONTROLLE
+RC_ADDRESS=${RC_ADDRESS:-5572}
+RC_USER=${RC_USER:-rclone}
+RC_PASSWORD=${RC_PASSWORD}
+
+## DISCORD
+DISCORD_SEND=${DISCORD_SEND:-null}
+DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL:-null}
+DISCORD_EMBED_TITEL=${DISCORD_EMBED_TITEL:-MOUNT_INFORMATIONS}
+DISCORD_ICON_OVERRIDE=${DISCORD_ICON_OVERRIDE:-https://i.imgur.com/MZYwA1I.png}
+DISCORD_NAME_OVERRIDE=${DISCORD_NAME_OVERRIDE:-MOUNT}
+
+## NZB CLEANUP-CONTROLLE
+NZBCLEANUP=${NZBCLEANUP:-false}
+DRIVEUSEDPERCENT=${DRIVEUSEDPERCENT:-75}
+NZBBACKUPFOLDER=${NZBBACKUPFOLDER:-/mnt/nzb}
+NZBBACKUPTIME=${NZBBACKUPTIME:-240}
+NZBDOWNLOADFOLDER=${NZBDOWNLOADFOLDER:-/mnt/downloads/nzb}
+NZBDOWNLOADFOLDERTIME=${NZBDOWNLOADFOLDERTIME:-10800}
+
+## LANGUAGE MESSAGES
+LANGUAGE=${LANGUAGE:-en}
+
+#-------------------------------------------------------
+#   MOUNT ENVIRONMENT
+#-------------------------------------------------------" >${rcloneenv}
+
+if [[ -f ${rclonetmp} ]]; then rm -f ${rclonetmp} ; fi
+
+source ${rcloneenv}
+if [[ ! -d ${TMPRCLONE} ]]; then mkdir -p "${TMPRCLONE}" && chown -hR abc:abc "${TMPRCLONE}" && chmod -R 775 "${TMPRCLONE}" ; fi
+if [[ -d ${TMPRCLONE} ]]; then fusermount -uzq ${TMPRCLONE} ; fi
+if [[ ! -d "/mnt/unionfs" ]]; then mkdir -p "${SUNION}" && chown -hR abc:abc "${SUNION}" && chmod -R 775 "${SUNION}" ; fi
+if [[ ! -d "/mnt/downloads" ]]; then mkdir -p "${SDOWN}" && chown -hR abc:abc "${SDOWN}" && chmod -R 775 "${SDOWN}" ; fi
+if [[ -d "/mnt/remotes" ]]; then fusermount -uzq /mnt/remotes; fi
+
+source /system/mount/mount.env
+ARRAY=$(ls -A ${JSONDIR} | wc -l)
+if [[ ${ARRAY} != 4 ]]; then
+   if [[ ! -d "/system/mount/.keys" ]]; then
+      mkdir -p /system/mount/.keys/ && chown -cR 1000:1000 /system/mount/.keys/
+   else
+      chown -cR 1000:1000 /system/mount/.keys/
+   fi
+   if [[ ! -f /system/mount/.keys/lastkey ]]; then FMINJS=1 ; else FMINJS=$(cat /system/mount/.keys/lastkey) ; fi
+   if `ls -A ${JSONDIR} | grep "GDSA" &>/dev/null`;then
+      export KEY=GDSA
+   elif `ls -A ${JSONDIR} | head -n1 | grep -Po '\[.*?]' | sed 's/.*\[\([^]]*\)].*/\1/' | sed '/GDSA/d'`;then
+      export KEY=""
+   else
+      log "no match found of GDSA[01=~100] or [01=~100]"
+      sleep infinity
+   fi
+   ARRAY=$(ls -A ${JSONDIR} | egrep -c '*.json')
+   MINJS=${FMINJS}
+   MAXJS=${ARRAY}
+   COUNT=$MINJS
+   IFS=$'\n'
+   filter="$1"
+   mapfile -t mounts < <(eval rclone listremotes --config=${CONFIG} | grep "$filter" | sed -e 's/://g' | sed '/crypt/d' | sed '/gdrive/d' | sed '/union/d' | sed '/remote/d' | sed '/GDSA/d')
+   for i in ${mounts[@]}; do
+       rclone config update $i service_account_file $JSONDIR/${GDSA}$COUNT.json --config=${CONFIG}
+       rclone config update $i service_account_file_path $JSONDIR --config=${CONFIG}
+   done
+   echo "${COUNT}" >/system/mount/.keys/lastkey
+fi
+
+source /system/mount/mount.env
+ARRAY=$(ls -A ${JSONDIR} | wc -l)
+if [[ ${ARRAY} != 0 ]]; then
+   if [[ -f $TMPCONFIG ]]; then rm -rf $TMPCONFIG ; fi
+   if [[ ! -f $TMPCONFIG ]]; then awk '$1~search {p=1} NF==0 {p=0}; p' search="gdrive|gcrypt" $SOURCECONFIG >$TMPCONFIG ; fi
+   if [[ ! -f $ENDFILE ]]; then
+      IFS=$'\n'
+      filter="$1"
+      mapfile -t mounts < <(eval rclone listremotes --config=$SOURCECONFIG | grep "$1" |  grep 't' |  sed '/gd/d' | sed '/remo/d' | sed '/crypt/d')
+      for i in ${mounts[@]}; do
+         NRTD=$((NRTD + 1))
+         TDID=$(rclone config show $i --config=${SOURCECONFIG} | egrep team_drive | awk $'{print $3}')
+         GETP=$(grep -C7 "$TDID" $SOURCECONFIG | tail -1 | sed "s/\[//g" | sed "s/\]//g" | awk $'{print $3}')
+         GETS=$(grep -C8 "$TDID" $SOURCECONFIG | tail -1 | sed "s/\[//g" | sed "s/\]//g" | awk $'{print $3}')
+         LREMO=$(rclone listremotes --config=$SOURCECONFIG | grep "$1" | sed -e 's/://g' | sed '/union/d' | sed '/remote/d' | sed '/GDSA/d' | sed '/gdrive/d' | sed '/crypt/d' | wc -l)
+         RCRYPT=$(grep $i:/encrypt $SOURCECONFIG | sed "s/\[//g" | sed "s/\]//g" | awk $'{print $3}')
+         if [[ $RCRYPT != "" ]]; then
+            echo -e "tdrive$NRTD|${TDID}|${GETP}|${GETS}" >>$ENDFILE
+         else
+            echo -e "tdrive$NRTD|${TDID}" >>$ENDFILE
+         fi
+      done
+   else
+      echo "${ENDFILE} exist"
+   fi
+   if [[ -f $ENDCONFIG ]]; then sed -i '/^$/d' $ENDCONFIG; fi
+   if [[ -f $ENDCONFIG ]]; then rm -rf $ENDCONFIG; fi
+   if [[ ! -f /system/mount/.keys/lastkey ]]; then FMINJS=1 ; else FMINJS=$(cat /system/mount/.keys/lastkey) ; fi
+
+   COUNT=$MINJS
+   sed '/^\s*#.*$/d' $ENDFILE | while IFS=$'|' read -r -a myArray; do
+      if [[ ${myArray[2]} == "" && ${myArray[3]} == "" ]]; then
+         echo -e "\n
+[${myArray[0]}]
+type = drive
+scope = drive
+server_side_across_configs = true
+service_account_file = ${JSONDIR}/${GDSA}${MINJS}.json
+service_account_file_path = ${JSONDIR}
+team_drive = ${myArray[1]}" >>$ENDCONFIG
+         rclone lsd ${myArray[0]}: --drive-service-account-file=$JSONDIR/${GDSA}$MINJS.json --fast-list --config=$ENDCONFIG
+         if [ $? != 0 ]; then rclone config delete ${myArray[0]} --config=$ENDCONFIG ; fi
+      else
+         echo -e "\n
+[${myArray[0]}]
+type = drive
+scope = drive
+server_side_across_configs = true
+service_account_file = ${JSONDIR}/${GDSA}${MINJS}.json
+service_account_file_path = ${JSONDIR}
+team_drive = ${myArray[1]}" >>$ENDCONFIG
+         rclone lsd ${myArray[0]}: --drive-service-account-file=$JSONDIR/${GDSA}$MINJS.json --fast-list --config=$ENDCONFIG
+         if [ $? != 0 ]; then
+            rclone config delete ${myArray[0]} --config=$ENDCONFIG
+         else
+            if [[ ${HASHPASSWORD} == "plain" && ${HASHPASSWORD} != "hashed" ]] ; then
+               ENC_PASSWORD=$(rclone obscure ${myArray[2]} | tail -n1)
+               ENC_SALT=$(rclone obscure ${myArray[3]} | tail -n1)
+            else
+               ENC_PASSWORD=${myArray[2]}
+               ENC_SALT=${myArray[3]}
+               echo -e "\n[tcrypt-${myArray[0]}]
+type = crypt
+remote = ${myArray[0]}:/encrypt
+filename_encryption = standard
+directory_name_encryption = true
+password = ${ENC_PASSWORD}
+password2 = ${ENC_SALT}" >>$ENDCONFIG
+               rclone mkdir ${myArray[0]}:/encrypt --drive-service-account-file=$JSONDIR/${GDSA}$MINJS.json --config=$ENDCONFIG
+            fi
+         fi
+      fi
+   done
+   if [[ -f $TMPCONFIG ]]; then awk '$1~search {p=1} NF==0 {p=0}; p' search="gdrive|gcrypt" $TMPCONFIG >>$ENDCONFIG ; fi
+else
+   if [[ ! -f $ENDCONFIG ]]; then ln -sv $SOURCECONFIG $ENDCONFIG ; else rm -rf $ENDCONFIG && ln -sv $SOURCECONFIG $ENDCONFIG ; fi
+fi
+
+value=/tmp/rcunion.union
+if [[ -f ${value} ]]; then rm -rf ${value}; fi
+
+IFS=$'\n'
+filter="$1"
+CONFIG=/app/rclone/rclone.conf
+mapfile -t mounts < <(eval rclone listremotes --config=${CONFIG} | grep "$filter" | sed -e 's/://g' | sed '/union/d' | sed '/download/d' | sed '/remote/d' | sed '/GDSA/d')
+for i in ${mounts[@]}; do
+   echo -n "$i: " >>${value}
+done
+
+mapfile -t mapped < <(eval cat ${value})
+for i in ${mapped[@]}; do
+  rclone config create remote union upstreams $i action_policy 'all' create_policy 'all' search_policy 'all' cache_time 120 --config=${CONFIG}
+done
+
+apk add --quiet --no-progress --update coreutils
+mkdir -p /root/.config/rclone/
+mount --bind /app/rclone/ /root/.config/rclone/
+
+file1=/system/mount/mount.env
+file2=/tmp/mount.env
+rm -rf "$file2" && cp "$file1" "$file2"
+
+echo "------------------------------
+    _____   _   _  __  __
+   |_   _| | | | | \ \/ /
+     | |   | |_| |  \  / 
+     | |   |  _  |  /  \ 
+     |_|   |_| |_| /_/\_\
+------------------------------
+     to all the coders
+
+We have take some code from :
+
+  88lex , RTRO , edrock200
+ ChaoticWeg & linuxserver.io
+
+       and all other
+  If we missed you, sorry..
+------------------------------"
+
+mkdir -p \
+   /tmp/uscreens/S-abc \
+   /tmp/screens/S-root &>/dev/null
+
+chmod -cR 777 \
+   /system \
+   /app \
+   /root \
+   /mnt \
+   /tmp/screens \
+   /tmp/uscreens \
+   /etc/logrotate.d \
+   $(which rclone) \
+   $(which mergerfs) &>/dev/null
+
+chown -cR abc:abc \
+   /system \
+   /app \
+   /root \
+   /mnt \
+   /tmp/uscreens \
+   /etc/logrotate.d \
+   $(which rclone) \
+   $(which mergerfs) &>/dev/null
+
+chmod u+s $(which screen) &>/dev/null
+chmod u+s $(which rclone) &>/dev/null
+chmod u+s $(which mergerfs) &>/dev/null
+
+## set permissions ##
+chown -cR root:root /tmp/screens &>/dev/null
+
+chmod 777 /tmp/screens &>/dev/null
+chmod 777 /tmp/uscreens &>/dev/null
+chmod 700 /tmp/screens/S-root &>/dev/null
+chmod 700 /tmp/uscreens/S-abc &>/dev/null
+
+#E-o-F#
+##left over
+## action_policy 'all' create_policy 'all' search_policy 'all' cache_time 5 --config=${CONFIG}

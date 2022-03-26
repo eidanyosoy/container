@@ -1,0 +1,10 @@
+{
+   "appname": "alpine",
+   "apppic": "",
+   "appfolder": "./base/alpine",
+   "newversion": "3.15.2",
+   "baseimage": "alpine",
+   "description": "Official Alpine Linux Docker image. Win at minimalism!",
+   "body": "Upgrading alpine to 3.15.2",
+   "user": "github-actions[bot]"
+}

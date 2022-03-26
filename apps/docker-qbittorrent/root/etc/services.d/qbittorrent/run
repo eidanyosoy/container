@@ -1,0 +1,16 @@
+#!/usr/bin/with-contenv bash
+
+APP="$(basename -- $(for i in $(ls -d /config/*/); do echo ${i%%/}; done))"
+if [[ -d "/mnt/unionfs" ]]; then
+   while [ -z "`ls /mnt/unionfs`" ]
+   do
+      echo "wait mount /mnt/unionfs" && sleep 10
+   done
+   echo "mount working! $APP starting..."
+fi
+
+WEBUI_PORT=${WEBUI_PORT:-8080}
+
+exec \
+   s6-setuidgid abc \
+   /usr/bin/qbittorrent-nox --webui-port="${WEBUI_PORT}"

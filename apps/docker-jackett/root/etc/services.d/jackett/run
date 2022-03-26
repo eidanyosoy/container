@@ -1,0 +1,9 @@
+#!/usr/bin/with-contenv bash
+
+COMMAND="/app/Jackett/jackett --NoUpdates"
+
+exec \
+  s6-setuidgid abc \
+  ${COMMAND} \
+  ${RUN_OPTS} >/dev/null 2>&1
+

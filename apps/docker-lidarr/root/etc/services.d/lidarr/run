@@ -1,0 +1,16 @@
+#!/usr/bin/with-contenv bash
+
+# cd /app/lidarr/bin || exit
+
+APP="$(basename -- $(for i in $(ls -d /config/*/); do echo ${i%%/}; done))"
+if [[ -d "/mnt/unionfs" ]]; then
+   while [ -z "`ls /mnt/unionfs`" ]
+   do
+      echo "wait mount /mnt/unionfs" && sleep 10
+   done
+   echo "mount working! $APP starting..."
+fi
+
+exec \
+    s6-setuidgid abc /app/lidarr/bin/Lidarr \
+    -nobrowser -data=/config >/dev/null 2>&1

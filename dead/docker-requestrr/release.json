@@ -1,0 +1,11 @@
+{
+   "appname": "docker-requestrr",
+   "apppic": "./images/docker-requestrr.png",
+   "appfolder": "./apps/docker-requestrr",
+   "newversion": "V2.1.1",
+   "appbranch": "master",
+   "baseimage": "ghcr.io/linuxserver/baseimage-ubuntu:focal",
+   "description": "Requestrr is a chatbot used to simplify using services like Sonarr/Radarr/Ombi via the use of chat. Current platform is Discord only, but the bot was built around the ideology of quick adaptation for new features as well as new platforms.",
+   "body": "Upgrading docker-requestrr to V2.1.1",
+   "user": "github-actions[bot]"
+}

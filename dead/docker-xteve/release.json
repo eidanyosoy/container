@@ -1,0 +1,11 @@
+{
+   "appname": "docker-xteve",
+   "apppic": "./images/docker-xteve.png",
+   "appfolder": "./apps/docker-xteve",
+   "newversion": "2.2.0.200",
+   "baseimage": "null",
+   "packages": "null",
+   "description": "M3U Proxy for Plex DVR and Emby Live TV",
+   "body": "Upgrading docker-xteve to 2.2.0.200",
+   "user": "github-actions[bot]"
+}

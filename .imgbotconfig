@@ -1,0 +1,12 @@
+{
+    "schedule": "daily",
+    "ignoredFiles": [
+        "*.svg",
+        "apps/*",
+        "base/*",
+        "nightly/*",
+    ],
+    "aggressiveCompression": "true",
+    "compressWiki": "true",
+    "minKBReduced": 500
+}

@@ -1,0 +1,10 @@
+{
+   "appname": "docker-multitautulli",
+   "apppic": "./images/docker-multitautulli.png",
+   "appfolder": "./apps/docker-multitautulli",
+   "newversion": "4.1.07",
+   "baseimage": "ghcr.io/linuxserver/baseimage-alpine:3.15",
+   "description": "A Python based monitoring and tracking tool for Plex Media Server.",
+   "body": "Upgrading docker-multitautulli to 4.1.07",
+   "user": "github-actions[bot]"
+}

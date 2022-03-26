@@ -1,0 +1,21 @@
+#!/usr/bin/with-contenv bash
+
+APP="$HOSTNAME"
+if [[ -d "/mnt/unionfs" ]]; then
+   while [ -z "`ls /mnt/unionfs`" ]
+   do
+      echo "wait mount /mnt/unionfs" && sleep 10
+   done
+   echo "mount working! $APP starting..."
+fi
+
+export \
+    JELLYFIN_DATA_DIR="/config/data" \
+    JELLYFIN_CONFIG_DIR="/config" \
+    JELLYFIN_LOG_DIR="/config/log" \
+    JELLYFIN_CACHE_DIR="/config/cache"
+
+exec \
+    s6-setuidgid abc /usr/bin/jellyfin \
+    --ffmpeg=/usr/lib/jellyfin-ffmpeg/ffmpeg \
+    --webdir=/usr/share/jellyfin/web >/dev/null 2>&1

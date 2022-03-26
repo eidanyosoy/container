@@ -1,0 +1,9 @@
+#!/usr/bin/with-contenv bash
+
+# Create folders
+mkdir -p /transcode
+
+# permissions (non-recursive) on config root and folders
+chown abc:abc \
+	/config \
+	/transcode

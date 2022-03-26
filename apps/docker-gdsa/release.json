@@ -1,0 +1,10 @@
+{
+   "appname": "docker-gdsa",
+   "apppic": "./images/docker-gdsa.png",
+   "appfolder": "./apps/docker-gdsa",
+   "newversion": "378.0.0-alpine",
+   "baseimage": "gcr.io/google.com/cloudsdktool/cloud-sdk",
+   "description": "Docker for Creating GDSA keys",
+   "body": "Upgrading docker-gdsa to 378.0.0-alpine",
+   "user": "github-actions[bot]"
+}

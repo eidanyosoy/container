@@ -1,0 +1,11 @@
+{
+   "appname": "ubuntu",
+   "apppic": "./images/ubuntu.png",
+   "appfolder": "./base/ubuntu",
+   "newversion": "focal-20220113",
+   "baseimage": "null",
+   "packages": "null",
+   "description": "Dockerbase Image with Ubuntu",
+   "body": "Upgrading ubuntu to focal-20220113",
+   "user": "github-actions[bot]"
+}

@@ -1,0 +1,16 @@
+#!/usr/bin/with-contenv bash
+
+cd /app/radarr/bin || exit
+
+APP="$(basename -- $(for i in $(ls -d /app/*/); do echo ${i%%/}; done))"
+if [[ -d "/mnt/unionfs" ]]; then
+   while [ -z "`ls /mnt/unionfs`" ]
+   do
+      echo "wait mount /mnt/unionfs" && sleep 10
+   done
+   echo "mount working! $APP starting..."
+fi
+
+exec \
+    s6-setuidgid abc /app/radarr/bin/Radarr \
+    -nobrowser -data=/config >/dev/null 2>&1

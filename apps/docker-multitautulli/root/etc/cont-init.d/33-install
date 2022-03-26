@@ -1,0 +1,97 @@
+#!/usr/bin/with-contenv bash
+ echo "**** install build packages ****" && \
+    apk add --no-cache --virtual=build-dependencies \
+        g++ gcc make py3-pip python3-dev
+
+ echo "**** install packages ****" && \
+   apk add --update --no-cache \
+       g++ gcc make python3-dev \
+       curl jq py3-openssl py3-setuptools \
+       python3 py-tz py-dateutil bash \
+       gcc musl-dev py3-pip \
+       libxslt-dev libxml2-dev py3-virtualenv \
+       coreutils curl  git \
+       openssl tar tzdata vnstat wget 
+
+
+  echo "**** install pip packages || part 1 ****" && \
+  pip3 install --no-cache-dir -U \
+  pip && \
+  pip3 install --no-cache-dir -U \
+  plexapi \
+  pycryptodomex \
+  pytz \
+  tzlocal \
+  pip-tools \
+  CherryPy \
+  Mako \
+  arrow \
+  portend \
+  APScheduler \
+  configobj \
+  urllib3 \
+  passlib \
+  requests \
+  infi.systray \
+  oauthlib \
+  xmltodict \
+  websocket-client \
+  geoip2 \
+  pyjwt \
+  logutils \
+  maxminddb \
+  cloudinary \
+  facebook-sdk \
+  python-twitter \
+  ipwhois \
+  IPy \
+  vnstat \
+  wget
+
+  echo "**** install pip & pip3 packages || part 2 ****" && \
+  pip3 install --no-cache-dir -U \
+  pip && \
+  pip3 install --no-cache-dir -U \
+  plexapi \
+  pycryptodomex \
+  pytz \
+  tzlocal \
+  pip-tools \
+  CherryPy \
+  Mako \
+  arrow \
+  portend \
+  APScheduler \
+  configobj \
+  urllib3 \
+  passlib \
+  requests \
+  infi.systray \
+  oauthlib \
+  xmltodict \
+  websocket-client \
+  geoip2 \
+  pyjwt \
+  logutils \
+  maxminddb \
+  cloudinary \
+  facebook-sdk \
+  python-twitter \
+  ipwhois \
+  IPy \
+  bs4 \
+  feedparser \
+  httpagentparser \
+  bleach \
+  paho-mqtt \
+  gntp \
+  PyNMA \
+  profilehooks \
+  distro \
+  pyopenssl
+
+ echo "**** install pip & pip3 packages || part 3 ****" && \
+    python3 -m pip install virtualenv
+    python3 -m venv /app/tautulli
+    source /app/tautulli/bin/activate
+

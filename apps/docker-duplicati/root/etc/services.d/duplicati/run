@@ -1,0 +1,19 @@
+#!/usr/bin/with-contenv bash
+
+cd /app/duplicati || exit
+
+APP="$(basename -- $(for i in $(ls -d /config/*/); do echo ${i%%/}; done))"
+if [[ -d "/mnt/unionfs" ]]; then
+   while [ -z "`ls /mnt/unionfs`" ]
+   do
+      echo "wait mount /mnt/unionfs" && sleep 10
+   done
+   echo "mount working! $APP starting..."
+fi
+
+exec \
+    s6-setuidgid abc mono Duplicati.Server.exe \
+    --webservice-interface=any \
+    --server-datafolder=/config \
+    --webservice-allowed-hostnames=* \
+    $CLI_ARGS >/dev/null 2>&1

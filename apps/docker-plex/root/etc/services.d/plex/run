@@ -1,0 +1,20 @@
+#!/usr/bin/with-contenv bash
+
+echo "checking mount"
+
+APP="$HOSTNAME"
+if [[ -d "/mnt/unionfs" ]]; then
+   while [ -z "`ls /mnt/unionfs`" ]
+   do
+      echo "wait mount /mnt/unionfs" && sleep 10
+   done
+   echo "mount working! $APP starting..."
+   echo "Starting $APP."
+fi
+
+export PLEX_MEDIA_SERVER_INFO_MODEL=$(uname -m)
+export PLEX_MEDIA_SERVER_INFO_PLATFORM_VERSION=$(uname -r)
+
+exec \
+   s6-setuidgid abc \
+   /usr/lib/plexmediaserver/Plex\ Media\ Server

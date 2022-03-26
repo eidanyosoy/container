@@ -1,0 +1,46 @@
+#!/usr/bin/with-contenv bash
+
+if [[ ${VERSION} == "" ]]; then
+   VERSION=latest
+else
+   VERSION=${VERSION}
+fi
+
+PLEX_TOKEN=$(sed -n 's/.*PlexOnlineToken="//p' "/config/Library/Application Support/Plex Media Server/Preferences.xml" | sed "s/\".*//")
+INSTALLED_VERSION=$(dpkg-query -W -f='${Version}' plexmediaserver)
+PLEX_ARCH=$(arch)
+apt-get update -y && apt-get install -y curl wget jq aria2
+
+if [[ "${PLEX_ARCH}" = x86_64 ]]; then
+    PLEX_URL_ARCH="amd64"
+elif [[ "${PLEX_ARCH}" = arm64 ]]; then
+    PLEX_URL_ARCH="arm64"
+else
+    PLEX_URL_ARCH="amd64"
+fi
+
+if [[ "${VERSION,,}" = latest ]] || [[ "${VERSION,,}" = plexpass ]] || [[ "$PLEXPASS" == "1" ]]; then
+   REMOTE_VERSION=$(curl -s "https://plex.tv/downloads/details/5?distro=debian&build=linux-${PLEX_ARCH}&channel=8&X-Plex-Token=$PLEX_TOKEN"| grep -oP 'version="\K[^"]+' | tail -n 1 )
+elif [[ "${VERSION,,}" = public ]]; then
+   REMOTE_VERSION=$(curl -sX GET 'https://plex.tv/api/downloads/5.json' | jq -r '.computer.Linux.version')
+else
+   REMOTE_VERSION=${INSTALLED_VERSION}
+fi
+
+if [[ "$REMOTE_VERSION" == $INSTALLED_VERSION ]]; then
+   exit 0
+else
+   echo "Atempting to upgrade to: $REMOTE_VERSION"
+   rm -f /tmp/plex*.deb
+   aria2c -d /tmp -o plex.deb "${PLEX_DOWNLOAD}/${REMOTE_VERSION}/debian/plexmediaserver_${REMOTE_VERSION}_${PLEX_URL_ARCH}.deb"
+   last=$?
+   if [[ "$last" -gt "0" ]] || [[ $(stat -c %s /tmp/plex.deb) -lt 10000 ]]; then
+      apt-get remove -yqq wget jq aria2 && apt-get purge -yqq \
+      && rm -rf /tmp/plex*.deb \
+      && exit 0
+   else
+      dpkg -i --force-confold /tmp/plex*.deb \
+      && rm -rf /tmp/plex*.deb \
+      && exit 0
+   fi
+fi

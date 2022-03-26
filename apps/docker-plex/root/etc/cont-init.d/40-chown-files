@@ -1,0 +1,29 @@
+#!/usr/bin/with-contenv bash
+
+if [ ! -d "${PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR}" ]; then
+   mkdir -p "${PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR}"
+   chown -R abc:abc /config
+fi
+
+PUID=${PUID:-911}
+if [ ! "$(stat -c %u /config/Library)" = "$PUID" ]; then
+   chown abc:abc -R /config/Library
+fi
+
+set -Eeuo pipefail
+IFS=$'\n\t'
+
+[[ -d "${PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR}/Plex Media Server/Codecs" ]] && \
+  rm -rf "${PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR}/Plex Media Server/Codecs/"
+
+[[ -d "${PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR}/Plex Media Server/Crash Reports" ]] && \
+  rm -rf "${PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR}/Plex Media Server/Crash Reports/"
+
+[[ -f "${PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR}/Plex Media Server/plexmediaserver.pid" ]] && \
+  rm -f "${PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR}/Plex Media Server/plexmediaserver.pid"
+
+chown abc:abc \
+	/config \
+	/config/*
+
+#E-O-F

@@ -1,0 +1,11 @@
+{
+   "appname": "docker-nzbget",
+   "apppic": "./images/docker-nzbget.png",
+   "appfolder": "./apps/docker-nzbget",
+   "newversion": "21.1",
+   "baseimage": "null",
+   "packages": "null",
+   "description": "Efficient Usenet Downloader",
+   "body": "Upgrading docker-nzbget to 21.1",
+   "user": "github-actions[bot]"
+}

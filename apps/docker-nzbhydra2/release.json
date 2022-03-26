@@ -1,0 +1,11 @@
+{
+   "appname": "docker-nzbhydra2",
+   "apppic": "./images/docker-nzbhydra2.png",
+   "appfolder": "./apps/docker-nzbhydra2",
+   "newversion": "4.0.2",
+   "baseimage": "null",
+   "packages": "null",
+   "description": "Usenet meta search",
+   "body": "Upgrading docker-nzbhydra2 to 4.0.2",
+   "user": "github-actions[bot]"
+}

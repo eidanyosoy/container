@@ -1,0 +1,21 @@
+#!/usr/bin/with-contenv bash
+
+   cat > /etc/apk/repositories << EOF; $(echo)
+http://dl-cdn.alpinelinux.org/alpine/v3.15/main
+http://dl-cdn.alpinelinux.org/alpine/v3.15/community
+http://dl-cdn.alpinelinux.org/alpine/edge/testing
+EOF
+
+echo "Updating Certificate"
+apk update --quiet
+apk add --quiet --no-cache openssl
+apk add --quiet --no-cache ca-certificates
+
+# update certs for mono
+if [[ ! -f "/app/duplicati/donecerts" ]]; then
+   echo "*** Running mono cert sync ***"
+   cert-sync --quiet /etc/ssl/certs/ca-certificates.crt
+   touch "/app/duplicati/donecerts"
+fi
+
+chown -R abc:abc /config

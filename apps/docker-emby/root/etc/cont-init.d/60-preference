@@ -1,0 +1,69 @@
+#!/usr/bin/env bash
+# shellcheck shell=bash
+#####################################
+# All rights reserved.              #
+# started from Zero                 #
+# Docker owned dockserver           #
+# Docker Maintainer dockserver      #
+#####################################
+#####################################
+# THIS DOCKER IS UNDER LICENSE      #
+# NO CUSTOMIZING IS ALLOWED         #
+# NO REBRANDING IS ALLOWED          #
+# NO CODE MIRRORING IS ALLOWED      #
+#####################################
+
+export DEBIAN_FRONTEND=noninteractive
+
+echo "**** update system  ****" && \
+   apt-get -yqq update 1>/dev/null 2>&1 && \
+   apt-get -yqq upgrade 1>/dev/null 2>&1
+
+echo "**** install xmlstarlet ****" && \
+   apt-get -yqq install xmlstarlet 1>/dev/null 2>&1
+
+if [ "${DEBUG,,}" = "true" ]; then
+   set -x
+fi
+
+prefFile="/config/system.xml"
+
+function getPref {
+  local key="${1}"
+  xmlstarlet sel -T -t -m "/ServerConfiguration" -v "@${key}" -n "${prefFile}"
+}
+
+function setPref {
+  local key="${1}"
+  local value="${2}"
+  count="$(xmlstarlet sel -t -v "count(/ServerConfiguration/@${key})" "${prefFile}")"
+  count=$(($count + 0))
+  xmlstarlet ed --inplace --delete "/Preferences/@${key}" -v "${value}" "${prefFile}"
+  xmlstarlet ed --inplace --insert "/Preferences/@${key}" -v "${value}" "${prefFile}"
+}
+
+FILE="/tmp/emby.env"
+echo -e "EnableAnonymousUsageReporting|false
+VacuumDatabaseOnStartup|true
+EnableHttps|true" >"${FILE}"
+
+sed '/^\s*#.*$/d' $FILE | \
+while IFS=$'|' read -r -a myArray; do
+   if [ -z "$(getPref "${myArray[0]}")" ]; then
+      setPref "${myArray[0]}" "${myArray[1]}"
+   fi
+done
+
+for var in "${!EMBY_PREFERENCE_@}"; do
+    value="${!var}"
+    PreferenceValue="${value#*=}"
+    PreferenceKey="${value%=*}"
+    setPref "${PreferenceKey}" "${PreferenceValue}"
+done
+
+echo "**** cleanup system ****" && \
+   apt-get -yqq purge xmlstarlet 1>/dev/null 2>&1 && \
+   apt-get -yqq autoclean 1>/dev/null 2>&1 && \
+   apt-get -yqq autoremove 1>/dev/null 2>&1
+
+#<E-o-F>#

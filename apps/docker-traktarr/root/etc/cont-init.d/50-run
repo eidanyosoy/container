@@ -1,0 +1,107 @@
+#!/usr/bin/with-contenv bash
+# shellcheck shell=bash
+# shellcheck disable=SC2086
+echo
+echo "-----------------------"
+echo "| Traktarr run options |"
+echo "-----------------------"
+echo
+echo '[ Checking App Branch]'
+echo "==> APP BRANCH: $APP_BRANCH"
+echo
+
+echo '[ Checking for Auto-Update Pref ]'
+if [ "$SKIPUPDATE" == "yes" ] || [ "$SKIPUPDATE" == "Yes" ] || [ "$SKIPUPDATE" == "YES" ]; then
+  echo '==> SKIP AUTO-UPDATE: yes'
+  echo
+elif [ "$SKIPUPDATE" == "no" ] || [ "$SKIPUPDATE" == "No" ] || [ "$SKIPUPDATE" == "NO" ]; then
+  echo '==> SKIP AUTO-UPDATE: no'
+  echo
+elif [ "$SKIPUPDATE" == "" ] || [ "$SKIPUPDATE" == "" ]; then
+  echo '==> App set to AUTO-UPDATE on container restart'
+  echo
+fi
+
+echo '[ Checking for Search Delay ]'
+if [ -z "$DELAY" ]; then
+  echo '==> SEARCH DELAY: no, default: 2.5'
+  echo
+  DELAY_OPTION=""
+else
+  echo "==> SEARCH DELAY: yes, $DELAY"
+  echo
+  DELAY_OPTION="-d $DELAY"
+fi
+
+echo '[ Checking for Sort ]'
+if [ -z "$SORT" ]; then
+  echo '==> SORT: not defined, default: votes'
+  echo
+  SORT_OPTION=""
+else
+  echo "==> SORT by: $SORT"
+  echo
+  SORT_OPTION="-s $SORT"
+fi
+
+echo '[ Checking for No-Search ]'
+if [ "$NOSEARCH" == "no" ] || [ "$NOSEARCH" == "No" ]; then
+  echo '==> NO-SEARCH: disabled'
+  echo
+  NOSEARCH_OPTION=""
+elif [ "$NOSEARCH" == "yes" ] || [ "$NOSEARCH" == "Yes" ]; then
+  echo '==> NO-SEARCH: enabled'
+  echo
+  NOSEARCH_OPTION="--no-search"
+elif [ "$NOSEARCH" == "" ] || [ "$NOSEARCH" == "" ]; then
+  echo '==> NO-SEARCH not defined'
+  echo
+fi
+
+echo '[ Checking for Notifications ]'
+if [ "$NOTIFICATIONS" == "yes" ] || [ "$NOTIFICATIONS" == "Yes" ]; then
+  echo '==> NOTIFICATIONS: enabled'
+  echo
+  NO_NOTIFICATIONS_OPTION=""
+elif [ "$NOTIFICATIONS" == "no" ] || [ "$NOTIFICATIONS" == "No" ]; then
+  echo '==> NOTIFICATIONS: disabled'
+  echo
+  NO_NOTIFICATIONS_OPTION="--no-notifications"
+elif [ "$NOTIFICATIONS" == "" ] || [ "$NOTIFICATIONS" == "" ]; then
+  echo '==> NOTIFICATIONS: not defined'
+  echo
+fi
+
+echo '[ Checking Blacklist options ]'
+if [ "$BLACKLIST" == "no" ] || [ "$BLACKLIST" == "No" ]; then
+  echo '==> BLACKLIST: disabled'
+  echo
+  IGNORE_BLACKLIST="--ignore-blacklist"
+elif [ "$BLACKLIST" == "yes" ] || [ "$BLACKLIST" == "Yes" ]; then
+  echo '==> BLACKLIST: enabled'
+  echo
+  IGNORE_BLACKLIST=""
+elif [ "$BLACKLIST" == "" ] || [ "$BLACKLIST" == "" ]; then
+  echo '==> BLACKLIST: not defined'
+  echo
+  IGNORE_BLACKLIST=""
+fi
+
+echo '[ Checking first run options ]'
+if [ "$RUNNOW" == "yes" ] || [ "$RUNNOW" == "Yes" ]; then
+  echo '==> Running script now on first-run'
+  echo
+  cd /traktarr || return
+  s6-setuidgid abc /usr/bin/python3 traktarr.py run $SORT_OPTION $DELAY_OPTION $NOSEARCH_OPTION $NO_NOTIFICATIONS_OPTION $IGNORE_BLACKLIST --run-now
+else
+  echo '==> Set to run on next schedule'
+  echo
+  cd /traktarr || return
+  s6-setuidgid abc /usr/bin/python3 traktarr.py run $SORT_OPTION $DELAY_OPTION $NOSEARCH_OPTION $NO_NOTIFICATIONS_OPTION $IGNORE_BLACKLIST
+fi
+echo 'for more info on the above run options: https://hub.docker.com/r/eafxx/traktarr'
+echo
+echo '---------------------'
+echo '| Starting Traktarr |'
+echo '---------------------'
+echo

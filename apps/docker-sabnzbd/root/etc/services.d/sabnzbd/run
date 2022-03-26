@@ -1,0 +1,20 @@
+#!/usr/bin/with-contenv bash
+
+CONFIG=/config/sabnzbd.ini
+
+APP="$(basename -- $(for i in $(ls -d /app/*/); do echo ${i%%/}; done))"
+if [[ -d "/mnt/unionfs" ]]; then
+   while [ -z "`ls /mnt/unionfs`" ]
+   do
+      echo "wait mount /mnt/unionfs" && sleep 10
+   done
+   echo "mount working! $APP starting..."
+fi
+
+PORT=$(sed -n '/^port *=/{s/port *= *//p;q}' ${CONFIG})
+LISTENER="0.0.0.0:${PORT:=8080}"
+echo "[${PORT}]"
+
+exec \
+  s6-setuidgid abc python3 /app/sabnzbd/SABnzbd.py \
+  --config-file /config --server ${LISTENER}

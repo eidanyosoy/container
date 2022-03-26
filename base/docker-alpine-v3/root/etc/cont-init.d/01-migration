@@ -1,0 +1,47 @@
+#!/command/with-contenv bash
+
+PUID=${PUID:-911}
+PGID=${PGID:-911}
+
+groupmod -o -g "$PGID" abc
+usermod -o -u "$PUID" abc
+
+if [[ -f /donate.txt ]]; then
+    echo '
+To support the app dev(s) visit:'
+    cat /donate.txt
+fi
+echo '
+-------------------------------------
+GID/UID
+-------------------------------------'
+echo "
+User uid:    $(id -u abc)
+User gid:    $(id -g abc)
+-------------------------------------
+"
+
+##bypass v3 s6-overlay /command part
+
+sections="/etc/cont-init.d /etc/cont-finish.d /etc/services.d /app /tmp /config /defaults /system"
+for letsdoit in ${sections[@]}; do
+  mkdir -p $letsdoit &>/dev/null
+  chown -R abc:abc $letsdoit &>/dev/null
+  chmod -R 0755 $letsdoit &>/dev/null
+done
+
+folder="/etc/cont-init.d /etc/services.d /app /config"
+for i in ${folder[@]}; do
+   find $i -mindepth 1 -type f | while read rename; do
+      sed -i 's|/usr/bin|/command|g' ${rename} &>/dev/null
+   done
+done
+
+sections="/etc/cont-init.d /etc/cont-finish.d /etc/services.d /app /tmp /config /defaults /system"
+for letsdoit in ${sections[@]}; do
+  mkdir -p $letsdoit &>/dev/null
+  chown -R abc:abc $letsdoit &>/dev/null
+  chmod -R 0755 $letsdoit &>/dev/null
+done
+
+rm -rf /var/cache/apk/*
