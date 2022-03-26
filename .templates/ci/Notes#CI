@@ -1,0 +1,37 @@
+#init comment
+
+#notes
+
+FOLDER=$1
+APP=$2
+USERNAME=$3
+TOKEN=$4
+
+####
+
+APPFOLDER="./$FOLDER/$APP"
+
+## Deploy docker from repo 
+
+# Build image
+docker build --no-cache -t ${DOCKER_IMAGE_NAME} .
+
+# Get ID 
+CONTAINER_ID=$(docker ps -aq)
+
+# Run Image
+docker run --rm ${DOCKER_IMAGE_NAME} || true
+
+## wait until docker is full builded
+
+# Remove running Image
+docker rm -f ${CONTAINER_ID} || true
+
+## run native
+docker run --rm ghcr.io/dockserver/docker-vnstat:latest
+
+## run completely 
+docker run --rm --entrypoint /bin/sh -v ./$FOLDER/$APP:/tmp ghcr.io/dockserver/${APP}:latest -c '\
+  curl -u $USERNAME:$TOKEN -fsSL https://raw.githubusercontent.com/dockservercontainer/.templates/pipeline.sh | bash'
+
+## 

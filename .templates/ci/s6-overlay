@@ -1,0 +1,75 @@
+ENV TIMEZONE=Etc/GMT \
+    S6_GLOBAL_PATH=/command:/usr/bin:/bin:/usr/sbin:sbin:/usr/local/bin:/usr/local/sbin \
+    S6_KEEP_ENV=1 \
+    S6_CMD_WAIT_FOR_SERVICES_MAXTIME=0
+
+ARG ALPINE_VERSION
+ARG S6_VERSION
+
+## ADD S6_OVERLAY_VERSION V3
+RUN \
+    echo "**** install build packages ****" && \
+      apk add --no-cache --purge -uU \
+         curl \
+         tar \
+         s6 \
+         jq \
+         musl \
+         xz \
+         procps \
+         bash \
+         wget \
+         busybox \
+         unzip \
+         coreutils \
+         shadow \
+         findutils \
+         apk-tools \
+         procps \
+         findutils \
+         linux-headers
+
+    ### S6 overlay installation
+RUN \
+    set -ex && \
+    apk update && apk upgrade && \
+    apkArch="$(apk --print-arch)" && \
+    case "$apkArch" in \
+        x86_64) s6Arch='x86_64' ;; \
+        armv7) s6Arch='armhf' ;; \
+        armhf) s6Arch='armhf' ;; \
+        aarch64) s6Arch='aarch64' ;; \
+        *) echo >&2 "Error: unsupported architecture ($apkArch)"; exit 1 ;; \
+    esac; \
+    S6_VERSION=$(curl -sX GET "https://api.github.com/repos/just-containers/s6-overlay/releases/latest" | jq -r .tag_name) && \
+    curl -sSL https://github.com/just-containers/s6-overlay/releases/download/${S6_VERSION}/s6-overlay-noarch.tar.xz | tar xvpfJ - -C / && \
+    curl -sSL https://github.com/just-containers/s6-overlay/releases/download/${S6_VERSION}/s6-overlay-${s6Arch}.tar.xz | tar xvpfJ - -C / && \
+    curl -sSL https://github.com/just-containers/s6-overlay/releases/download/${S6_VERSION}/s6-overlay-symlinks-noarch.tar.xz | tar xvpfJ - -C / && \
+    curl -sSL https://github.com/just-containers/s6-overlay/releases/download/${S6_VERSION}/s6-overlay-symlinks-arch.tar.xz | tar xvpfJ - -C /
+
+RUN \
+    mkdir -p \
+       /etc/cont-init.d \
+       /etc/cont-finish.d \
+       /etc/services.d \
+       /app \
+       /config \
+       /defaults \
+       /system && \
+    chmod -R 755 \
+       /app \
+       /config \
+       /defaults \
+       /system \
+       /etc/cont-init.d \
+       /etc/cont-finish.d \
+       /etc/services.d && \
+    sed -i "s|s6-rc -v2|s6-rc -v1|g" /package/admin/s6-overlay/etc/s6-linux-init/skel/rc.init && \
+    sed -i "s|s6-rc -v2|s6-rc -v1|g" /package/admin/s6-overlay/etc/s6-linux-init/skel/rc.shutdown && \
+    sed -i "s|echo|# echo |g" /package/admin/s6-overlay/etc/s6-rc/scripts/cont-init && \
+    sed -i "s|echo|# echo |g" /package/admin/s6-overlay/etc/s6-rc/scripts/cont-finish && \
+    sed -i "s|echo ' (no readiness notification)'|# echo ' (no readiness notification)'|g" /package/admin/s6-overlay/etc/s6-rc/scripts/services-up && \
+    sed -i "s|s6-echo -n|# s6-echo -n|g" /package/admin/s6-overlay/etc/s6-rc/scripts/services-up && \
+    rm -rf /var/cache/apk/*
+
+COPY --chmod=755 ./base/docker-alpine-v3/root/ /
