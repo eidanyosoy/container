@@ -21,7 +21,7 @@ FROM ghcr.io/linuxserver/baseimage-alpine:edge
 ARG TARGETPLATFORM
 ARG BUILDPLATFORM
 
-ARG VERSION="4.4.2-r0"
+ARG VERSION="4.4.2-r1"
 ARG QBT_VERSION="0.16.0"
 ARG BRANCH="master"
 
