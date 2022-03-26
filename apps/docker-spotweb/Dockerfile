@@ -27,9 +27,10 @@ RUN echo "force-unsafe-io" > /etc/dpkg/dpkg.cfg.d/02apt-speedup &&\
     rm -r /var/www/html && \
     rm -rf /tmp/ && \
     curl -fsSL "https://github.com/spotweb/spotweb/archive/refs/tags/${VERSION}.tar.gz" | tar xzf - -C /var/www/spotweb --strip-components=1 && \
-    chmod -R 775 /var/www/spotweb &&     chown -R www-data:www-data /var/www/spotweb
+    chmod -R 775 /var/www/spotweb && \
+    chown -R www-data:www-data /var/www/spotweb
 
-COPY /root/ /
+COPY ./apps/docker-spotweb/root/ /
 
 RUN chmod u+x /entrypoint.sh
 EXPOSE 80
