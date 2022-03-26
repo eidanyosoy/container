@@ -90,6 +90,7 @@ RUN echo "'"force-unsafe-io"'" > /etc/dpkg/dpkg.cfg.d/02apt-speedup &&\
     apt-get install -qy '"${APTOINSTALL}"' && \
     '"${SETMOD}"' && \
     '"${CLEANUP}"' && \
+    mkdir -p /var/www/spotweb && \
     curl -fsSL "'"https://github.com/spotweb/spotweb/archive/refs/tags/"'${VERSION}'".tar.gz"'" | tar xzf - -C /var/www/spotweb --strip-components=1 && \
     '"${SETPERM}"'
 
