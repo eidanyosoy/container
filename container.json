@@ -146,9 +146,9 @@ apps docker-fenrus
    "newversion": "3.15.2",
    "appbranch": "master",
    "baseimage": "alpine",
-   "appversion": "9083644081ed9145c2608af6d7fe1dd550ca90ba",
+   "appversion": "7a43ef8bfce55b5524d494fa450a0df3bc256d32",
    "description": "A personal home page for quick access to all your personal apps/sites.",
-   "body": "Upgrading docker-fenrus to 9083644081ed9145c2608af6d7fe1dd550ca90ba",
+   "body": "Upgrading docker-fenrus to 7a43ef8bfce55b5524d494fa450a0df3bc256d32",
    "user": "github-actions[bot]"
 }
 
@@ -169,11 +169,11 @@ apps docker-jackett
    "appname": "docker-jackett",
    "apppic": "./images/docker-jackett.png",
    "appfolder": "./apps/docker-jackett",
-   "newversion": "0.20.763",
+   "newversion": "0.20.770",
    "appbranch": "master",
    "baseimage": "ghcr.io/linuxserver/baseimage-ubuntu:bionic",
    "description": "API Support for your favorite torrent trackers",
-   "body": "Upgrading docker-jackett to 0.20.763",
+   "body": "Upgrading docker-jackett to 0.20.770",
    "user": "github-actions[bot]"
 }
 
@@ -329,12 +329,12 @@ apps docker-qbittorrent
    "appname": "docker-qbittorrent",
    "apppic": "./images/docker-qbittorrent.png",
    "appfolder": "./apps/docker-qbittorrent",
-   "newversion": "4.4.2-r0",
+   "newversion": "4.4.2-r1",
    "appversion": "0.16.0",
    "appbranch": "master",
    "baseimage": "ghcr.io/linuxserver/baseimage-alpine:edge",
    "description": "Cli to manage qBittorrent",
-   "body": "Upgrading docker-qbittorrent to 4.4.2-r0 with 0.16.0",
+   "body": "Upgrading docker-qbittorrent to 4.4.2-r1 with 0.16.0",
    "user": "github-actions[bot]"
 }
 
@@ -429,10 +429,10 @@ apps docker-tautulli
    "appname": "docker-tautulli",
    "apppic": "./images/docker-tautulli.png",
    "appfolder": "./apps/docker-tautulli",
-   "newversion": "2.9.4",
+   "newversion": "2.9.5",
    "baseimage": "ghcr.io/linuxserver/baseimage-alpine:3.15",
    "description": "A Python based monitoring and tracking tool for Plex Media Server.",
-   "body": "Upgrading docker-tautulli to 2.9.4",
+   "body": "Upgrading docker-tautulli to 2.9.5",
    "user": "github-actions[bot]"
 }
 
@@ -471,7 +471,7 @@ apps docker-wiki
    "appbranch": "master",
    "newversion": "3.15.2",
    "appversion": "1.4.25",
-   "wikiversion": "8.2.7",
+   "wikiversion": "8.2.8",
    "baseimage": "alpine",
    "description": "Docker + Traefik with Authelia and Cloudflare Protection",
    "body": "Upgrading docker-wiki to 3.15.2",
@@ -599,11 +599,11 @@ nightly docker-radarr-nightly
    "appname": "docker-radarr-nightly",
    "apppic": "./images/docker-radarr-nightly.png",
    "appfolder": "./nightly/docker-radarr-nightly",
-   "newversion": "4.1.0.6059",
+   "newversion": "4.1.0.6092",
    "appbranch": "nightly",
    "baseimage": "ghcr.io/dockserver/docker-alpine:latest",
    "description": "A fork of Sonarr to work with movies à la Couchpotato.",
-   "body": "Upgrading docker-radarr-nightly to 4.1.0.6059",
+   "body": "Upgrading docker-radarr-nightly to 4.1.0.6092",
    "user": "github-actions[bot]"
 }
 

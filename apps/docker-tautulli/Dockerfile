@@ -20,7 +20,7 @@ FROM ghcr.io/linuxserver/baseimage-alpine:3.15
 
 ARG TARGETPLATFORM
 ARG BUILDPLATFORM
-ARG VERSION="2.9.4"
+ARG VERSION="2.9.5"
 ARG BRANCH="master"
 
 ENV TAUTULLI_DOCKER=True
@@ -38,7 +38,7 @@ RUN \
    echo "**** install app ****" && \
      mkdir -p /app/tautulli && \
      curl -fsSL "https://github.com/Tautulli/Tautulli/archive/v${VERSION}.tar.gz" | tar xzf - -C /app/tautulli --strip-components=1 && \
-   echo -e "v2.9.4" > /app/tautulli/version.txt && \
+   echo -e "v2.9.5" > /app/tautulli/version.txt && \
    echo -e "master" > /app/tautulli/branch.txt && \
    echo "*** cleanup system ****" && \
      apk del --purge build-dependencies && \

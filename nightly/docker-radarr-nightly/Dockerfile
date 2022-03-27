@@ -21,7 +21,7 @@ FROM ghcr.io/dockserver/docker-alpine:latest
 ARG TARGETPLATFORM
 ARG BUILDPLATFORM
 
-ARG VERSION="4.1.0.6059"
+ARG VERSION="4.1.0.6092"
 ARG BRANCH="nightly"
 
 ENV XDG_CONFIG_HOME="/config/xdg"
