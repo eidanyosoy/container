@@ -80,9 +80,6 @@ EOF
   chmod -cR 755 /root/.config/rclone/ /app /system/* &>/dev/null
   chown -cR abc:abc /root/.config/ &>/dev/null
 
-  ln -s /system/servicekeys/rclonegdsa.conf /root/.config/rclone/rclone.conf 
-
-
   USERAGENT=${USERAGENT:-null}
   if [[ ${USERAGENT} == 'null' ]]; then
      USERAGENT=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
