@@ -34,67 +34,68 @@ CRYPTED=""
 BWLIMIT=""
 USERAGENT=""
 
-cp ${CONFIG} /root/.config/rclone/rclone.conf &>/dev/null
-
 mkdir -p "${LOGFILE}" "${START}" "${DONE}" 
 find "${BASE}" -type f -name '*.log' -delete
 find "${BASE}" -type f -name '*.txt' -delete
 find "${START}" -type f -name '*.json' -delete
 
+## EXPORT THE KEY SPECS
 
-if test -f ${CONFIG}; then
-   if `rclone config show --config=${CONFIG} | grep ":/encrypt" &>/dev/null`;then
-      export CRYPTED=C
-   fi
-   if `rclone config show --config=${CONFIG} | grep "GDSA" &>/dev/null`;then
-       export KEY=GDSA
-   elif `rclone config show --config=${CONFIG} | head -n1 | grep -Po '\[.*?]' | sed 's/.*\[\([^]]*\)].*/\1/' | sed '/GDSA/d'`;then
-       export KEY=""
-   else
-       log "no match found of GDSA[01=~100] or [01=~100]"
-       sleep infinity
-   fi
+if `ls -1p /system/servicekeys/keys/ | head -n1 | grep "GDSA" &>/dev/null`;then
+    export MOVEKEY=GDSA
+elif `ls -1p /system/servicekeys/keys/ | head -n1 | grep -Po '\[.*?]' | sed 's/.*\[\([^]]*\)].*/\1/' | sed '/GDSA/d'`;then
+    export MOVEKEY=NOGDSA
+else
+    log "no match found of GDSA[01=~100] or [01=~100]" && sleep infinity
 fi
 
+#####
+
 function loopcsv() {
+
 CSV=/system/servicekeys/uploader.csv
+
+mkdir -p /app/custom/
 if test -f ${CSV} ; then
    UPP=${UPP}
    MOVE=${MOVE:-/}
    FILE=$(basename "${UPP[1]}")
    DIR=$(dirname "${UPP[1]}" | sed "s#${DLFOLDER}/${MOVE}##g")
-   ENDCONFIG=/system/servicekeys/${UPP}.conf
+   ENDCONFIG=/app/custom/${UPP}.conf
+
    ARRAY=$(ls -A ${KEYLOCAL} | wc -l )
    USED=$(( $RANDOM % ${ARRAY} + 1 ))
 
    cat ${CSV} | grep -E ${DIR} | sed '/^\s*#.*$/d'| while IFS=$'|' read -ra myArray; do
    if [[ ${myArray[2]} == "" && ${myArray[3]} == "" ]]; then
-   echo -e "\n
-[${USED[0]}]
+
+cat > ${ENDCONFIG} << EOF; $(echo)
+[${KEY}$[USED]]
 type = drive
 scope = drive
 server_side_across_configs = true
-service_account_file = ${JSONDIR}/${USED}
-team_drive = ${myArray[1]}" >>$ENDCONFIG
+service_account_file = ${JSONDIR}/${KEY}$[USED]
+team_drive = ${myArray[1]}
+EOF
 
 else
 
-ENC_PASSWORD=${myArray[2]}
-ENC_SALT=${myArray[3]}
-   echo -e "\n
-[${USED[0]}]
+cat > ${ENDCONFIG} << EOF; $(echo)
+[${KEY}$[USED]]
 type = drive
 scope = drive
 server_side_across_configs = true
 service_account_file = ${JSONDIR}/${USED}
 team_drive = ${myArray[1]}
-##
+
+[${KEY}$[USED]C]
 type = crypt
 remote = ${USED[0]}:/encrypt
 filename_encryption = standard
 directory_name_encryption = true
-password = ${ENC_PASSWORD}
-password2 = ${ENC_SALT}" >>$ENDCONFIG
+password = ${myArray[2]}
+password2 = ${myArray[3]}
+EOF
    fi
 done
 fi
@@ -121,52 +122,63 @@ fi
 
 function rcloneupload() {
 
-UPP=${UPP}
-MOVE=${MOVE:-/}
-DLFOLDER=${DLFOLDER}
-FILE=$(basename "${UPP[1]}")
-DIR=$(dirname "${UPP[1]}" | sed "s#${DLFOLDER}/${MOVE}##g")
-STARTZ=$(date +%s)
-SIZE=$(stat -c %s "${DLFOLDER}/${UPP[1]}" | numfmt --to=iec-i --suffix=B --padding=7)
+   UPP=${UPP}
+   MOVE=${MOVE:-/}
+   DLFOLDER=${DLFOLDER}
+   FILE=$(basename "${UPP[1]}")
+   DIR=$(dirname "${UPP[1]}" | sed "s#${DLFOLDER}/${MOVE}##g")
+   STARTZ=$(date +%s)
+   SIZE=$(stat -c %s "${DLFOLDER}/${UPP[1]}" | numfmt --to=iec-i --suffix=B --padding=7)
 
-while true; do
-  SUMSTART=$(stat -c %s "${DLFOLDER}/${UPP[1]}")
-  sleep 5
-  SUMTEST=$(stat -c %s "${DLFOLDER}/${UPP[1]}")
-  if [[ "$SUMSTART" -eq "$SUMTEST" ]]; then
-     sleep 1 && break
-  else
-     sleep 1 && continue
-  fi
-done
+   while true; do
+     SUMSTART=$(stat -c %s "${DLFOLDER}/${UPP[1]}")
+     sleep 5
+     SUMTEST=$(stat -c %s "${DLFOLDER}/${UPP[1]}")
+     if [[ "$SUMSTART" -eq "$SUMTEST" ]]; then
+        sleep 1 && break
+     else
+        sleep 1 && continue
+     fi
+   done
 
-UPFILE=$($(which rclone) size "${DLFOLDER}/${UPP[1]}" --config="${CONFIG}" --json | cut -d ":" -f3 | cut -d "}" -f1)
-touch "${LOGFILE}/${FILE}.txt"
-ARRAY=$(ls -A ${KEYLOCAL} | wc -l )
-USED=$(( $RANDOM % ${ARRAY} + 1 ))
-  echo "{\"filedir\": \"${DIR}\",\"filebase\": \"${FILE}\",\"filesize\": \"${SIZE}\",\"logfile\": \"${LOGFILE}/${FILE}.txt\",\"gdsa\": \"${KEY}$[USED]${CRYPTED}\"}" > "${START}/${FILE}.json"
+   UPFILE=$($(which rclone) size "${DLFOLDER}/${UPP[1]}" --config="${CONFIG}" --json | cut -d ":" -f3 | cut -d "}" -f1)
+   touch "${LOGFILE}/${FILE}.txt"
+   ARRAY=$(ls -A ${KEYLOCAL} | wc -l )
+   USED=$(( $RANDOM % ${ARRAY} + 1 ))
+   echo "{\"filedir\": \"${DIR}\",\"filebase\": \"${FILE}\",\"filesize\": \"${SIZE}\",\"logfile\": \"${LOGFILE}/${FILE}.txt\",\"gdsa\": \"${KEY}$[USED]${CRYPTED}\"}" > "${START}/${FILE}.json"
 
-if test -f "/app/rclone/${UPP}.conf";then
-   CONFIG=/system/servicekeys/${UPP}.conf
-else
-   CONFIG=/system/servicekeys/rclonegdsa.conf
-fi
+   if test -f "/app/rclone/${UPP}.conf";then
+      CONFIG=/system/servicekeys/${UPP}.conf
+   else
+      CONFIG=/system/servicekeys/rclonegdsa.conf
+   fi
 
-## RUN MOVE
-$(which rclone) move "${DLFOLDER}/${UPP[1]}" "${KEY}$[USED]${CRYPTED}:/${DIR}/" --config="${CONFIG}" \
-  --stats=1s --checkers=32 --use-mmap --no-traverse --check-first --drive-chunk-size=64M \
-  --log-level="${LOG_LEVEL}" --user-agent="${USERAGENT}" ${BWLIMIT} --log-file="${LOGFILE}/${FILE}.txt" \
-  --tpslimit 50 --tpslimit-burst 50 --min-age="${MIN_AGE_FILE}"
+   ## RUN MOVE
+   $(which rclone) move "${DLFOLDER}/${UPP[1]}" "${KEY}$[USED]${CRYPTED}:/${DIR}/" \
+      --config="${CONFIG}" \
+      --stats=1s \
+      --checkers=32 \
+      --use-mmap \
+      --no-traverse \
+      --check-first \
+      --drive-chunk-size=64M \
+      --log-level="${LOG_LEVEL}" \
+      --user-agent="${USERAGENT}" ${BWLIMIT} \
+      --log-file="${LOGFILE}/${FILE}.txt" \
+      --tpslimit 50 \
+      --tpslimit-burst 50 \
+      --min-age="${MIN_AGE_FILE}"
 
-ENDZ=$(date +%s)
-echo "{\"filedir\": \"${DIR}\",\"filebase\": \"${FILE}\",\"filesize\": \"${SIZE}\",\"gdsa\": \"${KEY}$[USED]${CRYPTED}\",\"starttime\": \"${STARTZ}\",\"endtime\": \"${ENDZ}\"}" > "${DONE}/${FILE}.json"
-## END OF MOVE
-$(which rm) -rf "${LOGFILE}/${FILE}.txt" "${START}/${FILE}.json" 
-$(which chmod) 755 "${DONE}/${FILE}.json"
+   ENDZ=$(date +%s)
+   echo "{\"filedir\": \"${DIR}\",\"filebase\": \"${FILE}\",\"filesize\": \"${SIZE}\",\"gdsa\": \"${KEY}$[USED]${CRYPTED}\",\"starttime\": \"${STARTZ}\",\"endtime\": \"${ENDZ}\"}" > "${DONE}/${FILE}.json"
 
-if test -f "/app/rclone/${UPP}.conf";then
-   $(which rm) -rf /system/servicekeys/${UPP}.conf
-fi
+   ## END OF MOVE
+   $(which rm) -rf "${LOGFILE}/${FILE}.txt" "${START}/${FILE}.json" 
+   $(which chmod) 755 "${DONE}/${FILE}.json"
+
+   if test -f "/app/rclone/${UPP}.conf";then
+      $(which rm) -rf /system/servicekeys/${UPP}.conf
+   fi
 
 }
 
@@ -204,7 +216,7 @@ while true; do
          done
          ## Looping to correct drive
          if test -f ${CSV} ; then
-           loopcsv
+            loopcsv
          fi
          ## upload function startup
          rcloneupload
