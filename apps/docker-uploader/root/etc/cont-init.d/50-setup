@@ -16,14 +16,16 @@ function log() {
      echo "${1}"
 }
 
-addgroup -S abc
-adduser -S abc -G abc
+addgroup -S abc &>/dev/null
+adduser -S abc -G abc &>/dev/null
 PGID=${PGID:-1000}
 PUID=${PUID:-1000}
-groupmod -o -g "$PGID" abc
-usermod -o -u "$PUID" abc
+groupmod -o -g "$PGID" abc &>/dev/null
+usermod -o -u "$PUID" abc &>/dev/null
 
-if [[ -f /donate.txt ]]; then cat /donate.txt ; fi
+if [[ -f /donate.txt ]]; then
+   cat /donate.txt
+fi
 echo '
 -------------------------------------
 GID/UID
@@ -46,90 +48,49 @@ EOF
       apk add --quiet --no-progress --update ${myArray[@]}
    done
 
-ARCH="$(command arch)"
-if [ "${ARCH}" = "x86_64" ]; then
-   export ARCH="amd64"
-elif [ "${ARCH}" = "aarch64" ]; then
-     export ARCH="arm64"
-elif [ "${ARCH}" = "armv7l" ]; then
-     export ARCH="armhf"
-else
-    echo "**** Unsupported Linux architecture ${ARCH} found, exiting... ****" && exit 1
-fi
+   wget -qO- https://rclone.org/install.sh | bash &>/dev/null
 
-apk add --quiet --no-cache --no-progress --virtual=build-dependencies aria2 curl findutils coreutils unzip jq
-VERSION=$(curl -sX GET "https://api.github.com/repos/rclone/rclone/releases/latest" | awk '/tag_name/{print $4;exit}' FS='[""]' | sed -e 's_^v__')
-aria2c -x2 -k1M -d /tmp -o rclone.zip https://github.com/rclone/rclone/releases/download/v${VERSION}/rclone-v${VERSION}-linux-${ARCH}.zip && \
-cd /tmp/ && unzip -q /tmp/rclone.zip
-mv /tmp/rclone-*-linux-${ARCH}/rclone /usr/local/bin/
-apk del --quiet --purge build-dependencies && \
-echo "**** cleanup ****" && \
-rm -rf /var/cache/apk/* /tmp/*
+   KEYLOCAL=/system/servicekeys/keys/
+   ARRAY=$(ls -A ${KEYLOCAL} | wc -w )
+   if [[ "${ARRAY}" -eq "0" ]]; then
+      log "-->> [ WARNING ] ----------------- [ WARNING ] <<--"
+      log "-->> [ WARNING ]  no match found   [ WARNING ] <<--"
+      log "-->> [ WARNING ]  of GDSA[01=~100] [ WARNING ] <<--"
+      log "-->> [ WARNING ]    or [01=~100]   [ WARNING ] <<--"
+      log "-->> [ WARNING ] ----------------- [ WARNING ] <<--"
+      sleep infinity
+   fi
 
-if [[ ! -f "/system/servicekeys/rclonegdsa.conf" ]]; then
-   log "-->> [ WARNING ] ----------------------------- [ WARNING ] <<--"
-   log "-->> [ WARNING ] no rclonegdsa.conf file found [ WARNING ] <<--"
-   log "-->> [ WARNING ]         sleeping for 30s      [ WARNING ] <<--"
-   log "-->> [ WARNING ] ----------------------------- [ WARNING ] <<--"
-   sleep infinity
-fi
+  cp -r /conf/nginx.conf /etc/nginx/nginx.conf
+  cp -r /conf/fpm-pool.conf /etc/php8/php-fpm.d/www.conf
+  cp -r /conf/php.j2 /etc/php8/conf.d/custom.ini
 
-CONF=/system/servicekeys/rclonegdsa.conf
-if `rclone config show --config=${CONF} | grep "GDSA" &>/dev/null`;then
-  KEY="GDSA"
-elif `rclone config show --config=${CONF} | head -n1 | grep -Po '\[.*?]' | sed 's/.*\[\([^]]*\)].*/\1/' | sed '/GDSA/d'`;then
-  KEY=""
-else
-   log "-->> [ WARNING ] ----------------- [ WARNING ] <<--"
-   log "-->> [ WARNING ]  no match found   [ WARNING ] <<--"
-   log "-->> [ WARNING ]  of GDSA[01=~100] [ WARNING ] <<--"
-   log "-->> [ WARNING ]    or [01=~100]   [ WARNING ] <<--"
-   log "-->> [ WARNING ] ----------------- [ WARNING ] <<--"
-   sleep infinity
-fi
+  rm -rf /system/uploader/.keys/{usedupload,lastday} \
+         /app/uploader/{pid,discord} \
+         /system/uploader/vfsforget &>/dev/null
 
-KEYLOCAL=/system/servicekeys/keys/
-ARRAY=$(ls -A ${KEYLOCAL} | wc -l )
-if [[ "${ARRAY}" -eq "0" ]]; then
-   log "-->> [ WARNING ] ----------------- [ WARNING ] <<--"
-   log "-->> [ WARNING ]  no match found   [ WARNING ] <<--"
-   log "-->> [ WARNING ]  of GDSA[01=~100] [ WARNING ] <<--"
-   log "-->> [ WARNING ]    or [01=~100]   [ WARNING ] <<--"
-   log "-->> [ WARNING ] ----------------- [ WARNING ] <<--"
-   sleep infinity
-fi
+  mkdir -p /system/uploader/.keys \
+           /system/uploader/{logs,json} \
+           /system/uploader/json/{done,upload} &>/dev/null
 
-rm -rf /var/cache/apk/*
+  apk add --quiet --no-progress --update coreutils
+  find /mnt/downloads -type f -name '*.lck' -delete
+  mkdir -p /root/.config/rclone/
+  chown -cR abc:abc /root/.config/rclone /app /system/* &>/dev/null
+  chmod -cR 755 /root/.config/rclone/ /app /system/* &>/dev/null
+  chown -cR abc:abc /root/.config/ &>/dev/null
 
-cp -r /conf/nginx.conf /etc/nginx/nginx.conf
-cp -r /conf/fpm-pool.conf /etc/php8/php-fpm.d/www.conf
-cp -r /conf/php.j2 /etc/php8/conf.d/custom.ini
+  ln -s /system/servicekeys/rclonegdsa.conf /root/.config/rclone/rclone.conf 
 
-rm -rf /system/uploader/.keys/{usedupload,lastday} \
-       /app/uploader/{pid,discord} \
-       /system/uploader/vfsforget/ 
 
-mkdir -p /system/uploader/.keys \
-         /system/uploader/{logs,json} \
-         /system/uploader/json/{done,upload}
+  USERAGENT=${USERAGENT:-null}
+  if [[ ${USERAGENT} == 'null' ]]; then
+     USERAGENT=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
+  fi
 
-USERAGENT=${USERAGENT:-null}
-if [[ ${USERAGENT} == 'null' ]]; then
-   USERAGENT=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
-fi
-
-apk add --quiet --no-progress --update coreutils
-find /mnt/downloads -type f -name '*.lck' -delete
-mkdir -p /root/.config/rclone/
-chown -cR abc:abc /root/.config/rclone/ /app /system/* > /dev/null
-chmod -cR 755 /root/.config/rclone/ /app /system/* > /dev/null
-chown -cR abc:abc /root/.config/ > /dev/null
-
-cp /system/servicekeys/rclonegdsa.conf /root/.config/rclone/rclone.conf 
-
-sample=/app/uploader/.sample.uploader.env
-uploaderenv=/system/uploader/uploader.env
-if [[ -f ${uploaderenv} ]]; then
+  sample=/app/uploader/.sample.uploader.env
+  uploaderenv=/system/uploader/uploader.env
+  if [[ -f ${uploaderenv} ]]; then
 source $uploaderenv
 echo -e "#-------------------------------------------------------
 #   UPLOADER ENVIROMENTS
