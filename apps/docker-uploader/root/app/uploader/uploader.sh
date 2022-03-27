@@ -18,7 +18,6 @@ function log() {
 log "dockserver.io Multi-Thread Uploader started"
 
 BASE=/system/uploader
-CONFIG=/system/servicekeys/rclonegdsa.conf
 CSV=/system/servicekeys/uploader.csv
 KEYLOCAL=/system/servicekeys/keys/
 LOGFILE=/system/uploader/logs
@@ -26,18 +25,19 @@ START=/system/uploader/json/upload
 DONE=/system/uploader/json/done
 CHK=/system/uploader/logs/check.log
 EXCLUDE=/system/uploader/rclone.exclude
-LTKEY=/system/uploader/.keys/last
-MAXT=730
-MINSA=1
-DIFF=1
+CUSTOM=/app/custom
+
+## FOR MAPPING CLEANUP
+
+CONFIG=""
 CRYPTED=""
 BWLIMIT=""
 USERAGENT=""
 
-mkdir -p "${LOGFILE}" "${START}" "${DONE}" 
-find "${BASE}" -type f -name '*.log' -delete
-find "${BASE}" -type f -name '*.txt' -delete
-find "${START}" -type f -name '*.json' -delete
+$(which mkdir) -p "${LOGFILE}" "${START}" "${DONE}" "${CUSTOM}" 
+$(which find) "${BASE}" -type f -name '*.log' -delete
+$(which find) "${BASE}" -type f -name '*.txt' -delete
+$(which find) "${START}" -type f -name '*.json' -delete
 
 ## EXPORT THE KEY SPECS
 
@@ -48,6 +48,8 @@ elif `ls -1p ${KEYLOCAL} | head -n1 | grep -Po '\[.*?]' | sed 's/.*\[\([^]]*\)].
 else
     log "no match found of GDSA[01=~100] or [01=~100]" && sleep infinity
 fi
+
+### EXCLUDE PART
 
 if [[ ! -f ${EXCLUDE} ]]; then
    cat > ${EXCLUDE} << EOF; $(echo)
@@ -78,12 +80,11 @@ if test -f ${CSV} ; then
 
    FILE=$(basename "${UPP[1]}")
    DIR=$(dirname "${UPP[1]}" | sed "s#${DLFOLDER}/${MOVE}##g")
-   ENDCONFIG=/app/custom/${UPP}.conf
-
+   ENDCONFIG=${CUSTOM}/${UPP}.conf
    ARRAY=$(ls -A ${KEYLOCAL} | wc -l )
    USED=$(( $RANDOM % ${ARRAY} + 1 ))
 
-   cat ${CSV} | grep -E ${DIR} | sed '/^\s*#.*$/d'| while IFS=$'|' read -ra myArray; do
+   $(which cat) ${CSV} | grep -E ${DIR} | sed '/^\s*#.*$/d'| while IFS=$'|' read -ra myArray; do
    if [[ ${myArray[2]} == "" && ${myArray[3]} == "" ]]; then
 
 cat > ${ENDCONFIG} << EOF; $(echo)
@@ -136,28 +137,29 @@ function rcloneupload() {
    STARTZ=$(date +%s)
    SIZE=$(stat -c %s "${DLFOLDER}/${UPP[1]}" | numfmt --to=iec-i --suffix=B --padding=7)
 
-   while true; do
+   for (( ; ; ))
+   do
       SUMSTART=$(stat -c %s "${DLFOLDER}/${UPP[1]}")
       sleep 5
       SUMTEST=$(stat -c %s "${DLFOLDER}/${UPP[1]}")
       if [[ "$SUMSTART" -eq "$SUMTEST" ]]; then
          sleep 1 && break
       else
-         sleep 1 && continue
+         sleep 1
       fi
    done
 
-   UPFILE=$($(which rclone) size "${DLFOLDER}/${UPP[1]}" --config="${CONFIG}" --json | cut -d ":" -f3 | cut -d "}" -f1)
-   touch "${LOGFILE}/${FILE}.txt"
-   ARRAY=$(ls -A ${KEYLOCAL} | wc -l )
-   USED=$(( $RANDOM % ${ARRAY} + 1 ))
-   echo "{\"filedir\": \"${DIR}\",\"filebase\": \"${FILE}\",\"filesize\": \"${SIZE}\",\"logfile\": \"${LOGFILE}/${FILE}.txt\",\"gdsa\": \"${KEY}$[USED]${CRYPTED}\"}" > "${START}/${FILE}.json"
-
-   if test -f "/app/rclone/${UPP}.conf";then
-      CONFIG=/system/servicekeys/${UPP}.conf
+   if test -f "${CUSTOM}/${UPP}.conf";then
+      CONFIG=/${CUSTOM}/${UPP}.conf && \
+      USED=$($(which rclone) listremotes --config="${CONFIG}" | grep "$1" | sed -e 's/://g' | sed -e 's/GDSA//g' | sort))
    else
-      CONFIG=/system/servicekeys/rclonegdsa.conf
+      CONFIG=/system/servicekeys/rclonegdsa.conf && \
+      ARRAY=$(ls -A ${KEYLOCAL} | wc -w ) && \
+      USED=$(( $RANDOM % ${ARRAY} + 1 ))
    fi
+
+   touch "${LOGFILE}/${FILE}.txt" && \
+   echo "{\"filedir\": \"${DIR}\",\"filebase\": \"${FILE}\",\"filesize\": \"${SIZE}\",\"logfile\": \"${LOGFILE}/${FILE}.txt\",\"gdsa\": \"${KEY}$[USED]${CRYPTED}\"}" > "${START}/${FILE}.json"
 
    if [[ "${BANDWITHLIMIT}" =~ ^[0-9][0-9]+([.][0-9]+)?$ ]]; then
       BWLIMIT="--bwlimit=${BANDWITHLIMIT}"
@@ -186,26 +188,28 @@ function rcloneupload() {
    $(which rm) -rf "${LOGFILE}/${FILE}.txt" "${START}/${FILE}.json" 
    $(which chmod) 755 "${DONE}/${FILE}.json"
 
-   if test -f "/app/rclone/${UPP}.conf";then
-      $(which rm) -rf /system/servicekeys/${UPP}.conf
+   if test -f "/${CUSTOM}/${UPP}.conf";then
+      $(which rm) -rf /${CUSTOM}/${UPP}.conf
    fi
 
 }
 
 ## START HERE UPLOADER LIVE
 
-while true; do
+for (( ; ; ))
+do
    source /system/uploader/uploader.env
    DLFOLDER=${DLFOLDER}
 
    if [[ "${DRIVEUSEDSPACE}" =~ ^[0-9][0-9]+([.][0-9]+)?$ ]]; then
-      while true ; do 
+      for (( ; ; ))
+      do
         LCT=$(df --output=pcent ${DLFOLDER} --exclude={${DLFOLDER}/nzb,${DLFOLDER}/torrent,${DLFOLDER}/torrents} | tr -dc '0-9')
         if [[ "${DRIVEUSEDSPACE}" =~ ^[0-9][0-9]+([.][0-9]+)?$ ]]; then
           if [[ ! "${LCT}" -ge "${DRIVEUSEDSPACE}" ]]; then
              sleep 5 && break
           else
-             sleep 30 && continue
+             sleep 30
           fi
         fi
       done
@@ -223,23 +227,23 @@ while true; do
    #### FIRST LOOP
    if [ `cat ${CHK} | wc -l` -gt 0 ]; then
       TRANSFERS=${TRANSFERS:-2}
-      ACTIVETRANSFERS=$(ls -1p ${LOGFILE} | wc -w)
       # shellcheck disable=SC2086
       cat "${CHK}" | while IFS=$'|' read -ra UPP; do
 
-         while true; do
+         for (( ; ; ))
+         do
+           ACTIVETRANSFERS=$(ls -1p ${LOGFILE} | wc -w)
            if [[ ! ${ACTIVETRANSFERS} -ge ${TRANSFERS} ]]; then
               sleep 1 && break
            else
               log "Already ${ACTIVETRANSFERS} transfers running, waiting for next loop"
-              sleep 10 && continue
+              sleep 10
            fi
          done
 
          ## Looping to correct drive
-         if test -f ${CSV} ; then
-            loopcsv
-         fi
+         if test -f ${CSV}; then loopcsv ; fi
+
          ## upload function startup
          rcloneupload
          ## upload function shutdown
