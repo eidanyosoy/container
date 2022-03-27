@@ -41,66 +41,13 @@ find "${START}" -type f -name '*.json' -delete
 
 ## EXPORT THE KEY SPECS
 
-if `ls -1p /system/servicekeys/keys/ | head -n1 | grep "GDSA" &>/dev/null`;then
-    export MOVEKEY=GDSA
-elif `ls -1p /system/servicekeys/keys/ | head -n1 | grep -Po '\[.*?]' | sed 's/.*\[\([^]]*\)].*/\1/' | sed '/GDSA/d'`;then
-    export MOVEKEY=NOGDSA
+if `ls -1p ${KEYLOCAL} | head -n1 | grep "GDSA" &>/dev/null`;then
+    export KEY=GDSA
+elif `ls -1p ${KEYLOCAL} | head -n1 | grep -Po '\[.*?]' | sed 's/.*\[\([^]]*\)].*/\1/' | sed '/GDSA/d'`;then
+    export KEY=""
 else
     log "no match found of GDSA[01=~100] or [01=~100]" && sleep infinity
 fi
-
-#####
-
-function loopcsv() {
-
-CSV=/system/servicekeys/uploader.csv
-
-mkdir -p /app/custom/
-if test -f ${CSV} ; then
-   UPP=${UPP}
-   MOVE=${MOVE:-/}
-   FILE=$(basename "${UPP[1]}")
-   DIR=$(dirname "${UPP[1]}" | sed "s#${DLFOLDER}/${MOVE}##g")
-   ENDCONFIG=/app/custom/${UPP}.conf
-
-   ARRAY=$(ls -A ${KEYLOCAL} | wc -l )
-   USED=$(( $RANDOM % ${ARRAY} + 1 ))
-
-   cat ${CSV} | grep -E ${DIR} | sed '/^\s*#.*$/d'| while IFS=$'|' read -ra myArray; do
-   if [[ ${myArray[2]} == "" && ${myArray[3]} == "" ]]; then
-
-cat > ${ENDCONFIG} << EOF; $(echo)
-[${KEY}$[USED]]
-type = drive
-scope = drive
-server_side_across_configs = true
-service_account_file = ${JSONDIR}/${KEY}$[USED]
-team_drive = ${myArray[1]}
-EOF
-
-else
-
-cat > ${ENDCONFIG} << EOF; $(echo)
-[${KEY}$[USED]]
-type = drive
-scope = drive
-server_side_across_configs = true
-service_account_file = ${JSONDIR}/${USED}
-team_drive = ${myArray[1]}
-
-[${KEY}$[USED]C]
-type = crypt
-remote = ${USED[0]}:/encrypt
-filename_encryption = standard
-directory_name_encryption = true
-password = ${myArray[2]}
-password2 = ${myArray[3]}
-EOF
-   fi
-done
-fi
-
-}
 
 if [[ ! -f ${EXCLUDE} ]]; then
    cat > ${EXCLUDE} << EOF; $(echo)
@@ -120,25 +67,84 @@ deluge/**
 EOF
 fi
 
+##### FUNCTIONS
+
+function loopcsv() {
+
+mkdir -p /app/custom/
+if test -f ${CSV} ; then
+   UPP=${UPP}
+   MOVE=${MOVE:-/}
+
+   FILE=$(basename "${UPP[1]}")
+   DIR=$(dirname "${UPP[1]}" | sed "s#${DLFOLDER}/${MOVE}##g")
+   ENDCONFIG=/app/custom/${UPP}.conf
+
+   ARRAY=$(ls -A ${KEYLOCAL} | wc -l )
+   USED=$(( $RANDOM % ${ARRAY} + 1 ))
+
+   cat ${CSV} | grep -E ${DIR} | sed '/^\s*#.*$/d'| while IFS=$'|' read -ra myArray; do
+   if [[ ${myArray[2]} == "" && ${myArray[3]} == "" ]]; then
+
+cat > ${ENDCONFIG} << EOF; $(echo)
+## CUSTOM RCLONE.CONF
+[${KEY}$[USED]]
+type = drive
+scope = drive
+server_side_across_configs = true
+service_account_file = ${JSONDIR}/${KEY}$[USED]
+team_drive = ${myArray[1]}
+EOF
+
+   else
+
+cat > ${ENDCONFIG} << EOF; $(echo)
+## CUSTOM RCLONE.CONF
+[${KEY}$[USED]]
+type = drive
+scope = drive
+server_side_across_configs = true
+service_account_file = ${JSONDIR}/${KEY}$[USED]
+team_drive = ${myArray[1]}
+##
+[${KEY}$[USED]C]
+type = crypt
+remote = ${KEY}$[USED]:/encrypt
+filename_encryption = standard
+directory_name_encryption = true
+password = ${myArray[2]}
+password2 = ${myArray[3]}
+EOF
+
+   fi
+
+   done
+
+fi
+
+}
+
 function rcloneupload() {
+
+   source /system/uploader/uploader.env
+   DLFOLDER=${DLFOLDER}
 
    UPP=${UPP}
    MOVE=${MOVE:-/}
-   DLFOLDER=${DLFOLDER}
    FILE=$(basename "${UPP[1]}")
    DIR=$(dirname "${UPP[1]}" | sed "s#${DLFOLDER}/${MOVE}##g")
    STARTZ=$(date +%s)
    SIZE=$(stat -c %s "${DLFOLDER}/${UPP[1]}" | numfmt --to=iec-i --suffix=B --padding=7)
 
    while true; do
-     SUMSTART=$(stat -c %s "${DLFOLDER}/${UPP[1]}")
-     sleep 5
-     SUMTEST=$(stat -c %s "${DLFOLDER}/${UPP[1]}")
-     if [[ "$SUMSTART" -eq "$SUMTEST" ]]; then
-        sleep 1 && break
-     else
-        sleep 1 && continue
-     fi
+      SUMSTART=$(stat -c %s "${DLFOLDER}/${UPP[1]}")
+      sleep 5
+      SUMTEST=$(stat -c %s "${DLFOLDER}/${UPP[1]}")
+      if [[ "$SUMSTART" -eq "$SUMTEST" ]]; then
+         sleep 1 && break
+      else
+         sleep 1 && continue
+      fi
    done
 
    UPFILE=$($(which rclone) size "${DLFOLDER}/${UPP[1]}" --config="${CONFIG}" --json | cut -d ":" -f3 | cut -d "}" -f1)
@@ -151,6 +157,10 @@ function rcloneupload() {
       CONFIG=/system/servicekeys/${UPP}.conf
    else
       CONFIG=/system/servicekeys/rclonegdsa.conf
+   fi
+
+   if [[ "${BANDWITHLIMIT}" =~ ^[0-9][0-9]+([.][0-9]+)?$ ]]; then
+      BWLIMIT="--bwlimit=${BANDWITHLIMIT}"
    fi
 
    ## RUN MOVE
@@ -187,12 +197,12 @@ function rcloneupload() {
 while true; do
    source /system/uploader/uploader.env
    DLFOLDER=${DLFOLDER}
-   if [[ "${BANDWITHLIMIT}" =~ ^[0-9][0-9]+([.][0-9]+)?$ ]]; then BWLIMIT="--bwlimit=${BANDWITHLIMIT}" ; fi
+
    if [[ "${DRIVEUSEDSPACE}" =~ ^[0-9][0-9]+([.][0-9]+)?$ ]]; then
       while true ; do 
-        LCT=$(df --output=pcent ${DLFOLDER} --exclude={${DLFOLDER}/nzb,${DLFOLDER}/torrent,${DLFOLDER}/torrents} | tail -n 1 | cut -d'%' -f1)
+        LCT=$(df --output=pcent ${DLFOLDER} --exclude={${DLFOLDER}/nzb,${DLFOLDER}/torrent,${DLFOLDER}/torrents} | tr -dc '0-9')
         if [[ "${DRIVEUSEDSPACE}" =~ ^[0-9][0-9]+([.][0-9]+)?$ ]]; then
-          if [[ ! "${LCT}" -gt "${DRIVEUSEDSPACE}" ]]; then
+          if [[ ! "${LCT}" -ge "${DRIVEUSEDSPACE}" ]]; then
              sleep 5 && break
           else
              sleep 30 && continue
@@ -200,13 +210,24 @@ while true; do
         fi
       done
    fi
-   $(which rclone) lsf --files-only -R --min-age="${MIN_AGE_FILE}" --config="${CONFIG}" --separator "|" --format="tp" --order-by="modtime" --exclude-from="${EXCLUDE}" "${DLFOLDER}" | sort  > "${CHK}" 2>&1
+
+   #### RCLONE LIST FILE
+   $(which rclone) lsf "${DLFOLDER}" \
+      --files-only -R \
+      --min-age="${MIN_AGE_FILE}" \
+      --separator "|" \
+      --format="tp" \
+      --order-by="modtime" \
+      --exclude-from="${EXCLUDE}" | sort  > "${CHK}" 2>&1
+
+   #### FIRST LOOP
    if [ `cat ${CHK} | wc -l` -gt 0 ]; then
       TRANSFERS=${TRANSFERS:-2}
       ACTIVETRANSFERS=$(ls -1p ${LOGFILE} | wc -w)
       # shellcheck disable=SC2086
       cat "${CHK}" | while IFS=$'|' read -ra UPP; do
-         while true ;do
+
+         while true; do
            if [[ ! ${ACTIVETRANSFERS} -ge ${TRANSFERS} ]]; then
               sleep 1 && break
            else
@@ -214,6 +235,7 @@ while true; do
               sleep 10 && continue
            fi
          done
+
          ## Looping to correct drive
          if test -f ${CSV} ; then
             loopcsv
@@ -221,17 +243,28 @@ while true; do
          ## upload function startup
          rcloneupload
          ## upload function shutdown
-         LCT=$(df --output=pcent ${DLFOLDER} --exclude={${DLFOLDER}/nzb,${DLFOLDER}/torrent} | tail -n 1 | cut -d'%' -f1)
+
+         LCT=$(df --output=pcent ${DLFOLDER} --exclude={${DLFOLDER}/nzb,${DLFOLDER}/torrent,${DLFOLDER}/torrents} | tr -dc '0-9')
          if [[ "${DRIVEUSEDSPACE}" =~ ^[0-9][0-9]+([.][0-9]+)?$ ]]; then
-            if [[ ! "${LCT}" -gt "${DRIVEUSEDSPACE}" ]]; then
+            if [[ ! "${LCT}" -ge "${DRIVEUSEDSPACE}" ]]; then
                $(which rm) -rf "${CHK}" "${LOGFILE}/${FILE}.txt" "${START}/${FILE}.json" && \
                $(which chmod) 755 "${DONE}/${FILE}.json" && \
                break
             fi
          fi
+
       done
-      $(which rm) -rf "${CHK}" && log "MOVE FINISHED from ${DLFOLDER} to REMOTE"
+
+      $(which rm) -rf "${CHK}" && \
+      log "MOVE FINISHED from ${DLFOLDER} to REMOTE"
+
    else
-      log "MOVE skipped || less then 1 file" && sleep 60
+
+      log "MOVE skipped || less then 1 file" && \
+      sleep 60
+
    fi
 done
+
+
+## END OF FILE
