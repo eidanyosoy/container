@@ -16,11 +16,13 @@
 #####################################
 # shellcheck disable=SC2086
 # shellcheck disable=SC2046
+
+LABEL org.opencontainers.image.source="https://github.com/dockserver/container"
 FROM ghcr.io/dockserver/docker-alpine:latest
 ARG TARGETPLATFORM
 ARG BUILDPLATFORM
 
-ARG VERSION="5a091d55a6716eecb12b48c9e0a74873e441b4e9"
+ARG VERSION="dbaed5c8ed896b9aa11928fa384bfe3662ff5630"
 ARG BRANCH="develop"
 ARG UNRAR_VERSION=6.1.4
 
