@@ -40,7 +40,7 @@ DESCRIPTION="$(curl -u $USERNAME:$TOKEN -sX GET "$APPLINK" | jq -r '.description
 BASEIMAGE="ghcr.io/dockserver/docker-alpine:latest"
 
 INSTCOMMAND="apk add -U --update --no-cache"
-PACKAGES="jq curl p7zip par2cmdline python3 py3-pip"
+PACKAGES="jq ffmpeg curl p7zip par2cmdline python3 py3-pip"
 
 VIRTUEL="--virtual=build-dependencies build-base gcc jq libffi-dev openssl-dev python3-dev"
 ##APPSPEC="--repository http://dl-cdn.alpinelinux.org/alpine/v3.14/main unrar"
