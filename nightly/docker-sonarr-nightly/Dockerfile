@@ -20,6 +20,7 @@ FROM ghcr.io/dockserver/docker-alpine:latest
 
 ARG TARGETPLATFORM
 ARG BUILDPLATFORM
+
 ARG VERSION="3.0.7.1487"
 ARG BRANCH="develop"
 
@@ -28,7 +29,7 @@ ENV XDG_CONFIG_HOME="/config/xdg"
 RUN \
   echo "**** install build packages ****" && \
     apk add -U --update --no-cache \
-    --repository http://dl-cdn.alpinelinux.org/alpine/edge/main jq openssl curl wget tar mediainfo sqlite-libs tinyxml2 && \
+    --repository http://dl-cdn.alpinelinux.org/alpine/edge/main jq ffmpeg openssl curl wget tar mediainfo sqlite-libs tinyxml2 && \
   echo "**** install app packages ****" && \
     apk add -U --update --no-cache \
     --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing mono && \

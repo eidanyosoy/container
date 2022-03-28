@@ -20,15 +20,16 @@ FROM ghcr.io/dockserver/docker-alpine:latest
 
 ARG TARGETPLATFORM
 ARG BUILDPLATFORM
+
 ARG VERSION="4.0.5.5981"
 ARG BRANCH="master"
 
 ENV XDG_CONFIG_HOME="/config/xdg"
 
-RUN  \
-  echo "**** install packages ****" && \
-    apk add -U --update --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/main jq openssl curl icu-libs wget tar sqlite-libs mediainfo && \
-    apk add -U --update --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/main tinyxml2 && \
+RUN \
+  echo "**** install build packages ****" && \
+    apk add -U --update --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/main jq openssl curl icu-libs wget tar sqlite-libs ffmpeg mediainfo tinyxml2 && \
+  echo "**** install app packages ****" && \
     apk add -U --update --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/community libmediainfo  && \
   echo "**** install 'docker-radarr' ****" && \
     mkdir -p /app/radarr/bin && \

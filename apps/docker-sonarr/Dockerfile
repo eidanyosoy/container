@@ -25,16 +25,16 @@ ARG BRANCH="main"
 
 ENV XDG_CONFIG_HOME="/config/xdg"
 
-RUN  \
-  echo "**** install packages ****" && \
-    apk add -U --update --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/main jq openssl curl wget mediainfo tar sqlite-libs && \
-    apk add -U --update --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/main tinyxml2 && \
-    apk add -U --update --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/main tinyxml2 && \
+RUN \
+  echo "**** install build packages ****" && \
+    apk add -U --update --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/main jq ffmpeg openssl curl wget tar mediainfo sqlite-libs tinyxml2 && \
+  echo "**** install app packages ****" && \
     apk add -U --update --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing mono && \
   echo "**** install 'docker-sonarr' ****" && \
     mkdir -p /app/sonarr/bin && \
     curl -fsSL "https://download.sonarr.tv/v3/${BRANCH}/${VERSION}/Sonarr.${BRANCH}.${VERSION}.linux.tar.gz" | tar xzf - -C /app/sonarr/bin --strip-components=1 && \
   echo -e "UpdateMethod=docker\nBranch=${BRANCH}\nPackageVersion=${VERSION}\nPackageAuthor=[dockserver.io](https://dockserver.io)" > /app/sonarr/package_info && \
+    echo -e "3.15" > /etc/alpine-release && \
   echo "**** cleanup ****" && \
     rm -rf /app/sonarr/bin/Sonarr.Update
 

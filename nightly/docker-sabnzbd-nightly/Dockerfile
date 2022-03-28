@@ -30,7 +30,7 @@ PYTHONIOENCODING=utf-8
 RUN \
   echo "**** install packages ****" && \
     apk add -U --update --no-cache --virtual=build-dependencies build-base gcc jq libffi-dev openssl-dev python3-dev && \
-    apk add -U --update --no-cache jq curl p7zip par2cmdline python3 py3-pip && \
+    apk add -U --update --no-cache jq ffmpeg curl p7zip par2cmdline python3 py3-pip && \
   echo "**** install unrar ****" && \
     mkdir -p /tmp/unrar && \
     curl -fsSL "https://www.rarlab.com/rar/unrarsrc-"${UNRAR_VERSION}".tar.gz" | tar xzf - -C /tmp/unrar --strip-components=1 && \

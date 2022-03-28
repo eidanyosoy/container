@@ -28,7 +28,7 @@ ENV XDG_CONFIG_HOME="/config/xdg"
 
 RUN \
   echo "**** install build packages ****" && \
-    apk add -U --update --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/main jq openssl curl icu-libs wget tar sqlite-libs mediainfo tinyxml2 && \
+    apk add -U --update --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/main jq openssl curl icu-libs wget tar sqlite-libs ffmpeg mediainfo tinyxml2 && \
   echo "**** install app packages ****" && \
     apk add -U --update --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/community libmediainfo  && \
   echo "**** install 'docker-radarr-nightly' ****" && \
