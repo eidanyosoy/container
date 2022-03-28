@@ -40,7 +40,7 @@ DESCRIPTION="$(curl -u $USERNAME:$TOKEN -sX GET "$APPLINK" | jq -r '.description
 BASEIMAGE="ghcr.io/dockserver/docker-alpine:latest"
 
 INSTCOMMAND="apk add -U --update --no-cache"
-PACKAGES="--repository http://dl-cdn.alpinelinux.org/alpine/edge/main jq openssl curl wget tar mediainfo sqlite-libs tinyxml2"
+PACKAGES="--repository http://dl-cdn.alpinelinux.org/alpine/edge/main jq ffmpeg openssl curl wget tar mediainfo sqlite-libs tinyxml2"
 APPSPEC="--repository http://dl-cdn.alpinelinux.org/alpine/edge/testing mono"
 CLEANUP="rm -rf /app/sonarr/bin/Sonarr.Update"
 
