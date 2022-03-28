@@ -16,8 +16,6 @@
 #####################################
 # shellcheck disable=SC2086
 # shellcheck disable=SC2046
-
-LABEL org.opencontainers.image.source="https://github.com/dockserver/container"
 FROM ghcr.io/linuxserver/baseimage-ubuntu:bionic as buildstage
 LABEL org.opencontainers.image.source="https://github.com/dockserver/container"
 

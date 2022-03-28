@@ -16,8 +16,6 @@
 #####################################
 # shellcheck disable=SC2086
 # shellcheck disable=SC2046
-
-LABEL org.opencontainers.image.source="https://github.com/dockserver/container"
 FROM haproxy:2.5.5-alpine3.15
 LABEL org.opencontainers.image.source="https://github.com/dockserver/container"
 
