@@ -34,9 +34,8 @@ DESCRIPTION="$(curl -u $USERNAME:$TOKEN -sX GET "$APPLINK" | jq -r '.description
 BASEIMAGE="ghcr.io/dockserver/docker-alpine:latest"
 
 INSTCOMMAND="apk add -U --update --no-cache"
-PACKAGES="--repository http://dl-cdn.alpinelinux.org/alpine/edge/main jq openssl curl icu-libs wget tar sqlite-libs mediainfo"
-APPSPEC="--repository http://dl-cdn.alpinelinux.org/alpine/edge/main tinyxml2"
-APPSPEC2="--repository http://dl-cdn.alpinelinux.org/alpine/edge/community libmediainfo "
+PACKAGES="--repository http://dl-cdn.alpinelinux.org/alpine/edge/main jq openssl curl icu-libs wget tar sqlite-libs ffmpeg mediainfo tinyxml2"
+APPSPEC="--repository http://dl-cdn.alpinelinux.org/alpine/edge/community libmediainfo "
 CLEANUP="rm -rf /app/radarr/bin/Radarr.Update"
 PICTURE="./images/$APP.png"
 
@@ -70,16 +69,17 @@ FROM '"${BASEIMAGE}"'
 
 ARG TARGETPLATFORM
 ARG BUILDPLATFORM
+
 ARG VERSION="'"${NEWVERSION}"'"
 ARG BRANCH="'"${APPBRANCH}"'"
 
 ENV XDG_CONFIG_HOME="'"/config/xdg"'"
 
-RUN  \
-  echo "'"**** install packages ****"'" && \
+RUN \
+  echo "'"**** install build packages ****"'" && \
     '"${INSTCOMMAND}"' '"${PACKAGES}"' && \
+  echo "'"**** install app packages ****"'" && \
     '"${INSTCOMMAND}"' '"${APPSPEC}"' && \
-    '"${INSTCOMMAND}"' '"${APPSPEC2}"' && \
   echo "'"**** install '"${APP}"' ****"'" && \
     mkdir -p /app/radarr/bin && \
     curl -fsSL "'"https://radarr.servarr.com/v1/update/"'${BRANCH}'"/updatefile?version="'${VERSION}'"&os=linuxmusl&runtime=netcore&arch=x64"'" | tar xzf - -C /app/radarr/bin --strip-components=1 && \

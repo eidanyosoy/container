@@ -42,7 +42,7 @@ BASEIMAGE="ghcr.io/dockserver/docker-alpine:latest"
 BUILDDATE="$(date +%Y-%m-%d)"
 
 INSTCOMMAND="apk add -U --update --no-cache"
-PACKAGES="--repository http://dl-cdn.alpinelinux.org/alpine/edge/main jq openssl curl icu-libs wget tar sqlite-libs mediainfo tinyxml2"
+PACKAGES="--repository http://dl-cdn.alpinelinux.org/alpine/edge/main jq openssl curl icu-libs wget tar sqlite-libs ffmpeg mediainfo tinyxml2"
 APPSPEC="--repository http://dl-cdn.alpinelinux.org/alpine/edge/community libmediainfo "
 CLEANUP="rm -rf /app/radarr/bin/Radarr.Update"
 PICTURE="./images/$APP.png"

@@ -34,7 +34,7 @@ libintl-0.20.2-r2
 libksba-1.5.0-r0
 libldap-2.4.57-r1
 libmount-2.37.4-r0
-libsasl-2.1.27-r10
+libsasl-2.1.28-r0
 libsecret-0.20.4-r0
 libssl1.1-1.1.1n-r0
 libtasn1-4.16.0-r1
