@@ -16,7 +16,7 @@ env:
   PLATFORM: "linux/amd64"
   DOCKER_CLI_EXPERIMENTAL: enabled
   LICENSE: "GPL-3.0 DockServer.io"
-  SOURCE: "dockserver.io"
+  SOURCE: "https://github.com/dockserver/container"
   CODE_OWNED: "base image LSIO, changes dockserver.io"
   CACHE: "gha"
 
