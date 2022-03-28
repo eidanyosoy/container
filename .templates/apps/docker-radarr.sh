@@ -84,6 +84,7 @@ RUN \
     mkdir -p /app/radarr/bin && \
     curl -fsSL "'"https://radarr.servarr.com/v1/update/"'${BRANCH}'"/updatefile?version="'${VERSION}'"&os=linuxmusl&runtime=netcore&arch=x64"'" | tar xzf - -C /app/radarr/bin --strip-components=1 && \
   echo -e "'"UpdateMethod=docker\nBranch="'${BRANCH}'"\nPackageVersion="'${VERSION}'"\nPackageAuthor=[dockserver.io](https://dockserver.io)"'" > /app/radarr/package_info && \
+    echo -e "'"3.15.2"'" > /etc/alpine-release && \
   echo "'"**** cleanup ****"'" && \
     '"${CLEANUP}"'
 
