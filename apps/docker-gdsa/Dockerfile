@@ -19,6 +19,7 @@
 
 LABEL org.opencontainers.image.source="https://github.com/dockserver/container"
 FROM gcr.io/google.com/cloudsdktool/cloud-sdk:378.0.0-alpine
+LABEL org.opencontainers.image.source="https://github.com/dockserver/container"
 
 ARG TARGETPLATFORM
 ARG BUILDPLATFORM

@@ -19,9 +19,11 @@
 
 LABEL org.opencontainers.image.source="https://github.com/dockserver/container"
 FROM ghcr.io/linuxserver/baseimage-ubuntu:bionic
+LABEL org.opencontainers.image.source="https://github.com/dockserver/container"
 
 ARG TARGETPLATFORM
 ARG BUILDPLATFORM
+
 ARG VERSION="0.2.0-beta.27"
 ARG BRANCH="master"
 

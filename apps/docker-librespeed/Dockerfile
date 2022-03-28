@@ -19,13 +19,15 @@
 
 LABEL org.opencontainers.image.source="https://github.com/dockserver/container"
 FROM ghcr.io/linuxserver/baseimage-alpine-nginx:3.15
+LABEL org.opencontainers.image.source="https://github.com/dockserver/container"
 
 ARG TARGETPLATFORM
 ARG BUILDPLATFORM
+
 ARG VERSION="5.2.5"
 ARG BRANCH="master"
 
-RUN  \
+RUN \
   echo "**** install packages ****" && \
     apk add -U --update --no-cache aria2 jq tar curl php7-ctype php7-gd php7-mysqli php7-pdo_pgsql php7-pdo_sqlite && \
   echo "**** install 'docker-librespeed' ****" && \

@@ -19,9 +19,11 @@
 
 LABEL org.opencontainers.image.source="https://github.com/dockserver/container"
 FROM ghcr.io/linuxserver/baseimage-ubuntu:focal
+LABEL org.opencontainers.image.source="https://github.com/dockserver/container"
 
 ARG TARGETPLATFORM
 ARG BUILDPLATFORM
+
 ARG VERSION="1.25.8.5663-e071c3d62"
 ARG BRANCH="master"
 

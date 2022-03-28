@@ -19,9 +19,11 @@
 
 LABEL org.opencontainers.image.source="https://github.com/dockserver/container"
 FROM ghcr.io/dockserver/docker-alpine:latest
+LABEL org.opencontainers.image.source="https://github.com/dockserver/container"
 
 ARG TARGETPLATFORM
 ARG BUILDPLATFORM
+
 ARG VERSION="3.0.7.1477"
 ARG BRANCH="main"
 

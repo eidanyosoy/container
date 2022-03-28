@@ -19,9 +19,11 @@
 
 LABEL org.opencontainers.image.source="https://github.com/dockserver/container"
 FROM alpine:3.15.2 as buildstage
+LABEL org.opencontainers.image.source="https://github.com/dockserver/container"
 
 ARG TARGETPLATFORM
 ARG BUILDPLATFORM
+
 ARG BASEVERSION="3.15.2"
 ARG APPVERSION="1.4.25"
 ARG WIKIVERSION="8.2.8"

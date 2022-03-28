@@ -19,9 +19,11 @@
 
 LABEL org.opencontainers.image.source="https://github.com/dockserver/container"
 FROM haproxy:2.5.5-alpine3.15
+LABEL org.opencontainers.image.source="https://github.com/dockserver/container"
 
 ARG TARGETPLATFORM
 ARG BUILDPLATFORM
+
 ARG VERSION="2.5.5-alpine3.15"
 
 ENV ALLOW_RESTARTS=0 \
