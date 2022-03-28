@@ -33,10 +33,8 @@ DESCRIPTION="$(curl -u $USERNAME:$TOKEN -sX GET "$APPLINK" | jq -r '.description
 BASEIMAGE="ghcr.io/dockserver/docker-alpine:latest"
 
 INSTCOMMAND="apk add -U --update --no-cache"
-PACKAGES="--repository http://dl-cdn.alpinelinux.org/alpine/edge/main jq openssl curl wget mediainfo tar sqlite-libs"
-APPSPEC="--repository http://dl-cdn.alpinelinux.org/alpine/edge/main tinyxml2"
-APPSPEC2="--repository http://dl-cdn.alpinelinux.org/alpine/edge/main tinyxml2"
-APPSPEC3="--repository http://dl-cdn.alpinelinux.org/alpine/edge/testing mono"
+PACKAGES="--repository http://dl-cdn.alpinelinux.org/alpine/edge/main jq ffmpeg openssl curl wget tar mediainfo sqlite-libs tinyxml2"
+APPSPEC="--repository http://dl-cdn.alpinelinux.org/alpine/edge/testing mono"
 CLEANUP="rm -rf /app/sonarr/bin/Sonarr.Update"
 
 PICTURE="./images/$APP.png"
@@ -74,16 +72,16 @@ ARG BRANCH="'"${APPBRANCH}"'"
 
 ENV XDG_CONFIG_HOME="'"/config/xdg"'"
 
-RUN  \
-  echo "'"**** install packages ****"'" && \
+RUN \
+  echo "'"**** install build packages ****"'" && \
     '"${INSTCOMMAND}"' '"${PACKAGES}"' && \
+  echo "'"**** install app packages ****"'" && \
     '"${INSTCOMMAND}"' '"${APPSPEC}"' && \
-    '"${INSTCOMMAND}"' '"${APPSPEC2}"' && \
-    '"${INSTCOMMAND}"' '"${APPSPEC3}"' && \
   echo "'"**** install '"${APP}"' ****"'" && \
     mkdir -p /app/sonarr/bin && \
     curl -fsSL "'"https://download.sonarr.tv/v3/"'${BRANCH}'"/"'${VERSION}'"/Sonarr."'${BRANCH}'"."'${VERSION}'".linux.tar.gz"'" | tar xzf - -C /app/sonarr/bin --strip-components=1 && \
   echo -e "'"UpdateMethod=docker\nBranch="'${BRANCH}'"\nPackageVersion="'${VERSION}'"\nPackageAuthor=[dockserver.io](https://dockserver.io)"'" > /app/sonarr/package_info && \
+    echo -e "'"3.15"'" > /etc/alpine-release && \
   echo "'"**** cleanup ****"'" && \
     '"${CLEANUP}"'
 
