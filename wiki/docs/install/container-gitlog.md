@@ -34,3 +34,14 @@
  * Update github-metrics.svg - [Skip GitHub Action] (doob187)
  * Update github-metrics.svg - [Skip GitHub Action] (doob187)
  * Update rebase.yml (doob187)
+ * [Auto Generation] Changes : .github/workflows/rebase.yml (dockserver-bot[bot])
+ * [Auto Changes Packages] Changes : wiki/docs/install/container-gitlog.md (github-actions[bot])
+ * Update github-metrics.svg - [Skip GitHub Action] (doob187)
+ * Update headline.txt (doob187)
+ * [Auto Generation] Changes : .templates/headline.txt (dockserver-bot[bot])
+ * Update github-metrics.svg - [Skip GitHub Action] (doob187)
+
+## 2022-03-28
+ * [Auto Generation] Changes : github-metrics.svg (dockserver-bot[bot])
+ * [Auto Generation] Changes : wiki/docs/install/container-gitlog.md (dockserver-bot[bot])
+ * [Auto Generation] Changes : wiki/docs/install/container-gitlog.md (dockserver-bot[bot])

@@ -16,11 +16,12 @@
 #####################################
 # shellcheck disable=SC2086
 # shellcheck disable=SC2046
+LABEL org.opencontainers.image.source https://github.com/dockserver/container
 FROM ghcr.io/linuxserver/baseimage-ubuntu:bionic
 
 ARG TARGETPLATFORM
 ARG BUILDPLATFORM
-ARG VERSION="0.20.770"
+ARG VERSION="0.20.772"
 ARG BRANCH="master"
 
 ARG DEBIAN_FRONTEND="noninteractive"
@@ -37,7 +38,7 @@ RUN \
      curl -fsSL "https://github.com/Jackett/Jackett/releases/download/v${VERSION}/Jackett.Binaries.LinuxAMDx64.tar.gz" | tar xzf - -C /app/Jackett --strip-components=1 && \
    echo "**** fix for host id mapping error ****" && \
      chown -R root:root /app/Jackett && \
-   echo "v0.20.770" > /etc/docker-image && \
+   echo "v0.20.772" > /etc/docker-image && \
    echo "**** cleanup ****" && \
      apt-get remove -yqq software-properties-common gpg-agent && \
      apt-get autoremove -yqq && apt-get clean -yqq && \
