@@ -16,7 +16,7 @@
 #####################################
 # shellcheck disable=SC2086
 # shellcheck disable=SC2046
-FROM ghcr.io/dockserver/docker-alpine-v3:v3.15.2
+FROM ghcr.io/dockserver/docker-alpine-v3:v3.15.3
 LABEL org.opencontainers.image.source="https://github.com/dockserver/container"
 
 ARG TARGETPLATFORM
@@ -29,7 +29,7 @@ RUN \
   echo "**** install build packages ****" && \
     apk add -U --update --no-cache bash ca-certificates shadow musl findutils linux-headers coreutils apk-tools busybox && \
   echo "**** set alpine version ****" && \
-    echo -e "3.15.2" > /etc/alpine-release && \
+    echo -e "3.15.3" > /etc/alpine-release && \
   echo "*** cleanup system ****" && \
     apk del --quiet --clean-protected --no-progress && \
     rm -f /var/cache/apk/*
