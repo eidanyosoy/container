@@ -2,6 +2,7 @@
 ARG VERSION
 
 FROM eafxx/alpine-python
+LABEL org.opencontainers.image.source="https://github.com/dockserver/container"
 
 ENV \
   APP_DIR=traktarr \

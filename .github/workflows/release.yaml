@@ -16,7 +16,7 @@ env:
   PLATFORM: "linux/amd64"
   DOCKER_CLI_EXPERIMENTAL: enabled
   LICENSE: "GPL-3.0 DockServer.io"
-  SOURCE: "dockserver.io"
+  SOURCE: "https://github.com/dockserver/container"
   CODE_OWNED: "base image LSIO, changes dockserver.io"
   CACHE: "gha"
 
@@ -96,7 +96,6 @@ jobs:
            CREATED="$(date +%Y-%m-%d)"
         echo ::set-output name=shashort::$(echo ${GITHUB_SHA} | cut -c1-8)
         echo ::set-output name=created::${CREATED}
-        echo ::set-output name=source::${{ env.SOURCE }}
         echo ::set-output name=platformout::${{ env.PLATFORM }}
         echo ::set-output name=linc::${{ env.LICENSE }}
         echo ::set-output name=owndocker::${{ env.CODE_OWNED }}
@@ -195,7 +194,6 @@ jobs:
           org.opencontainers.image.maintainer=${{ github.repository_owner }}
           org.opencontainers.image.created=${{ steps.prep.outputs.created }}
           org.opencontainers.image.authors=${{ github.repository_owner }}
-          org.opencontainers.image.source=${{ steps.prep.outputs.source }}
           org.opencontainers.image.vendor=${{ github.repository_owner }}
           org.opencontainers.image.platform=${{ steps.prep.outputs.platformout }}
           org.opencontainers.image.license=${{ steps.prep.outputs.linc }}

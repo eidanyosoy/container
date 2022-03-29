@@ -17,15 +17,17 @@
 # shellcheck disable=SC2086
 # shellcheck disable=SC2046
 FROM ghcr.io/dockserver/docker-alpine:latest
+LABEL org.opencontainers.image.source="https://github.com/dockserver/container"
 
 ARG TARGETPLATFORM
 ARG BUILDPLATFORM
+
 ARG VERSION="1.28.0"
 ARG BRANCH=""
 
 ENV HOME="/config"
 
-RUN  \
+RUN \
   echo "**** install packages ****" && \
     apk add -U --update --no-cache --virtual=build-dependencies curl g++ jq curl wget tar make python3 && \
   echo "**** symlink python3 for compatibility ****" && \

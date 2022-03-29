@@ -12,6 +12,8 @@ ARG NGINX_UID=102
 ARG NGINX_GID=102
 
 FROM --platform=${BUILDPLATFORM:-linux/amd64} alpine:${ALPINE_VERSION} AS download
+LABEL org.opencontainers.image.source="https://github.com/dockserver/container"
+
 RUN apk --update --no-cache add curl git tar subversion
 
 ARG OVERLAY_VERSION

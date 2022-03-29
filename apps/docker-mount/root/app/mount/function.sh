@@ -315,7 +315,7 @@ $(which screen) -S rclonerc -dm bash -c "$(which bash) /tmp/rclone.sh";
 function rcmergerfs() {
 
 UFSPATH="/mnt/downloads=RW:/mnt/remotes=NC"
-MGFS="allow_other,rw,async_read=false,use_ino,func.getattr=newest,category.action=all,category.create=mspmfs,cache.files=auto-full,dropcacheonclose=true,nonempty,minfreespace=0,fsname=mergerfs"
+MGFS="allow_other,rw,async_read=true,statfs_ignore=nc,use_ino,func.getattr=newest,category.action=all,category.create=mspmfs,cache.writeback=true,cache.symlinks=true,cache.files=auto-full,dropcacheonclose=true,nonempty,minfreespace=0,fsname=mergerfs"
 $(which mergerfs) -o ${MGFS} ${UFSPATH} /mnt/unionfs &>/dev/null
  
 }

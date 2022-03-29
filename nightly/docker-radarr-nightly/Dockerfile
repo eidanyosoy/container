@@ -17,18 +17,19 @@
 # shellcheck disable=SC2086
 # shellcheck disable=SC2046
 FROM ghcr.io/dockserver/docker-alpine:latest
+LABEL org.opencontainers.image.source="https://github.com/dockserver/container"
 
 ARG TARGETPLATFORM
 ARG BUILDPLATFORM
 
-ARG VERSION="4.1.0.6092"
+ARG VERSION="4.1.0.6095"
 ARG BRANCH="nightly"
 
 ENV XDG_CONFIG_HOME="/config/xdg"
 
 RUN \
   echo "**** install build packages ****" && \
-    apk add -U --update --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/main jq openssl curl icu-libs wget tar sqlite-libs mediainfo tinyxml2 && \
+    apk add -U --update --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/main jq openssl curl icu-libs wget tar sqlite-libs ffmpeg mediainfo tinyxml2 && \
   echo "**** install app packages ****" && \
     apk add -U --update --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/community libmediainfo  && \
   echo "**** install 'docker-radarr-nightly' ****" && \

@@ -17,10 +17,12 @@
 # shellcheck disable=SC2086
 # shellcheck disable=SC2046
 FROM ghcr.io/dockserver/docker-alpine:latest
+LABEL org.opencontainers.image.source="https://github.com/dockserver/container"
+
 ARG TARGETPLATFORM
 ARG BUILDPLATFORM
 
-ARG VERSION="5a091d55a6716eecb12b48c9e0a74873e441b4e9"
+ARG VERSION="dbaed5c8ed896b9aa11928fa384bfe3662ff5630"
 ARG BRANCH="develop"
 ARG UNRAR_VERSION=6.1.4
 
@@ -30,7 +32,7 @@ PYTHONIOENCODING=utf-8
 RUN \
   echo "**** install packages ****" && \
     apk add -U --update --no-cache --virtual=build-dependencies build-base gcc jq libffi-dev openssl-dev python3-dev && \
-    apk add -U --update --no-cache jq curl p7zip par2cmdline python3 py3-pip && \
+    apk add -U --update --no-cache jq ffmpeg curl p7zip par2cmdline python3 py3-pip && \
   echo "**** install unrar ****" && \
     mkdir -p /tmp/unrar && \
     curl -fsSL "https://www.rarlab.com/rar/unrarsrc-"${UNRAR_VERSION}".tar.gz" | tar xzf - -C /tmp/unrar --strip-components=1 && \

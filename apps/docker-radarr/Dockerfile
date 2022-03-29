@@ -17,23 +17,26 @@
 # shellcheck disable=SC2086
 # shellcheck disable=SC2046
 FROM ghcr.io/dockserver/docker-alpine:latest
+LABEL org.opencontainers.image.source="https://github.com/dockserver/container"
 
 ARG TARGETPLATFORM
 ARG BUILDPLATFORM
+
 ARG VERSION="4.0.5.5981"
 ARG BRANCH="master"
 
 ENV XDG_CONFIG_HOME="/config/xdg"
 
-RUN  \
-  echo "**** install packages ****" && \
-    apk add -U --update --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/main jq openssl curl icu-libs wget tar sqlite-libs mediainfo && \
-    apk add -U --update --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/main tinyxml2 && \
+RUN \
+  echo "**** install build packages ****" && \
+    apk add -U --update --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/main jq openssl curl icu-libs wget tar sqlite-libs ffmpeg mediainfo tinyxml2 && \
+  echo "**** install app packages ****" && \
     apk add -U --update --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/community libmediainfo  && \
   echo "**** install 'docker-radarr' ****" && \
     mkdir -p /app/radarr/bin && \
     curl -fsSL "https://radarr.servarr.com/v1/update/${BRANCH}/updatefile?version=${VERSION}&os=linuxmusl&runtime=netcore&arch=x64" | tar xzf - -C /app/radarr/bin --strip-components=1 && \
   echo -e "UpdateMethod=docker\nBranch=${BRANCH}\nPackageVersion=${VERSION}\nPackageAuthor=[dockserver.io](https://dockserver.io)" > /app/radarr/package_info && \
+    echo -e "3.15.2" > /etc/alpine-release && \
   echo "**** cleanup ****" && \
     rm -rf /app/radarr/bin/Radarr.Update
 
