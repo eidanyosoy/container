@@ -239,12 +239,9 @@ if [ "${RT_LOG_XMLRPC}" = "true" ]; then
 fi
 
 # rTorrent config
-echo "  ${norm}[${green}+${norm}] Checking rTorrent configuration..."
-if [ ! -f ${CONFIG_PATH}/rtorrent/.rtorrent.rc ]; then
-  echo "    ${norm}[${blue}-${norm}] Creating default configuration..."
-  cp /etc/rtorrent/.rtorrent.rc ${CONFIG_PATH}/rtorrent/.rtorrent.rc
-  chown rtorrent. ${CONFIG_PATH}/rtorrent/.rtorrent.rc
-fi
+echo "    ${norm}[${blue}-${norm}] linking rutorrent configuration..."
+cp /etc/rtorrent/.rtorrent.rc ${CONFIG_PATH}/rtorrent/.rtorrent.rc
+chown rtorrent. ${CONFIG_PATH}/rtorrent/.rtorrent.rc
 
 # ruTorrent config
 echo "  ${norm}[${green}+${norm}] Bootstrapping ruTorrent configuration..."
