@@ -26,11 +26,13 @@ if [[ -d "/data" ]]; then
 else
    CONFIG_PATH=${CONFIG_PATH:-/config}
 fi
+
 if [[ -d "/mnt/downloads/torrents" ]];then
     DOWNLOAD_PATH=${DOWNLOAD_PATH:-/mnt/downloads/torrents}
 else
     DOWNLOAD_PATH=${DOWNLOAD_PATH:-/mnt/downloads/torrent}
 fi
+
 TOPDIR_PATH=${TOPDIR_PATH:-/mnt/downloads}
 WAN_IP=${WAN_IP:-$(dig +short myip.opendns.com @resolver1.opendns.com)}
 WAN_IP=${WAN_IP:-$(curl ifconfig.me)}
@@ -229,10 +231,12 @@ sed -e "s!@RT_LOG_LEVEL@!$RT_LOG_LEVEL!g" \
     -e "s!@CONFIG_PATH@!$CONFIG_PATH!g" \
     -e "s!@DOWNLOAD_PATH@!$DOWNLOAD_PATH!g" \
     -i /etc/rtorrent/.rtlocal.rc
+
 if [ "${RT_LOG_EXECUTE}" = "true" ]; then
   echo "    ${norm}[${blue}-${norm}] Enabling rTorrent execute log..."
   sed -i "s!#log\.execute.*!log\.execute = (cat,(cfg.logs),\"execute.log\")!g" /etc/rtorrent/.rtlocal.rc
 fi
+
 if [ "${RT_LOG_XMLRPC}" = "true" ]; then
   echo "    ${norm}[${blue}-${norm}] Enabling rTorrent xmlrpc log..."
   sed -i "s!#log\.xmlrpc.*!log\.xmlrpc = (cat,(cfg.logs),\"xmlrpc.log\")!g" /etc/rtorrent/.rtlocal.rc
@@ -318,26 +322,27 @@ chown nobody.nogroup "/var/www/rutorrent/conf/config.php"
 # Symlinking ruTorrent config
 ln -sf ${CONFIG_PATH}/rutorrent/conf/users /var/www/rutorrent/conf/users
 if [ ! -f ${CONFIG_PATH}/rutorrent/conf/access.ini ]; then
-  echo "  ${norm}[${green}+${norm}] Symlinking ruTorrent access.ini file..."
-  mv /var/www/rutorrent/conf/access.ini ${CONFIG_PATH}/rutorrent/conf/access.ini
-  ln -sf ${CONFIG_PATH}/rutorrent/conf/access.ini /var/www/rutorrent/conf/access.ini
+   echo "  ${norm}[${green}+${norm}] Symlinking ruTorrent access.ini file..."
+   mv /var/www/rutorrent/conf/access.ini ${CONFIG_PATH}/rutorrent/conf/access.ini
+   ln -sf ${CONFIG_PATH}/rutorrent/conf/access.ini /var/www/rutorrent/conf/access.ini
 fi
 chown rtorrent. ${CONFIG_PATH}/rutorrent/conf/access.ini
 if [ ! -f ${CONFIG_PATH}/rutorrent/conf/plugins.ini ]; then
-  echo "  ${norm}[${green}+${norm}] Symlinking ruTorrent plugins.ini file..."
-  mv /var/www/rutorrent/conf/plugins.ini ${CONFIG_PATH}/rutorrent/conf/plugins.ini
-  ln -sf ${CONFIG_PATH}/rutorrent/conf/plugins.ini /var/www/rutorrent/conf/plugins.ini
+   echo "  ${norm}[${green}+${norm}] Symlinking ruTorrent plugins.ini file..."
+   mv /var/www/rutorrent/conf/plugins.ini ${CONFIG_PATH}/rutorrent/conf/plugins.ini
+   ln -sf ${CONFIG_PATH}/rutorrent/conf/plugins.ini /var/www/rutorrent/conf/plugins.ini
 fi
+
 chown rtorrent. ${CONFIG_PATH}/rutorrent/conf/plugins.ini
 
 # Remove ruTorrent core plugins
 if [ -n "$RU_REMOVE_CORE_PLUGINS" ]; then
-  for i in ${RU_REMOVE_CORE_PLUGINS//,/ }
-  do
-    if [ -z "$i" ]; then continue; fi
-    echo "  ${norm}[${green}+${norm}] Removing core plugin ${green}$i${norm}..."
-    rm -rf "/var/www/rutorrent/plugins/${i}"
-  done
+   for i in ${RU_REMOVE_CORE_PLUGINS//,/ }
+   do
+     if [ -z "$i" ]; then continue; fi
+        echo "  ${norm}[${green}+${norm}] Removing core plugin ${green}$i${norm}..."
+        rm -rf "/var/www/rutorrent/plugins/${i}"
+   done
 fi
 
 # Override ruTorrent plugins config
@@ -403,8 +408,8 @@ echo "  ${norm}[${green}+${norm}] Checking ruTorrent custom plugins..."
 plugins=$(ls -l ${CONFIG_PATH}/rutorrent/plugins | egrep '^d' | awk '{print $9}')
 for plugin in ${plugins}; do
   if [ "${plugin}" == "theme" ]; then
-    echo "    ${norm}[${red}-${norm}] ${red}WARNING: Plugin theme cannot be overriden${norm}"
-    continue
+     echo "    ${norm}[${red}-${norm}] ${red}WARNING: Plugin theme cannot be overriden${norm}"
+     continue
   fi
   echo "    ${norm}[${blue}+${norm}] Copying custom plugin ${blue}${plugin}${norm}..."
   rm -rf "/var/www/rutorrent/plugins/${plugin}"
@@ -416,17 +421,17 @@ done
 echo "  ${norm}[${green}+${norm}] Checking ruTorrent custom plugins configuration..."
 for pluginConfFile in ${CONFIG_PATH}/rutorrent/plugins-conf/*.php; do
   if [ ! -f "$pluginConfFile" ]; then
-    continue
+     continue
   fi
   pluginConf=$(basename "$pluginConfFile")
   pluginName=$(echo "$pluginConf" | cut -f 1 -d '.')
   if [ ! -d "/var/www/rutorrent/plugins/${pluginName}" ]; then
-    echo "    ${norm}[${red}-${norm}] ${red}WARNING: Plugin $pluginName does not exist${norm}"
-    continue
+     echo "    ${norm}[${red}-${norm}] ${red}WARNING: Plugin $pluginName does not exist${norm}"
+     continue
   fi
   if [ -d "${CONFIG_PATH}/rutorrent/plugins/${pluginName}" ]; then
-    echo "    ${norm}[${red}-${norm}] ${red}WARNING: Plugin $pluginName already present in ${CONFIG_PATH}/rutorrent/plugins/${norm}"
-    continue
+     echo "    ${norm}[${red}-${norm}] ${red}WARNING: Plugin $pluginName already present in ${CONFIG_PATH}/rutorrent/plugins/${norm}"
+     continue
   fi
   echo "    ${norm}[${blue}-${norm}] Copying ${blue}${pluginName}${norm} plugin config..."
   cp -f "${pluginConfFile}" "/var/www/rutorrent/plugins/${pluginName}/conf.php"
@@ -434,8 +439,8 @@ for pluginConfFile in ${CONFIG_PATH}/rutorrent/plugins-conf/*.php; do
 done
 
 if [ ! -f ${CONFIG_PATH}/rutorrent/share/settings/theme.dat ]; then
-  echo "  ${norm}[${green}+${norm}] Setting ruTorrent ${green}MaterialDesign${norm} theme..."
-  echo 'O:6:"rTheme":2:{s:4:"hash";s:9:"theme.dat";s:7:"current";s:14:"MaterialDesign";}' > ${CONFIG_PATH}/rutorrent/share/settings/theme.dat
+   echo "  ${norm}[${green}+${norm}] Setting ruTorrent ${green}MaterialDesign${norm} theme..."
+   echo 'O:6:"rTheme":2:{s:4:"hash";s:9:"theme.dat";s:7:"current";s:14:"MaterialDesign";}' > ${CONFIG_PATH}/rutorrent/share/settings/theme.dat
 fi
 
 # Check ruTorrent themes
