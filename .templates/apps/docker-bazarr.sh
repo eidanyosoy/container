@@ -34,16 +34,13 @@ BASEIMAGE="ghcr.io/dockserver/docker-alpine:latest"
 BUILDDATE="$(date +%Y-%m-%d)"
 
 INSTCOMMAND="apk add -U --update --no-cache"
-PACKAGES="jq tar openssl curl ffmpeg libxml2 libxslt py3-pip python3 python3 py3-lxml py3-numpy py3-gevent py3-cryptography py3-setuptools unzip"
+PACKAGES="curl ffmpeg libxml2 libxslt py3-pip python3 unzip"
 VIRTUEL="--virtual=build-dependencies build-base cargo g++ gcc jq libffi-dev libxml2-dev libxslt-dev python3-dev"
 APPSPEC="--repository http://dl-cdn.alpinelinux.org/alpine/v3.14/main unrar"
 
 PYTHON3="pip3 install -U --no-cache-dir pip && \\
-   pip install --no-cache-dir --upgrade \\
-        gevent-websocket>=0.10.1 \\
-        webrtcvad-wheels>=2.0.10 && \\
-   pip install lxml --no-binary :all: && \\
-   pip install -U --no-cache-dir --find-links https://wheel-index.linuxserver.io/alpine/ -r /app/bazarr/bin/requirements.txt"
+    pip install lxml --no-binary :all: && \\
+    pip install -U --no-cache-dir --find-links https://wheel-index.linuxserver.io/alpine/ -r /app/bazarr/bin/requirements.txt"
 
 CLEANUP="apk del --purge build-dependencies && \\
    rm -rf /root/.cache /root/.cargo /tmp/"
@@ -84,18 +81,19 @@ ARG BUILDPLATFORM
 ARG VERSION="'"${NEWVERSION}"'"
 ARG BRANCH="'"${APPBRANCH}"'"
 
-ENV HOME="'"/config"'" \
-TZ="'"Etc/UTC"'"
+ENV TZ="'"Etc/UTC"'"
 
-RUN  \
+RUN \
   echo "'"**** install packages ****"'" && \
     '"${INSTCOMMAND}"' '"${PACKAGES}"' && \
     '"${INSTCOMMAND}"' '"${VIRTUEL}"' && \
     '"${INSTCOMMAND}"' '"${APPSPEC}"' && \
   echo "'"**** install '"${APP}"' ****"'" && \
-    mkdir -p /app/bazarr/bin && \
-    curl -fsSL "'"https://github.com/morpheus65535/bazarr/archive/refs/tags/v"'${VERSION}'".tar.gz"'" | tar xzf - -C /app/bazarr/bin --strip-components=1 && \
-  echo -e "'"UpdateMethod=docker\nBranch="'${BRANCH}'"\nPackageVersion="'${VERSION}'"\nPackageAuthor=[dockserver.io](https://dockserver.io)"'" > /app/bazarr/package_info && \
+     curl -o /tmp/bazarr.zip -L "'"https://github.com/morpheus65535/bazarr/releases/download/"'${VERSION}'"/bazarr.zip"'' && \
+     mkdir -p /app/bazarr/bin && \
+     unzip /tmp/bazarr.zip -d /app/bazarr/bin && \
+     rm -Rf /app/bazarr/bin/bin && \
+     echo -e "'"UpdateMethod=docker\nBranch="'${BRANCH}'"\nPackageVersion="'${VERSION}'"\nPackageAuthor=[dockserver.io](https://dockserver.io)"'" > /app/bazarr/package_info && \
   echo "'"**** Install requirements ****"'" && \
    '"${PYTHON3}"' && \
   echo "'"**** cleanup ****"'" && \
