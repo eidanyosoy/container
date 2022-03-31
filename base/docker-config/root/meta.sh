@@ -14,3 +14,6 @@ echo "sonarr = $sonarr"
 echo "sonarr4k = $sonarr4k"
 echo "radarr = $radarr"
 echo "radarr4k = $radarr4k"
+
+
+PLEX_TOKEN=$(cat "/opt/appdata/plex/database/Library/Application Support/Plex Media Server/Preferences.xml" | sed -e 's;^.* PlexOnlineToken=";;' | sed -e 's;".*$;;' | tail -1)
