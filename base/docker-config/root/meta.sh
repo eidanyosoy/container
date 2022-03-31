@@ -17,3 +17,9 @@ echo "radarr4k = $radarr4k"
 
 
 PLEX_TOKEN=$(cat "/opt/appdata/plex/database/Library/Application Support/Plex Media Server/Preferences.xml" | sed -e 's;^.* PlexOnlineToken=";;' | sed -e 's;".*$;;' | tail -1)
+
+
+## get apkiey für die arrs
+info=$(cat /opt/appdata/radarr/config.xml)
+info=${info#*<ApiKey>} 1>/dev/null 2>&1
+info1=$(echo ${info:0:32})
