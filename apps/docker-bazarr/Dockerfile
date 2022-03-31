@@ -34,9 +34,11 @@ RUN \
     apk add -U --update --no-cache --virtual=build-dependencies build-base cargo g++ gcc jq libffi-dev libxml2-dev libxslt-dev python3-dev && \
     apk add -U --update --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/v3.14/main unrar && \
   echo "**** install 'docker-bazarr' ****" && \
+    curl -o /tmp/bazarr.zip -L "https://github.com/morpheus65535/bazarr/releases/download/v${VERSION}/bazarr.zip" && \
     mkdir -p /app/bazarr/bin && \
-    curl -fsSL "https://github.com/morpheus65535/bazarr/archive/refs/tags/v${VERSION}.tar.gz" | tar xzf - -C /app/bazarr/bin && \
-    rm -Rf /app/bazarr/bin/bin && \
+    unzip /tmp/bazarr.zip -d /app/bazarr/bin && \
+    rm -Rf /app/bazarr/bin/bin \
+          /tmp/bazarr.zip&& \
   echo -e "UpdateMethod=docker\nBranch=${BRANCH}\nPackageVersion=${VERSION}\nPackageAuthor=[dockserver.io](https://dockserver.io)" > /app/bazarr/package_info && \
   echo "**** Install requirements ****" && \
    pip3 install -U --no-cache-dir pip && \
