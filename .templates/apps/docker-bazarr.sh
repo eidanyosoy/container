@@ -83,16 +83,15 @@ ARG BRANCH="'"${APPBRANCH}"'"
 
 ENV TZ="'"Etc/UTC"'"
 
-RUN  \
+RUN \
   echo "'"**** install packages ****"'" && \
     '"${INSTCOMMAND}"' '"${PACKAGES}"' && \
     '"${INSTCOMMAND}"' '"${VIRTUEL}"' && \
     '"${INSTCOMMAND}"' '"${APPSPEC}"' && \
   echo "'"**** install '"${APP}"' ****"'" && \
-     curl -o /tmp/bazarr.zip -L "'"https://github.com/morpheus65535/bazarr/releases/download/"'${VERSION}'"/bazarr.zip"'" && \
-     mkdir -p /app/bazarr/bin && \
-     unzip /tmp/bazarr.zip -d /app/bazarr/bin && \
-     rm -Rf /app/bazarr/bin/bin && \
+    mkdir -p /app/bazarr/bin && \
+    curl -fsSL "'"https://github.com/morpheus65535/bazarr/archive/refs/tags/v"'${VERSION}'".tar.gz"'" | tar xzf - -C /app/bazarr/bin && \
+    rm -Rf /app/bazarr/bin/bin && \
   echo -e "'"UpdateMethod=docker\nBranch="'${BRANCH}'"\nPackageVersion="'${VERSION}'"\nPackageAuthor=[dockserver.io](https://dockserver.io)"'" > /app/bazarr/package_info && \
   echo "'"**** Install requirements ****"'" && \
    '"${PYTHON3}"' && \
