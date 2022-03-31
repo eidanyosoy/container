@@ -189,3 +189,4 @@
  * [Auto Generation] Changes : github-metrics.svg (dockserver-bot[bot])
  * [Auto Generation] Changes : wiki/docs/install/container-gitlog.md (dockserver-bot[bot])
  * Update docker-bazarr.sh (doob187)
+ * [Auto Generation] Changes : .templates/apps/docker-bazarr.sh (dockserver-bot[bot])
