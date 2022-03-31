@@ -89,7 +89,7 @@ RUN  \
     '"${INSTCOMMAND}"' '"${VIRTUEL}"' && \
     '"${INSTCOMMAND}"' '"${APPSPEC}"' && \
   echo "'"**** install '"${APP}"' ****"'" && \
-     curl -o /tmp/bazarr.zip -L "'"https://github.com/morpheus65535/bazarr/releases/download/${ERSION}/bazarr.zip"'" && \
+     curl -o /tmp/bazarr.zip -L "'"https://github.com/morpheus65535/bazarr/releases/download/"'${VERSION}'"/bazarr.zip"'" && \
      mkdir -p /app/bazarr/bin && \
      unzip /tmp/bazarr.zip -d /app/bazarr/bin && \
      rm -Rf /app/bazarr/bin/bin && \
