@@ -38,7 +38,7 @@ RUN \
     mkdir -p /app/bazarr/bin && \
     unzip /tmp/bazarr.zip -d /app/bazarr/bin && \
     rm -Rf /app/bazarr/bin/bin \
-          /tmp/bazarr.zip&& \
+          /tmp/bazarr.zip && \
   echo -e "UpdateMethod=docker\nBranch=${BRANCH}\nPackageVersion=${VERSION}\nPackageAuthor=[dockserver.io](https://dockserver.io)" > /app/bazarr/package_info && \
   echo "**** Install requirements ****" && \
    pip3 install -U --no-cache-dir pip && \
