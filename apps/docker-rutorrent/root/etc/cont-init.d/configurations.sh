@@ -18,7 +18,6 @@ yellow="${cli}1;33m"
 blue="${cli}1;34m"
 
 echo -e "\n${bold} DockServer.io : rTorrent/ruTorrent Configuration = start${norm}\n"
-if [[ -f /donate.txt ]]; then cat /donate.txt ; fi
 
 # General
 if [[ -d "/data" ]]; then
@@ -27,13 +26,13 @@ else
    CONFIG_PATH=${CONFIG_PATH:-/config}
 fi
 
-if [[ -d "/mnt/downloads/torrents" ]];then
-    DOWNLOAD_PATH=${DOWNLOAD_PATH:-/mnt/downloads/torrents}
+if [[ -d "/mnt/unionfs/torrents" ]];then
+    DOWNLOAD_PATH=${DOWNLOAD_PATH:-/mnt/unionfs/torrents}
 else
-    DOWNLOAD_PATH=${DOWNLOAD_PATH:-/mnt/downloads/torrent}
+    DOWNLOAD_PATH=${DOWNLOAD_PATH:-/mnt/unionfs/torrent}
 fi
 
-TOPDIR_PATH=${TOPDIR_PATH:-/mnt/downloads}
+TOPDIR_PATH=${TOPDIR_PATH:-/mnt/unionfs}
 WAN_IP=${WAN_IP:-$(dig +short myip.opendns.com @resolver1.opendns.com)}
 WAN_IP=${WAN_IP:-$(curl ifconfig.me)}
 TZ=${TZ:-UTC}
