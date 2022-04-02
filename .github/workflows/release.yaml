@@ -51,7 +51,7 @@ jobs:
         echo ::set-output name=containers::${CONTAINERS}
   build:
     name: Build Docker
-    runs-on: self-hosted
+    runs-on: ubuntu-20.04
     continue-on-error: false
 
     permissions:
