@@ -173,7 +173,7 @@ while true; do
    done
 
    unwanted && perms
-   looping
+
    unset FOLDER FOLDERTMP URL APPVERSION MINFILES GTHUB
    
 done
