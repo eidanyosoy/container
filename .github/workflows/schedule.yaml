@@ -28,9 +28,9 @@ jobs:
         if test -f "./.templates/ci/version.sh"; then
            bash "./.templates/ci/version.sh"
         fi
-      ##env:
-      ##  username: ${{ github.actor }}
-      ##   token: ${{ secrets.CR_PAT }}
+      env:
+        username: ${{ github.actor }}
+        token: ${{ secrets.CR_PAT }}
 
   run-crf:
     runs-on: ubuntu-20.04
