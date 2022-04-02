@@ -69,3 +69,19 @@ if test -f "./wiki/docs/install/container-gitlog.md"; then
    cat "./wiki/docs/install/headline.md" > ./wiki/docs/install/container-gitlog.md
    git-log-to-markdown "$@" > ./wiki/docs/install/container-gitlog.md
 fi
+
+sleep 5
+if [[ -n $(git status --porcelain) ]]; then
+   git config --global user.name 'dockserver-bot[bot]'
+   git config --global user.email 'dockserver-bot[bot]@dockserver.io'
+   git reflog expire --expire=now --all
+   git gc --prune=now --aggressive
+   git repack -adf --depth=5000 --window=5000
+   git add -A
+   COMMIT=$(git show -s --format="%H" HEAD)
+   LOG=$(git diff-tree --no-commit-id --name-only -r $COMMIT)
+   git commit -sam "[Auto Generation] Changelog : $LOG" || exit 0
+   git push --force
+fi
+
+exit 0
