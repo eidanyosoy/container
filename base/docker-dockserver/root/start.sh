@@ -107,7 +107,7 @@ function apps() {
 function download() {
 
    URL="https://api.github.com/repos/dockserver/dockserver/releases/latest"
-   APPVERSION="$(curl -u $USER:$TOKEN -sX GET "${URL}" | jq -r '.tag_name')"
+   APPVERSION="$(curl -sX GET "${URL}" | jq -r '.tag_name')"
    log "**** downloading dockserver version ${APPVERSION} ****" && \
    rm -rf ${FOLDER}/* && mkdir -p ${FOLDER} && \
    curl -fsSL "${GTHUB}/${APPVERSION}.tar.gz" | tar xzf - -C "${FOLDER}" --strip-components=1 && \
@@ -126,9 +126,6 @@ function run() {
 
 while true; do
 
-   export TOKEN=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
-   export USER=doob187
-
    export FOLDER=/opt/dockserver
    export FOLDERTMP=/tmp/dockserver
    export URL="https://api.github.com/repos/dockserver/dockserver/releases/latest"
@@ -138,7 +135,7 @@ while true; do
 
    ### API BUSTED FALLBACK
    while true; do
-      APPVERSION="$(curl -u $USER:$TOKEN -sX GET "${URL}" | jq -r '.tag_name')"
+      APPVERSION="$(curl -sX GET "${URL}" | jq -r '.tag_name')"
       if [[ $APPVERSION == null ]]; then
          log "*** we cant download the version, could be api related ***"
          log "*** sleeping now 300 secs ***"
@@ -157,7 +154,7 @@ while true; do
          export LOCALVERSION=0
       fi
 
-      APPVERSION="$(curl -u $USER:$TOKEN -sX GET "${URL}" | jq -r '.tag_name')"
+      APPVERSION="$(curl -sX GET "${URL}" | jq -r '.tag_name')"
       if [[ $APPVERSION == $LOCALVERSION ]]; then
          sleep 8600
       else
