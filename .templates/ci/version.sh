@@ -67,7 +67,7 @@ if [[ -n $(git status --porcelain) ]]; then
    COMMIT=$(git show -s --format="%H" HEAD)
    LOG=$(git diff-tree --no-commit-id --name-only -r $COMMIT)
    git commit -sam "[Auto Generation] Changes : $LOG" || exit 0
-   git push --force
+   git push
 fi
 
 exit 0
