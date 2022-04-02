@@ -44,6 +44,9 @@ EOF
    groupmod -o -g "$PGID" abc
    usermod -o -u "$PUID" abc
 
+   if test -f "/tmp/LOCAL";then
+      rm -rf /tmp/LOCAL
+   fi
 }
 
 function unwanted() {
@@ -130,13 +133,24 @@ while true; do
    export APPVERSION="$(curl -sX GET "${URL}" | jq -r '.tag_name')"
 
    if test -f "/tmp/LOCAL";then
-      LOCALVERSION=$(cat /tmp/LOCAL)
+      export LOCALVERSION="$(cat /tmp/LOCAL)"
    else
-      LOCALVERSION=0
+      export LOCALVERSION=0
    fi
 
-   echo $APPVERSION > /tmp/LOCAL
+   ### API BUSTED FALLBACK
+   while true; do
+      APPVERSION="$(curl -sX GET "${URL}" | jq -r '.tag_name')"
+      if [[ $APPVERSION == null ]]; then
+         log "*** we cant download the version, could be api related ***"
+         log "*** sleeping now 300 secs ***"
+         sleep 300
+      else
+         sleep 1 && break
+      fi
+   done
 
+   ### CHECK LOCAL AND REMOTE
    while true; do
       if [[ $APPVERSION == $LOCALVERSION ]]; then
          sleep 8600
@@ -149,6 +163,9 @@ while true; do
          fi       
       fi
    done
+
+   echo $APPVERSION > /tmp/LOCAL
+
    unwanted && perms
    looping
    unset FOLDER FOLDERTMP URL APPVERSION MINFILES GTHUB
