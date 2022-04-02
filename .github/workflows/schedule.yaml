@@ -64,8 +64,7 @@ jobs:
     runs-on: ubuntu-20.04
     needs: 
     - get-version
-    - run-crf
-    - run-repack
+    - contrib
     permissions:
       packages: write
       id-token: write
