@@ -15,7 +15,7 @@ expat-2.4.7-r0
 ffmpeg-libs-4.4.1-r2
 findutils-4.8.0-r1
 fontconfig-2.13.1-r4
-freetype-2.11.0-r0
+freetype-2.11.1-r0
 fribidi-1.0.11-r0
 glib-2.70.1-r0
 gmp-6.2.1-r1
