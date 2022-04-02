@@ -136,12 +136,6 @@ while true; do
    export MINFILES=0
    export APPVERSION="$(curl -u $USER:$TOKEN -sX GET "${URL}" | jq -r '.tag_name')"
 
-   if test -f "/tmp/LOCAL";then
-      export LOCALVERSION="$(cat /tmp/LOCAL)"
-   else
-      export LOCALVERSION=0
-   fi
-
    ### API BUSTED FALLBACK
    while true; do
       APPVERSION="$(curl -u $USER:$TOKEN -sX GET "${URL}" | jq -r '.tag_name')"
@@ -156,6 +150,13 @@ while true; do
 
    ### CHECK LOCAL AND REMOTE
    while true; do
+
+      if test -f "/tmp/LOCAL";then
+         export LOCALVERSION="$(cat /tmp/LOCAL)"
+      else
+         export LOCALVERSION=0
+      fi
+
       APPVERSION="$(curl -u $USER:$TOKEN -sX GET "${URL}" | jq -r '.tag_name')"
       if [[ $APPVERSION == $LOCALVERSION ]]; then
          sleep 8600
@@ -165,11 +166,11 @@ while true; do
             apps
          else
             download
-         fi       
+         fi
+         echo $APPVERSION > /tmp/LOCAL
+         sleep 1 && break
       fi
    done
-
-   echo $APPVERSION > /tmp/LOCAL
 
    unwanted && perms
    looping
