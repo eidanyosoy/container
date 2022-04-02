@@ -23,7 +23,7 @@ env:
 jobs:
   changes:
     name: Get changes
-    runs-on: self-hosted
+    runs-on: ubuntu-20.04
     outputs:
       matrix: "{\"container\": ${{ steps.reduce.outputs.containers }} }"
     steps:
