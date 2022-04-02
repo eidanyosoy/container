@@ -14,6 +14,8 @@
 # shellcheck disable=SC2196
 # shellcheck disable=SC2046
 
+### FUNCTION START
+
 function log() {
 
    echo "[INSTALL] DockServer ${1}"
@@ -64,10 +66,13 @@ changelog-ci-config.yaml
 .gitattributes
 log4j
 wiki
-imagss" > /tmp/unwanted
+images
+github-metrics.svg
+LICENSE
+.pre-commit-config.yaml
+.imgbotconfig" > /tmp/unwanted
 
-   sed '/^\s*#.*$/d' /tmp/unwanted | \
-   while IFS=$'\n' read -ra remove; do
+   sed '/^\s*#.*$/d' /tmp/unwanted | while IFS=$'\n' read -ra remove; do
        rm -rf ${FOLDER}/${remove[0]} > /dev/null
    done
    unset remove
@@ -124,19 +129,35 @@ while true; do
    export MINFILES=0
    export APPVERSION="$(curl -sX GET "${URL}" | jq -r '.tag_name')"
 
-   log "**** downloading dockserver ${APPVERSION} ****"
-   if [[ `ls ${FOLDER}/apps/myapps/ | wc -l` -gt ${MINFILES} ]]; then
-      apps
+   if test -f "/tmp/LOCAL";then
+      LOCALVERSION=$(cat /tmp/LOCAL)
    else
-      download
+      LOCALVERSION=0
    fi
-   unwanted && perms
-   unset FOLDER FOLDERTMP URL APPVERSION MINFILES GTHUB 
-   sleep 86400
 
+   echo $APPVERSION > /tmp/LOCAL
+
+   while true; do
+      if [[ $APPVERSION == $LOCALVERSION ]]; then
+         sleep 8600
+      else
+         log "**** downloading dockserver ${APPVERSION} ****"
+         if [[ `ls ${FOLDER}/apps/myapps/ | wc -l` -gt ${MINFILES} ]]; then
+            apps
+         else
+            download
+         fi       
+      fi
+   done
+   unwanted && perms
+   looping
+   unset FOLDER FOLDERTMP URL APPVERSION MINFILES GTHUB
+   
 done
 
 }
+
+### FUNCTION END
    ## RUN IN ORDER
    first
    build 
