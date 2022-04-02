@@ -9,7 +9,7 @@ permissions: read-all
 
 jobs:
   get-packafes:
-    runs-on: self-hosted
+    runs-on: ubuntu-20.04
     permissions:
       packages: write
       id-token: write
