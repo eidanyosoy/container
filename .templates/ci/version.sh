@@ -57,12 +57,6 @@ for i in ${folder[@]}; do
    done
 done
 
-## generate changelog
-echo " run changelog "
-if test -f "./.templates/ci/gitlog.sh"; then
-    bash "./.templates/ci/gitlog.sh"
-fi
-
 #### END FILE ####
 
 sleep 5
