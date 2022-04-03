@@ -16,7 +16,7 @@
 #####################################
 # shellcheck disable=SC2086
 # shellcheck disable=SC2046
-FROM FROM ghcr.io/dockserver/docker-ubuntu-focal:latest
+FROM ghcr.io/dockserver/docker-ubuntu-focal:latest
 LABEL org.opencontainers.image.source="https://github.com/dockserver/container"
 
 
