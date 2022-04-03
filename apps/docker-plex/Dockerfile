@@ -16,7 +16,7 @@
 #####################################
 # shellcheck disable=SC2086
 # shellcheck disable=SC2046
-FROM ghcr.io/dockserver/docker-ubuntu-jammy:latest
+FROM ghcr.io/linuxserver/baseimage-ubuntu:focal
 LABEL org.opencontainers.image.source="https://github.com/dockserver/container"
 
 ARG TARGETPLATFORM
@@ -42,7 +42,7 @@ RUN \
      echo "**** add Intel repo ****" && \
          mkdir -p /usr/share/keyrings && \
          curl -o /usr/share/keyrings/intel-graphics.key -L https://repositories.intel.com/graphics/intel-graphics.key && \
-         echo "deb [trusted=yes arch=amd64 signed-by=/usr/share/keyrings/intel-graphics.key] https://repositories.intel.com/graphics/ubuntu focal main"  > /etc/apt/sources.list.d/intel.list && \
+         echo "deb [trusted=yes arch=amd64 signed-by=/usr/share/keyrings/intel-graphics.key] https://repositories.intel.com/graphics/ubuntu focal main" > /etc/apt/sources.list.d/intel.list && \
          export ARCH=amd64 && \
       echo "**** install runtime packages ****" && \
          apt-get update -yqq && \

@@ -54,7 +54,7 @@ apps docker-deluge
    "appfolder": "./apps/docker-deluge",
    "newversion": "2.0.5-0",
    "appbranch": "master",
-   "baseimage": "ghcr.io/linuxserver/baseimage-ubuntu:focal",
+   "baseimage": "ghcr.io/dockserver/docker-ubuntu-focal:latest",
    "description": "Deluge BitTorrent client - Git mirror, PRs only",
    "body": "Upgrading docker-deluge to 2.0.5-0",
    "user": "github-actions[bot]"
@@ -197,7 +197,7 @@ apps docker-jellyfin
    "appfolder": "./apps/docker-jellyfin",
    "newversion": "10.7.7-1",
    "appbranch": "master",
-   "baseimage": "ghcr.io/linuxserver/baseimage-ubuntu:focal",
+   "baseimage": "FROM ghcr.io/dockserver/docker-ubuntu-focal:latest",
    "description": "The Free Software Media System",
    "body": "Upgrading docker-jellyfin to 10.7.7-1",
    "user": "github-actions[bot]"
@@ -253,7 +253,7 @@ apps docker-multitautulli
    "apppic": "./images/docker-multitautulli.png",
    "appfolder": "./apps/docker-multitautulli",
    "newversion": "4.1.07",
-   "baseimage": "ghcr.io/linuxserver/baseimage-alpine:3.15",
+   "baseimage": "ghcr.io/dockserver/docker-alpine:latest",
    "description": "A Python based monitoring and tracking tool for Plex Media Server.",
    "body": "Upgrading docker-multitautulli to 4.1.07",
    "user": "github-actions[bot]"
@@ -430,7 +430,7 @@ apps docker-tautulli
    "apppic": "./images/docker-tautulli.png",
    "appfolder": "./apps/docker-tautulli",
    "newversion": "2.9.5",
-   "baseimage": "ghcr.io/linuxserver/baseimage-alpine:3.15",
+   "baseimage": "ghcr.io/dockserver/docker-alpine:latest",
    "description": "A Python based monitoring and tracking tool for Plex Media Server.",
    "body": "Upgrading docker-tautulli to 2.9.5",
    "user": "github-actions[bot]"
