@@ -29,8 +29,6 @@ BUILDVERSION="${BUILDVERSION#*release-}"
 BUILDVERSION="${BUILDVERSION}"
 
 BUILDIMAGE="alpine"
-ALPINEVERSION="${BUILDVERSION}"
-
 
 PICTURE="./images/$APP.png"
 APPFOLDER="./$FOLDER/$APP"
@@ -43,8 +41,8 @@ echo '{
    "appfolder": "./'$FOLDER'/'$APP'",
    "newversion": "'${BUILDVERSION}'",
    "baseimage": "'${BUILDIMAGE}'",
-   "baseversion": "'${ALPINEVERSION}'",
-   "description": "Docker image  for '${APP}'  ",
+   "description": "Docker image  for '${APP}'",
    "body": "Upgrading '${APP}' to baseimage: '${BUILDIMAGE}':'${BUILDVERSION}'",
    "user": "dockserver image update[bot]"
 }' > "./$FOLDER/$APP/release.json
+
