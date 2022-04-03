@@ -1,0 +1,56 @@
+name: Update Parts 
+
+on:
+  workflow_dispatch:
+  schedule:
+  - cron: "0 */2 * * *"
+
+permissions: read-all
+
+jobs:
+  contrib:
+    runs-on: ubuntu-20.04
+    permissions:
+      packages: write
+      id-token: write
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+      with:
+        token: ${{ secrets.CR_PAT }}
+
+
+    - uses: BobAnkh/add-contributors@master
+      with:
+        REPO_NAME: 'dockserver/container'
+        CONTRIBUTOR: '### Contributors'
+        COLUMN_PER_ROW: '4'
+        ACCESS_TOKEN: ${{ secrets.CR_PAT }}
+        IMG_WIDTH: '50'
+        FONT_SIZE: '14'
+        PATH: '/README.md'
+        COMMIT_MESSAGE: 'docs(README): update contributors'
+        AVATAR_SHAPE: 'round'
+
+  run-changelog:
+    runs-on: ubuntu-20.04
+    needs:
+    - contrib
+    permissions:
+      packages: write
+      id-token: write
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+      with:
+        token: ${{ secrets.CR_PAT }}
+
+    - name: Run Changelog
+      run: |
+        echo "run repack"
+        echo " run changelog "
+        if test -f "./.templates/ci/gitlog.sh"; then
+           bash "./.templates/ci/gitlog.sh"
+        fi

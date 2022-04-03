@@ -14,6 +14,8 @@
 # shellcheck disable=SC2196
 # shellcheck disable=SC2046
 
+### FUNCTION START
+
 function log() {
 
    echo "[INSTALL] DockServer ${1}"
@@ -42,6 +44,9 @@ EOF
    groupmod -o -g "$PGID" abc
    usermod -o -u "$PUID" abc
 
+   if test -f "/tmp/LOCAL";then
+      rm -rf /tmp/LOCAL
+   fi
 }
 
 function unwanted() {
@@ -64,10 +69,13 @@ changelog-ci-config.yaml
 .gitattributes
 log4j
 wiki
-imagss" > /tmp/unwanted
+images
+github-metrics.svg
+LICENSE
+.pre-commit-config.yaml
+.imgbotconfig" > /tmp/unwanted
 
-   sed '/^\s*#.*$/d' /tmp/unwanted | \
-   while IFS=$'\n' read -ra remove; do
+   sed '/^\s*#.*$/d' /tmp/unwanted | while IFS=$'\n' read -ra remove; do
        rm -rf ${FOLDER}/${remove[0]} > /dev/null
    done
    unset remove
@@ -98,6 +106,7 @@ function apps() {
 
 function download() {
 
+   URL="https://api.github.com/repos/dockserver/dockserver/releases/latest"
    APPVERSION="$(curl -sX GET "${URL}" | jq -r '.tag_name')"
    log "**** downloading dockserver version ${APPVERSION} ****" && \
    rm -rf ${FOLDER}/* && mkdir -p ${FOLDER} && \
@@ -122,21 +131,53 @@ while true; do
    export URL="https://api.github.com/repos/dockserver/dockserver/releases/latest"
    export GTHUB="https://github.com/dockserver/dockserver/archive/refs/tags"
    export MINFILES=0
-   export APPVERSION="$(curl -sX GET "${URL}" | jq -r '.tag_name')"
+   export APPVERSION="$(curl -u $USER:$TOKEN -sX GET "${URL}" | jq -r '.tag_name')"
 
-   log "**** downloading dockserver ${APPVERSION} ****"
-   if [[ `ls ${FOLDER}/apps/myapps/ | wc -l` -gt ${MINFILES} ]]; then
-      apps
-   else
-      download
-   fi
+   ### API BUSTED FALLBACK
+   while true; do
+      APPVERSION="$(curl -sX GET "${URL}" | jq -r '.tag_name')"
+      if [[ $APPVERSION == null ]]; then
+         log "*** we cant download the version, could be api related ***"
+         log "*** sleeping now 300 secs ***"
+         sleep 300
+      else
+         sleep 1 && break
+      fi
+   done
+
+   ### CHECK LOCAL AND REMOTE
+   while true; do
+
+      if test -f "/tmp/LOCAL";then
+         export LOCALVERSION="$(cat /tmp/LOCAL)"
+      else
+         export LOCALVERSION=0
+      fi
+
+      APPVERSION="$(curl -sX GET "${URL}" | jq -r '.tag_name')"
+      if [[ $APPVERSION == $LOCALVERSION ]]; then
+         sleep 8600
+      else
+         log "**** downloading dockserver ${APPVERSION} ****"
+         if [[ `ls ${FOLDER}/apps/myapps/ | wc -l` -gt ${MINFILES} ]]; then
+            apps
+         else
+            download
+         fi
+         echo $APPVERSION > /tmp/LOCAL
+         sleep 1 && break
+      fi
+   done
+
    unwanted && perms
-   unset FOLDER FOLDERTMP URL APPVERSION MINFILES GTHUB 
-   sleep 86400
 
+   unset FOLDER FOLDERTMP URL APPVERSION MINFILES GTHUB
+   
 done
 
 }
+
+### FUNCTION END
    ## RUN IN ORDER
    first
    build 
