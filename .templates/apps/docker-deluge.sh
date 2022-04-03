@@ -31,7 +31,7 @@ NEWVERSION="${NEWVERSION}"
 HEADLINE="$(cat ./.templates/headline.txt)"
 DESCRIPTION="$(curl -u $USERNAME:$TOKEN -sX GET "$APPLINK" | jq -r '.description')"
 
-BASEIMAGE="ghcr.io/linuxserver/baseimage-ubuntu:focal"
+BASEIMAGE="ghcr.io/dockserver/docker-ubuntu-focal:latest"
 
 INSTCOMMAND="apt-get install -yqq"
 UPTCOMMAND="apt-get update -yqq"
