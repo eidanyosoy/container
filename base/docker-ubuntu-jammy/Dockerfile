@@ -36,7 +36,7 @@ ENV HOME="/root" \
     TERM="xterm"
 
 # copy sources
-COPY sources.list /etc/apt/
+COPY ./base/docker-ubuntu-jammy/sources.list /etc/apt/
 
 RUN \
  echo "**** Ripped from Ubuntu Docker Logic ****" && \
