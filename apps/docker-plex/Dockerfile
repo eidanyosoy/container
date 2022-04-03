@@ -41,11 +41,11 @@ RUN \
      echo "**** add Intel repo ****" && \
          curl -sL https://repositories.intel.com/graphics/intel-graphics.key | apt-key add - && \
       echo "deb [arch=amd64] https://repositories.intel.com/graphics/ubuntu focal main" > /etc/apt/sources.list.d/intel.list && \
-      export ARCH=amd64 && \
+         export ARCH=amd64 && \
       echo "**** install runtime packages ****" && \
          apt-get update -yqq && \
       echo "**** install Intel packages ****" && \
-         apt-get install --no-install-recommends -yqq intel-opencl-icd i965-va-driver gpg-agent libmfx1 ocl-icd-libopencl1; \
+         apt-get install --no-install-recommends -yqq intel-opencl-icd intel-gpu-tools i965-va-driver-shaders va-driver-all beignet-opencl-icd mesa-vulkan-drivers vulkan-utils gpg-agent libmfx1 ocl-icd-libopencl1; \
     ;; \
     'linux/arm64') export ARCH=arm64 && unset NVIDIA_DRIVER_CAPABILITIES ;; \
    esac \
