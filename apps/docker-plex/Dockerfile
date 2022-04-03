@@ -47,7 +47,7 @@ RUN \
       echo "**** install runtime packages ****" && \
          apt-get update -yqq && \
       echo "**** install Intel packages ****" && \
-         apt-get install --no-install-recommends -yqq intel-opencl-icd intel-gpu-tools i965-va-driver-shaders va-driver-all beignet-opencl-icd mesa-vulkan-drivers vulkan-utils gpg-agent libmfx1 ocl-icd-libopencl1; \
+         apt-get install --no-install-recommends -yqq intel-opencl-icd intel-gpu-tools i965-va-driver-shaders va-driver-all beignet-opencl-icd mesa-vulkan-drivers gpg-agent libmfx1 ocl-icd-libopencl1; \
     ;; \
     'linux/arm64') export ARCH=arm64 && unset NVIDIA_DRIVER_CAPABILITIES ;; \
    esac \
