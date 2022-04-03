@@ -52,7 +52,7 @@ BASEMLINK="mv -t /app/emby \\
 ## FINALIMAGE
 FINALIMAGE="ghcr.io/dockserver/docker-ubuntu-focal:latest"
 PACKAGESFINAL="aria2 jq unrar unzip curl uuid-runtime mesa-va-drivers"
-PACKAGESINTEL="intel-opencl-icd i965-va-driver gpg-agent libmfx1 ocl-icd-libopencl1"
+PACKAGESINTEL="intel-opencl-icd intel-gpu-tools i965-va-driver-shaders va-driver-all beignet-opencl-icd mesa-vulkan-drivers gpg-agent libmfx1 ocl-icd-libopencl1"
 CLEANUP="apt-get remove -yqq aria2 jq software-properties-common gpg-agent && \\
      apt-get autoremove -yqq && apt-get clean -yqq && \\
      rm -rf /tmp/* /var/lib/apt/lists/* /var/tmp/"
@@ -131,9 +131,10 @@ RUN \
     '"'linux/amd64'"') \
          export NVIDIA_DRIVER_CAPABILITIES="'"compute,video,utility"'" && \
      echo "'"**** add Intel repo ****"'" && \
-         curl -sL https://repositories.intel.com/graphics/intel-graphics.key | apt-key add - && \
-      echo "'"deb [arch=amd64] https://repositories.intel.com/graphics/ubuntu focal main"'" > /etc/apt/sources.list.d/intel.list && \
-      export ARCH=amd64 && \
+         mkdir -p /usr/share/keyrings && \
+         curl -o /usr/share/keyrings/intel-graphics.key -L https://repositories.intel.com/graphics/intel-graphics.key && \
+         echo "'"deb [trusted=yes arch=amd64 signed-by=/usr/share/keyrings/intel-graphics.key] https://repositories.intel.com/graphics/ubuntu focal main"'" > /etc/apt/sources.list.d/intel.list && \
+         export ARCH=amd64 && \
       echo "'"**** install runtime packages ****"'" && \
          '"${UPTCOMMAND}"' && \
       echo "'"**** install Intel packages ****"'" && \
