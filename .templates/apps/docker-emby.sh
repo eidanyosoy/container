@@ -50,7 +50,7 @@ BASEMLINK="mv -t /app/emby \\
      /tmp/opt/emby-server/etc"
 
 ## FINALIMAGE
-FINALIMAGE="ghcr.io/dockserver/docker-ubuntu-focal:latest"
+FINALIMAGE="ghcr.io/linuxserver/baseimage-ubuntu:focal"
 PACKAGESFINAL="aria2 jq unrar unzip curl uuid-runtime mesa-va-drivers"
 PACKAGESINTEL="intel-opencl-icd intel-gpu-tools i965-va-driver-shaders va-driver-all beignet-opencl-icd mesa-vulkan-drivers gpg-agent libmfx1 ocl-icd-libopencl1"
 CLEANUP="apt-get remove -yqq aria2 jq software-properties-common gpg-agent && \\
