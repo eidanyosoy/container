@@ -1,0 +1,11 @@
+{
+   "appname": "docker-ubuntu-jammy",
+   "apppic": "./imagesdocker-ubuntu-jammy.png",
+   "appfolder": "./base/docker-ubuntu-jammy",
+   "newversion": "3.15.2",
+   "baseimage": "alpine",
+   "packages": "null",
+   "description": "Dockerbase Image with Ubuntu 22.04",
+   "body": "Upgrading docker-ubuntu-jammy to 3.15.2",
+   "user": "github-actions[bot]"
+}
