@@ -21,7 +21,7 @@ TOKEN=$4
 
 ### APP SETTINGS ###
 
-APPBRANCH="develop"
+APPBRANCH="nightly"
 APPLINK="https://api.github.com/repos/whisparr/whisparr"
 NEWVERSION=$(curl -sX GET "https://whisparr.servarr.com/v1/update/${APPBRANCH}/changes?os=linuxmusl&runtime=netcore&arch=x64" | jq -r .[0].version)
 
