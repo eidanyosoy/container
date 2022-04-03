@@ -34,16 +34,16 @@ BASEIMAGE="ghcr.io/dockserver/docker-alpine:latest"
 BUILDDATE="$(date +%Y-%m-%d)"
 
 INSTCOMMAND="apk add -U --update --no-cache"
-PACKAGES="curl ffmpeg libxml2 libxslt py3-pip python3 unzip"
+PACKAGES="curl jq ffmpeg libxml2 libxslt py3-pip python3 unzip"
 VIRTUEL="--virtual=build-dependencies build-base cargo g++ gcc jq libffi-dev libxml2-dev libxslt-dev python3-dev"
 APPSPEC="--repository http://dl-cdn.alpinelinux.org/alpine/v3.14/main unrar"
 
 PYTHON3="pip3 install -U --no-cache-dir pip && \\
     pip install lxml --no-binary :all: && \\
     pip install -U --no-cache-dir --find-links https://wheel-index.linuxserver.io/alpine/ -r /app/bazarr/bin/requirements.txt"
-
 CLEANUP="apk del --purge build-dependencies && \\
    rm -rf /root/.cache /root/.cargo /tmp/"
+
 PICTURE="./images/$APP.png"
 APPFOLDER="./$FOLDER/$APP"
 PORT="EXPOSE 6767"
@@ -89,12 +89,12 @@ RUN \
     '"${INSTCOMMAND}"' '"${VIRTUEL}"' && \
     '"${INSTCOMMAND}"' '"${APPSPEC}"' && \
   echo "'"**** install '"${APP}"' ****"'" && \
-     curl -o /tmp/bazarr.zip -L "'"https://github.com/morpheus65535/bazarr/releases/download/"'${VERSION}'"/bazarr.zip"'" && \
-     mkdir -p /app/bazarr/bin && \
-     unzip /tmp/bazarr.zip -d /app/bazarr/bin && \
-     rm -Rf /app/bazarr/bin/bin && \
-     rm -f /tmp/bazarr.zip && \
-     echo -e "'"UpdateMethod=docker\nBranch="'${BRANCH}'"\nPackageVersion="'${VERSION}'"\nPackageAuthor=[dockserver.io](https://dockserver.io)"'" > /app/bazarr/package_info && \
+    curl -o /tmp/bazarr.zip -L "'"https://github.com/morpheus65535/bazarr/releases/download/v"'${VERSION}'"/bazarr.zip"'" && \
+    mkdir -p /app/bazarr/bin && \
+    unzip /tmp/bazarr.zip -d /app/bazarr/bin && \
+    rm -Rf /app/bazarr/bin/bin \
+          /tmp/bazarr.zip && \
+  echo -e "'"UpdateMethod=docker\nBranch="'${BRANCH}'"\nPackageVersion="'${VERSION}'"\nPackageAuthor=[dockserver.io](https://dockserver.io)"'" > /app/bazarr/package_info && \
   echo "'"**** Install requirements ****"'" && \
    '"${PYTHON3}"' && \
   echo "'"**** cleanup ****"'" && \
