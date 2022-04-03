@@ -102,8 +102,8 @@ RUN \
     '"'linux/amd64'"') \
          export ARCH='"'amd64'"' && \
          mkdir -p /usr/share/keyrings && \
-         curl -o /usr/share/keyrings/jellyfin_team.gpg.key https://repo.jellyfin.org/ubuntu/jellyfin_team.gpg.key && \
-         echo "'"deb [trusted=yesarch=amd64 signed-by=/usr/share/keyrings/jellyfin_team.gpg.key] https://repo.jellyfin.org/ubuntu focal main"'" > /etc/apt/sources.list.d/jellyfin.list && \
+         curl -o /usr/share/keyrings/jellyfin_team.gpg.key -L https://repo.jellyfin.org/ubuntu/jellyfin_team.gpg.key && \
+         echo "'"deb [trusted=yes arch=amd64 signed-by=/usr/share/keyrings/jellyfin_team.gpg.key] https://repo.jellyfin.org/ubuntu focal main"'" > /etc/apt/sources.list.d/jellyfin.list && \
          curl -o /usr/share/keyrings/intel-graphics.key -L https://repositories.intel.com/graphics/intel-graphics.key && \
          echo "'"deb [trusted=yes arch=amd64 signed-by=/usr/share/keyrings/intel-graphics.key] https://repositories.intel.com/graphics/ubuntu focal main"'" > /etc/apt/sources.list.d/intel.list ; \
     ;; \
@@ -111,7 +111,7 @@ RUN \
         export ARCH='"'arm64'"' && \
         unset NVIDIA_DRIVER_CAPABILITIES && \
         mkdir -p /usr/share/keyrings && \
-        curl -o /usr/share/keyrings/jellyfin_team.gpg.key https://repo.jellyfin.org/ubuntu/jellyfin_team.gpg.key && \
+        curl -o /usr/share/keyrings/jellyfin_team.gpg.key -L https://repo.jellyfin.org/ubuntu/jellyfin_team.gpg.key && \
         echo "'"deb [trusted=yes arch=arm64 signed-by=/usr/share/keyrings/jellyfin_team.gpg.key] https://repo.jellyfin.org/ubuntu focal main"'" > /etc/apt/sources.list.d/jellyfin.list && \
         curl -s https://keyserver.ubuntu.com/pks/lookup?op=get\&search=0x6587ffd6536b8826e88a62547876ae518cbcf2f2 | apt-key add - && \
         echo "'"deb [trusted=yes] http://ppa.launchpad.net/ubuntu-raspi2/ppa-nightly/ubuntu focal main"'" > /etc/apt/sources.list.d/raspbins.list ; \
