@@ -34,7 +34,7 @@ NEWVERSION="${NEWVERSION}"
 HEADLINE="$(cat ./.templates/headline.txt)"
 
 DESCRIPTION="$(curl -u $USERNAME:$TOKEN -sX GET "$APPLINK" | jq -r '.description')"
-BASEIMAGE="ghcr.io/linuxserver/baseimage-ubuntu:focal"
+BASEIMAGE="FROM ghcr.io/dockserver/docker-ubuntu-focal:latest"
 
 INTEL_LIBVA_VER="2.13.0+i643~u20.04"
 INTEL_GMM_VER="21.3.3+i643~u20.04"
