@@ -7,7 +7,7 @@ on:
 
 permissions: read-all
 
-jobs
+jobs:
   contrib:
     runs-on: ubuntu-20.04
     permissions:
