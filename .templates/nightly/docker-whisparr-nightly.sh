@@ -31,7 +31,8 @@ NEWVERSION="${NEWVERSION}"
 
 HEADLINE="$(cat ./.templates/headline.txt)"
 
-DESCRIPTION="$(curl -u $USERNAME:$TOKEN -sX GET "$APPLINK" | jq -r '.description')"
+##DESCRIPTION="$(curl -u $USERNAME:$TOKEN -sX GET "$APPLINK" | jq -r '.description')"
+DESCRIPTION="Whisparr is an adult movie collection manager for Usenet and BitTorrent users."
 BASEIMAGE="ghcr.io/dockserver/docker-alpine:latest"
 
 INSTCOMMAND="apk add -U --update --no-cache"
