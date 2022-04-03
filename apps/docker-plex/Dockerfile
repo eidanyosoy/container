@@ -39,8 +39,8 @@ RUN \
    case $TARGETPLATFORM in \
     'linux/amd64') \
      echo "**** add Intel repo ****" && \
-         curl -sL https://repositories.intel.com/graphics/intel-graphics.key | apt-key add - && \
-      echo "deb [arch=amd64] https://repositories.intel.com/graphics/ubuntu focal main" > /etc/apt/sources.list.d/intel.list && \
+         curl https://repositories.intel.com/graphics/intel-graphics.key | gpg --dearmor > /usr/share/keyrings/intel-graphics.key && \
+      echo "deb [arch=amd64 /usr/share/keyrings/intel-graphics.key] https://repositories.intel.com/graphics/ubuntu jammy main" > /etc/apt/sources.list.d/intel.list && \
          export ARCH=amd64 && \
       echo "**** install runtime packages ****" && \
          apt-get update -yqq && \
