@@ -54,7 +54,7 @@ RUN \
      /tmp/opt/emby-server/etc
 
 ### FINALIMAGE
-FROM  ghcr.io/dockserver/docker-ubuntu-focal:latest
+FROM ghcr.io/dockserver/docker-ubuntu-focal:latest
 
 ARG TARGETPLATFORM
 ARG BUILDPLATFORM
