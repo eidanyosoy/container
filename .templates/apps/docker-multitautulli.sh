@@ -30,8 +30,8 @@ NEWVERSION="${NEWVERSION}"
 DESCRIPTION="$(curl -u $USERNAME:$TOKEN -sX GET "$APPLINK" | jq -r '.description')"
 HEADLINE="$(cat ./.templates/headline.txt)"
 
-##BASEIMAGE="ghcr.io/dockserver/docker-alpine:latest"
-BASEIMAGE="ghcr.io/linuxserver/baseimage-alpine:3.15"
+BASEIMAGE="ghcr.io/dockserver/docker-alpine:latest"
+##BASEIMAGE="ghcr.io/linuxserver/baseimage-alpine:3.15"
 
 BUILDDATE="$(date +%Y-%m-%d)"
 PICTURE="./images/$APP.png"
