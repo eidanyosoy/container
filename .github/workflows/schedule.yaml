@@ -9,7 +9,7 @@ permissions: read-all
 
 jobs:
   get-version:
-    runs-on: self-hosted
+    runs-on: ubuntu-20.04
     permissions:
       packages: write
       id-token: write
@@ -32,34 +32,10 @@ jobs:
         username: ${{ github.actor }}
         token: ${{ secrets.CR_PAT }}
 
-  run-crf:
-    runs-on: self-hosted
-    needs: 
-    - get-version
-    permissions:
-      packages: write
-      id-token: write
-
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v3
-      with:
-        token: ${{ secrets.CR_PAT }}
-        fetch-depth: 0
-        clean: false
-
-    - name: Run CRLF changes
-      run: |
-        echo "Fixxing endings"
-        if test -f "./.templates/ci/crlf.sh"; then
-           bash "./.templates/ci/crlf.sh"
-        fi
-
   contrib:
     runs-on: ubuntu-20.04
     needs: 
     - get-version
-    - run-crf
     permissions:
       packages: write
       id-token: write
@@ -83,3 +59,28 @@ jobs:
         PATH: '/README.md'
         COMMIT_MESSAGE: 'docs(README): update contributors'
         AVATAR_SHAPE: 'round'
+
+  run-changelog:
+    runs-on: ubuntu-20.04
+    needs: 
+    - get-version
+    - contrib
+    permissions:
+      packages: write
+      id-token: write
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+      with:
+        token: ${{ secrets.CR_PAT }}
+        fetch-depth: 0
+        clean: true
+ 
+    - name: Run Changelog
+      run: |
+        echo "run repack"
+        echo " run changelog "
+        if test -f "./.templates/ci/gitlog.sh"; then
+           bash "./.templates/ci/gitlog.sh"
+        fi
