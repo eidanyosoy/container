@@ -23,7 +23,8 @@ TOKEN=$4
 
 APPBRANCH="develop"
 APPLINK="https://api.github.com/repos/whisparr/whisparr"
-NEWVERSION=$(curl -sX GET "https://whisparr.servarr.com/v1/update/${APPBRANCH}/changes?runtime=netcore&os=linuxmusl" | jq -r '.[0].version')
+NEWVERSION=$(curl -sX GET "https://whisparr.servarr.com/v1/update/${APPBRANCH}/changes?os=linuxmusl&runtime=netcore&arch=x64" | jq -r .[0].version)
+
 NEWVERSION="${NEWVERSION#*v}"
 NEWVERSION="${NEWVERSION#*release-}"
 NEWVERSION="${NEWVERSION}"
