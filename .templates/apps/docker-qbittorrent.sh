@@ -29,10 +29,11 @@ NEWVERSION="${NEWVERSION#*v}"
 NEWVERSION="${NEWVERSION#*release-}"
 NEWVERSION="${NEWVERSION}"
 
-QBT_VERSION=$(curl -u $USERNAME:$TOKEN -sX GET "https://api.github.com/repos/ludviglundgren/qbittorrent-cli/releases/latest" | jq --raw-output '.tag_name')
-QBT_VERSION="${QBT_VERSION#*v}"
-QBT_VERSION="${QBT_VERSION#*release-}"
-QBT_VERSION="${QBT_VERSION}"
+#QBT_VERSION=$(curl -u $USERNAME:$TOKEN -sX GET "https://api.github.com/repos/linuxserver/docker-qbittorrent/releases/latest" | jq --raw-output '.tag_name')
+#QBT_VERSION="${QBT_VERSION#*v}"
+#QBT_VERSION="${QBT_VERSION#*release-}"
+#QBT_VERSION="${QBT_VERSION}"
+QBT_VERSION=1.7
 
 HEADLINE="$(cat ./.templates/headline.txt)"
 
@@ -40,10 +41,9 @@ DESCRIPTION="$(curl -u $USERNAME:$TOKEN -sX GET "$APPLINK" | jq -r '.description
 BASEIMAGE="ghcr.io/linuxserver/baseimage-alpine:edge"
 
 INSTCOMMAND="apk add -U --update --no-cache"
-PACKAGES="bash jq tar curl python3"
+PACKAGES="bash jq tar curl icu-libs libstdc++ openssl p7zip python3 make g++ gcc"
 UPCOMMAND="apk --quiet --no-cache --no-progress update && \\
     apk --quiet --no-cache --no-progress upgrade"
-MOVE="mv /tmp/qbt /usr/bin"
 LINKED="ln -s /usr/bin/python3 /usr/bin/python"
 
 CLEANUP="rm -rf /tmp/* /var/cache/apk/*"
@@ -94,17 +94,12 @@ RUN \
   echo "'"**** update packages ****"'" && \
     '"${UPCOMMAND}"' && \
   echo "'"**** install packages ****"'" && \
-    '"${INSTCOMMAND}"' '"${PACKAGES}"' qbittorrent-nox && \
+    '"${INSTCOMMAND}"' '"${PACKAGES}"' qbittorrent-nox=='"${NEWVERSION}"' && \
   echo "'"**** symlink python3 for compatibility ****"'" && \
     '"${LINKED}"' && \
   echo "'"**** install '"${APP}"' ****"'" && \
-    case $TARGETPLATFORM in \
-      '"'linux/amd64'"') curl -fsSL "'"https://github.com/ludviglundgren/qbittorrent-cli/releases/download/v"'${QBT_VERSION}'"/qbittorrent-cli_"'${QBT_VERSION}'"_linux_amd64.tar.gz"'" | tar xzf - -C /tmp;; \
-      '"'linux/arm64'"') curl -fsSL "'"https://github.com/ludviglundgren/qbittorrent-cli/releases/download/v"'${QBT_VERSION}'"/qbittorrent-cli_"'${QBT_VERSION}'"_linux_arm64.tar.gz"'" | tar xzf - -C /tmp;; \
-      '"'linux/aarch64'"') curl -fsSL "'"https://github.com/ludviglundgren/qbittorrent-cli/releases/download/v"'${QBT_VERSION}'"/qbittorrent-cli_"'${QBT_VERSION}'"_linux_arm64.tar.gz"'" | tar xzf - -C /tmp;; \
-    esac \
-    && \
-    '"${MOVE}"' && \
+    mkdir /qbt && \
+    curl -fsSL "'"https://github.com/linuxserver/docker-qbittorrent/releases/download/qbt-"'${QBT_VERSION}'"/qbt.tar.gz"'" | tar xzf - -C /qbt && \
   echo "'"**** cleanup ****"'" && \
     '"${CLEANUP}"'
 
