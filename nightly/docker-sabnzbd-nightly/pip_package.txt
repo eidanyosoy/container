@@ -1,5 +1,5 @@
 CacheControl==0.12.10
-Cheetah3==3.2.6.post1
+Cheetah3==3.2.6
 CherryPy==18.6.1
 Markdown==3.3.6
 PySocks==1.7.1
