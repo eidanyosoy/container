@@ -37,10 +37,8 @@ sleep 5
 if [[ -n $(git status --porcelain) ]]; then
    git config --global user.name 'github-actions[bot]'
    git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-   git reflog expire --expire=now --all
-   git gc --prune=now --aggressive
-   git repack -adf --depth=5000 --window=5000
-   git add -A && git commit -sam "[Auto Update Depends] Get New Package Versions From Image" || true
+   git add -A
+   git commit -sam "[Auto Update Depends] Get New Package Versions From Image" || true
    git push --force
 fi
 
