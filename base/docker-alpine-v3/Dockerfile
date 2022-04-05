@@ -60,7 +60,7 @@ RUN \
     apk update && apk upgrade && \
     apkArch="$(apk --print-arch)" && \
     case "$apkArch" in \
-        x86_64) s6Arch='x86_64' ;; \
+        x86_64|x86) s6Arch='x86_64' ;; \
         armv7) s6Arch='armhf' ;; \
         armhf) s6Arch='armhf' ;; \
         aarch64) s6Arch='aarch64' ;; \
