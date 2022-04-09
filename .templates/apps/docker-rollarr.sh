@@ -49,7 +49,7 @@ PORT="EXPOSE 3100"
 
 ADDRUN="RUN \\
     chmod 755 /rollarr/* && \\
-    ./rollarr/install.sh"
+    bash /rollarr/install.sh"
 
 VOLUMEN="VOLUME /config"
 
