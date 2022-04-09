@@ -127,9 +127,13 @@ set -ex && \
    rm -rf /var/lib/apt/lists/* && \
    rm -rf /root/.cache
 
-echo -e "#run python script every hour
+
+if [[ ! -f "/rollarr/crontab.conf" ]]; then
+   cat > /rollarr/crontab.conf << EOF; $(echo)
+#run python script every hour
 0 * * * * /usr/local/bin/python /rollarr/PrerollUpdate.py > /proc/1/fd/1 2>/proc/1/fd/2
-#empty" >/rollarr/crontab.conf
+#empty
+EOF
 
 mkdir -p /config \
          /preroll \
