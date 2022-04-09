@@ -142,8 +142,6 @@ ln -s /rollarr/data.json /config/data.json && \
 ln -s /preroll /config/preroll && \
 ln -s /rollar/crontab.conf /crontab
 
-/usr/bin/crontab /crontab.conf
-
 echo -e "## run as user
 exec su -l abc -c "cron -f /crontab & \
 exec su -l abc -c "python /rollarr/Preroll.py" >/rollar/run.sh
@@ -155,3 +153,5 @@ chmod 755 /rollarr/* \
 chown -cR abc:abc /rollarr/* \
           /config/data.json \
           /rollarr/crontab.conf &>/dev/null
+
+/usr/bin/crontab /crontab.conf
