@@ -35,10 +35,9 @@ COPY ./apps/docker-rollarr/root/ /
 
 RUN \
     chmod 755 /rollarr/* && \
-    ./rollarr/install.sh && \
-    rm -rf /rollarr/install.sh &>/dev/null
-
-
+    bash /rollarr/install.sh && \
+    chown -cR abc:abc /rollarr && \
+    chmod -cR 755 /rollarr/*
 
 EXPOSE 3100
 
