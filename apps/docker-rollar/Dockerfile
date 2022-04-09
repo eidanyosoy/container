@@ -4,6 +4,15 @@ LABEL org.opencontainers.image.source="https://github.com/dockserver/container"
 ARG TARGETPLATFORM
 ARG BUILDPLATFORM
 
+ENV LANG=C.UTF-8 \
+    GPG_KEY=A035C8C19219BA821ECEA86B64E628F8D684696D \
+    PYTHON_VERSION=3.10.1 \
+    PYTHON_PIP_VERSION=21.2.4 \
+    PYTHON_SETUPTOOLS_VERSION=57.5.0 \
+    PYTHON_GET_PIP_URL=https://github.com/pypa/get-pip/raw/3cb8888cc2869620f57d5d2da64da38f516078c7/public/get-pip.py \
+    PYTHON_GET_PIP_SHA256=c518250e91a70d7b20cceb15272209a4ded2a0c263ae5776f129e0d9b5674309 \
+    PATH=/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
 CMD ["bash"]
 
 RUN \
@@ -16,13 +25,7 @@ RUN \
        tar \
        wget \
        dirmngr \
-       gnupg && \
-   rm -rf /var/lib/apt/lists/*
-
-RUN \
-    set -ex && \
-    apt-get update && \
-    apt-get install -y --no-install-recommends \
+       gnupg \
        autoconf \
        automake \
        bzip2 \
@@ -63,18 +66,10 @@ RUN \
        unzip \
        xz-utils \
        zlib1g-dev \
+       cron \
+       vim \
        $(if apt-cache show 'default-libmysqlclient-dev' 2>/dev/null | grep -q '^Version:';then echo 'default-libmysqlclient-dev';else; echo 'libmysqlclient-dev';fi ) && \
    rm -rf /var/lib/apt/lists/*
-
-ENV LANG=C.UTF-8 \
-    GPG_KEY=A035C8C19219BA821ECEA86B64E628F8D684696D \
-    PYTHON_VERSION=3.10.1 \
-    PYTHON_PIP_VERSION=21.2.4 \
-    PYTHON_SETUPTOOLS_VERSION=57.5.0 \
-    PYTHON_GET_PIP_URL=https://github.com/pypa/get-pip/raw/3cb8888cc2869620f57d5d2da64da38f516078c7/public/get-pip.py
-    PYTHON_GET_PIP_SHA256=c518250e91a70d7b20cceb15272209a4ded2a0c263ae5776f129e0d9b5674309
-
-PATH=/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
 RUN \
     set -ex && \
@@ -103,7 +98,7 @@ RUN \
          make -j "$(nproc)" && \
          make install && \
          rm -rf /usr/src/python && \
-     find /usr/local -depth \( \( -type d -a \( -name test -o -name tests -o -name idle_test \) \) \ -o \( -type f -a \( -name '*.pyc' -o -name '*.pyo' -o -name '*.a' \) \) \) -exec rm -rf '{}' + && \
+    find /usr/local -depth \( \( -type d -a \( -name test -o -name tests -o -name idle_test \) \) \ -o \( -type f -a \( -name '*.pyc' -o -name '*.pyo' -o -name '*.a' \) \) \) -exec rm -rf '{}' + && \ \
     ldconfig && \
     python3 --version
 
@@ -116,28 +111,25 @@ RUN \
        ln -s python3-config python-config
 
 RUN \
-   set -ex && \
+    set -ex && \
        wget -O get-pip.py "$PYTHON_GET_PIP_URL" && \
        echo "$PYTHON_GET_PIP_SHA256 *get-pip.py" | sha256sum --check --strict - && \
        python get-pip.py --disable-pip-version-check --no-cache-dir "pip==$PYTHON_PIP_VERSION" "setuptools==$PYTHON_SETUPTOOLS_VERSION" && \
        pip --version && \
-       find /usr/local -depth \( \( -type d -a \( -name test -o -name tests -o -name idle_test \) \) -o \( -type f -a \( -name '*.pyc' -o -name '*.pyo' \) \) \) -exec rm -rf '{}' +; 
+       find /usr/local -depth \( \( -type d -a \( -name test -o -name tests -o -name idle_test \) \) -o \( -type f -a \( -name '*.pyc' -o -name '*.pyo' \) \) \) -exec rm -rf '{}' + && \
        rm -f get-pip.py
 
 CMD [ "python3" ]
-
-RUN /bin/sh -c apt-get update && apt-get install -y cron vim
 
 COPY ./root .
 
 RUN \
  chmod 0644 /crontab \
- chmod 0744 /rollarr/PrerollUpdate.py \
-                          /rollarr/PrerollUpdate.py
+ chmod 0744 /rollarr/*
 
-RUN /bin/sh -c pip install -r /rollarr/requirements.txt
-RUN /bin/sh -c /usr/bin/crontab /crontab
+RUN pip install -r /rollarr/requirements.txt
+RUN /usr/bin/crontab /crontab
 
-EXPOSE [ 3100 ]
+EXPOSE 3100
 
 CMD ["./run.sh"]
