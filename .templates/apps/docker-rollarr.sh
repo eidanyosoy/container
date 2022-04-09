@@ -50,11 +50,7 @@ PORT="EXPOSE 3100"
 ADDRUN="RUN \\
     chmod 755 /rollarr/* && \\
     ./rollarr/install.sh && \\
-    rm -rf /rollarr/install.sh &>/dev/null && \\
-    pip install -r /rollarr/requirements.txt && \\
-    cp /rollarr/crontab /crontab 
-
-RUN /usr/bin/crontab /crontab"
+    rm -rf /rollarr/install.sh &>/dev/null"
 
 ### RELEASE SETTINGS ###
 
