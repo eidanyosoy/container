@@ -48,7 +48,7 @@ APPFOLDER="./$FOLDER/$APP"
 PORT="EXPOSE 3100"
 
 ADDRUN="RUN \\
-    chmod 755 /rollarr/* && \\
+    chmod -R 755 /rollarr/* && \\
     bash /rollarr/install.sh"
 
 VOLUMEN="VOLUME /config"
@@ -88,12 +88,14 @@ COPY '"${APPFOLDER}"'/root/ /
 '"${ADDRUN}"'
 
 CMD [ "'"python3"'" ]
-RUN apt-get update -yqq && apt-get install -yqq cron vim && \
+RUN apt-get update -yqq && \
+    apt-get install -yqq cron vim && \
     chmod 0644 /crontab && \
-    pip install -r /rollarr/requirements.txt && \
-    crontab /crontab
+    pip install -r /rollarr/requirements.txt
+
+RUN crontab /crontab
 
 '"${PORT}"'
 '"${VOLUMEN}"'
-CMD [ "'"/bin/bash"'", ""'"/run.sh"'" ]
+CMD [ "'"/bin/bash"'", "'"/run.sh"'" ]
 ##EOF' > ./$FOLDER/$APP/Dockerfile
