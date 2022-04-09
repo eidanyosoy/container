@@ -34,7 +34,7 @@ CMD [ "bash" ]
 COPY ./apps/docker-rollarr/root/ /
 RUN \
     chmod 755 /rollarr/* && \
-    ./rollarr/install.sh
+    bash /rollarr/install.sh
 
 EXPOSE 3100
 VOLUME /config
