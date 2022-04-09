@@ -128,11 +128,9 @@ PATH=/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
    chmod -R 755 /rollarr/* \  
             /config/data.json \
-            /rollarr/crontab.conf \
             /crontab &>/dev/null
 
    chown -cR abc:abc /rollarr/* \
          /config/data.json \
-         /rollarr/crontab.conf \
          /crontab &>/dev/null
 #EoF
