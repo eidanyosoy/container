@@ -117,7 +117,7 @@ jobs:
       if: ${{ steps.prep.outputs.version != '' }}
       uses: sigstore/cosign-installer@d6a3abf1bdea83574e28d40543793018b6035605
       with:
-        cosign-release: 'v1.6.0'
+        cosign-release: 'v1.7.1'
 
     - name: Login in Registry || major
       if: ${{ steps.prep.outputs.version != '' }}
