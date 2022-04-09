@@ -116,62 +116,31 @@ set -eux && \
       ln -s python3 python && \
       ln -s python3-config python-config
 
-set -eux && \
    curl -sSL https://bootstrap.pypa.io/get-pip.py -o get-pip.py && \
       python get-pip.py --disable-pip-version-check --no-cache-dir "pip==$PYTHON_PIP_VERSION" "setuptools==$PYTHON_SETUPTOOLS_VERSION" && \
-      pip --version && \
    find /usr/local -depth \( \( -type d -a \( -name test -o -name tests -o -name idle_test \) \) -o \( -type f -a \( -name '*.pyc' -o -name '*.pyo' \) \) \) -exec rm -rf '{}' + && \
       rm -rf get-pip.py && \
       pip install --upgrade pip && \
-      pip install --no-warn-script-location --upgrade --force-reinstall -r /rollarr/requirements.txt && \
-   rm -rf /tmp/* && \
-   rm -rf /var/lib/apt/lists/* && \
-   rm -rf /root/.cache
+      pip install --no-warn-script-location --upgrade --force-reinstall -r /rollarr/requirements.txt
 
-set -eux && \
-   if [[ ! -f "/rollarr/crontab.conf" ]]; then
-      cat > /rollarr/crontab.conf << EOF; $(echo)
-#run python script every hour
-0 * * * * /usr/local/bin/python /rollarr/PrerollUpdate.py > /proc/1/fd/1 2>/proc/1/fd/2
-#empty
-EOF
-
-set -eux && \
    mkdir -p /config \
             /preroll \
            /config/preroll &>/dev/null
 
-set -eux && \
    useradd -u 911 -U -d /config -s /bin/false abc &>/dev/null && \
    usermod -G users abc &>/dev/null
 
-set -eux && \
    ln -s /rollarr/data.json /config/data.json && \
-   ln -s /preroll /config/preroll && \
-   ln -s /rollarr/crontab.conf /crontab
+   ln -s /preroll /config/preroll
 
-set -eux && \
-if [[ ! -f "/rollarr/run.sh" ]]; then
-   cat > /rollarr/run.sh << EOF; $(echo)
-## run as user
-exec su -l abc -c "cron -f & \
-exec su -l abc -c "python /rollarr/Preroll.py"
-EOF
-fi
-
-set -eux && \
-  chmod 755 /rollarr/* \
-            /config/data.json \
-            /rollarr/crontab.conf \
+   chmod 755 /rollarr/* \                     
+            /config/data.json \              
+            /rollarr/crontab.conf \          
             /crontab &>/dev/null
 
-set -eux && \
-  chown -cR abc:abc \
-         /rollarr/* \
-         /config/data.json \
-         /rollarr/crontab.conf \
+   chown -cR abc:abc \                        
+         /rollarr/* \                        
+         /config/data.json \                 
+         /rollarr/crontab.conf \             
          /crontab &>/dev/null
-
-
-$(command -v crontab) /crontab
 #EoF
