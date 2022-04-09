@@ -1,0 +1,3 @@
+#run python script every hour
+0 * * * * /usr/local/bin/python /rollarr/PrerollUpdate.py > /proc/1/fd/1 2>/proc/1/fd/2
+#empty

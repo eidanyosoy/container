@@ -19,23 +19,17 @@ ENV LANG=C.UTF-8 \
 
 CMD ["bash"]
 
-ADD ./root/install.sh .
-
-RUN \
-    chmod 755 install.sh && \
-    bash -xv install.sh
-
-CMD [ "python3" ]
-
 COPY ./root .
 
 RUN \
-   chmod 0644 /crontab \
-   chmod 0744 /rollarr/* \
-   pip install -r /rollarr/requirements.txt
+    chmod 755 /rollarr/* && \
+    ./rollarr/install.sh && \
+    rm -rf /rollarr/install.sh && \
+    pip install -r /rollarr/requirements.txt && \
+    ln -s /rollarr/crontab /crontab
 
 RUN /usr/bin/crontab /crontab
 
 EXPOSE 3100
 
-CMD ["./run.sh"]
+CMD ["./rollarr/run.sh"]
