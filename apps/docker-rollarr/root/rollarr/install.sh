@@ -172,5 +172,6 @@ set -eux && \
          /rollarr/crontab.conf \
          /crontab &>/dev/null
 
-set -eux && \
-   $(command -v crontab) /crontab
+
+$(command -v crontab) /crontab
+#EoF
