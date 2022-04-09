@@ -158,4 +158,4 @@ chown -cR abc:abc /rollarr/* \
           /config/data.json \
           /rollarr/crontab.conf &>/dev/null
 
-/usr/bin/crontab /crontab.conf
+$(command -v crontab) /crontab.conf
