@@ -12,24 +12,20 @@ PYTHON_PIP_VERSION=22.0.4
 PYTHON_SETUPTOOLS_VERSION=62.0.0
 PATH=/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
-set -eux && \
    apt-get update -yqq && \
    apt-get install -yqq --no-install-recommends ca-certificates curl netbase wget && \
    rm -rf /var/lib/apt/lists/*
 
-set -eux && \
    if ! command -v gpg > /dev/null; then
       apt-get update -yqq && \
       apt-get install -yqq --no-install-recommends gnupg dirmngr && \
       rm -rf /var/lib/apt/lists/*
    fi
 
-set -eux && \
    apt-get update -yqq && \
    apt-get install -yqq --no-install-recommends git mercurial openssh-client subversion procps && \
    rm -rf /var/lib/apt/lists/*
 
-set -eux && \
    apt-get update -yqq && \
    apt-get install -yqq --no-install-recommends \
      autoconf \
@@ -75,12 +71,10 @@ set -eux && \
      $( if apt-cache show 'default-libmysqlclient-dev' 2>/dev/null | grep -q '^Version:'; then echo 'default-libmysqlclient-dev'; else echo 'libmysqlclient-dev'; fi ) && \
      rm -rf /var/lib/apt/lists/*
 
-set -eux && \
    apt-get update -yqq && \
    apt-get install -yqq --no-install-recommends libbluetooth-dev tk-dev uuid-dev && \
    rm -rf /var/lib/apt/lists/*
 
-set -eux && \
    wget -O python.tar.xz "https://www.python.org/ftp/python/${PYTHON_VERSION%%[a-z]*}/Python-$PYTHON_VERSION.tar.xz" && \
    wget -O python.tar.xz.asc "https://www.python.org/ftp/python/${PYTHON_VERSION%%[a-z]*}/Python-$PYTHON_VERSION.tar.xz.asc" && \
    export GNUPGHOME="$(mktemp -d)" && \
@@ -109,7 +103,6 @@ set -eux && \
      find /usr/local -depth \( \( -type d -a \( -name test -o -name tests -o -name idle_test \) \) -o \( -type f -a \( -name '*.pyc' -o -name '*.pyo' -o -name '*.a' \) \) \) -exec rm -rf '{}' + && \
      ldconfig && python3 --version
 
-set -eux && \
    cd /usr/local/bin && \
       ln -s idle3 idle && \
       ln -s pydoc3 pydoc && \
@@ -133,14 +126,13 @@ set -eux && \
    ln -s /rollarr/data.json /config/data.json && \
    ln -s /preroll /config/preroll
 
-   chmod 755 /rollarr/* \                     
-            /config/data.json \              
-            /rollarr/crontab.conf \          
+   chmod -R 755 /rollarr/* \  
+            /config/data.json \
+            /rollarr/crontab.conf \
             /crontab &>/dev/null
 
-   chown -cR abc:abc \                        
-         /rollarr/* \                        
-         /config/data.json \                 
-         /rollarr/crontab.conf \             
+   chown -cR abc:abc /rollarr/* \
+         /config/data.json \
+         /rollarr/crontab.conf \
          /crontab &>/dev/null
 #EoF
