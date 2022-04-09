@@ -52,6 +52,8 @@ ADDRUN="RUN \\
     ./rollarr/install.sh && \\
     rm -rf /rollarr/install.sh &>/dev/null"
 
+VOLUMEN="VOLUME /config"
+
 ### RELEASE SETTINGS ###
 
 echo '{
@@ -83,15 +85,15 @@ ARG BUILDPLATFORM
 '"${ENCOPY}"'
 
 CMD [ "'"bash"'" ]
-
 COPY '"${APPFOLDER}"'/root/ /
 
 '"${ADDRUN}"'
 
-'"${PORT}"'
-
 '"${FINALCMD}"'
 
-CMD [ "'"./rollarr/run.sh"'" ]
+'"${PORT}"'
 
+'"${VOLUMEN}"'
+
+CMD [ "'"./rollarr/run.sh"'" ]
 ##EOF' > ./$FOLDER/$APP/Dockerfile
