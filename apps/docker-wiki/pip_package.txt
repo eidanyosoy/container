@@ -7,7 +7,7 @@ MarkupSafe==2.1.1
 MkDocsJsonSchemaPlugin==0.0.4
 PyYAML==6.0
 Pygments==2.11.2
-beautifulsoup4==4.10.0
+beautifulsoup4==4.11.1
 bracex==2.2.1
 certifi==2021.10.8
 charset-normalizer==2.0.12
@@ -40,7 +40,7 @@ pyyaml_env_tag==0.1
 requests==2.27.1
 six==1.16.0
 smmap==5.0.0
-soupsieve==2.3.1
+soupsieve==2.3.2
 termcolor==1.1.0
 urllib3==1.26.9
 watchdog==2.1.7
