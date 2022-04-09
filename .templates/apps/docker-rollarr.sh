@@ -52,7 +52,7 @@ ADDRUN="RUN \\
     ./rollarr/install.sh && \\
     rm -rf /rollarr/install.sh && \\
     pip install -r /rollarr/requirements.txt && \\
-    ln -s /rollarr/crontab /crontab 
+    cp /rollarr/crontab /crontab 
 
 RUN /usr/bin/crontab /crontab"
 
