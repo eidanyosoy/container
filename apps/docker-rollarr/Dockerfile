@@ -32,15 +32,11 @@ ENV LANG=C.UTF-8 \
 
 CMD [ "bash" ]
 COPY ./apps/docker-rollarr/root/ /
-
 RUN \
     chmod 755 /rollarr/* && \
-    bash /rollarr/install.sh && \
-    chmod -cR 755 /rollarr/*
+    ./rollarr/install.sh
 
 EXPOSE 3100
-
 VOLUME /config
-
 CMD [ "./rollarr/run.sh" ]
 ##EOF
