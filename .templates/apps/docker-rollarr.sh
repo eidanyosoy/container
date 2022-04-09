@@ -19,7 +19,6 @@ APP=$2
 USERNAME=$3
 TOKEN=$4
 
-
 ### APP SETTINGS ###
 
 APPLINK="https://github.com/TheHumanRobot/Rollarr"
@@ -54,7 +53,6 @@ PICTURE="./images/$APP.png"
 APPFOLDER="./$FOLDER/$APP"
 PORT="EXPOSE 3100"
 
-COM="CMD [ bash ]"
 ADDRUN="RUN \\
     chmod 755 /rollarr/* && \\
     ./rollarr/install.sh && \\
@@ -63,8 +61,6 @@ ADDRUN="RUN \\
     ln -s /rollarr/crontab /crontab 
 
 RUN /usr/bin/crontab /crontab"
-
-FINALCMD="CMD [ ./rollarr/run.sh ]"
 
 ### RELEASE SETTINGS ###
 
@@ -96,7 +92,7 @@ ARG BUILDPLATFORM
 
 '"${ENCOPY}"'
 
-'"${COM}"'
+CMD [ "'"bash"'" ]
 
 COPY '"${APPFOLDER}"'/root/ /
 
@@ -105,4 +101,7 @@ COPY '"${APPFOLDER}"'/root/ /
 '"${PORT}"'
 
 '"${FINALCMD}"'
+
+CMD [ "'"./rollarr/run.sh"'" ]
+
 ##EOF' > ./$FOLDER/$APP/Dockerfile
