@@ -129,10 +129,29 @@ set -ex && \
 
 echo -e "#run python script every hour
 0 * * * * /usr/local/bin/python /rollarr/PrerollUpdate.py > /proc/1/fd/1 2>/proc/1/fd/2
-#empty" >/crontab.conf
+#empty" >/rollar/crontab.conf
+
+mkdir -p /config \
+         /preroll \
+         /config/preroll &>/dev/null
+
+useradd -u 911 -U -d /config -s /bin/false abc &>/dev/null && \
+usermod -G users abc &>/dev/null
+
+ln -s /rollarr/data.json /config/data.json && \
+ln -s /preroll /config/preroll && \
+ln -s /rollar/crontab.conf /crontab
 
 /usr/bin/crontab /crontab.conf
 
-mkdir -p /config && \
-ln -s /rollarr/data.json /config/data.json
+echo -e "## run as user
+exec su -l abc -c "cron -f /crontab & \
+exec su -l abc -c "python /rollarr/Preroll.py" >/rollar/run.sh
 
+chmod 755 /rollarr/* \
+          /config/data.json \
+          /rollarr/crontab.conf &>/dev/null
+
+chown -cR abc:abc /rollarr/* \
+          /config/data.json \
+          /rollarr/crontab.conf &>/dev/null
