@@ -13,7 +13,7 @@ PYTHON_SETUPTOOLS_VERSION=62.0.0
 PATH=/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
 set -eux && \
-   apt-get update && \
+   apt-get update -yqq && \
    apt-get install -yqq --no-install-recommends ca-certificates curl netbase wget && \
    rm -rf /var/lib/apt/lists/*
 
@@ -75,12 +75,12 @@ set -eux && \
      $( if apt-cache show 'default-libmysqlclient-dev' 2>/dev/null | grep -q '^Version:'; then echo 'default-libmysqlclient-dev'; else echo 'libmysqlclient-dev'; fi ) && \
      rm -rf /var/lib/apt/lists/*
 
-set -ex && \
+set -eux && \
    apt-get update -yqq && \
    apt-get install -yqq --no-install-recommends libbluetooth-dev tk-dev uuid-dev && \
    rm -rf /var/lib/apt/lists/*
 
-set -ex && \
+set -eux && \
    wget -O python.tar.xz "https://www.python.org/ftp/python/${PYTHON_VERSION%%[a-z]*}/Python-$PYTHON_VERSION.tar.xz" && \
    wget -O python.tar.xz.asc "https://www.python.org/ftp/python/${PYTHON_VERSION%%[a-z]*}/Python-$PYTHON_VERSION.tar.xz.asc" && \
    export GNUPGHOME="$(mktemp -d)" && \
@@ -109,13 +109,14 @@ set -ex && \
      find /usr/local -depth \( \( -type d -a \( -name test -o -name tests -o -name idle_test \) \) -o \( -type f -a \( -name '*.pyc' -o -name '*.pyo' -o -name '*.a' \) \) \) -exec rm -rf '{}' + && \
      ldconfig && python3 --version
 
-cd /usr/local/bin && \
-   ln -s idle3 idle && \
-   ln -s pydoc3 pydoc && \
-   ln -s python3 python && \
-   ln -s python3-config python-config
+set -eux && \
+   cd /usr/local/bin && \
+      ln -s idle3 idle && \
+      ln -s pydoc3 pydoc && \
+      ln -s python3 python && \
+      ln -s python3-config python-config
 
-set -ex && \
+set -eux && \
    curl -sSL https://bootstrap.pypa.io/get-pip.py -o get-pip.py && \
       python get-pip.py --disable-pip-version-check --no-cache-dir "pip==$PYTHON_PIP_VERSION" "setuptools==$PYTHON_SETUPTOOLS_VERSION" && \
       pip --version && \
@@ -127,39 +128,49 @@ set -ex && \
    rm -rf /var/lib/apt/lists/* && \
    rm -rf /root/.cache
 
-
-if [[ ! -f "/rollarr/crontab.conf" ]]; then
-   cat > /rollarr/crontab.conf << EOF; $(echo)
+set -eux && \
+   if [[ ! -f "/rollarr/crontab.conf" ]]; then
+      cat > /rollarr/crontab.conf << EOF; $(echo)
 #run python script every hour
 0 * * * * /usr/local/bin/python /rollarr/PrerollUpdate.py > /proc/1/fd/1 2>/proc/1/fd/2
 #empty
 EOF
 
-mkdir -p /config \
-         /preroll \
-         /config/preroll &>/dev/null
+set -eux && \
+   mkdir -p /config \
+            /preroll \
+           /config/preroll &>/dev/null
 
-useradd -u 911 -U -d /config -s /bin/false abc &>/dev/null && \
-usermod -G users abc &>/dev/null
+set -eux && \
+   useradd -u 911 -U -d /config -s /bin/false abc &>/dev/null && \
+   usermod -G users abc &>/dev/null
 
-ln -s /rollarr/data.json /config/data.json && \
-ln -s /preroll /config/preroll && \
-ln -s /rollarr/crontab.conf /crontab
+set -eux && \
+   ln -s /rollarr/data.json /config/data.json && \
+   ln -s /preroll /config/preroll && \
+   ln -s /rollarr/crontab.conf /crontab
 
+set -eux && \
 if [[ ! -f "/rollarr/run.sh" ]]; then
    cat > /rollarr/run.sh << EOF; $(echo)
 ## run as user
-exec su -l abc -c "cron -f /crontab & \
+exec su -l abc -c "cron -f & \
 exec su -l abc -c "python /rollarr/Preroll.py"
 EOF
 fi
 
-chmod 755 /rollarr/* \
-          /config/data.json \
-          /rollarr/crontab.conf &>/dev/null
+set -eux && \
+  chmod 755 /rollarr/* \
+            /config/data.json \
+            /rollarr/crontab.conf \
+            /crontab &>/dev/null
 
-chown -cR abc:abc /rollarr/* \
-          /config/data.json \
-          /rollarr/crontab.conf &>/dev/null
+set -eux && \
+  chown -cR abc:abc \
+         /rollarr/* \
+         /config/data.json \
+         /rollarr/crontab.conf \
+         /crontab &>/dev/null
 
-$(command -v crontab) /crontab.conf
+set -eux && \
+   $(command -v crontab) /crontab
