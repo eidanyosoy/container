@@ -31,7 +31,6 @@ ENV LANG=C.UTF-8 \
     PATH=/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
 CMD [ "bash" ]
-
 COPY ./apps/docker-rollarr/root/ /
 
 RUN \
@@ -39,10 +38,11 @@ RUN \
     ./rollarr/install.sh && \
     rm -rf /rollarr/install.sh &>/dev/null
 
+
+
 EXPOSE 3100
 
-
+VOLUME /config
 
 CMD [ "./rollarr/run.sh" ]
-
 ##EOF
