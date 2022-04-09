@@ -129,7 +129,7 @@ set -ex && \
 
 echo -e "#run python script every hour
 0 * * * * /usr/local/bin/python /rollarr/PrerollUpdate.py > /proc/1/fd/1 2>/proc/1/fd/2
-#empty" >/rollar/crontab.conf
+#empty" >/rollarr/crontab.conf
 
 mkdir -p /config \
          /preroll \
@@ -140,7 +140,7 @@ usermod -G users abc &>/dev/null
 
 ln -s /rollarr/data.json /config/data.json && \
 ln -s /preroll /config/preroll && \
-ln -s /rollar/crontab.conf /crontab
+ln -s /rollarr/crontab.conf /crontab
 
 if [[ ! -f "/rollarr/run.sh" ]]; then
    cat > /rollarr/run.sh << EOF; $(echo)
