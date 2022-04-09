@@ -86,14 +86,9 @@ ARG BUILDPLATFORM
 
 CMD [ "'"bash"'" ]
 COPY '"${APPFOLDER}"'/root/ /
-
 '"${ADDRUN}"'
 
-'"${FINALCMD}"'
-
 '"${PORT}"'
-
 '"${VOLUMEN}"'
-
 CMD [ "'"./rollarr/run.sh"'" ]
 ##EOF' > ./$FOLDER/$APP/Dockerfile
