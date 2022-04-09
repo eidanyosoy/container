@@ -121,8 +121,8 @@ set -ex && \
       pip --version && \
    find /usr/local -depth \( \( -type d -a \( -name test -o -name tests -o -name idle_test \) \) -o \( -type f -a \( -name '*.pyc' -o -name '*.pyo' \) \) \) -exec rm -rf '{}' + && \
       rm -rf get-pip.py && \
-      python3 -m pip install --upgrade pip && \
-      python3 -m pip install --no-warn-script-location --upgrade --python-version="${PYTHON_VERSION}" --force-reinstall -r /rollarr/requirements.txt && \
+      pip install --upgrade pip && \
+      pip install --no-warn-script-location --upgrade --force-reinstall -r /rollarr/requirements.txt && \
    rm -rf /tmp/* && \
    rm -rf /var/lib/apt/lists/* && \
    rm -rf /root/.cache
