@@ -88,9 +88,9 @@ COPY '"${APPFOLDER}"'/root/ /
 '"${ADDRUN}"'
 
 CMD [ "'"python3"'" ]
-RUN apt-get update -yqq && apt-get install -yqq cron vim && \\
-    chmod 0644 /crontab && \\
-    pip install -r /rollarr/requirements.txt && \\
+RUN apt-get update -yqq && apt-get install -yqq cron vim && \
+    chmod 0644 /crontab && \
+    pip install -r /rollarr/requirements.txt && \
     crontab /crontab
 
 '"${PORT}"'
