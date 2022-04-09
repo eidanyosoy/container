@@ -33,10 +33,18 @@ ENV LANG=C.UTF-8 \
 CMD [ "bash" ]
 COPY ./apps/docker-rollarr/root/ /
 RUN \
-    chmod 755 /rollarr/* && \
+    chmod -R 755 /rollarr/* && \
     bash /rollarr/install.sh
+
+CMD [ "python3" ]
+RUN apt-get update -yqq && \
+    apt-get install -yqq cron vim && \
+    chmod 0644 /crontab && \
+    pip install -r /rollarr/requirements.txt
+
+RUN crontab /crontab
 
 EXPOSE 3100
 VOLUME /config
-CMD [ "./rollarr/run.sh" ]
+CMD [ "/bin/bash", "/run.sh" ]
 ##EOF
