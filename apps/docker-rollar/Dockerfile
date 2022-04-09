@@ -68,7 +68,11 @@ RUN \
        zlib1g-dev \
        cron \
        vim \
-       $(if apt-cache show 'default-libmysqlclient-dev' 2>/dev/null | grep -q '^Version:';then echo 'default-libmysqlclient-dev';else; echo 'libmysqlclient-dev';fi ) && \
+       $(if apt-cache show 'default-libmysqlclient-dev' 2>/dev/null | grep -q '^Version:'; then
+         echo 'default-libmysqlclient-dev'
+       else
+         echo 'libmysqlclient-dev'
+       fi ) && \
    rm -rf /var/lib/apt/lists/*
 
 RUN \
@@ -124,10 +128,10 @@ CMD [ "python3" ]
 COPY ./root .
 
 RUN \
- chmod 0644 /crontab \
- chmod 0744 /rollarr/*
+   chmod 0644 /crontab \
+   chmod 0744 /rollarr/* \
+   pip install -r /rollarr/requirements.txt
 
-RUN pip install -r /rollarr/requirements.txt
 RUN /usr/bin/crontab /crontab
 
 EXPOSE 3100
