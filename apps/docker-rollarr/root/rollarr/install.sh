@@ -117,20 +117,15 @@ PATH=/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
       pip install --no-warn-script-location --upgrade --force-reinstall -r /rollarr/requirements.txt
 
    mkdir -p /config \
-            /preroll \
+            /config/preroll \
            /config/preroll &>/dev/null
 
    useradd -u 911 -U -d /config -s /bin/false abc &>/dev/null && \
    usermod -G users abc &>/dev/null
 
-   ln -s /rollarr/data.json /config/data.json && \
-   ln -s /preroll /config/preroll
-
-   chmod -R 755 /rollarr/* \  
-            /config/data.json \
+   chmod -R 755 /rollarr/* \
             /crontab &>/dev/null
 
    chown -cR abc:abc /rollarr/* \
-         /config/data.json \
          /crontab &>/dev/null
 #EoF
