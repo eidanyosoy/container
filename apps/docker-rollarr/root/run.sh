@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [[ ! -f "/config/config.json" ]]; then
+if [[ ! -f "/config/data.json" ]]; then
    cp /rollarr/data_sample.json /config/data.json
 fi
 
