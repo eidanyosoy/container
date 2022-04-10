@@ -113,15 +113,23 @@ PATH=/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
       python get-pip.py --disable-pip-version-check --no-cache-dir "pip==$PYTHON_PIP_VERSION" "setuptools==$PYTHON_SETUPTOOLS_VERSION" && \
    find /usr/local -depth \( \( -type d -a \( -name test -o -name tests -o -name idle_test \) \) -o \( -type f -a \( -name '*.pyc' -o -name '*.pyo' \) \) \) -exec rm -rf '{}' + && \
       rm -rf get-pip.py && \
-      pip install --upgrade pip && \
-      pip install --no-warn-script-location --upgrade --force-reinstall -r /rollarr/requirements.txt
+      pip install --no-warn-script-location --upgrade --no-cache-dir --force-reinstall -r /rollarr/requirements.txt
 
    mkdir -p /config /config/preroll &>/dev/null
 
    useradd -u 911 -U -d /config -s /bin/false abc &>/dev/null && \
    usermod -G users abc &>/dev/null
 
-   chmod -R 755 /rollarr/* /crontab &>/dev/null
+   chmod -R 755 /rollarr /crontab &>/dev/null
 
-   chown -cR abc:abc /rollarr/* /crontab &>/dev/null
+   chown -cR abc:abc /rollarr /crontab &>/dev/null
+
+   apt-get update -yqq && \
+   apt-get install -yqq cron && \
+   chmod 0644 /crontab
+
+   apt-get autoremove -yqq && \
+   apt-get clean -yqq && \
+   rm -rf /tmp/* /root/.cache /var/lib/apt/lists/* /var/tmp/
+
 #EoF
