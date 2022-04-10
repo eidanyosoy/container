@@ -1104,4 +1104,4 @@ class Rollarr(App):
             self.popupconnectedfail.show(self)
 
 if __name__ == "__main__":
-    start(Rollarr, address='127.0.0.1', port=3100, start_browser=True, multiple_instance=True)
+    start(Rollarr, address='0.0.0.0', port=3100, start_browser=True, multiple_instance=True)
