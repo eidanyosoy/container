@@ -116,16 +116,12 @@ PATH=/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
       pip install --upgrade pip && \
       pip install --no-warn-script-location --upgrade --force-reinstall -r /rollarr/requirements.txt
 
-   mkdir -p /config \
-            /config/preroll \
-           /config/preroll &>/dev/null
+   mkdir -p /config /config/preroll &>/dev/null
 
    useradd -u 911 -U -d /config -s /bin/false abc &>/dev/null && \
    usermod -G users abc &>/dev/null
 
-   chmod -R 755 /rollarr/* \
-            /crontab &>/dev/null
+   chmod -R 755 /rollarr/* /crontab &>/dev/null
 
-   chown -cR abc:abc /rollarr/* \
-         /crontab &>/dev/null
+   chown -cR abc:abc /rollarr/* /crontab &>/dev/null
 #EoF
