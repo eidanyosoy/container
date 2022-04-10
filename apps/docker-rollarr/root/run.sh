@@ -4,11 +4,11 @@ if [[ ! -f "/config/data.json" ]]; then
    cp /rollarr/data_sample.json /config/data.json
 fi
 
-chmod -R 755 /rollarr/* \  
+chmod -R 755 /rollarr \  
           /config/data.json \
           /crontab &>/dev/null
 
-chown -cR abc:abc /rollarr/* \
+chown -cR abc:abc /rollarr \
          /config/data.json \
          /crontab &>/dev/null
 
