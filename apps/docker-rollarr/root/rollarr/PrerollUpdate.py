@@ -7,11 +7,9 @@ import os
 
 
 def update():
-    os.chdir('/rollarr/')
+    os.chdir('/config/')
     f = open(str('./data.json'))
-
     data = json.load(f)
-
     if data['Freq'] == 'Monthly':
         Date = datetime.date.today()
         Date = Date.strftime("%b")
@@ -199,7 +197,6 @@ def update():
             print('Pre-roll updated')
 # Closing file
     f.close()
-
 
 if __name__ == '__main__':
     update()
