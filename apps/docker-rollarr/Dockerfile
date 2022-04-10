@@ -36,12 +36,6 @@ RUN \
     chmod -R 755 /rollarr/* && \
     bash /rollarr/install.sh
 
-CMD [ "python3" ]
-RUN apt-get update -yqq && \
-    apt-get install -yqq cron vim && \
-    chmod 0644 /crontab && \
-    pip install -r /rollarr/requirements.txt
-
 RUN crontab /crontab
 
 EXPOSE 3100
