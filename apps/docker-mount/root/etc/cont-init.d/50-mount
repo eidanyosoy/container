@@ -38,7 +38,12 @@ PUID=${PUID:-1000} &>/dev/null
 groupmod -o -g "$PGID" abc &>/dev/null
 usermod -o -u "$PUID" abc &>/dev/null
 
-if [[ -f /donate.txt ]]; then cat /donate.txt ; fi
+echo "----------------------------------------------------
+     GID/UID
+----------------------------------------------------
+     User uid:    ${PUID}
+     User gid:    ${PGID}
+----------------------------------------------------"
 
    cat > /etc/apk/repositories << EOF; $(echo)
 http://dl-cdn.alpinelinux.org/alpine/v$(cat /etc/alpine-release | cut -d'.' -f1,2)/main
@@ -64,21 +69,6 @@ log "**** install build packages from requirements ****" && \
 
 mkdir -p /app/rclone /system/mount/{logs,env,rclone,keys}
 
-echo "----------------------------------------------------
- ____             _                                 
-|  _ \  ___   ___| | _____  ___ _ ____   _____ _ __ 
-| | | |/ _ \ / __| |/ / __|/ _ \ '__\ \ / / _ \ '__|
-| |_| | (_) | (__|   <\__ \  __/ |   \ V /  __/ |   
-|____/ \___/ \___|_|\_\___/\___|_|    \_/ \___|_|
-
-
-----------------------------------------------------
-     GID/UID
-----------------------------------------------------
-     User uid:    ${PUID}
-     User gid:    ${PGID}
-----------------------------------------------------
-"
 drivespace=$(df -BG /mnt --local | tail -n +2 | awk '{print $4}' | sed -e 's/G//g')
 checkspace=$(echo $(((${drivespace}) / 4 | bc)) | sed -r 's/([^0-9]*([0-9]*)){1}.*/\2/')
 VFS_CACHE_MAX_SIZE=${VFS_CACHE_MAX_SIZE:-null}
@@ -213,8 +203,8 @@ if [[ ${ARRAY} != 4 ]]; then
    filter="$1"
    mapfile -t mounts < <(eval rclone listremotes --config=${CONFIG} | grep "$filter" | sed -e 's/://g' | sed '/crypt/d' | sed '/gdrive/d' | sed '/union/d' | sed '/remote/d' | sed '/GDSA/d')
    for i in ${mounts[@]}; do
-       rclone config update $i service_account_file $JSONDIR/${GDSA}$COUNT.json --config=${CONFIG}
-       rclone config update $i service_account_file_path $JSONDIR --config=${CONFIG}
+       $(which rclone) config update $i service_account_file $JSONDIR/${GDSA}$COUNT.json --config=${CONFIG}
+       $(which rclone) config update $i service_account_file_path $JSONDIR --config=${CONFIG}
    done
    echo "${COUNT}" >/system/mount/.keys/lastkey
 fi
@@ -230,10 +220,10 @@ if [[ ${ARRAY} != 0 ]]; then
       mapfile -t mounts < <(eval rclone listremotes --config=$SOURCECONFIG | grep "$1" |  grep 't' |  sed '/gd/d' | sed '/remo/d' | sed '/crypt/d')
       for i in ${mounts[@]}; do
          NRTD=$((NRTD + 1))
-         TDID=$(rclone config show $i --config=${SOURCECONFIG} | egrep team_drive | awk $'{print $3}')
+         TDID=$($(which rclone) config show $i --config=${SOURCECONFIG} | egrep team_drive | awk $'{print $3}')
          GETP=$(grep -C7 "$TDID" $SOURCECONFIG | tail -1 | sed "s/\[//g" | sed "s/\]//g" | awk $'{print $3}')
          GETS=$(grep -C8 "$TDID" $SOURCECONFIG | tail -1 | sed "s/\[//g" | sed "s/\]//g" | awk $'{print $3}')
-         LREMO=$(rclone listremotes --config=$SOURCECONFIG | grep "$1" | sed -e 's/://g' | sed '/union/d' | sed '/remote/d' | sed '/GDSA/d' | sed '/gdrive/d' | sed '/crypt/d' | wc -l)
+         LREMO=$($(which rclone) listremotes --config=$SOURCECONFIG | grep "$1" | sed -e 's/://g' | sed '/union/d' | sed '/remote/d' | sed '/GDSA/d' | sed '/gdrive/d' | sed '/crypt/d' | wc -l)
          RCRYPT=$(grep $i:/encrypt $SOURCECONFIG | sed "s/\[//g" | sed "s/\]//g" | awk $'{print $3}')
          if [[ $RCRYPT != "" ]]; then
             echo -e "tdrive$NRTD|${TDID}|${GETP}|${GETS}" >>$ENDFILE
@@ -272,7 +262,7 @@ service_account_file_path = ${JSONDIR}
 team_drive = ${myArray[1]}" >>$ENDCONFIG
          rclone lsd ${myArray[0]}: --drive-service-account-file=$JSONDIR/${GDSA}$MINJS.json --fast-list --config=$ENDCONFIG
          if [ $? != 0 ]; then
-            rclone config delete ${myArray[0]} --config=$ENDCONFIG
+            $(which rclone) config delete ${myArray[0]} --config=$ENDCONFIG
          else
             if [[ ${HASHPASSWORD} == "plain" && ${HASHPASSWORD} != "hashed" ]] ; then
                ENC_PASSWORD=$(rclone obscure ${myArray[2]} | tail -n1)
@@ -287,7 +277,7 @@ filename_encryption = standard
 directory_name_encryption = true
 password = ${ENC_PASSWORD}
 password2 = ${ENC_SALT}" >>$ENDCONFIG
-               rclone mkdir ${myArray[0]}:/encrypt --drive-service-account-file=$JSONDIR/${GDSA}$MINJS.json --config=$ENDCONFIG
+               $(which rclone) mkdir ${myArray[0]}:/encrypt --drive-service-account-file=$JSONDIR/${GDSA}$MINJS.json --config=$ENDCONFIG
             fi
          fi
       fi
@@ -310,7 +300,7 @@ done
 
 mapfile -t mapped < <(eval cat ${value})
 for i in ${mapped[@]}; do
-  rclone config create remote union upstreams $i action_policy 'all' create_policy 'all' search_policy 'all' cache_time 120 --config=${CONFIG}
+  $(which rclone) config create remote union upstreams $i action_policy 'all' create_policy 'all' search_policy 'all' cache_time 120 --config=${CONFIG}
 done
 
 apk add --quiet --no-progress --update coreutils
