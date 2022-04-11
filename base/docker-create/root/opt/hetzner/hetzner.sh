@@ -13,7 +13,7 @@
 # NO CODE MIRRORING IS ALLOWED      #
 #####################################
 mkdir -p /opt/hetzner/
-cat > /opt/hetzner/hetzner.sh << EOF; $(echo)
+
 HMOD=$(ls /etc/modprobe.d/ | grep -qE 'hetzner' && echo true || echo false)
 ITEL=$(cat /etc/modprobe.d/blacklist-hetzner.conf | grep -qE '#blacklist i915' && echo true || echo false)
 IMOL1=$(cat /etc/default/grub | grep -qE '#GRUB_CMDLINE_LINUX_DEFAULT' && echo true || echo false)
@@ -49,4 +49,4 @@ fi
 if [[ $VIFO == "false" ]]; then $(command -v apt) install vainfo -yqq; fi
 if [[ $INTE == "false" && $IGPU == "true" ]]; then $(command -v apt) update -yqq && $(command -v apt) install intel-gpu-tools -yqq; fi
 if [[ $IMOL1 == "true" && $IMOL2 == "true" && $ITEL == "true" && $GVID == "true" && $DEVT == "true" ]]; then echo "Intel IGPU is working"; else echo "Intel IGPU is not working"; fi
-EOF
+
