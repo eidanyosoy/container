@@ -29,16 +29,6 @@ case "$1" in
 esac
 }
 
-### EXECUTIVE VALIDATION
-function os() {
-## case 2 = function to execute
-source /app/function/function.sh
-case "$2" in
-   folder ) clear && folder ;;
-   *) clear && exit ;;
-esac
-}
-
 ######
 function startno() {
 
