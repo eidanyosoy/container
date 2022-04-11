@@ -12,7 +12,7 @@
 # NO REBRANDING IS ALLOWED          #
 # NO CODE MIRRORING IS ALLOWED      #
 #####################################
-
+mkdir -p /opt/hetzner/
 cat > /opt/hetzner/hetzner.sh << EOF; $(echo)
 HMOD=$(ls /etc/modprobe.d/ | grep -qE 'hetzner' && echo true || echo false)
 ITEL=$(cat /etc/modprobe.d/blacklist-hetzner.conf | grep -qE '#blacklist i915' && echo true || echo false)
