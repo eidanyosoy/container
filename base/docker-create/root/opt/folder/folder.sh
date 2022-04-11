@@ -12,7 +12,7 @@
 # NO REBRANDING IS ALLOWED          #
 # NO CODE MIRRORING IS ALLOWED      #
 #####################################
-function folders() {
+
 folder="/mnt"
 basefolder="/opt/appdata"
 for fo in ${folder}; do
@@ -31,5 +31,4 @@ for app in ${basefolder}; do
     $(which find) $app -exec $(command -v chmod) a=rx,u+w {} \;
     $(which find) $app -exec $(command -v chown) -hR 1000:1000 {} \;
 done
-}
-folder
+
