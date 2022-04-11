@@ -29,13 +29,4 @@ case "$1" in
 esac
 }
 
-######
-function startno() {
-
-echo " some crazy stuff is coming || stay tune "
-sleep 10
-exit 0
-
-}
-
-startno
+start
