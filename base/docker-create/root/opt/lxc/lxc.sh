@@ -14,7 +14,6 @@
 #####################################
 
 mkdir -p /opt/lxc
-
 cat > /opt/lxc/.lxcstart.sh << EOF; $(echo)
 #!/bin/bash
 #
