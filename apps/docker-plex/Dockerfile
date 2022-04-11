@@ -22,7 +22,7 @@ LABEL org.opencontainers.image.source="https://github.com/dockserver/container"
 ARG TARGETPLATFORM
 ARG BUILDPLATFORM
 
-ARG VERSION="1.25.8.5663-e071c3d62"
+ARG VERSION="1.25.9.5721-965587f64"
 ARG BRANCH="master"
 
 ENV NVIDIA_DRIVER_CAPABILITIES="compute,video,utility" \
@@ -36,16 +36,18 @@ ENV NVIDIA_DRIVER_CAPABILITIES="compute,video,utility" \
     PLEX_MEDIA_SERVER_INFO_DEVICE="Docker Container"
 
 RUN \
+   apt-get update -yqq && apt-get install gnupg2 wget ca-certificates lsb-release software-properties-common -yqq && \
    case $TARGETPLATFORM in \
     'linux/amd64') \
      echo "**** add Intel repo ****" && \
-         curl -sL https://repositories.intel.com/graphics/intel-graphics.key | apt-key add - && \
-      echo "deb [arch=amd64] https://repositories.intel.com/graphics/ubuntu focal main" > /etc/apt/sources.list.d/intel.list && \
-      export ARCH=amd64 && \
+         mkdir -p /usr/share/keyrings && \
+         curl -o /usr/share/keyrings/intel-graphics.key -L https://repositories.intel.com/graphics/intel-graphics.key && \
+         echo "deb [trusted=yes arch=amd64 signed-by=/usr/share/keyrings/intel-graphics.key] https://repositories.intel.com/graphics/ubuntu focal main" > /etc/apt/sources.list.d/intel.list && \
+         export ARCH=amd64 && \
       echo "**** install runtime packages ****" && \
          apt-get update -yqq && \
       echo "**** install Intel packages ****" && \
-         apt-get install --no-install-recommends -yqq intel-opencl-icd i965-va-driver gpg-agent libmfx1 ocl-icd-libopencl1; \
+         apt-get install --no-install-recommends -yqq intel-opencl-icd intel-gpu-tools i965-va-driver-shaders va-driver-all beignet-opencl-icd mesa-vulkan-drivers gpg-agent libmfx1 ocl-icd-libopencl1; \
     ;; \
     'linux/arm64') export ARCH=arm64 && unset NVIDIA_DRIVER_CAPABILITIES ;; \
    esac \

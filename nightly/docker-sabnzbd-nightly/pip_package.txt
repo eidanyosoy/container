@@ -1,5 +1,5 @@
 CacheControl==0.12.10
-Cheetah3==3.2.6.post1
+Cheetah3==3.2.6
 CherryPy==18.6.1
 Markdown==3.3.6
 PySocks==1.7.1
@@ -49,7 +49,7 @@ rebulk==3.1.0
 requests-oauthlib==1.3.1
 requests==2.27.1
 retrying==1.3.3
-sabyenc3==5.1.6
+sabyenc3==5.1.7
 sgmllib3k==1.0.0
 six==1.16.0
 tempora==5.0.1
@@ -58,4 +58,4 @@ tomli==1.2.2
 urllib3==1.26.7
 webencodings==0.5.1
 zc.lockfile==2.0
-zipp==3.7.0
+zipp==3.8.0

@@ -15,18 +15,15 @@
 
 export DEBIAN_FRONTEND=noninteractive
 echo "**** update system  ****" && \
-  apt-get -yqq update 1>/dev/null 2>&1 && \
-  apt-get -yqq upgrade 1>/dev/null 2>&1
-
-  cat /requirements.txt | while IFS=$'\n' read -r -a myArray; do
-      apt-get install -yqq ${myArray[0]} 1>/dev/null 2>&1
-  done
-
-echo "**** set permissions ****" && \
-  if [[ ! -d "/app" ]]; then mkdir -p /app 1>/dev/null 2>&1;fi && \
-  if [[ ! -d "/config" ]]; then  mkdir -p /config 1>/dev/null 2>&1;fi && \
-  if [[ -d "/app" ]]; then chown -cR abc:abc /app 1>/dev/null 2>&1;fi && \
-  if [[ -d "/config" ]]; then chown -cR abc:abc /config 1>/dev/null 2>&1;fi
+  apt-get -yqq update &>/dev/null && \
+  apt-get -yqq upgrade &>/dev/null && \
+  apt-get install -yqq  \
+     beignet-opencl-icd jq \
+     ocl-icd-libopencl1 udev \
+     unrar wget git curl xmlstarlet \
+     sqlite i965-va-driver-shaders \
+     va-driver-all mesa-vulkan-drivers \
+     vulkan-utils ffmpeg &>/dev/null
 
   if [ "${DEBUG,,}" = "true" ]; then set -x ; fi
 
@@ -144,14 +141,7 @@ for var in "${!PLEX_PREFERENCE_@}"; do
     setPref "${PreferenceKey}" "${PreferenceValue}"
 done
 
-echo "**** cleanup system ****" && \
-   apt-get -yqq purge xmlstarlet 1>/dev/null 2>&1
-   apt-get -yqq autoclean 1>/dev/null 2>&1
-   apt-get -yqq autoremove 1>/dev/null 2>&1
-
 echo "**** set permissions ****" && \
-   if [[ ! -d "/app" ]]; then mkdir -p /app 1>/dev/null 2>&1;fi
-   if [[ ! -d "/config" ]]; then mkdir -p /config 1>/dev/null 2>&1;fi
    if [[ -d "/app" ]]; then chown -cR abc:abc /app 1>/dev/null 2>&1;fi
    if [[ -d "/config" ]]; then chown -cR abc:abc /config 1>/dev/null 2>&1;fi
 

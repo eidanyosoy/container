@@ -16,15 +16,15 @@
 #####################################
 # shellcheck disable=SC2086
 # shellcheck disable=SC2046
-FROM alpine:3.15.3 as buildstage
+FROM alpine:3.15.4 as buildstage
 LABEL org.opencontainers.image.source="https://github.com/dockserver/container"
 
 ARG TARGETPLATFORM
 ARG BUILDPLATFORM
 
-ARG BASEVERSION="3.15.3"
+ARG BASEVERSION="3.15.4"
 ARG APPVERSION="1.4.25"
-ARG WIKIVERSION="8.2.8"
+ARG WIKIVERSION="8.2.9"
 ARG BRANCH="master"
 
 ## BUILDSTAGE
@@ -43,7 +43,7 @@ RUN \
 
 ## FINALSTAGE
 
-FROM ghcr.io/squidfunk/mkdocs-material:8.2.8
+FROM ghcr.io/squidfunk/mkdocs-material:8.2.9
 
 COPY --from=buildstage /app/wiki /docs
 

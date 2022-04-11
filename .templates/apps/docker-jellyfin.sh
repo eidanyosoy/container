@@ -97,21 +97,24 @@ RUN \
      '"${UPTCOMMAND}"' && \
    echo "'"**** install build packages ****"'" && \
      '"${INSTCOMMAND}"' '"${BUILDPACK}"' && \
+     apt-get update -yqq && apt-get install gnupg2 wget ca-certificates lsb-release software-properties-common -yqq && \
    case $TARGETPLATFORM in \
     '"'linux/amd64'"') \
-        export ARCH='"'amd64'"' && \
-        curl -s https://repo.jellyfin.org/ubuntu/jellyfin_team.gpg.key | apt-key add - && \
-        echo "'"deb [arch=amd64] https://repo.jellyfin.org/ubuntu focal main"'" > /etc/apt/sources.list.d/jellyfin.list && \
-        curl -s https://repositories.intel.com/graphics/intel-graphics.key | apt-key add - && \
-        echo "'"deb [arch=amd64] https://repositories.intel.com/graphics/ubuntu focal main"'" > /etc/apt/sources.list.d/intel-graphics.list ; \
+         export ARCH='"'amd64'"' && \
+         mkdir -p /usr/share/keyrings && \
+         curl -o /usr/share/keyrings/jellyfin_team.gpg.key -L https://repo.jellyfin.org/ubuntu/jellyfin_team.gpg.key && \
+         echo "'"deb [trusted=yes arch=amd64 signed-by=/usr/share/keyrings/jellyfin_team.gpg.key] https://repo.jellyfin.org/ubuntu focal main"'" > /etc/apt/sources.list.d/jellyfin.list && \
+         curl -o /usr/share/keyrings/intel-graphics.key -L https://repositories.intel.com/graphics/intel-graphics.key && \
+         echo "'"deb [trusted=yes arch=amd64 signed-by=/usr/share/keyrings/intel-graphics.key] https://repositories.intel.com/graphics/ubuntu focal main"'" > /etc/apt/sources.list.d/intel.list ; \
     ;; \
     '"'linux/arm64'"') \
         export ARCH='"'arm64'"' && \
         unset NVIDIA_DRIVER_CAPABILITIES && \
-        curl -s https://repo.jellyfin.org/ubuntu/jellyfin_team.gpg.key | apt-key add - && \
+        mkdir -p /usr/share/keyrings && \
+        curl -o /usr/share/keyrings/jellyfin_team.gpg.key -L https://repo.jellyfin.org/ubuntu/jellyfin_team.gpg.key && \
+        echo "'"deb [trusted=yes arch=arm64 signed-by=/usr/share/keyrings/jellyfin_team.gpg.key] https://repo.jellyfin.org/ubuntu focal main"'" > /etc/apt/sources.list.d/jellyfin.list && \
         curl -s https://keyserver.ubuntu.com/pks/lookup?op=get\&search=0x6587ffd6536b8826e88a62547876ae518cbcf2f2 | apt-key add - && \
-        echo "'"deb [arch=arm64] https://repo.jellyfin.org/ubuntu focal main"'" > /etc/apt/sources.list.d/jellyfin.list && \
-        echo "'"deb http://ppa.launchpad.net/ubuntu-raspi2/ppa-nightly/ubuntu focal main"'" > /etc/apt/sources.list.d/raspbins.list ; \
+        echo "'"deb [trusted=yes] http://ppa.launchpad.net/ubuntu-raspi2/ppa-nightly/ubuntu focal main"'" > /etc/apt/sources.list.d/raspbins.list ; \
     ;; \
    esac \
    && \

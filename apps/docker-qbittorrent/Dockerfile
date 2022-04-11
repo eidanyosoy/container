@@ -22,8 +22,8 @@ LABEL org.opencontainers.image.source="https://github.com/dockserver/container"
 ARG TARGETPLATFORM
 ARG BUILDPLATFORM
 
-ARG VERSION="4.4.2-r1"
-ARG QBT_VERSION="0.16.0"
+ARG VERSION="4.4.2-r3"
+ARG QBT_VERSION="1.7"
 ARG BRANCH="master"
 
 ENV HOME="/config" \
@@ -35,17 +35,12 @@ RUN \
     apk --quiet --no-cache --no-progress update && \
     apk --quiet --no-cache --no-progress upgrade && \
   echo "**** install packages ****" && \
-    apk add -U --update --no-cache bash jq tar curl python3 qbittorrent-nox && \
+    apk add -U --update --no-cache bash jq tar curl icu-libs libstdc++ openssl p7zip python3 make g++ gcc qbittorrent-nox==4.4.2-r3 && \
   echo "**** symlink python3 for compatibility ****" && \
     ln -s /usr/bin/python3 /usr/bin/python && \
   echo "**** install 'docker-qbittorrent' ****" && \
-    case $TARGETPLATFORM in \
-      'linux/amd64') curl -fsSL "https://github.com/ludviglundgren/qbittorrent-cli/releases/download/v${QBT_VERSION}/qbittorrent-cli_${QBT_VERSION}_linux_amd64.tar.gz" | tar xzf - -C /tmp;; \
-      'linux/arm64') curl -fsSL "https://github.com/ludviglundgren/qbittorrent-cli/releases/download/v${QBT_VERSION}/qbittorrent-cli_${QBT_VERSION}_linux_arm64.tar.gz" | tar xzf - -C /tmp;; \
-      'linux/aarch64') curl -fsSL "https://github.com/ludviglundgren/qbittorrent-cli/releases/download/v${QBT_VERSION}/qbittorrent-cli_${QBT_VERSION}_linux_arm64.tar.gz" | tar xzf - -C /tmp;; \
-    esac \
-    && \
-    mv /tmp/qbt /usr/bin && \
+    mkdir /qbt && \
+    curl -fsSL "https://github.com/linuxserver/docker-qbittorrent/releases/download/qbt-${QBT_VERSION}/qbt.tar.gz" | tar xzf - -C /qbt && \
   echo "**** cleanup ****" && \
     rm -rf /tmp/* /var/cache/apk/*
 

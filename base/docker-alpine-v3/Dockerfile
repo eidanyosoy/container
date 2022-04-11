@@ -16,7 +16,7 @@
 #####################################
 # shellcheck disable=SC2086
 # shellcheck disable=SC2046
-FROM alpine:3.15.3
+FROM alpine:3.15.4
 LABEL org.opencontainers.image.source="https://github.com/dockserver/container"
 
 ### BUILD STAGE
@@ -60,7 +60,7 @@ RUN \
     apk update && apk upgrade && \
     apkArch="$(apk --print-arch)" && \
     case "$apkArch" in \
-        x86_64) s6Arch='x86_64' ;; \
+        x86_64|x86) s6Arch='x86_64' ;; \
         armv7) s6Arch='armhf' ;; \
         armhf) s6Arch='armhf' ;; \
         aarch64) s6Arch='aarch64' ;; \

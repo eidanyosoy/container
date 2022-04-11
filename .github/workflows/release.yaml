@@ -115,9 +115,9 @@ jobs:
 
     - name: Install cosign
       if: ${{ steps.prep.outputs.version != '' }}
-      uses: sigstore/cosign-installer@581838fbedd492d2350a9ecd427a95d6de1e5d01
+      uses: sigstore/cosign-installer@d6a3abf1bdea83574e28d40543793018b6035605
       with:
-        cosign-release: 'v1.6.0'
+        cosign-release: 'v1.7.1'
 
     - name: Login in Registry || major
       if: ${{ steps.prep.outputs.version != '' }}
@@ -159,7 +159,7 @@ jobs:
     - name: Extract Docker metadata
       if: ${{ steps.prep.outputs.version != '' }}
       id: meta
-      uses: docker/metadata-action@e5622373a38e60fb6d795a4421e56882f2d7a681
+      uses: docker/metadata-action@f2a13332ac1ce8c0a71aeac48a150dbb1838ab67
       with:
         images: ${{ secrets.DOCKER_REGISTRY }}/${{ github.repository_owner }}/${{ matrix.container }}
 
