@@ -21,7 +21,6 @@ def get_readme_file(path):
     """
     find case insensitive readme.md in path and return the contents
     """
-
     readme = None
 
     for file in os.listdir(path):
@@ -53,13 +52,12 @@ def get_env_file(path):
     """
     find case insensitive emv in path and return the contents
     """
-
     env = None
 
     for file in os.listdir(path):
         if file.lower() == ".env" and os.path.isfile(os.path.join(path, file)):
             file = open(os.path.join(path, file))
-            logo = file.read()
+            env = file.read()
             file.close()
             break
 
