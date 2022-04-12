@@ -26,7 +26,7 @@ FROM python:alpine3.15
 
 RUN apk add -U --no-cache git 
 
-VOLUME ["/opt/appdata"]
+VOLUME ["/opt"]
 
 COPY --from=builder /env /env
 COPY --from=builder /app /app
@@ -36,4 +36,4 @@ EXPOSE 5000
 CMD []
 ENTRYPOINT ["/env/bin/python", "/app/main.py"]
 
-WORKDIR /opt/appdata/
+WORKDIR /opt
