@@ -39,9 +39,10 @@ echo '{
    "appname": "'${APP}'",
    "apppic": "'${PICTURE}'",
    "appfolder": "./'$FOLDER'/'$APP'",
-   "newversion": "'${BUILDVERSION}'",
-   "baseimage": "'${BUILDIMAGE}'",
-   "description": "Docker image  for '${APP}'",
-   "body": "Upgrading '${APP}' to baseimage: '${BUILDIMAGE}':'${BUILDVERSION}'",
-   "user": "dockserver image update[bot]"
-}' > "./$FOLDER/$APP/release.json
+   "newversion": "'${NEWVERSION}'",
+   "appversion": "'${APPVERSION}'",
+   "baseimage": "'${BASEIMAGE}'",
+   "description": "'${DESCRIPTION}'",
+   "body": "Upgrading '${APP}' to '${NEWVERSION}'",
+   "user": "github-actions[bot]"
+}' > "./$FOLDER/$APP/release.json"
