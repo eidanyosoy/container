@@ -44,4 +44,4 @@ echo '{
    "description": "Docker image  for '${APP}'",
    "body": "Upgrading '${APP}' to baseimage: '${BUILDIMAGE}':'${BUILDVERSION}'",
    "user": "dockserver image update[bot]"
-}' > "./$FOLDER/$APP/release.json
+}' > "./$FOLDER/$APP/release.json"
