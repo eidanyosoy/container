@@ -19,7 +19,7 @@ updates:
       prefix-development: "GH dev"
       include: "scope"
 
-  - package-ecosystem: "npm"
+  - package-ecosystem: "bower"
     directory: "/"
     schedule:
       interval: "daily"
