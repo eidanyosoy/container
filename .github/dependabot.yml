@@ -18,3 +18,21 @@ updates:
       prefix: "GH updates "
       prefix-development: "GH dev"
       include: "scope"
+
+  - package-ecosystem: "bower"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    rebase-strategy: "auto"
+    target-branch: "master"
+    labels:
+      - "dependabot"
+    allow:
+      - dependency-type: "all"
+    assignees:
+      - "doob187"
+    open-pull-requests-limit: 10
+    commit-message:
+      prefix: "GH updates "
+      prefix-development: "GH dev"
+      include: "scope"
