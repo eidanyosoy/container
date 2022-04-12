@@ -14,13 +14,13 @@ RUN apk add -U --no-cache cargo \
     openssl \
     openssl-dev
 
-COPY ./requirements.txt /app/requirements.txt
+COPY ./base/docker-ui/root/requirements.txt /app/requirements.txt
 RUN virtualenv /env && \
     /env/bin/python -m pip install --upgrade pip && \
     /env/bin/pip install --no-cache-dir cryptography && \
     /env/bin/pip install --no-cache-dir -r /app/requirements.txt
 
-COPY . /app
+COPY ./base/docker-ui/root/ /app
 
 FROM python:alpine3.15
 

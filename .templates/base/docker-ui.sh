@@ -20,29 +20,38 @@ USERNAME=$3
 TOKEN=$4
 
 ### APP SETTINGS ###
+
 APPLINK="https://api.github.com/repos/dockserver/dockserver"
-BUILDVERSION=$(curl -sX GET "https://registry.hub.docker.com/v1/repositories/library/alpine/tags" \
+NEWVERSION=$(curl -sX GET "https://registry.hub.docker.com/v1/repositories/library/alpine/tags" \
    | jq --raw-output '.[] | select(.name | contains(".")) | .name' \
    | sort -t "." -k1,1n -k2,2n -k3,3n | tail -n1)
-BUILDVERSION="${BUILDVERSION#*v}"
-BUILDVERSION="${BUILDVERSION#*release-}"
-BUILDVERSION="${BUILDVERSION}"
+NEWVERSION="${NEWVERSION#*v}"
+NEWVERSION="${NEWVERSION#*release-}"
+NEWVERSION="${NEWVERSION}"
 
-BUILDIMAGE="alpine"
+## APP VERSION
+APPVERSION=$(curl -sX GET "https://api.github.com/repos/dockserver/dockserver/releases/latest" | awk '/tag_name/{print $4;exit}' FS='[""]' | sed -e 's_^v__')
+APPVERSION="${NEWVERSION#*v}"
+APPVERSION="${NEWVERSION#*release-}"
+APPVERSION="${NEWVERSION}"
 
-PICTURE="./images/$APP.png"
+HEADLINE="$(cat ./.templates/headline.txt)"
 APPFOLDER="./$FOLDER/$APP"
+DESCRIPTION="$(curl -u $USERNAME:$TOKEN -sX GET "$APPLINK" | jq -r '.description')"
+BASEIMAGE="alpine"
 
-## RELEASE SETTINGS ###
+
+### RELEASE SETTINGS ###
 
 echo '{
    "appname": "'${APP}'",
    "apppic": "'${PICTURE}'",
    "appfolder": "./'$FOLDER'/'$APP'",
-   "newversion": "'${BUILDVERSION}'",
-   "baseimage": "'${BUILDIMAGE}'",
-   "description": "Docker image  for '${APP}'",
-   "body": "Upgrading '${APP}' to baseimage: '${BUILDIMAGE}':'${BUILDVERSION}'",
-   "user": "dockserver image update[bot]"
+   "newversion": "'${NEWVERSION}'",
+   "appversion": "'${APPVERSION}'",
+   "baseimage": "'${BASEIMAGE}'",
+   "description": "'${DESCRIPTION}'",
+   "body": "Upgrading '${APP}' to '${NEWVERSION}'",
+   "user": "github-actions[bot]"
 }' > "./$FOLDER/$APP/release.json"
 
