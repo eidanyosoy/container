@@ -125,11 +125,12 @@ def project_yml(name):
     folder_path = projects[name]
     path = get_yml_path(folder_path)
     config = project_config(folder_path)
+    ##envpath = /opt/appdata/compose/.env
 
     with open(path) as data_file:
         env = None
-        if os.path.isfile(folder_path + '/.env'):
-            with open(folder_path + '/.env') as env_file:
+        if os.path.isfile(folder_path + '/opt/appdata/compose/.env'):
+            with open(folder_path + '/opt/appdata/compose/.env') as env_file:
                 env = env_file.read()
 
         return jsonify(yml=data_file.read(), env=env, config=config._replace(config_version=config.config_version.__str__(), version=config.version.__str__()))
