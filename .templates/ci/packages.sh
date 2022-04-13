@@ -17,7 +17,7 @@
 folder=$(ls -1p ./ | grep '/$' | sed 's/\/$//' | sed '/images/d' | sed '/dead/d' )
 
 for i in ${folder[@]}; do
-   find ./$i -maxdepth 1 -mindepth 1 -type d -exec basename {} \; | while read app; do
+   find ./$i -maxdepth 1 -mindepth 1 -type d -exec basename {} \; | sort | while read app; do
       if test -f "./.templates/ci/packages.sh"; then
          if [[ "${app}" != "docker-cloudflared" ]];then
             echo "$i" "${app}" && \
