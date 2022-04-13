@@ -215,14 +215,14 @@ cat > /etc/logrotate.d/mount.conf << EOF; $(echo)
     daily
     copytruncate
     create
-    maxage 31
+    maxage 7
     compress
     compresscmd /command/bzip2
-    dateformat .%Y-%m-%d
+    dateformat ".%Y-%m-%d"
     dateext
-    compressext .bz2
+    compressext ".bz2"
     missingok
-    0777 abc abc
+    create 0777 abc abc
 }
 EOF
 logrotate -d /etc/logrotate.d/mount.conf &>/dev/null
@@ -371,6 +371,9 @@ function drivecheck() {
 }
 
 function testrun() {
+
+## force a start sleeping to fetch all options 
+rlog && sleep 30
 
 while true; do
    source /system/mount/mount.env

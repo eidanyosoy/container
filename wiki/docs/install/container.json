@@ -142,11 +142,11 @@
    "appname": "docker-jackett",
    "apppic": "./images/docker-jackett.png",
    "appfolder": "./apps/docker-jackett",
-   "newversion": "0.20.850",
+   "newversion": "0.20.860",
    "appbranch": "master",
    "baseimage": "ghcr.io/linuxserver/baseimage-ubuntu:bionic",
    "description": "API Support for your favorite torrent trackers",
-   "body": "Upgrading docker-jackett to 0.20.850",
+   "body": "Upgrading docker-jackett to 0.20.860",
    "user": "github-actions[bot]"
 }
 {
@@ -198,15 +198,15 @@
    "apppic": "./images/docker-mount.png",
    "appfolder": "./apps/docker-mount",
    "newversion": "3.15.4",
-   "mergerfs": "2.33.4",
+   "mergerfs": "2.33.5",
    "rclone": "v1.58.0",
    "baseimage": "alpine",
    "buildimage": "alpine",
    "finalimage": "ghcr.io/dockserver/docker-alpine-v3",
    "baseversion": "3.15.4",
    "s6stage": "v3.1.0.1",
-   "description": "Docker docker-mount with mergerfs version 2.33.4 and rclone version v1.58.0 include s6-overlay: v3.1.0.1",
-   "body": "Upgrading docker-mount to baseimage: alpine:3.15.4 with mergerfs: 2.33.4 and rclone: v1.58.0 include s6-overlay: v3.1.0.1",
+   "description": "Docker docker-mount with mergerfs version 2.33.5 and rclone version v1.58.0 include s6-overlay: v3.1.0.1",
+   "body": "Upgrading docker-mount to baseimage: alpine:3.15.4 with mergerfs: 2.33.5 and rclone: v1.58.0 include s6-overlay: v3.1.0.1",
    "user": "dockserver image update[bot]"
 }
 {
@@ -483,22 +483,31 @@
    "appname": "docker-ubuntu-focal",
    "apppic": "./images/docker-ubuntu-focal.png",
    "appfolder": "./base/docker-ubuntu-focal",
-   "newversion": "3.15.0-rc.4",
-   "baseimage": "null",
-   "packages": "null",
-   "description": "Dockerbase Image with Ubuntu focal",
-   "body": "Upgrading docker-ubuntu-focal to 3.15.0-rc.4",
-   "user": "github-actions[bot]"
+   "newversion": "3.15.4",
+   "baseimage": "alpine",
+   "description": "Docker image  for docker-ubuntu-focal",
+   "body": "Upgrading docker-ubuntu-focal to baseimage: alpine:3.15.4",
+   "user": "dockserver image update[bot]"
 }
 {
    "appname": "docker-ubuntu-jammy",
-   "apppic": "./imagesdocker-ubuntu-jammy.png",
+   "apppic": "./images/docker-ubuntu-jammy.png",
    "appfolder": "./base/docker-ubuntu-jammy",
-   "newversion": "3.15.2",
+   "newversion": "3.15.4",
    "baseimage": "alpine",
-   "packages": "null",
-   "description": "Dockerbase Image with Ubuntu 22.04",
-   "body": "Upgrading docker-ubuntu-jammy to 3.15.2",
+   "description": "Docker image  for docker-ubuntu-jammy",
+   "body": "Upgrading docker-ubuntu-jammy to baseimage: alpine:3.15.4",
+   "user": "dockserver image update[bot]"
+}
+{
+   "appname": "docker-ui",
+   "apppic": "",
+   "appfolder": "./base/docker-ui",
+   "newversion": "3.15.4",
+   "appversion": "3.15.4",
+   "baseimage": "alpine",
+   "description": "Docker + Traefik with Authelia and Cloudflare Protection",
+   "body": "Upgrading docker-ui to 3.15.4",
    "user": "github-actions[bot]"
 }
 {

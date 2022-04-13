@@ -11,7 +11,7 @@ def find_yml_files(path):
     """
     matches = {}
     for root, _, filenames in os.walk(path, followlinks=True):
-        for _ in set().union(fnmatch.filter(filenames, 'docker-compose.yml'), fnmatch.filter(filenames, 'docker-compose.yaml')):
+        for _ in set().union(fnmatch.filter(filenames, '*.yml'), fnmatch.filter(filenames, '*.yaml')):
             key = root.split('/')[-1]
             matches[key] = os.path.join(os.getcwd(), root)
     return matches
@@ -21,7 +21,6 @@ def get_readme_file(path):
     """
     find case insensitive readme.md in path and return the contents
     """
-
     readme = None
 
     for file in os.listdir(path):
@@ -48,3 +47,18 @@ def get_logo_file(path):
             break
 
     return logo
+
+def get_env_file(path):
+    """
+    find case insensitive emv in path and return the contents
+    """
+    env = None
+
+    for file in os.listdir(path):
+        if file.lower() == ".env" and os.path.isfile(os.path.join(path, file)):
+            file = open(os.path.join(path, file))
+            env = file.read()
+            file.close()
+            break
+
+    return env
