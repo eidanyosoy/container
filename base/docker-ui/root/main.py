@@ -21,10 +21,10 @@ from scripts.manage_project import manage
 
 # Flask Application
 API_V1 = '/api/v1/'
-DOCKER_COMPOSE_UI_YML_PATH = '/opt/appdata/compose/apps/'
+DOCKER_COMPOSE_UI_YML_PATH = '/opt/appdata/compose/'
 GIT_YML_PATH = 'https://github.com/dockserver/apps.git'
 YML_PATH = os.getenv('DOCKER_COMPOSE_UI_YML_PATH') or '.'
-ENV_PATH = '/opt/appdata/compose/'
+ENV_PATH = os.getenv('DOCKER_COMPOSE_UI_YML_PATH') or '.'
 PATH_GLOBAL = '/opt/appdata/'
 COMPOSE_REGISTRY = os.getenv('DOCKER_COMPOSE_REGISTRY')
 STATIC_URL_PATH = '/' + (os.getenv('DOCKER_COMPOSE_UI_PREFIX') or '')
@@ -59,7 +59,8 @@ def load_projects():
 
     projects = find_yml_files(YML_PATH)
     env = get_env_files(ENV_PATH)
-    logging.info(projects)
+    ##logging.info(projects)
+    logging.info(env)
 
 load_projects()
 
@@ -220,6 +221,9 @@ def up_():
     req = loads(request.data)
     name = req["id"]
     service_names = req.get('service_names', None)
+    directory = PATH_GLOBAL + projects
+    os.mkdir(directory)
+    shutil.chown(directory, user=1000, group=1000)
     do_build = BuildAction.force if req.get('do_build', False) else BuildAction.none
     container_list = get_project_with_name(name).up(
         service_names=service_names,
@@ -278,10 +282,10 @@ def update_project():
 @requires_auth
 def remove_project(name):
     """
-    remove project
+    remove project and folder
     """
-    directory = PATH_GLOBAL + '/' + name
-    rmtree(directory)
+    directory = PATH_GLOBAL + name
+    shutil.rmtree(directory)
     load_projects()
     return jsonify(path=directory)
 
