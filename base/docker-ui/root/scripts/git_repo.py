@@ -3,6 +3,8 @@ git functionalities
 """
 
 import os
+import sys
+import shutil
 import logging
 from git import Repo
 
@@ -16,6 +18,16 @@ def git_pull():
     """
     perform git pull
     """
+
+    if len(os.listdir(GIT_YML_PATH)) == 0:
+        # removing the file using the os.remove() method
+        os.rmdir(GIT_YML_PATH)
+    else:
+        # messaging saying folder not empty
+        logging.info('Folder is not empty | fallback to rmtree')
+        shutil.rmtree(GIT_YML_PATH)
+        logging.info('Folder is empty now')
+
     if git_repo:
         logging.info('git pull ' + git_repo)
         Repo(GIT_YML_PATH).remote('origin').pull()
