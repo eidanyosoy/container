@@ -20,7 +20,8 @@ from scripts.manage_project import manage
 
 # Flask Application
 API_V1 = '/api/v1/'
-DOCKER_COMPOSE_UI_YML_PATH = '/opt/dockserver/apps/'
+DOCKER_COMPOSE_UI_YML_PATH = '/opt/appdata/compose/apps/'
+GIT_YML_PATH = 'https://github.com/dockserver/apps.git'
 YML_PATH = os.getenv('DOCKER_COMPOSE_UI_YML_PATH') or '.'
 ENV_PATH = '/opt/appdata/compose/.env'
 COMPOSE_REGISTRY = os.getenv('DOCKER_COMPOSE_REGISTRY')
@@ -49,11 +50,14 @@ def load_projects():
     """
     global projects
 
-    if git_repo:
-        git_pull()
-        projects = find_yml_files(GIT_YML_PATH)
-    else:
-        projects = find_yml_files(YML_PATH)
+    ##if git_repo:
+    ##    git_pull()
+    ##    projects = find_yml_files(GIT_YML_PATH)
+    ##else:
+    ##    projects = find_yml_files(YML_PATH)
+
+    projects = find_yml_files(YML_PATH)
+    envglobal = find_env_files(ENV_PATH)
 
     logging.info(projects)
 
@@ -125,15 +129,14 @@ def project_yml(name):
     folder_path = projects[name]
     path = get_yml_path(folder_path)
     config = project_config(folder_path)
-    env = get_env_path(folder_path)
+    env = get_env_path(env_path)
 
-    with open(path) as data_file:
-        ##env = None
-        if os.path.isfile(folder_path):
-            with open(folder_path) as env_file:
-                env = env_file.read()
+    ##with open(path) as data_file:
+    ##   if os.path.isfile(folder_path):
+    ##       with open(env_path) as env_file:
+    ##            env = env_file.read()
 
-        return jsonify(yml=data_file.read(), env=env, config=config._replace(config_version=config.config_version.__str__(), version=config.version.__str__()))
+    return jsonify(yml=get_yml_file(path), env=get_env_file(path), config=config._replace(config_version=config.config_version.__str__(), version=config.version.__str__()))
 
 @app.route(API_V1 + "projects/readme/<name>", methods=['GET'])
 def get_project_readme(name):
@@ -261,7 +264,7 @@ def create_project():
     file_path = manage(YML_PATH + '/' +  data["name"], data["yml"], False)
 
     if 'env' in data and data["env"]:
-        env_file = open(YML_PATH + '/' + data["name"] + ENV_PATH, "w")
+        env_file = open(ENV_PATH + '/' + data[".env"], False )
         env_file.write(data["env"])
         env_file.close()
 
@@ -279,7 +282,7 @@ def update_project():
     file_path = manage(YML_PATH + '/' +  data["name"], data["yml"], True)
 
     if 'env' in data and data["env"]:
-        env_file = open(YML_PATH + '/' + data["name"] + ENV_PATH, "w")
+        env_file = open(ENV_PATH + '/' + data[".env"], False )
         env_file.write(data["env"])
         env_file.close()
 
