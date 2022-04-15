@@ -18,7 +18,6 @@ def git_pull():
     """
     perform git pull
     """
-
     if len(os.listdir(GIT_YML_PATH)) == 0:
         # removing the file using the os.remove() method
         os.rmdir(GIT_YML_PATH)
@@ -29,10 +28,12 @@ def git_pull():
         logging.info('Folder is empty now')
 
     if git_repo:
-        logging.info('git pull ' + git_repo)
+        logging.info('git clone ' + git_repo)
         Repo(GIT_YML_PATH).remote('origin').pull()
     else:
-        logging.info('will not execute git pull: not a git repository')
+        logging.info('fallback to reclone of GIT_REPO)
+        logging.info('git clone ' + git_repo)
+        Repo.clone_from(git_repo, GIT_YML_PATH)
 
 if git_repo:
     logging.info('git repo: ' + git_repo)
