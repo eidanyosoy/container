@@ -28,10 +28,10 @@ def git_pull():
         logging.info('Folder is empty now')
 
     if git_repo:
-        logging.info('git clone ' + git_repo)
+        logging.info('git pull ' + git_repo)
         Repo(GIT_YML_PATH).remote('origin').pull()
     else:
-        logging.info('fallback to reclone of GIT_REPO)
+        logging.info('fallback to reclone of GIT_REPO')
         logging.info('git clone ' + git_repo)
         Repo.clone_from(git_repo, GIT_YML_PATH)
 
