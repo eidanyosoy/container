@@ -36,30 +36,22 @@ def get_logo_file(path):
     """
     find case insensitive logo.png in path and return the contents
     """
-
     logo = None
-
     for file in os.listdir(path):
         if file.lower() == "logo.png" and os.path.isfile(os.path.join(path, file)):
             file = open(os.path.join(path, file))
             logo = file.read()
             file.close()
             break
-
     return logo
 
 def get_env_files(path):
     """
     find case insensitive emv in path and return the contents
     """
-
     env = None
-
-    for file in os.listdir(path):
-        if file.lower() == ".env" and os.path.isfile(os.path.join(path, file)):
-            file = open(os.path.join(path, file))
-            env = file.read()
-            file.close()
-            break
-
+    for root, _, filenames in os.walk(path, followlinks=False):
+        for _ in set().union(fnmatch.filter(filenames, '.env')):
+            ##key = root.split('/')[-1]
+            env = os.path.join(os.getcwd(), root)
     return env
