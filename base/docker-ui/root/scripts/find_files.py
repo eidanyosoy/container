@@ -47,7 +47,7 @@ def get_logo_file(path):
 
     return logo
 
-def get_env_file(path):
+def get_env_files(path):
     """
     find case insensitive emv in path and return the contents
     """
