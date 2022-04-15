@@ -24,7 +24,7 @@ COPY ./base/docker-ui/root/ /app
 
 FROM python:alpine3.15
 
-RUN apk add -U --no-cache git 
+RUN apk add -U --no-cache git nano bash
 
 VOLUME ["/opt"]
 
@@ -35,5 +35,3 @@ EXPOSE 5000
 
 CMD []
 ENTRYPOINT ["/env/bin/python", "/app/main.py"]
-
-WORKDIR /opt
