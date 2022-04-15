@@ -57,7 +57,7 @@ def load_projects():
     ##    projects = find_yml_files(YML_PATH)
 
     projects = find_yml_files(YML_PATH)
-    envglobal = find_env_files(ENV_PATH)
+    envglobal = get_env_files(ENV_PATH)
 
     logging.info(projects)
 
