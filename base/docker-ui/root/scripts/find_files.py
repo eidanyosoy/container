@@ -5,6 +5,10 @@ find docker-compose.yml files
 import fnmatch
 import os
 import sys
+import shutil
+import logging
+
+DOCKER_COMPOSE_UI_YML_PATH = '/opt/appdata/compose/'
 
 def find_yml_files(path):
     """
@@ -45,13 +49,15 @@ def get_logo_file(path):
             break
     return logo
 
-def get_env_files(path):
+def get_env_files(DOCKER_COMPOSE_UI_YML_PATH):
     """
     find case insensitive emv in path and return the contents
     """
-    env = None
-    for root, _, filenames in os.walk(path, followlinks=False):
-        for _ in set().union(fnmatch.filter(filenames, '.env')):
-            ##key = root.split('/')[-1]
-            env = os.path.join(os.getcwd(), root)
+    env = {}
+    for file in os.listdir(DOCKER_COMPOSE_UI_YML_PATH):
+        if file.lower() == ".env" and os.path.isfile(os.path.join(path, file)):
+            file = open(os.path.join(path, file))
+            env = file.read()
+            file.close()
+            break
     return env
