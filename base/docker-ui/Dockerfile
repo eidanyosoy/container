@@ -25,7 +25,7 @@ RUN virtualenv /env && \
 ## FINAL IMAGE 
 FROM ghcr.io/dockserver/docker-alpine-v3:latest
 
-COPY ./base/docker-ui/root/ .
+COPY --from=builder /app /app
 CMD [ "bash" ]
 RUN apk add bash && chmod -R 755 /app/* && bash /app/install.sh 
 CMD []
