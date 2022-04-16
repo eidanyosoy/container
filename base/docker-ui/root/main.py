@@ -5,6 +5,7 @@ Docker Compose UI, flask based application
 from json import loads
 import logging
 import os
+import sys
 import traceback
 from shutil import rmtree
 from compose.service import ImageType, BuildAction
@@ -13,16 +14,18 @@ import requests
 from flask import Flask, jsonify, request, abort
 from scripts.git_repo import git_pull, git_repo, GIT_YML_PATH
 from scripts.bridge import ps_, get_project, get_container_from_id, get_yml_path, containers, project_config, info
-from scripts.find_files import find_yml_files, get_readme_file, get_logo_file, get_env_file
+from scripts.find_files import find_yml_files, get_readme_file, get_logo_file, get_env_files
 from scripts.requires_auth import requires_auth, authentication_enabled, \
   disable_authentication, set_authentication
 from scripts.manage_project import manage
 
 # Flask Application
 API_V1 = '/api/v1/'
-DOCKER_COMPOSE_UI_YML_PATH = '/opt/dockserver/apps/'
+DOCKER_COMPOSE_UI_YML_PATH = '/opt/appdata/compose/'
+GIT_YML_PATH = 'https://github.com/dockserver/apps.git'
 YML_PATH = os.getenv('DOCKER_COMPOSE_UI_YML_PATH') or '.'
-ENV_PATH = '/opt/appdata/compose/.env'
+ENV_PATH = os.getenv('DOCKER_COMPOSE_UI_YML_PATH') or '.'
+PATH_GLOBAL = '/opt/appdata/'
 COMPOSE_REGISTRY = os.getenv('DOCKER_COMPOSE_REGISTRY')
 STATIC_URL_PATH = '/' + (os.getenv('DOCKER_COMPOSE_UI_PREFIX') or '')
 
@@ -48,14 +51,16 @@ def load_projects():
     load project definitions (docker-compose.yml files)
     """
     global projects
-
     if git_repo:
         git_pull()
         projects = find_yml_files(GIT_YML_PATH)
     else:
         projects = find_yml_files(YML_PATH)
 
-    logging.info(projects)
+    projects = find_yml_files(YML_PATH)
+    env = get_env_files(ENV_PATH)
+    ##logging.info(projects)
+    logging.info(env)
 
 load_projects()
 
@@ -104,13 +109,10 @@ def run_service(project, service_id):
     """
     json = loads(request.data)
     service = get_project_with_name(project).get_service(service_id)
-
     command = json["command"] if 'command' in json else service.options.get('command')
-
     container = service \
         .create_container(one_off=True, command=command)
     container.start()
-
     return jsonify(\
         command='run %s/%s' % (project, service_id), \
         name=container.name, \
@@ -122,18 +124,17 @@ def project_yml(name):
     """
     get yml content
     """
+    env_path = '/opt/appdata/compose/.env'
     folder_path = projects[name]
     path = get_yml_path(folder_path)
     config = project_config(folder_path)
-    env = get_env_path(folder_path)
+    ##env = get_env_files(env_path)
 
     with open(path) as data_file:
-        ##env = None
-        if os.path.isfile(folder_path):
-            with open(folder_path) as env_file:
+       if os.path.isfile(env_path):
+           with open(env) as env_file:
                 env = env_file.read()
-
-        return jsonify(yml=data_file.read(), env=env, config=config._replace(config_version=config.config_version.__str__(), version=config.version.__str__()))
+    return jsonify(yml=get_yml_file(path), env=env, config=config._replace(config_version=config.config_version.__str__(), version=config.version.__str__()))
 
 @app.route(API_V1 + "projects/readme/<name>", methods=['GET'])
 def get_project_readme(name):
@@ -185,7 +186,7 @@ def kill(name):
     docker-compose kill -f
     """
     get_project_with_name(name).kill()
-    return jsonify(command='kill')
+    return jsonify(command='kill -q')
 
 @app.route(API_V1 + "projects", methods=['PUT'])
 @requires_auth
@@ -195,7 +196,7 @@ def pull():
     """
     name = loads(request.data)["id"]
     get_project_with_name(name).pull()
-    return jsonify(command='pull')
+    return jsonify(command='pull -q')
 
 @app.route(API_V1 + "services", methods=['PUT'])
 @requires_auth
@@ -207,7 +208,6 @@ def scale():
     name = req['project']
     service_name = req['service']
     num = req['num']
-
     project = get_project_with_name(name)
     project.get_service(service_name).scale(desired_num=int(num))
     return jsonify(command='scale')
@@ -221,15 +221,16 @@ def up_():
     req = loads(request.data)
     name = req["id"]
     service_names = req.get('service_names', None)
+    directory = PATH_GLOBAL + projects
+    os.mkdir(directory)
+    shutil.chown(directory, user=1000, group=1000)
     do_build = BuildAction.force if req.get('do_build', False) else BuildAction.none
-
     container_list = get_project_with_name(name).up(
         service_names=service_names,
         do_build=do_build)
-
     return jsonify(
         {
-            'command': 'up',
+            'command': 'up -q --force-recreate',
             'containers': [container.name for container in container_list]
         })
 
@@ -241,13 +242,10 @@ def build():
     """
     json = loads(request.data)
     name = json["id"]
-
     dic = dict(no_cache=json["no_cache"] if "no_cache" in json \
       else None, pull=json["pull"] if "pull" in json else None)
-
     get_project_with_name(name).build(**dic)
-
-    return jsonify(command='build')
+    return jsonify(command='build -q')
 
 @app.route(API_V1 + "create-project", methods=['POST'])
 @app.route(API_V1 + "create", methods=['POST'])
@@ -257,16 +255,12 @@ def create_project():
     create new project
     """
     data = loads(request.data)
-
     file_path = manage(YML_PATH + '/' +  data["name"], data["yml"], False)
-
     if 'env' in data and data["env"]:
-        env_file = open(YML_PATH + '/' + data["name"] + ENV_PATH, "w")
+        env_file = open(ENV_PATH + '/' + data[".env"], False )
         env_file.write(data["env"])
         env_file.close()
-
     load_projects()
-
     return jsonify(path=file_path)
 
 @app.route(API_V1 + "update-project", methods=['PUT'])
@@ -279,21 +273,19 @@ def update_project():
     file_path = manage(YML_PATH + '/' +  data["name"], data["yml"], True)
 
     if 'env' in data and data["env"]:
-        env_file = open(YML_PATH + '/' + data["name"] + ENV_PATH, "w")
+        env_file = open(ENV_PATH + '/' + data[".env"], False )
         env_file.write(data["env"])
         env_file.close()
-
     return jsonify(path=file_path)
-
 
 @app.route(API_V1 + "remove-project/<name>", methods=['DELETE'])
 @requires_auth
 def remove_project(name):
     """
-    remove project
+    remove project and folder
     """
-    directory = YML_PATH + '/' + name
-    rmtree(directory)
+    directory = PATH_GLOBAL + name
+    shutil.rmtree(directory)
     load_projects()
     return jsonify(path=directory)
 
@@ -310,7 +302,6 @@ def search():
         result.status_code = response.status_code
     return result
 
-
 @app.route(API_V1 + "yml", methods=['POST'])
 def yml():
     """
@@ -320,7 +311,6 @@ def yml():
     response = requests.get(COMPOSE_REGISTRY + '/api/v1/yml', \
         params={'id': item_id}, headers={'x-key': 'default'})
     return jsonify(response.json())
-
 
 @app.route(API_V1 + "_create", methods=['POST'])
 @requires_auth
@@ -340,7 +330,7 @@ def start():
     """
     name = loads(request.data)["id"]
     get_project_with_name(name).start()
-    return jsonify(command='start')
+    return jsonify(command='start -q')
 
 @app.route(API_V1 + "stop", methods=['POST'])
 @requires_auth
@@ -350,7 +340,7 @@ def stop():
     """
     name = loads(request.data)["id"]
     get_project_with_name(name).stop()
-    return jsonify(command='stop')
+    return jsonify(command='stop -q')
 
 @app.route(API_V1 + "down", methods=['POST'])
 @requires_auth
@@ -360,7 +350,7 @@ def down():
     """
     name = loads(request.data)["id"]
     get_project_with_name(name).down(ImageType.none, None)
-    return jsonify(command='down')
+    return jsonify(command='down -q')
 
 @app.route(API_V1 + "restart", methods=['POST'])
 @requires_auth
@@ -370,7 +360,7 @@ def restart():
     """
     name = loads(request.data)["id"]
     get_project_with_name(name).restart()
-    return jsonify(command='restart')
+    return jsonify(command='restart -q')
 
 @app.route(API_V1 + "logs/<name>", defaults={'limit': "all"}, methods=['GET'])
 @app.route(API_V1 + "logs/<name>/<int:limit>", methods=['GET'])
@@ -380,8 +370,7 @@ def logs(name, limit):
     """
     lines = {}
     for k in get_project_with_name(name).containers(stopped=True):
-        lines[k.name] = k.logs(timestamps=True, tail=limit).decode().split('\n')
- 
+        lines[k.name] = k.logs(timestamps=True, tail=limit).decode().split('\n') 
     return jsonify(logs=lines)
 
 @app.route(API_V1 + "logs/<name>/<container_id>", defaults={'limit': "all"}, methods=['GET'])
@@ -401,7 +390,6 @@ def host():
     docker host info
     """
     host_value = os.getenv('DOCKER_HOST')
-
     return jsonify(host=host_value, workdir=os.getcwd() if YML_PATH == '.' else YML_PATH)
 
 @app.route(API_V1 + "compose-registry", methods=['GET'])

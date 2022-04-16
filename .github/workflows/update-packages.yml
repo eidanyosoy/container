@@ -8,8 +8,9 @@ on:
 permissions: read-all
 
 jobs:
-  get-packafes:
-    runs-on: ubuntu-20.04
+  get-packages:
+    #runs-on: ubuntu-20.04
+    runs-on: self-hosted
     permissions:
       packages: write
       id-token: write
