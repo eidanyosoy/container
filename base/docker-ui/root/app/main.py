@@ -52,9 +52,7 @@ def load_projects():
     """
     global projects
     projects = find_yml_files(YML_PATH)
-    env = get_env_files(ENV_PATH)
     logging.info(projects)
-    logging.info(env)
 
 load_projects()
 
