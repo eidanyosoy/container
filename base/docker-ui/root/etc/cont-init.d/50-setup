@@ -40,17 +40,20 @@ http://dl-cdn.alpinelinux.org/alpine/edge/testing
 EOF
 
    apk --quiet --no-progress update && \
-   apk --quiet --no-progress upgrade
+   apk --quiet --no-progress upgrade && \
+   apk --quiet --no-progress add git
 
    if [[ "${GIT_REPO}" != "" ]]; then
       mkdir -p /opt/appdata/compose
       git -C /tmp/apps clone "${GIT_REPO}"
       find /opt/appdata/compose -type f -name "*.yml' -delete
+      find /opt/appdata/compose -type f -name "*.yaml' -delete
+      find /opt/appdata/compose -type f -name "*.png' -delete
+      find /opt/appdata/compose -type f -name "*.md' -delete
       find /opt/appdata/compose -type d -empty -delete
-      cp -rv /tmp/apps /opt/appdata/compose
-      rm /tmp/apps
+      cp -r /tmp/apps /opt/appdata/compose
+      rm -rf /tmp/apps
    fi
-
 
 echo "------------------------------
     _____   _   _  __  __
