@@ -29,6 +29,12 @@ PATH_GLOBAL = '/opt/appdata/'
 COMPOSE_REGISTRY = os.getenv('DOCKER_COMPOSE_REGISTRY')
 STATIC_URL_PATH = '/' + (os.getenv('DOCKER_COMPOSE_UI_PREFIX') or '')
 
+cwd = os.getcwd()
+print('Current Working Directory is: ', cwd)
+absolute_path = '/opt/appdata/compose'
+os.chdir(absolute_path)
+print('New working directory is: ', os.getcwd())
+
 logging.basicConfig(level=logging.INFO)
 app = Flask(__name__, static_url_path=STATIC_URL_PATH)
 
