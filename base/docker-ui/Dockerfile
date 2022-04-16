@@ -70,5 +70,6 @@ RUN virtualenv /env && \
     rm -rf /var/cache/apk/*
 
 EXPOSE 5000
+WORKDIR /opt/
 ENTRYPOINT ["/init"]
-WORKDIR ["/opt"]
+
