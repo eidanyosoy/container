@@ -12,7 +12,7 @@ git_repo = os.getenv('GIT_REPO')
 
 logging.basicConfig(level=logging.DEBUG)
 
-GIT_YML_PATH = '/opt/appdata/compose/apps/'
+GIT_YML_PATH = '/opt/appdata/compose/'
 
 def git_pull():
     """
