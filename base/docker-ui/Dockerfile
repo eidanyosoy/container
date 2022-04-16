@@ -25,11 +25,11 @@ RUN virtualenv /env && \
 ## FINAL IMAGE 
 FROM ghcr.io/dockserver/docker-alpine-v3:latest
 
+COPY --from=builder /app /app
 CMD [ "bash" ]
 RUN apk add bash && chmod -R 755 /app/* && bash /app/install.sh 
 CMD []
 COPY --from=builder /env /env
-COPY --from=builder /app /app
 
 EXPOSE 5000
 ENTRYPOINT ["/init"]
