@@ -12,7 +12,6 @@ from compose.service import ImageType, BuildAction
 import docker
 import requests
 from flask import Flask, jsonify, request, abort
-from scripts.git_repo import git_pull, git_repo, GIT_YML_PATH
 from scripts.bridge import ps_, get_project, get_container_from_id, get_yml_path, containers, project_config, info
 from scripts.find_files import find_yml_files, get_readme_file, get_logo_file, get_env_files
 from scripts.requires_auth import requires_auth, authentication_enabled, \
@@ -24,7 +23,7 @@ API_V1 = '/api/v1/'
 DOCKER_COMPOSE_UI_YML_PATH = '/opt/appdata/compose/'
 GIT_YML_PATH = 'https://github.com/dockserver/apps.git'
 YML_PATH = os.getenv('DOCKER_COMPOSE_UI_YML_PATH') or '.'
-ENV_PATH = os.getenv('DOCKER_COMPOSE_UI_YML_PATH') or '.'
+ENV_PATH = '/opt/appdata/compose/'
 PATH_GLOBAL = '/opt/appdata/'
 COMPOSE_REGISTRY = os.getenv('DOCKER_COMPOSE_REGISTRY')
 STATIC_URL_PATH = '/' + (os.getenv('DOCKER_COMPOSE_UI_PREFIX') or '')
@@ -51,15 +50,9 @@ def load_projects():
     load project definitions (docker-compose.yml files)
     """
     global projects
-    if git_repo:
-        git_pull()
-        projects = find_yml_files(GIT_YML_PATH)
-    else:
-        projects = find_yml_files(YML_PATH)
-
     projects = find_yml_files(YML_PATH)
     env = get_env_files(ENV_PATH)
-    ##logging.info(projects)
+    logging.info(projects)
     logging.info(env)
 
 load_projects()
@@ -128,12 +121,13 @@ def project_yml(name):
     folder_path = projects[name]
     path = get_yml_path(folder_path)
     config = project_config(folder_path)
-    ##env = get_env_files(env_path)
 
     with open(path) as data_file:
-       if os.path.isfile(env_path):
-           with open(env) as env_file:
+        env = None
+        if os.path.isfile(folder_path):
+            with open(env_path) as env_file:
                 env = env_file.read()
+
     return jsonify(yml=get_yml_file(path), env=env, config=config._replace(config_version=config.config_version.__str__(), version=config.version.__str__()))
 
 @app.route(API_V1 + "projects/readme/<name>", methods=['GET'])
