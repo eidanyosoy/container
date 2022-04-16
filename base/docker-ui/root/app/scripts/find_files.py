@@ -53,8 +53,8 @@ def get_env_files(path):
     """
     find case insensitive emv in path and return the contents
     """
-    listenv = {}
-    for root, dirs, files in os.walk(path, topdown=False):
-        for _ in set().union(fnmatch.filter(filename, '.env')):
-            listenv = os.path.join(os.listdir(path), root)
-    return env
+    for root, dirnames, filenames in os.walk(path, followlinks=True):
+        for filename in fnmatch.filter(filenames, '.env'):
+            key = root.split('/')[-1]
+            matches[key] = yield os.path.join(root, filename)
+    return match
