@@ -14,7 +14,7 @@ RUN apk add -U --no-cache cargo \
     nano \
     bash
 
-COPY ./base/docker-ui/root/ /app
+COPY ./base/docker-ui/root/ .
 
 RUN pip install virtualenv
 RUN virtualenv /env && \
