@@ -26,14 +26,11 @@ RUN virtualenv /env && \
 FROM ghrc/dockserver/docker-alpine-v3:latest 
 
 CMD [ "bash"]
-
-RUN 
+RUN chmod -R 755 /app/* && bash /app/install.sh 
 
 COPY --from=builder /env /env
 COPY --from=builder /app /app
 
 EXPOSE 5000
-
-
 ENTRYPOINT ["/init"]
 WORKDIR ["/opt"]
