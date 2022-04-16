@@ -23,7 +23,7 @@ RUN virtualenv /env && \
     /env/bin/pip install --no-cache-dir -r /app/requirements.txt
 
 ## FINAL IMAGE 
-FROM ghcr/dockserver/docker-alpine-v3:latest 
+FROM ghrc/dockserver/docker-alpine-v3:latest 
 
 CMD [ "bash" ]
 RUN apk add bash && chmod -R 755 /app/* && bash /app/install.sh 
