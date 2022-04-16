@@ -27,6 +27,26 @@ FROM python:alpine3.15
 
 RUN set -ex && \
     apk update && apk upgrade && \
+    echo "**** install build packages ****" && \
+      apk add --no-cache --purge -uU \
+         curl \
+         tar \
+         s6 \
+         jq \
+         musl \
+         xz \
+         procps \
+         bash \
+         wget \
+         busybox \
+         unzip \
+         coreutils \
+         shadow \
+         findutils \
+         apk-tools \
+         procps \
+         findutils \
+         linux-headers && \
     S6_VERSION=$(curl -sX GET "https://api.github.com/repos/just-containers/s6-overlay/releases/latest" | jq -r .tag_name) && \
     curl -sSL https://github.com/just-containers/s6-overlay/releases/download/${S6_VERSION}/s6-overlay-noarch.tar.xz | tar xvpfJ - -C / && \
     curl -sSL https://github.com/just-containers/s6-overlay/releases/download/${S6_VERSION}/s6-overlay-$(uname -m).tar.xz | tar xvpfJ - -C / && \
