@@ -122,11 +122,16 @@ def project_yml(name):
     config = project_config(folder_path)
 
     with open(path) as data_file:
-        env = None
-        if os.path.isfile(folder_path + envfile + '/.env'):
+        if os.path.isfile(folder_path):
+            with open(folder_path) as data_file:
+                data = data_file.read()
+
+    with open(envfile) as env_file:
+        if os.path.isfile(envfile + '/.env'):
             with open(envfile + '/.env') as env_file:
                 env = env_file.read()
-        return jsonify(yml=data_file.read(), env=env, config=config._replace(config_version=config.config_version.__str__(), version=config.version.__str__()))
+
+        return jsonify(yml=data, env=env, config=config._replace(config_version=config.config_version.__str__(), version=config.version.__str__()))
 
 @app.route(API_V1 + "projects/readme/<name>", methods=['GET'])
 def get_project_readme(name):
@@ -248,12 +253,9 @@ def create_project():
     """
     data = loads(request.data)
     file_path = manage(YML_PATH + '/' +  data["name"], data["yml"], False)
-    if 'env' in data and data["env"]:
-        env_file = open(ENV_PATH + data[".env"], False )
-        env_file.write(data["env"])
-        env_file.close()
+    env_file = manage(ENV_PATH + data[".env"], True )
     load_projects()
-    return jsonify(path=file_path)
+    return jsonify(path=file_path, env=env_file)
 
 @app.route(API_V1 + "update-project", methods=['PUT'])
 @requires_auth
@@ -263,12 +265,8 @@ def update_project():
     """
     data = loads(request.data)
     file_path = manage(YML_PATH + '/' +  data["name"], data["yml"], True)
-
-    if 'env' in data and data["env"]:
-        env_file = open(ENV_PATH + data[".env"], False )
-        env_file.write(data["env"])
-        env_file.close()
-    return jsonify(path=file_path)
+    env_file = manage(ENV_PATH + data[".env"], True )
+    return jsonify(path=file_path, env=env_file)
 
 @app.route(API_V1 + "remove-project/<name>", methods=['DELETE'])
 @requires_auth
