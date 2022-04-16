@@ -9,8 +9,6 @@ import glob
 import shutil
 import logging
 
-DOCKER_COMPOSE_UI_YML_PATH = '/opt/appdata/compose/'
-
 path = "/opt/appdata/compose"
 dirs = os.listdir( path )
 
@@ -19,30 +17,23 @@ def find_yml_files(path):
     find docker-compose.yml files in path
     """
     matches = {}
-
     for root, dirs, filenames in os.walk(path, followlinks=True):
         for _ in set().union(fnmatch.filter(filenames, 'docker-compose.yml'), fnmatch.filter(filenames, 'docker-compose.yaml')):
             key = root.split('/')[-1]
-            matches[key] = os.path.join(os.getcwd() root)
-       for name in files:
-           print(os.path.join(root, name))
-       for name in dirs:
-           print(os.path.join(root, name))
-    return matches
+            matches[key] = os.path.join(os.listdir(path), root)
+    return match 
 
 def get_readme_file(path):
     """
     find case insensitive readme.md in path and return the contents
     """
     readme = None
-
     for file in os.listdir( path ):
         if file.lower() == "readme.md" and os.path.isfile(os.path.join(path, file)):
             file = open(os.path.join(path, file))
             readme = file.read()
             file.close()
             break
-
     return readme
 
 def get_logo_file(path):
@@ -58,15 +49,12 @@ def get_logo_file(path):
             break
     return logo
 
-def get_env_files(DOCKER_COMPOSE_UI_YML_PATH):
+def get_env_files(path):
     """
     find case insensitive emv in path and return the contents
     """
-    env = {}
-    for file in os.listdir(DOCKER_COMPOSE_UI_YML_PATH):
-        if file.lower() == ".env" and os.path.isfile(os.path.join(path, file)):
-            file = open(os.path.join(path, file))
-            env = file.read()
-            file.close()
-            break
+    listenv = {}
+    for root, dirs, files in os.walk(path, topdown=False):
+        for _ in set().union(fnmatch.filter(filename, '.env')):
+            listenv = os.path.join(os.listdir(path), root)
     return env
