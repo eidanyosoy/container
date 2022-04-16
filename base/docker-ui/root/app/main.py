@@ -12,9 +12,8 @@ from compose.service import ImageType, BuildAction
 import docker
 import requests
 from flask import Flask, jsonify, request, abort
-###from scripts.git_repo import git_pull, git_repo, GIT_YML_PATH
 from scripts.bridge import ps_, get_project, get_container_from_id, get_yml_path, containers, project_config, info
-from scripts.find_files import find_yml_files, get_readme_file, get_logo_file, DOCKER_COMPOSE_UI_YML_PATH
+from scripts.find_files import find_yml_files, get_readme_file, get_logo_file, get_env_files
 from scripts.requires_auth import requires_auth, authentication_enabled, \
   disable_authentication, set_authentication
 from scripts.manage_project import manage
@@ -28,12 +27,6 @@ ENV_PATH = '/opt/appdata/compose/'
 PATH_GLOBAL = '/opt/appdata/'
 COMPOSE_REGISTRY = os.getenv('DOCKER_COMPOSE_REGISTRY')
 STATIC_URL_PATH = '/' + (os.getenv('DOCKER_COMPOSE_UI_PREFIX') or '')
-
-cwd = os.getcwd()
-print('Current Working Directory is: ', cwd)
-absolute_path = '/opt/appdata/compose'
-os.chdir(absolute_path)
-print('New working directory is: ', os.getcwd())
 
 logging.basicConfig(level=logging.INFO)
 app = Flask(__name__, static_url_path=STATIC_URL_PATH)
@@ -58,8 +51,8 @@ def load_projects():
     """
     global projects
     projects = find_yml_files(YML_PATH)
-    ##env = get_env_files(ENV_PATH)
-    ##logging.info(projects)
+    env = get_env_files(ENV_PATH)
+    logging.info(projects)
     logging.info(env)
 
 load_projects()
