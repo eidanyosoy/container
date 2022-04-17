@@ -6,6 +6,8 @@ from json import loads
 import logging
 import os
 import sys
+import glob
+import fnmatch
 import traceback
 from shutil import rmtree
 from compose.service import ImageType, BuildAction
@@ -13,7 +15,7 @@ import docker
 import requests
 from flask import Flask, jsonify, request, abort
 from scripts.bridge import ps_, get_project, get_container_from_id, get_yml_path, containers, project_config, info
-from scripts.find_files import find_yml_files, get_readme_file, get_logo_file
+from scripts.find_files import find_yml_files, get_env_file, get_readme_file, get_logo_file
 
 from scripts.requires_auth import requires_auth, authentication_enabled, \
   disable_authentication, set_authentication
