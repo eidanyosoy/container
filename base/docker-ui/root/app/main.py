@@ -117,13 +117,13 @@ def run_service(project, service_id):
 def project_yml(name):
     """
     get yml content
+        ##env = None
     """
     folder_path = projects[name]
     path = get_yml_path(folder_path)
     config = project_config(folder_path)
 
     with open(path) as data_file:
-        env = None
         if os.path.isfile(ENV_PATH + '/.env'):
             with open(ENV_PATH + '/.env') as env_file:
                 env = env_file.read()
@@ -249,7 +249,7 @@ def create_project():
     create new project
     """
     data = loads(request.data)
-    file_path = manage(YML_PATH + '/' +  data["name"], data["yml"], False)
+    file_path = manage(YML_PATH + '/' +  data["name"], data["yml"], True)
     env_file = manage(ENV_PATH + "/.env", "w")
     load_projects()
     return jsonify(path=file_path, env=env_file)
