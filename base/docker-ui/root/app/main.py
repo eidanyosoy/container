@@ -35,14 +35,7 @@ logging.basicConfig(level=logging.INFO)
 app = Flask(__name__, static_url_path=STATIC_URL_PATH)
 
 def prefix_route(route_function, prefix='', mask='{0}{1}'):
-  '''
-    Defines a new route function with a prefix.
-    The mask argument is a `format string` formatted with, in that order:
-      prefix, route
-    Pulled from https://stackoverflow.com/a/37878456 from user 7heo.tk
-  '''
   def newroute(route, *args, **kwargs):
-    '''New function to prefix the route'''
     return route_function(mask.format(prefix, route), *args, **kwargs)
   return newroute
 
@@ -122,12 +115,10 @@ def project_yml(name):
     folder_path = projects[name]
     path = get_yml_path(folder_path)
     config = project_config(folder_path)
-
     with open(path) as data_file:
         if os.path.isfile(ENV_PATH + '/.env'):
             with open(ENV_PATH + '/.env') as env_file:
                 env = env_file.read()
-
         return jsonify(yml=data_file.read(), env=env, config=config._replace(config_version=config.config_version.__str__(), version=config.version.__str__()))
 
 @app.route(API_V1 + "projects/readme/<name>", methods=['GET'])
@@ -249,10 +240,13 @@ def create_project():
     create new project
     """
     data = loads(request.data)
-    file_path = manage(YML_PATH + '/' +  data["name"], data["yml"], True)
-    env_file = manage(ENV_PATH + "/.env", "w")
+    file_path = manage(YML_PATH + '/' +  data["name"], data["yml"], False)
+    if 'env' in data and data["env"]:
+        env_file = open(ENV_PATH + "/.env", "w")
+        env_file.write(data["env"])
+        env_file.close()
     load_projects()
-    return jsonify(path=file_path, env=env_file)
+    return jsonify(path=file_path)
 
 @app.route(API_V1 + "update-project", methods=['PUT'])
 @requires_auth
@@ -261,9 +255,13 @@ def update_project():
     update project
     """
     data = loads(request.data)
-    file_path = manage(YML_PATH + '/' +  data["name"], data["yml"], True)
-    env_file = manage(ENV_PATH + "/.env", "w")
-    return jsonify(path=file_path, env=env_file)
+    file_path = manage(YML_PATH + '/' +  data["name"], data["yml"], False)
+    if 'env' in data and data["env"]:
+        env_file = open(ENV_PATH + "/.env", "w")
+        env_file.write(data["env"])
+        env_file.close()
+    load_projects()
+    return jsonify(path=file_path)
 
 @app.route(API_V1 + "remove-project/<name>", methods=['DELETE'])
 @requires_auth
