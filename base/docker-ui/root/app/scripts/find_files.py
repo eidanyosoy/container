@@ -9,8 +9,6 @@ import glob
 import shutil
 import logging
 
-envpath = '/opt/appdata/compose'
-
 def find_yml_files(path):
     """
     find docker-compose.yml files in path
@@ -48,15 +46,10 @@ def get_logo_file(path):
             break
     return logo
 
-def get_env_file(envpath):
-    """
-    find case insensitive env in path and return the contents
-    """
-    env = None
+def find_env_files(path):
     for dirpath, dirs, files in os.walk(path):  
-      for file in fnmatch.filter(files, '*.env'): 
-            file = open(os.path.join(dirpath, file)) 
-            env = file.read()
-            file.close()
-            break
+        for filename in fnmatch.filter(files, '.env'):
+            env = os.path.join(dirpath, filename)
+            print(os.path.join(dirpath, filename))
+            print(env)
     return env
