@@ -37,7 +37,7 @@ def get_logo_file(path):
             break
     return logo
 
-def get_env_files(path):
+def get_env_file(path):
     for dirpath, dirs, files in os.walk(path):  
         for filename in fnmatch.filter(files, '.env'):
             env = os.path.join(dirpath, filename)
