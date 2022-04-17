@@ -120,13 +120,14 @@ def project_yml(name):
     """
     folder_path = projects[name]
     path = get_yml_path(folder_path)
-    env_path = get_env_file(envfile)
     config = project_config(folder_path)
 
     with open(path) as data_file:
-        if os.path.isfile(path):
-            with open(env_path) as env_file:
+        env = None
+        if os.path.isfile(ENV_PATH + '/.env'):
+            with open(ENV_PATH + '/.env') as env_file:
                 env = env_file.read()
+
         return jsonify(yml=data_file.read(), env=env, config=config._replace(config_version=config.config_version.__str__(), version=config.version.__str__()))
 
 @app.route(API_V1 + "projects/readme/<name>", methods=['GET'])
@@ -249,7 +250,7 @@ def create_project():
     """
     data = loads(request.data)
     file_path = manage(YML_PATH + '/' +  data["name"], data["yml"], False)
-    env_file = manage(ENV_PATH + data[".env"], True )
+    env_file = manage(ENV_PATH + "/.env", "w")
     load_projects()
     return jsonify(path=file_path, env=env_file)
 
@@ -261,7 +262,7 @@ def update_project():
     """
     data = loads(request.data)
     file_path = manage(YML_PATH + '/' +  data["name"], data["yml"], True)
-    env_file = manage(ENV_PATH + data[".env"], True )
+    env_file = manage(ENV_PATH + "/.env", "w")
     return jsonify(path=file_path, env=env_file)
 
 @app.route(API_V1 + "remove-project/<name>", methods=['DELETE'])
