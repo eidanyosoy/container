@@ -1,5 +1,5 @@
 """
-find docker-compose.yml files
+find docker-compose.yml / readme and environment file
 """
 
 import fnmatch
@@ -8,6 +8,8 @@ import sys
 import glob
 import shutil
 import logging
+
+envpath = '/opt/appdata/compose'
 
 def find_yml_files(path):
     """
@@ -45,3 +47,17 @@ def get_logo_file(path):
             file.close()
             break
     return logo
+
+def get_env_file(envpath)
+    """
+    find case insensitive env in path and return the contents
+    ""
+    for dirpath, dirs, files in os.walk(envpath):  
+      for filename in files: 
+         env = os.path.join(dirpath,filename) 
+            if file.endswith('.env'): 
+              print(env)
+              env = file.read()
+              file.close()
+              break
+    return env
