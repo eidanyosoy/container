@@ -52,12 +52,11 @@ def get_env_file(envpath):
     """
     find case insensitive env in path and return the contents
     """
-    for dirpath, dirs, files in os.walk(envpath):  
-      for filename in files: 
-         env = os.path.join(dirpath,filename) 
-            if file.endswith('.env'): 
-              print(env)
-              env = file.read()
-              file.close()
-              break
+    env = None
+    for dirpath, dirs, files in os.walk(path):  
+      for file in fnmatch.filter(files, '*.env'): 
+            file = open(os.path.join(dirpath, file)) 
+            env = file.read()
+            file.close()
+            break
     return env
