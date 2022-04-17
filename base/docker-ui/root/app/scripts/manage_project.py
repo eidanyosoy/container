@@ -11,7 +11,7 @@ def manage(directory, yml, is_update):
     """
     create or update docker compose project
     """
-    file_path = YML_PATH + directory + "/docker-compose.yaml" 
+    file_path = YML_PATH + directory + "/docker-compose.yml" 
     if is_update:
         rename(file_path, file_path + "." + str(int(round(time()))))
     else:
