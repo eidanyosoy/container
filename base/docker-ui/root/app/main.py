@@ -6,6 +6,8 @@ from json import loads
 import logging
 import os
 import sys
+import glob
+import fnmatch
 import traceback
 from shutil import rmtree
 from compose.service import ImageType, BuildAction
@@ -13,7 +15,8 @@ import docker
 import requests
 from flask import Flask, jsonify, request, abort
 from scripts.bridge import ps_, get_project, get_container_from_id, get_yml_path, containers, project_config, info
-from scripts.find_files import find_yml_files, get_readme_file, get_logo_file, get_env_files
+from scripts.find_files import find_yml_files, get_env_file, get_readme_file, get_logo_file
+
 from scripts.requires_auth import requires_auth, authentication_enabled, \
   disable_authentication, set_authentication
 from scripts.manage_project import manage
@@ -32,14 +35,7 @@ logging.basicConfig(level=logging.INFO)
 app = Flask(__name__, static_url_path=STATIC_URL_PATH)
 
 def prefix_route(route_function, prefix='', mask='{0}{1}'):
-  '''
-    Defines a new route function with a prefix.
-    The mask argument is a `format string` formatted with, in that order:
-      prefix, route
-    Pulled from https://stackoverflow.com/a/37878456 from user 7heo.tk
-  '''
   def newroute(route, *args, **kwargs):
-    '''New function to prefix the route'''
     return route_function(mask.format(prefix, route), *args, **kwargs)
   return newroute
 
@@ -51,9 +47,7 @@ def load_projects():
     """
     global projects
     projects = find_yml_files(YML_PATH)
-    env = get_env_files(ENV_PATH)
     logging.info(projects)
-    logging.info(env)
 
 load_projects()
 
@@ -116,19 +110,16 @@ def run_service(project, service_id):
 def project_yml(name):
     """
     get yml content
+        ##env = None
     """
-    env_path = '/opt/appdata/compose/.env'
     folder_path = projects[name]
     path = get_yml_path(folder_path)
     config = project_config(folder_path)
-
     with open(path) as data_file:
-        env = None
-        if os.path.isfile(folder_path):
-            with open(env_path) as env_file:
+        if os.path.isfile(ENV_PATH + '/.env'):
+            with open(ENV_PATH + '/.env') as env_file:
                 env = env_file.read()
-
-    return jsonify(yml=get_yml_file(path), env=env, config=config._replace(config_version=config.config_version.__str__(), version=config.version.__str__()))
+        return jsonify(yml=data_file.read(), env=env, config=config._replace(config_version=config.config_version.__str__(), version=config.version.__str__()))
 
 @app.route(API_V1 + "projects/readme/<name>", methods=['GET'])
 def get_project_readme(name):
@@ -190,7 +181,7 @@ def pull():
     """
     name = loads(request.data)["id"]
     get_project_with_name(name).pull()
-    return jsonify(command='pull -q')
+    return jsonify(command='--env_file /opt/appdata/compose/.env pull -q')
 
 @app.route(API_V1 + "services", methods=['PUT'])
 @requires_auth
@@ -224,7 +215,7 @@ def up_():
         do_build=do_build)
     return jsonify(
         {
-            'command': 'up -q --force-recreate',
+            'command': '--env_file /opt/appdata/compose/.env up -q --force-recreate',
             'containers': [container.name for container in container_list]
         })
 
@@ -239,7 +230,7 @@ def build():
     dic = dict(no_cache=json["no_cache"] if "no_cache" in json \
       else None, pull=json["pull"] if "pull" in json else None)
     get_project_with_name(name).build(**dic)
-    return jsonify(command='build -q')
+    return jsonify(command='--env_file /opt/appdata/compose/.env build -q')
 
 @app.route(API_V1 + "create-project", methods=['POST'])
 @app.route(API_V1 + "create", methods=['POST'])
@@ -251,7 +242,7 @@ def create_project():
     data = loads(request.data)
     file_path = manage(YML_PATH + '/' +  data["name"], data["yml"], False)
     if 'env' in data and data["env"]:
-        env_file = open(ENV_PATH + '/' + data[".env"], False )
+        env_file = open(ENV_PATH + "/.env", "w")
         env_file.write(data["env"])
         env_file.close()
     load_projects()
@@ -264,12 +255,12 @@ def update_project():
     update project
     """
     data = loads(request.data)
-    file_path = manage(YML_PATH + '/' +  data["name"], data["yml"], True)
-
+    file_path = manage(YML_PATH + '/' +  data["name"], data["yml"], False)
     if 'env' in data and data["env"]:
-        env_file = open(ENV_PATH + '/' + data[".env"], False )
+        env_file = open(ENV_PATH + "/.env", "w")
         env_file.write(data["env"])
         env_file.close()
+    load_projects()
     return jsonify(path=file_path)
 
 @app.route(API_V1 + "remove-project/<name>", methods=['DELETE'])
@@ -314,7 +305,7 @@ def create():
     """
     name = loads(request.data)["id"]
     get_project_with_name(name).create()
-    return jsonify(command='create')
+    return jsonify(command='--env_file /opt/appdata/compose/.env create')
 
 @app.route(API_V1 + "start", methods=['POST'])
 @requires_auth
@@ -324,7 +315,7 @@ def start():
     """
     name = loads(request.data)["id"]
     get_project_with_name(name).start()
-    return jsonify(command='start -q')
+    return jsonify(command='--env_file /opt/appdata/compose/.env start -q')
 
 @app.route(API_V1 + "stop", methods=['POST'])
 @requires_auth
@@ -334,7 +325,7 @@ def stop():
     """
     name = loads(request.data)["id"]
     get_project_with_name(name).stop()
-    return jsonify(command='stop -q')
+    return jsonify(command='--env_file /opt/appdata/compose/.env stop -q')
 
 @app.route(API_V1 + "down", methods=['POST'])
 @requires_auth

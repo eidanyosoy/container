@@ -37,8 +37,9 @@ APPVERSION="${NEWVERSION}"
 
 HEADLINE="$(cat ./.templates/headline.txt)"
 APPFOLDER="./$FOLDER/$APP"
-DESCRIPTION="$(curl -u $USERNAME:$TOKEN -sX GET "$APPLINK" | jq -r '.description')"
+##DESCRIPTION="$(curl -u $USERNAME:$TOKEN -sX GET "$APPLINK" | jq -r '.description')"
 BASEIMAGE="alpine"
+DESCRIPTION="DEVELOP STATUS DO NOT USE IN PRODUCTION ENVIROMENT"
 
 
 ### RELEASE SETTINGS ###
