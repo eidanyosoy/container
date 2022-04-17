@@ -119,19 +119,18 @@ def project_yml(name):
     folder_path = projects[name]
     envfile = '/opt/appdata/compose'
     path = get_yml_path(folder_path)
+    #env_path = get_env_file(envfile)
     config = project_config(folder_path)
 
     with open(path) as data_file:
-        if os.path.isfile(folder_path):
-            with open(folder_path) as data_file:
-                data = data_file.read()
+        env = None
+        for dirpath, dirs, files in os.walk(envfile):  
+           for filename in files: 
+              fname = os.path.join(dirpath,filename) 
+              if fname.endswith('.env'): 
+                 fname = env_file.read()
 
-    with open(envfile) as env_file:
-        if os.path.isfile(envfile + '/.env'):
-            with open(envfile + '/.env') as env_file:
-                env = env_file.read()
-
-        return jsonify(yml=data, env=env, config=config._replace(config_version=config.config_version.__str__(), version=config.version.__str__()))
+        return jsonify(yml=data_file.read(), env=env, config=config._replace(config_version=config.config_version.__str__(), version=config.version.__str__()))
 
 @app.route(API_V1 + "projects/readme/<name>", methods=['GET'])
 def get_project_readme(name):
