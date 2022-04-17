@@ -51,7 +51,7 @@ def get_logo_file(path):
 def get_env_file(envpath):
     """
     find case insensitive env in path and return the contents
-    ""
+    """
     for dirpath, dirs, files in os.walk(envpath):  
       for filename in files: 
          env = os.path.join(dirpath,filename) 
