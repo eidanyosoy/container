@@ -30,5 +30,5 @@ COPY ./base/docker-ui/root/app/ /app
 EXPOSE 5000
 
 CMD []
-ENTRYPOINT ["/env/bin/python", "/app/main.py"]
+ENTRYPOINT ["./app/entrypoint.sh"]
 WORKDIR /opt
