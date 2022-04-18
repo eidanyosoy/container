@@ -9,6 +9,8 @@ import sys
 import glob
 import fnmatch
 import traceback
+from dotenv import load_dotenv
+from pathlib import Path
 from shutil import rmtree
 from compose.service import ImageType, BuildAction
 import docker
@@ -112,6 +114,7 @@ def project_yml(name):
     get yml content
         ##env = None
     """
+    dotenv_path = Path(ENV_PATH + '/.env')
     folder_path = projects[name]
     path = get_yml_path(folder_path)
     config = project_config(folder_path)
@@ -119,6 +122,7 @@ def project_yml(name):
         if os.path.isfile(ENV_PATH + '/.env'):
             with open(ENV_PATH + '/.env') as env_file:
                 env = env_file.read()
+                load_dotenv(dotenv_path=dotenv_path)
         return jsonify(yml=data_file.read(), env=env, config=config._replace(config_version=config.config_version.__str__(), version=config.version.__str__()))
 
 @app.route(API_V1 + "projects/readme/<name>", methods=['GET'])
