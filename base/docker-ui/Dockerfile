@@ -1,7 +1,7 @@
 # https://github.com/nsano-rururu/docker-compose-ui
 # DOCKER-VERSION 19.03
-ORIGINAL_MAINTAINER Naoyuki Sano <nsano@ae.em-net.ne.jp>
-MODDED_FROM dockserver[bot]@dockserver.io
+# ORIGINAL_MAINTAINER Naoyuki Sano <nsano@ae.em-net.ne.jp>
+# MODDED_FROM dockserver[bot]@dockserver.io
 
 FROM python:alpine3.15 AS builder
 RUN pip install virtualenv && \
