@@ -9,9 +9,10 @@ import sys
 import glob
 import fnmatch
 import traceback
+import shutil
 from dotenv import load_dotenv
 from pathlib import Path
-from shutil import rmtree
+##from shutil import rmtree
 from compose.service import ImageType, BuildAction
 import docker
 import requests
@@ -133,15 +134,16 @@ def project_yml(name):
                 load_dotenv(dotenv_path=dotenv_path)
         return jsonify(yml=data_file.read(), env=env, config=config._replace(config_version=config.config_version.__str__(), version=config.version.__str__()))
 
+@app.route(API_V1 + "projects/readme/<name>", methods=['GET'])
+def get_project_readme(name):
     """
-    @app.route(API_V1 + "projects/readme/<name>", methods=['GET'])
-    def get_project_readme(name):
-
     get README.md or readme.md if available
     use the local readme ( need fix )
+    """
     path = projects[name]
     return jsonify(readme=get_readme_file(path))
 
+    """
     @app.route(API_V1 + "projects/logo/<name>", methods=['GET'])
     def get_project_logo(name):
 
