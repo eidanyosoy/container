@@ -9,9 +9,10 @@ import sys
 import glob
 import fnmatch
 import traceback
+import shutil
 from dotenv import load_dotenv
 from pathlib import Path
-from shutil import rmtree
+##from shutil import rmtree
 from compose.service import ImageType, BuildAction
 import docker
 import requests
@@ -33,6 +34,12 @@ PATH_GLOBAL = '/opt/appdata/'
 COMPOSE_REGISTRY = os.getenv('DOCKER_COMPOSE_REGISTRY')
 STATIC_URL_PATH = '/' + (os.getenv('DOCKER_COMPOSE_UI_PREFIX') or '')
 
+cwd = os.getcwd()
+print('Current Working Directory is: ', cwd)
+absolute_path = '/opt/appdata/compose'
+os.chdir(absolute_path)
+print('New working directory is: ', os.getcwd())
+
 logging.basicConfig(level=logging.INFO)
 app = Flask(__name__, static_url_path=STATIC_URL_PATH)
 
@@ -48,6 +55,8 @@ def load_projects():
     load project definitions (docker-compose.yml files)
     """
     global projects
+    dotenv_path = Path(ENV_PATH + '/.env')
+    load_dotenv(dotenv_path=dotenv_path)
     projects = find_yml_files(YML_PATH)
     logging.info(projects)
 
@@ -125,15 +134,16 @@ def project_yml(name):
                 load_dotenv(dotenv_path=dotenv_path)
         return jsonify(yml=data_file.read(), env=env, config=config._replace(config_version=config.config_version.__str__(), version=config.version.__str__()))
 
+@app.route(API_V1 + "projects/readme/<name>", methods=['GET'])
+def get_project_readme(name):
     """
-    @app.route(API_V1 + "projects/readme/<name>", methods=['GET'])
-    def get_project_readme(name):
-
     get README.md or readme.md if available
     use the local readme ( need fix )
+    """
     path = projects[name]
     return jsonify(readme=get_readme_file(path))
 
+    """
     @app.route(API_V1 + "projects/logo/<name>", methods=['GET'])
     def get_project_logo(name):
 
@@ -246,6 +256,8 @@ def create_project():
     """
     data = loads(request.data)
     file_path = manage(YML_PATH + '/' +  data["name"], data["yml"], False)
+    dotenv_path = Path(ENV_PATH + '/.env')
+    load_dotenv(dotenv_path=dotenv_path)
     if 'env' in data and data["env"]:
         env_file = open(ENV_PATH + "/.env", "w")
         env_file.write(data["env"])
@@ -261,6 +273,8 @@ def update_project():
     """
     data = loads(request.data)
     file_path = manage(YML_PATH + '/' +  data["name"], data["yml"], False)
+    dotenv_path = Path(ENV_PATH + '/.env')
+    load_dotenv(dotenv_path=dotenv_path)
     if 'env' in data and data["env"]:
         env_file = open(ENV_PATH + "/.env", "w")
         env_file.write(data["env"])
@@ -340,7 +354,7 @@ def down():
     """
     name = loads(request.data)["id"]
     get_project_with_name(name).down(ImageType.none, None)
-    return jsonify(command='down -q')
+    return jsonify(command='-env_file /opt/appdata/compose/.env down -q')
 
 @app.route(API_V1 + "restart", methods=['POST'])
 @requires_auth
