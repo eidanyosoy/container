@@ -23,12 +23,13 @@ RUN virtualenv /env && \
 
 FROM python:alpine3.15
 
-RUN apk add -U --no-cache git
+RUN apk add -U --no-cache git bash
 COPY --from=builder /env /env
 COPY ./base/docker-ui/root/app/ /app
+ADD ./base/docker-ui/root/entrypoint.sh /app/entrypoint.sh
 
 EXPOSE 5000
 
 CMD []
-ENTRYPOINT ["./app/entrypoint.sh"]
+ENTRYPOINT [ "bash", "/app/entrypoint.sh" ]
 WORKDIR /opt
