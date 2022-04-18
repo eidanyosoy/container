@@ -48,6 +48,8 @@ def load_projects():
     load project definitions (docker-compose.yml files)
     """
     global projects
+    dotenv_path = Path(ENV_PATH + '/.env')
+    load_dotenv(dotenv_path=dotenv_path)
     projects = find_yml_files(YML_PATH)
     logging.info(projects)
 
@@ -246,6 +248,8 @@ def create_project():
     """
     data = loads(request.data)
     file_path = manage(YML_PATH + '/' +  data["name"], data["yml"], False)
+    dotenv_path = Path(ENV_PATH + '/.env')
+    load_dotenv(dotenv_path=dotenv_path)
     if 'env' in data and data["env"]:
         env_file = open(ENV_PATH + "/.env", "w")
         env_file.write(data["env"])
@@ -261,6 +265,8 @@ def update_project():
     """
     data = loads(request.data)
     file_path = manage(YML_PATH + '/' +  data["name"], data["yml"], False)
+    dotenv_path = Path(ENV_PATH + '/.env')
+    load_dotenv(dotenv_path=dotenv_path)
     if 'env' in data and data["env"]:
         env_file = open(ENV_PATH + "/.env", "w")
         env_file.write(data["env"])
@@ -340,7 +346,7 @@ def down():
     """
     name = loads(request.data)["id"]
     get_project_with_name(name).down(ImageType.none, None)
-    return jsonify(command='down -q')
+    return jsonify(command='-env_file /opt/appdata/compose/.env down -q')
 
 @app.route(API_V1 + "restart", methods=['POST'])
 @requires_auth
@@ -478,4 +484,5 @@ def handle_generic_error(err):
 
 # run app
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', threaded=True)
+    from waitress import serve
+    serve(app, host="0.0.0.0", port=8080)
