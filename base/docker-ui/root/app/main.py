@@ -125,25 +125,26 @@ def project_yml(name):
                 load_dotenv(dotenv_path=dotenv_path)
         return jsonify(yml=data_file.read(), env=env, config=config._replace(config_version=config.config_version.__str__(), version=config.version.__str__()))
 
-@app.route(API_V1 + "projects/readme/<name>", methods=['GET'])
-def get_project_readme(name):
     """
+    @app.route(API_V1 + "projects/readme/<name>", methods=['GET'])
+    def get_project_readme(name):
+
     get README.md or readme.md if available
-    """
+    use the local readme ( need fix )
     path = projects[name]
     return jsonify(readme=get_readme_file(path))
 
-@app.route(API_V1 + "projects/logo/<name>", methods=['GET'])
-def get_project_logo(name):
-    """
+    @app.route(API_V1 + "projects/logo/<name>", methods=['GET'])
+    def get_project_logo(name):
+
     get logo.png if available
-    """
+    use stored inage in folder ( need fix )
     path = projects[name]
     logo = get_logo_file(path)
     if logo is None:
         abort(404)
     return logo
-
+    """
 @app.route(API_V1 + "projects/<name>/<container_id>", methods=['GET'])
 def project_container(name, container_id):
     """
