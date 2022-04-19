@@ -25,6 +25,7 @@ RUN virtualenv /env && \
     apk del --purge build-dependencies && \
     rm -rf /var/cache/apk/* /tmp/* 
 
+
 #FINAL IMAGE
 
 FROM python:alpine3.15
@@ -37,7 +38,7 @@ RUN apk add -U --no-cache git bash rsync && \
     rm -rf /var/cache/apk/* /tmp/*
 
 COPY --from=builder /env /env
-COPY ./base/docker-ui/root/ .
+COPY ./base/dockserver-ui/root/ .
 
 # gunicorn
 CMD ["gunicorn", "--config", "gunicorn-cfg.py", "run:app"]
