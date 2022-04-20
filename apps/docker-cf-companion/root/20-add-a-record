@@ -1,14 +1,14 @@
 #!/command/with-contenv bash
 ## change to "bin/sh" when necessary
 
-auth_email={CLOUDFLARE_EMAIL}                   # The email used to login 'https://dash.cloudflare.com'
+auth_email="${CF_EMAIL}"                        # The email used to login 'https://dash.cloudflare.com'
 auth_method="global"                            # Set to "global" for Global API Key or "token" for Scoped API Token
-auth_key=${CLOUDFLARE_API_KEY}                  # Your API Token or Global API Key
-zone_identifier=${DOMAIN1_ZONE_ID}              # Can be found in the "Overview" tab of your domain
+auth_key="${CF_TOKEN}'                          # Your API Token or Global API Key
+zone_identifier="${DOMAIN1_ZONE_ID}"            # Can be found in the "Overview" tab of your domain
 record_name="A"                                 # Which record you want to be synced
-ttl="3600"                                      # Set the DNS TTL (seconds)
+ttl="auto"                                      # Set the DNS TTL (seconds)
 proxy="true"                                    # Set the proxy to true or false
-sitename="{DOMAIN}"                             # Title of site "Example Site"
+sitename="${TARGET_DOMAIN}"                    # Title of site "Example Site"
 
 ###########################################
 ## Check if we have a public IP
