@@ -6,32 +6,23 @@ PGID=${PGID:-911}
 groupmod -o -g "$PGID" abc
 usermod -o -u "$PUID" abc
 
-echo "----------------------------------------------------
+SCRIPTS_DIR="/config/custom-cont-init.d"
+SERVICES_DIR="/config/custom-services.d"
 
- ____             _                                 
-|  _ \  ___   ___| | _____  ___ _ ____   _____ _ __ 
-| | | |/ _ \ / __| |/ / __|/ _ \ '__\ \ / / _ \ '__|
-| |_| | (_) | (__|   <\__ \  __/ |   \ V /  __/ |   
-|____/ \___/ \___|_|\_\___/\___|_|    \_/ \___|_|
+set -Eeuo pipefail
+IFS=$'\n\t'
 
-----------------------------------------------------"
-if [[ -f /donate.txt ]]; then
-    echo '
-To support the app dev(s) visit:'
-    cat /donate.txt
-fi
-echo '
--------------------------------------
-GID/UID
--------------------------------------'
-echo "
-User uid:    $(id -u abc)
-User gid:    $(id -g abc)
--------------------------------------
-"
+folder="/app /config /defaults /system"
+removefolder="${SERVICES_DIR} ${SCRIPTS_DIR}"
+PUID=${PUID:-911}
 
-chown abc:abc /app
-chown abc:abc /config
-chown abc:abc /defaults
-chown abc:abc /system
+for i in ${folder[@]}; do
+  [[ ! "$(stat -c %u $i)" = $PUID ]] && \
+   chown abc:abc -R $i
+done
+
+for i in ${removefolder[@]}; do
+  [[ -d $i ]] && \
+   rm -rf $i
+done
 
