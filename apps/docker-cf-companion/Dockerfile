@@ -49,4 +49,4 @@ RUN set -x && \
     rm -rf /var/cache/apk/*
 
 ### Add Files
-ADD ./apps/docker-cf-companion/install /
+ADD ./apps/docker-cf-companion/root/install/ /
