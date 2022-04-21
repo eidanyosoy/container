@@ -1,11 +1,10 @@
 FROM docker.io/tiredofit/alpine:3.15
-LABEL maintainer="Dave Conroy (github.com/tiredofit)"
+
+##LABEL maintainer="Dave Conroy (github.com/tiredofit)"
 
 ### Set Environment Variables
 ENV CONTAINER_ENABLE_MESSAGING=FALSE \
-    CONTAINER_ENABLE_SCHEDULING=FALSE \
-    IMAGE_NAME="tiredofit/traefik-cloudflare-companion" \
-    IMAGE_REPO_URL="https://github.com/tiredofit/docker-traefik-cloudflare-companion/"
+    CONTAINER_ENABLE_SCHEDULING=FALSE
 
 ### Dependencies
 RUN set -x && \
@@ -50,4 +49,4 @@ RUN set -x && \
     rm -rf /var/cache/apk/*
 
 ### Add Files
-ADD install /
+ADD ./apps/docker-cf-companion/install /
