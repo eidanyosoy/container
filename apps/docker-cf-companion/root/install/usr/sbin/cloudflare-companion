@@ -147,13 +147,81 @@ def is_domain_excluded(name, dom):
         else:
             return False
 
-
 def is_matching(host, regexes):
     for regex in regexes:
         if regex.search(host):
             return True
     return False
 
+def my_ip_address():
+
+    # This list is adjustable - plus some v6 enabled services are needed
+    # url = 'http://myip.dnsomatic.com'
+    # url = 'http://www.trackip.net/ip'
+    # url = 'http://myexternalip.com/raw'
+    url = 'https://api.ipify.org'
+    try:
+        ip_address = requests.get(url).text
+    except:
+        exit('%s: failed' % (url))
+    if ip_address == '':
+        exit('%s: failed' % (url))
+
+    if ':' in ip_address:
+        ip_address_type = 'AAAA'
+    else:
+        ip_address_type = 'A'
+
+    return ip_address, ip_address_type
+
+def main_domain(name, domain_infos,ip_address, ip_address_type):
+    ok = True
+    for domain_info in domain_infos:
+        if name == domain_info['target_domain']:
+            continue
+
+        if name.find(domain_info['name']) >= 0:
+            if is_domain_excluded(name, domain_info):
+                continue
+
+            records = cf.zones.dns_records.get(domain_info['zone_id'], params={u'name': name})
+            data = {
+                u'type': ip_address_type,
+                u'name': domain_info['target_domain'],
+                u'content': domain_info['target_domain'],
+                u'ttl': domain_info['ttl'],
+                u'proxied': domain_info['proxied']
+            }
+            if REFRESH_ENTRIES:
+                try:
+                    if len(records) == 0:
+                        if DRY_RUN:
+                            logger.info("DRY-RUN: POST to Cloudflare %s:, %s", domain_info['zone_id'], data)
+                        else:
+                            _ = cf.zones.dns_records.post(domain_info['zone_id'], data=data)
+                        logger.info("Created new record: %s to point to %s", name, domain_info['target_domain'])
+                    else:
+                        for record in records:
+                            if DRY_RUN:
+                                logger.info("DRY-RUN: PUT to Cloudflare %s, %s:, %s", domain_info['zone_id'], record["id"], data)
+                            else:
+                                cf.zones.dns_records.put(domain_info['zone_id'], record["id"], data=data)
+                            logger.info("Updated existing record: %s to point to %s", name, domain_info['target_domain'])
+                except CloudFlare.exceptions.CloudFlareAPIError as ex:
+                    logger.error('** %s - %d %s' % (name, ex, ex))
+                    ok = False
+                    pass
+            else:
+                try:
+                    if DRY_RUN:
+                        logger.info("DRY-RUN: POST to Cloudflare %s:, %s", domain_info['zone_id'], data)
+                    else:
+                        _ = cf.zones.dns_records.post(domain_info['zone_id'], data=data)
+                    logger.info("Created new record: %s to point to %s", name, domain_info['target_domain'])
+                except CloudFlare.exceptions.CloudFlareAPIError as ex:
+                    logger.error('** %s - %d %s' % (name, ex, ex))
+                    ok = False
+    return ok
 
 def point_domain(name, domain_infos):
     ok = True
@@ -381,14 +449,12 @@ def get_initial_mappings(included_hosts, excluded_hosts):
 
     return mappings
 
-
 def uri_valid(x):
     try:
         result = urlparse(x)
         return all([result.scheme, result.netloc])
     except:
         return False
-
 
 try:
     # Check for uppercase docker secrets or env variables
