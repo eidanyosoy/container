@@ -35,6 +35,19 @@ apps docker-bazarr
    "user": "github-actions[bot]"
 }
 
+apps docker-cf-companion
+{
+   "appname": "docker-cf-companion",
+   "apppic": "",
+   "appfolder": "./base/docker-cf-companion",
+   "newversion": "0.0.1",
+   "appversion": "0.0.1",
+   "baseimage": "alpine",
+   "description": "DEVELOP STATUS DO NOT USE IN PRODUCTION ENVIROMENT",
+   "body": "Upgrading docker-cf-companion to 0.0.1",
+   "user": "dockserver image update[bot]"
+}
+
 apps docker-cloudflared
 {
    "appname": "docker-cloudflared",
