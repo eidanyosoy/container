@@ -175,15 +175,74 @@ printf "━━━━━━━━━━━━━━━━━━━━━━━━
    fi
 }
 
+
+function addcfrecord() {
+
+for i in curl host jq bind-tools; do
+  apk add -U --update --no-cache $i &>/dev/null
+done
+
+ipv4=$($(which curl) -sX GET -4 https://ifconfig.co)
+ipv6=$($(which curl) -sX GET -6 https://ifconfig.co)
+
+## IPv4
+if host $DOMAIN 1.1.1.1 | grep "has address" | grep "$ipv4"; then
+   echo "$DOMAIN is currently set to $ipv4; no changes needed"
+else
+   ## GET ZONE ID
+   zoneid=$($(which curl) -sX GET "https://api.cloudflare.com/client/v4/zones?name=$EMAIL&status=active" \
+       -H "X-Auth-Email: $EMAIL" \
+       -H "Authorization: Bearer $CFGLOBAL" \
+       -H "Content-Type: application/json" | jq -r '{"result"}[] | .[0] | .id')
+
+   ## GET DNS RECORDID
+   dnsrecordid=$($(which curl) -sX GET "https://api.cloudflare.com/client/v4/zones/$zoneid/dns_records?type=A&name=$DOMAIN" \
+       -H "X-Auth-Email: $EMAIL" \
+       -H "Authorization: Bearer $CFGLOBAL" \
+       -H "Content-Type: application/json" | jq -r '{"result"}[] | .[0] | .id')
+
+   ## PUSH A RECORD FOR IPv4
+   $(which curl) -sX PUT "https://api.cloudflare.com/client/v4/zones/$zoneid/dns_records/$dnsrecordid" \
+       -H "X-Auth-Email: $EMAIL" \
+       -H "Authorization: Bearer $CFGLOBAL" \
+       -H "Content-Type: application/json" \
+       --data "{\"type\":\"A\",\"name\":\"$DOMAIN\",\"content\":\"$ipv4\",\"ttl\":1,\"proxied\":true}" | jq
+fi
+
+## IPv6
+if host $DOMAIN 1.1.1.1 | grep "has address" | grep "$ipv6"; then
+   echo "$DOMAIN is currently set to $ipv4; no changes needed"
+else
+   ## GET ZONE ID
+   zoneid=$($(which curl) -sX GET "https://api.cloudflare.com/client/v4/zones?name=$EMAIL&status=active" \
+       -H "X-Auth-Email: $EMAIL" \
+       -H "Authorization: Bearer $CFGLOBAL" \
+       -H "Content-Type: application/json" | jq -r '{"result"}[] | .[0] | .id')
+
+   ## GET DNS RECORDID
+   dnsrecordid=$($(which curl) -sX GET "https://api.cloudflare.com/client/v4/zones/$zoneid/dns_records?type=AAAA&name=$DOMAIN" \
+       -H "X-Auth-Email: $EMAIL" \
+       -H "Authorization: Bearer $CFGLOBAL" \
+       -H "Content-Type: application/json" | jq -r '{"result"}[] | .[0] | .id')
+
+   ## PUSH A RECORD FOR IPv6
+   $(which curl) -sX PUT "https://api.cloudflare.com/client/v4/zones/$zoneid/dns_records/$dnsrecordid" \
+       -H "X-Auth-Email: $EMAIL" \
+       -H "Authorization: Bearer $CFGLOBAL" \
+       -H "Content-Type: application/json" \
+       --data "{\"type\":\"AAAA\",\"name\":\"$DOMAIN\",\"content\":\"$ipv6\",\"ttl\":auto,\"proxied\":true}" | jq
+fi
+}
+
 function deploynow() {
 
 ## NOTE 
 ## env schreiben ( basis env ) ! done
-## Authelia config schreiben
-## traefik compose live schreiben / oder nachrangiger compose in wget file
-## Authelia Password ? Docker socket mounten? 
-## D-o-D system ? 
-## shell A Record hinzufügen bei CF ?
+## Authelia config schreiben     || jinja kann das lösen 
+## traefik compose live schreiben / oder nachrangiger compose in wget file  || jinja-compose wird es lösen für uns
+## Authelia Password ? Docker socket mounten?   || tcpsocket or socket beides wird klappen
+## D-o-D system ?  || done
+## shell A Record hinzufügen bei CF ? || DONE
 
 ## SERVERIP 
 SERVERIP=$(curl -s http://whatismijnip.nl | cut -d " " -f 5)
@@ -242,7 +301,7 @@ TEMPLATE_NAME=${TEMPLATE_NAME:-l7-dark}
 TZ=${TZ}
 ID=${ID:-1000}
 DOCKERNETWORK=${DOCKERNETWORK:-proxy}
-SERVERIP=${SERVERIP:-SERVERIP_ID}
+SERVERIP=${SERVERIP:-SERVERIP}
 APPFOLDER=${APPFOLDER:-/opt/appdata}
 RESTARTAPP=${RESTARTAPP:-unless-stopped}
 UMASK=${UMASK:-022}
@@ -263,7 +322,6 @@ SECURITYOPSSET=${SECURITYOPSSET:-true}
 ## ERLEICHTERT ALLES FÜR UNS
 ## CF SETTINGS ?!
 ## python oder doch bash ?!
-
 
 echo " not done yet but should not token so long"
 echo " don't need 18 months , to get it working"
@@ -288,15 +346,15 @@ printf "━━━━━━━━━━━━━━━━━━━━━━━━
 
    read -erp '↘️  Type Number | Press [ENTER]: ' headtyped </dev/tty
    case $headtyped in
-   1) domain ;;
-   2) displayname ;;
-   3) password ;;
-   4) cfemail ;;
-   5) cfkey ;;
-   6) cfzoneid ;;
-   d | D) deploynow ;;
-   Z | z | exit | EXIT | Exit | close) exit 0 ;;
-   *) clear && traefik ;;
+     1) domain ;;
+     2) displayname ;;
+     3) password ;;
+     4) cfemail ;;
+     5) cfkey ;;
+     6) cfzoneid ;;
+     d | D) addcfrecord && deploynow ;;
+     Z | z | exit | EXIT | Exit | close) exit 0 ;;
+     *) clear && traefik ;;
    esac
 }
 
