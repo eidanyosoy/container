@@ -37,4 +37,4 @@ RUN \
 COPY ./base/docker-create/root/ /
 
 ENTRYPOINT ["/bin/bash", "/start.sh"]
-#
+##EOF
