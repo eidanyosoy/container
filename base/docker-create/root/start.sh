@@ -13,6 +13,7 @@
 #####################################
 # shellcheck disable=SC2086
 # shellcheck disable=SC2006
+
 ## add repositories apk parts
 cat > /etc/apk/repositories << EOF; $(echo)
 http://dl-cdn.alpinelinux.org/alpine/v$(cat /etc/alpine-release | cut -d'.' -f1,2)/main
@@ -48,7 +49,8 @@ $(which ln) -s $(which python3) /usr/bin/python &>/dev/null
     "setuptools==62.0.0" \
       "cryptography==36.0.2" \
         "docker-compose==1.29.2" \
-          "jinja2=3.1.1" &>/dev/null
+          "jinja-compose==0.0.1" \
+            "jinja2==3.1.1" &>/dev/null
 
 echo "*** cleanup system ****" && \
   apk del --quiet --clean-protected --no-progress && \
@@ -72,9 +74,8 @@ else
    export DOCKER_HOST='tcp://docker:2375'
 fi
 
-if docker compose > /dev/null 2>&1; then echo " stage 1 works " ; fi
-if docker help  > /dev/null 2>&1; then echo " stage 2 works " ; fi
 
+####### START HERE THE MAIN SETTINGS #######
 function domain() {
 printf "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
    🚀   Treafik Domain
