@@ -32,6 +32,7 @@ echo "**** install build packages ****" && \
        musl \
        findutils \
        coreutils \
+       bind-tools \
        py-pip \
        python3-dev \
        libffi-dev \
@@ -84,23 +85,25 @@ printf "━━━━━━━━━━━━━━━━━━━━━━━━
    records yourself via the Cloudflare dashboard.
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
    read -erp "Which domain would you like to use?: " DOMAIN </dev/tty
-   if [[ $DOMAIN == "" ]]; then
-      echo "Domain cannot be empty" && domain
-   else
-      export $DOMAIN && traefik
-   fi
 
+   if [ -z "$(dig +short "$DOMAIN")" ]; then
+      echo "$DOMAIN  is valid" && \
+        export $DOMAIN && traefik
+   else
+      echo "Domain cannot be empty" && domain
+   fi
 }
 
 function displayname() {
 printf "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
    🚀   Authelia Username
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-   read -erp "Enter your username for Authelia (eg. John Doe): " DISPLAYNAME </dev/tty
-   if [[ $DISPLAYNAME == "" ]]; then
+   read -erp "Enter your username for Authelia (eg. John Doe): " AUTH_USERNAME </dev/tty
+
+   if test -z "$AUTH_USERNAME";then
       echo "Username cannot be empty" && displayname
    else
-      export $DISPLAYNAME && traefik
+      export $AUTH_USERNAME && traefik
    fi
 }
 
@@ -108,11 +111,12 @@ function password() {
  printf "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
    🚀   Authelia Password
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-   read -erp "Enter a password for $USERNAME: " PASSWORD </dev/tty
-   if [[ $PASSWORD == "" ]]; then
+   read -erp "Enter a password for $USERNAME: " AUTH_PASSWORD </dev/tty
+
+   if test -z "$AUTH_PASSWORD";then
       echo "Password cannot be empty" && password
    else
-      export $PASSWORD && traefik
+      export $AUTH_PASSWORD && traefik
    fi
 }
 
@@ -121,7 +125,8 @@ printf "━━━━━━━━━━━━━━━━━━━━━━━━
    🚀   Cloudflare Email-Address
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
    read -erp "What is your CloudFlare Email Address : " EMAIL </dev/tty
-   if [[ $EMAIL != "" ]]; then
+
+   if test -z "$EMAIL"; then
       export $EMAIL && traefik
    else
       echo "CloudFlare Email Address cannot be empty" && cfemail
@@ -133,7 +138,8 @@ printf "━━━━━━━━━━━━━━━━━━━━━━━━
    🚀   Cloudflare Global-Key
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
    read -erp "What is your CloudFlare Global Key: " CFGLOBAL </dev/tty
-   if [[ $CFGLOBAL != "" ]]; then
+
+   if test -z "$CFGLOBAL"; then
       export $CFGLOBAL && traefik
    else
       echo "CloudFlare Global-Key cannot be empty" && cfkey
@@ -145,7 +151,8 @@ printf "━━━━━━━━━━━━━━━━━━━━━━━━
    🚀   Cloudflare Zone-ID
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
    read -erp "Whats your CloudFlare Zone ID: " CFZONEID </dev/tty
-   if [[ $CFZONEID != "" ]]; then
+
+   if test -z "$CFZONEID"; then
       export $CFZONEID && traefik
    else
       echo "CloudFlare Zone ID cannot be empty" && cfzoneid
@@ -155,24 +162,51 @@ printf "━━━━━━━━━━━━━━━━━━━━━━━━
 function deploynow() {
 
 ## NOTE 
-## env schreiben ( basis env )
+## env schreiben ( basis env ) ! done
 ## Authelia config schreiben
 ## traefik compose live schreiben / oder nachrangiger compose in wget file
 ## Authelia Password ? Docker socket mounten? 
 ## D-o-D system ? 
 ## shell A Record hinzufügen bei CF ?
 
+## SERVERIP 
 SERVERIP=$(curl -s http://whatismijnip.nl | cut -d " " -f 5)
-if [[ $SERVERIP == "" ]];then
-   SERVERIP=$(curl ifconfig.me) && \
-   export $SERVERIP
+if [[ "$SERVERIP" =~ ^(([1-9]?[0-9]|1[0-9][0-9]|2([0-4][0-9]|5[0-5]))\.){3}([1-9]?[0-9]|1[0-9][0-9]|2([0-4][0-9]|5[0-5]))$ ]]; then
+   echo "We found a valid IP | $SERVERIP | success"
+else
+  echo "First test failed : Running secondary test now."
+  if [[ $SERVERIP == "" ]];then
+     echo "We found a valid IP | $SERVERIP | success" && \
+       SERVERIP=$(curl ifconfig.me) && \
+         export $SERVERIP
+  fi
 fi
+
+## AUTHELIA TOKENS
+JWTTOKEN=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 64 | head -n 1)
+SECTOKEN=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 64 | head -n 1)
+ENCTOKEN=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 64 | head -n 1)
+
+## ----
+
+## AUTHELIA CONFIG
+
+## USER CONFIG 
+## AUTHELIA CONFIG
+
+## ----
+
+## TRAEFIK CONFIG HIER
+
+# TOMLS / RULES !!
+
+## ENV FILE
 
 echo -e "##Environment for Docker-Compose
 ## TRAEFIK
-CLOUDFLARE_EMAIL=${CF-EMAIL}
-CLOUDFLARE_API_KEY=${CF-API-KEY}
-DOMAIN1_ZONE_ID=${CF-ZONE_ID}
+CLOUDFLARE_EMAIL=${EMAIL}
+CLOUDFLARE_API_KEY=${CFGLOBAL}
+DOMAIN1_ZONE_ID=${CFZONEID}
 DOMAIN=${DOMAIN}
 CLOUDFLARED_UUID=${CLOUDFLARED_UUID:-TUNNEL_UUID_HERE}
 
@@ -203,6 +237,11 @@ SOCKET=${SOCKET:-/var/run/docker.sock}
 SECURITYOPS=${SECURITYOPS:-no-new-privileges}
 SECURITYOPSSET=${SECURITYOPSSET:-true}
 ##EOF" >/opt/appdata/compose/.env
+
+## CLOUDFLARE A RECORD HIER !!!
+## ERLEICHTERT ALLES FÜR UNS
+## CF SETTINGS ?!
+## python oder doch bash ?!
 
 
 echo " not done yet but should not token so long"
