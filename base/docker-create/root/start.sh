@@ -158,9 +158,52 @@ function deploynow() {
 ## env schreiben ( basis env )
 ## Authelia config schreiben
 ## traefik compose live schreiben / oder nachrangiger compose in wget file
-## Authelia Password ? Doxker socket mounten? 
+## Authelia Password ? Docker socket mounten? 
 ## D-o-D system ? 
 ## shell A Record hinzufügen bei CF ?
+
+SERVERIP=$(curl -s http://whatismijnip.nl | cut -d " " -f 5)
+if [[ $SERVERIP == "" ]];then
+   SERVERIP=$(curl ifconfig.me) && \
+   export $SERVERIP
+fi
+
+echo -e "##Environment for Docker-Compose
+## TRAEFIK
+CLOUDFLARE_EMAIL=${CF-EMAIL}
+CLOUDFLARE_API_KEY=${CF-API-KEY}
+DOMAIN1_ZONE_ID=${CF-ZONE_ID}
+DOMAIN=${DOMAIN}
+CLOUDFLARED_UUID=${CLOUDFLARED_UUID:-TUNNEL_UUID_HERE}
+
+## AUTHELIA 
+AUTHELIA_USERNAME=${AUTH_USERNAME}
+AUTHELIA_PASSWORD=${AUTH_PASSWORD}
+
+## TRAEFIK-ERROR-PAGES
+TEMPLATE_NAME=${TEMPLATE_NAME:-l7-dark}
+
+## APPPART
+TZ=${TZ}
+ID=${ID:-1000}
+DOCKERNETWORK=${DOCKERNETWORK:-proxy}
+SERVERIP=${SERVERIP:-SERVERIP_ID}
+APPFOLDER=${APPFOLDER:-/opt/appdata}
+RESTARTAPP=${RESTARTAPP:-unless-stopped}
+UMASK=${UMASK:-022}
+LOCALTIME=${LOCALTIME:-/etc/localtime}
+TP_HOTIO=${TP_HOTIO:-true}
+PLEX_CLAIM=${PLEX_CLAIM:-PLEX_CLAIM_ID}
+
+## DOCKERSECURITY
+NS1=${NS1:-1.1.1.1}
+NS2=${NS2:-8.8.8.8}
+PORTBLOCK=${PORTBLOCK:-127.0.0.1}
+SOCKET=${SOCKET:-/var/run/docker.sock}
+SECURITYOPS=${SECURITYOPS:-no-new-privileges}
+SECURITYOPSSET=${SECURITYOPSSET:-true}
+##EOF" >/opt/appdata/compose/.env
+
 
 echo " not done yet but should not token so long"
 echo " don't need 18 months , to get it working"
@@ -196,6 +239,7 @@ printf "━━━━━━━━━━━━━━━━━━━━━━━━
    *) clear && traefik ;;
    esac
 }
+
 
 
 traefik
