@@ -21,33 +21,37 @@ http://dl-cdn.alpinelinux.org/alpine/edge/testing
 EOF
 
 echo "**** update packages ****" && \
-    apk --quiet --no-cache --no-progress update && \
-    apk --quiet --no-cache --no-progress upgrade
+  apk --quiet --no-cache --no-progress update &>/dev/null && \
+    apk --quiet --no-cache --no-progress upgrade &>/dev/null
 
 echo "**** install build packages ****" && \
-    apk add -U --update --no-cache \
-       bash \
-       ca-certificates \
-       shadow \
-       musl \
-       findutils \
-       coreutils \
-       bind-tools \
-       py-pip \
-       python3-dev \
-       libffi-dev \
-       openssl-dev \
-       gcc \
-       libc-dev \
-       make \
-       docker
+  apk add -U --update --no-cache \
+    bash \
+    ca-certificates \
+    shadow \
+    musl \
+    findutils \
+    coreutils \
+    bind-tools \
+    py3-pip \
+    python3-dev \
+    libffi-dev \
+    openssl-dev \
+    gcc \
+    libc-dev \
+    make \
+    tzdata \
+    docker &>/dev/null
 
-   python -m pip install --no-warn-script-location --upgrade pip setuptools && \
-   pip install --no-warn-script-location --no-cache-dir cryptography && \
-   pip install --no-warn-script-location --no-cache-dir docker-compose==1.29.2
+$(which ln) -s $(which python3) /usr/bin/python &>/dev/null
+  $(which python) -m $(which pip) install --no-warn-script-location --upgrade "pip==22.0.4" \
+    "setuptools==62.0.0" \
+      "cryptography==36.0.2" \
+        "docker-compose==1.29.2" \
+          "jinja2=3.1.1" &>/dev/null
 
- echo "*** cleanup system ****" && \
-    apk del --quiet --clean-protected --no-progress && \
+echo "*** cleanup system ****" && \
+  apk del --quiet --clean-protected --no-progress && \
     rm -f /var/cache/apk/*
 
 echo '{
@@ -85,10 +89,10 @@ printf "━━━━━━━━━━━━━━━━━━━━━━━━
    records yourself via the Cloudflare dashboard.
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
    read -erp "Which domain would you like to use?: " DOMAIN </dev/tty
-
    if [ -z "$(dig +short "$DOMAIN")" ]; then
       echo "$DOMAIN  is valid" && \
-        export $DOMAIN && traefik
+        export $DOMAIN && \
+          traefik
    else
       echo "Domain cannot be empty" && domain
    fi
@@ -99,11 +103,12 @@ printf "━━━━━━━━━━━━━━━━━━━━━━━━
    🚀   Authelia Username
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
    read -erp "Enter your username for Authelia (eg. John Doe): " AUTH_USERNAME </dev/tty
-
    if test -z "$AUTH_USERNAME";then
-      echo "Username cannot be empty" && displayname
+      echo "Username cannot be empty" && \
+        displayname
    else
-      export $AUTH_USERNAME && traefik
+      export $AUTH_USERNAME && \
+        traefik
    fi
 }
 
@@ -111,25 +116,37 @@ function password() {
  printf "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
    🚀   Authelia Password
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-   read -erp "Enter a password for $USERNAME: " AUTH_PASSWORD </dev/tty
-
+   read -erp "Enter a password for $AUTH_USERNAME: " AUTH_PASSWORD </dev/tty
    if test -z "$AUTH_PASSWORD";then
-      echo "Password cannot be empty" && password
+      echo "Password cannot be empty" && \
+        password
    else
-      export $AUTH_PASSWORD && traefik
+      export $AUTH_PASSWORD && \
+        traefik
    fi
 }
 
 function cfemail() {
+
 printf "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
    🚀   Cloudflare Email-Address
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
    read -erp "What is your CloudFlare Email Address : " EMAIL </dev/tty
 
+   regex="^[a-z0-9!#\$%&'*+/=?^_\`{|}~-]+(\.[a-z0-9!#$%&'*+/=?^_\`{|}~-]+)*@([a-z0-9]([a-z0-9-]*[a-z0-9])?\.)+[a-z0-9]([a-z0-9-]*[a-z0-9])?\$"
    if test -z "$EMAIL"; then
-      export $EMAIL && traefik
+     if [[ $EMAIL =~ $regex ]] ; then
+        echo "OK" && \
+          export $EMAIL && \
+            traefik
+     else
+        echo "CloudFlare Email is not valid" && \
+          echo "CloudFlare Email Address cannot be empty" && \
+            cfemail
+      fi
    else
-      echo "CloudFlare Email Address cannot be empty" && cfemail
+      echo "CloudFlare Email Address cannot be empty" && \
+        cfemail
    fi
 }
 
@@ -138,7 +155,6 @@ printf "━━━━━━━━━━━━━━━━━━━━━━━━
    🚀   Cloudflare Global-Key
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
    read -erp "What is your CloudFlare Global Key: " CFGLOBAL </dev/tty
-
    if test -z "$CFGLOBAL"; then
       export $CFGLOBAL && traefik
    else
@@ -151,7 +167,6 @@ printf "━━━━━━━━━━━━━━━━━━━━━━━━
    🚀   Cloudflare Zone-ID
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
    read -erp "Whats your CloudFlare Zone ID: " CFZONEID </dev/tty
-
    if test -z "$CFZONEID"; then
       export $CFZONEID && traefik
    else
@@ -201,6 +216,11 @@ ENCTOKEN=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 64 | head -n 1)
 # TOMLS / RULES !!
 
 ## ENV FILE
+
+
+TZONE=$(
+$(which timedatectl) | grep "Time zone:" | awk '{print $3}'
+)
 
 echo -e "##Environment for Docker-Compose
 ## TRAEFIK
