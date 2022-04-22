@@ -22,6 +22,7 @@ LABEL org.opencontainers.image.source="https://github.com/dockserver/container"
 
 ARG TARGETPLATFORM
 ARG BUILDPLATFORM
+ARG VERSION="3.15.4"
 
 RUN \
   echo "**** update packages ****" && \
@@ -31,8 +32,9 @@ RUN \
     apk add -U --update --no-cache bash ca-certificates shadow musl findutils coreutils && \
   echo "*** cleanup system ****" && \
     apk del --quiet --clean-protected --no-progress && \
-    rm -f /var/cache/apk/*
+  rm -f /var/cache/apk/*
 
-COPY ./apps/docker-create/root/ /
+COPY ./base/docker-create/root/ /
 
 ENTRYPOINT ["/bin/bash", "/start.sh"]
+#
