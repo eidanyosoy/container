@@ -178,15 +178,17 @@ printf "━━━━━━━━━━━━━━━━━━━━━━━━
 
 function addcfrecord() {
 
-for i in curl host jq bind-tools; do
-  apk add -U --update --no-cache $i &>/dev/null
+for i in curl jq bind-tools; do
+   apk add -U --update --no-cache $i &>/dev/null
 done
 
 ipv4=$($(which curl) -sX GET -4 https://ifconfig.co)
 ipv6=$($(which curl) -sX GET -6 https://ifconfig.co)
+checkipv4=$(dig @1.1.1.1 -4 ch txt whoami.cloudflare +short)
+checkipv6=$(dig @1.1.1.1 -6 ch txt whoami.cloudflare +short)
 
 ## IPv4
-if host $DOMAIN 1.1.1.1 | grep "has address" | grep "$ipv4"; then
+if [[ $checkipv4 == $ipv4 ]]; then
    echo "$DOMAIN is currently set to $ipv4; no changes needed"
 else
    ## GET ZONE ID
@@ -210,8 +212,8 @@ else
 fi
 
 ## IPv6
-if host $DOMAIN 1.1.1.1 | grep "has address" | grep "$ipv6"; then
-   echo "$DOMAIN is currently set to $ipv4; no changes needed"
+if [[ $checkipv6 == $ipv6 ]]; then
+   echo "$DOMAIN is currently set to $ipv6; no changes needed"
 else
    ## GET ZONE ID
    zoneid=$($(which curl) -sX GET "https://api.cloudflare.com/client/v4/zones?name=$EMAIL&status=active" \
@@ -243,6 +245,22 @@ function deploynow() {
 ## Authelia Password ? Docker socket mounten?   || tcpsocket or socket beides wird klappen
 ## D-o-D system ?  || done
 ## shell A Record hinzufügen bei CF ? || DONE
+## CLOUDFLARE TRUSTED IPS ändert sich immer wieder         {| done
+## Muss also gepullt werden und in Traefik geadded werden  {| done
+
+## CF TRUSTED IPS LIVE PULL AND MAP
+   if test -f "/tmp/trusted_cf_ips"; then $(which rm) -rf /tmp/trusted_cf_ips ; fi
+## IPv4 PULL
+   for i in `curl -sX GET "https://www.cloudflare.com/ips-v4"`; do echo $i >>/tmp/temp_trustedips ; done
+## IPv6 PULL
+   for i in `curl -sX GET "https://www.cloudflare.com/ips-v6"`; do echo $i >>/tmp/temp_trustedips ; done
+
+   cat /tmp/temp_trustedips | while IFS=$'\n' read -ra CFTIPS; do echo -ne "${CFTIPS[0]}" >>/tmp/trusted_cf_ips ; done
+   if test -f "/tmp/endtrustedips";then $(which rm) -rf /tmp/endtrustedips ; fi
+
+## REMOVE LATEST , TO PREVENT IP FAILS
+   cat /tmp/trusted_cf_ips | sed 's/.$//' >/tmp/endtrustedips
+   CFTRUSTEDIPS=$($(which cat) /tmp/endtrustedips)
 
 ## SERVERIP 
 SERVERIP=$(curl -s http://whatismijnip.nl | cut -d " " -f 5)
@@ -277,15 +295,14 @@ ENCTOKEN=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 64 | head -n 1)
 
 ## ENV FILE
 
-
-TZONE=$(
-$(which timedatectl) | grep "Time zone:" | awk '{print $3}'
-)
+TZONE=$($(which timedatectl) | grep "Time zone:" | awk '{print $3}')
+CFTRUSTEDIPS=$($(which cat) /tmp/endtrustedips)
 
 echo -e "##Environment for Docker-Compose
 ## TRAEFIK
 CLOUDFLARE_EMAIL=${EMAIL}
 CLOUDFLARE_API_KEY=${CFGLOBAL}
+CLOUDFLARE_TRUSTED_IPS=${CFTRUSTEDIPS}
 DOMAIN1_ZONE_ID=${CFZONEID}
 DOMAIN=${DOMAIN}
 CLOUDFLARED_UUID=${CLOUDFLARED_UUID:-TUNNEL_UUID_HERE}
