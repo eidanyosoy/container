@@ -281,7 +281,7 @@ ENCTOKEN=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 64 | head -n 1)
 ## ARGON PASSWORD HASHED
 $(which docker) pull authelia/authelia -q >/dev/null
   AUTHPASSWORDSECRET=$($(which docker) run authelia/authelia authelia hash-password $AUTH_PASSWORD -i 2 -k 32 -m 128 -p 8 -l 32 | sed 's/Password hash: //g')
-    AUTHELIAPASSWORDSECRET=$(echo $AUTH_PASSWORD | sed -e 's/[\/&]/\\&/g')/g)
+    AUTHELIAPASSWORDSECRET=$AUTH_PASSWORD
 
 ## ----
 
@@ -289,10 +289,6 @@ $(which docker) pull authelia/authelia -q >/dev/null
 
 ## USER CONFIG 
 ## AUTHELIA CONFIG
-
-$(which docker) pull authelia/authelia -q >/dev/null
-  AUTHPASSWORDSECRET=$($(which docker) run authelia/authelia authelia hash-password $AUTH_PASSWORD -i 2 -k 32 -m 128 -p 8 -l 32 | sed 's/Password hash: //g')
-    AUTHELIAPASSWORDSECRET=$(echo $AUTH_PASSWORD | sed -e 's/[\/&]/\\&/g')/g)
 
 ## ----
 
