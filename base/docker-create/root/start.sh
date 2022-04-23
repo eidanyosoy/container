@@ -45,16 +45,24 @@ echo "**** install build packages ****" && \
     docker &>/dev/null
 
 $(which ln) -s $(which python3) /usr/bin/python &>/dev/null
-  $(which python) -m $(which pip) install --no-warn-script-location --upgrade "pip==22.0.4" \
-    "setuptools==62.0.0" \
-      "cryptography==36.0.2" \
+$(which ln) -s $(which pip3) /usr/bin/pip &>/dev/null
+
+$(which curl) -fsSL https://bootstrap.pypa.io/get-pip.py -o /tmp/get-pip.py && \
+  $(which python) /tmp/get-pip.py \
+    --disable-pip-version-check \
+      --ignore-installed six \
+        "pip==22.0.4" \
+        "setuptools==62.0.0" \
+        "cryptography==36.0.2" \
         "docker-compose==1.29.2" \
-          "jinja-compose==0.0.1" \
-            "jinja2==3.1.1" &>/dev/null
+        "jinja-compose==0.0.1" \
+        "jinja2==3.1.1" \
+        "pyyaml" \
+        "tld" &>/dev/null
 
 echo "*** cleanup system ****" && \
   apk del --quiet --clean-protected --no-progress && \
-    rm -f /var/cache/apk/*
+    rm -f /var/cache/apk/* /tmp/get-pip.py
 
 echo '{
     "storage-driver": "overlay2",
@@ -375,8 +383,5 @@ printf "━━━━━━━━━━━━━━━━━━━━━━━━
    esac
 }
 
-
-
 traefik
-
 # E-O-F FUU shitbox
