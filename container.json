@@ -562,7 +562,7 @@ base docker-create
    "appfolder": "./base/docker-create",
    "newversion": "3.15.4",
    "baseimage": "alpine",
-   "description": "Docker + Traefik with Authelia and Cloudflare Protection",
+   "description": " !!! DEVERLOP STATUS !!! DO NOT TRY TO PULL THE IMAGE YOU NEED ACCESS TO THE REPOSITORY",
    "body": "Upgrading docker-create to 3.15.4",
    "user": "github-actions[bot]"
 }
@@ -624,7 +624,7 @@ base docker-ui
    "newversion": "3.15.4",
    "appversion": "3.15.4",
    "baseimage": "alpine",
-   "description": "DEVELOP STATUS DO NOT USE IN PRODUCTION ENVIROMENT",
+   "description": " !!! DEVERLOP STATUS !!! DO NOT TRY TO PULL THE IMAGE YOU NEED ACCESS TO THE REPOSITORY",
    "body": "Upgrading docker-ui to 3.15.4",
    "user": "github-actions[bot]"
 }
@@ -637,7 +637,7 @@ base dockserver-ui
    "newversion": "0.0.1",
    "appversion": "0.0.1",
    "baseimage": "pyrhon-alpine",
-   "description": "DEVELOP STATUS DO NOT USE IN PRODUCTION ENVIROMENT",
+   "description": " !!! DEVERLOP STATUS !!! DO NOT TRY TO PULL THE IMAGE | YOU NEED ACCESS TO THE REPOSITORY",
    "body": "Upgrading dockserver-ui to 0.0.1",
    "user": "dockserver image update[bot]"
 }
@@ -673,11 +673,11 @@ nightly docker-radarr-nightly
    "appname": "docker-radarr-nightly",
    "apppic": "./images/docker-radarr-nightly.png",
    "appfolder": "./nightly/docker-radarr-nightly",
-   "newversion": "4.2.0.6216",
+   "newversion": "4.2.0.6218",
    "appbranch": "nightly",
    "baseimage": "ghcr.io/dockserver/docker-alpine:latest",
    "description": "A fork of Sonarr to work with movies à la Couchpotato.",
-   "body": "Upgrading docker-radarr-nightly to 4.2.0.6216",
+   "body": "Upgrading docker-radarr-nightly to 4.2.0.6218",
    "user": "github-actions[bot]"
 }
 

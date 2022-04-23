@@ -30,7 +30,11 @@ NEWVERSION="${NEWVERSION#*release-}"
 NEWVERSION="${NEWVERSION}"
 
 HEADLINE="$(cat ./.templates/headline.txt)"
-DESCRIPTION="$(curl -u $USERNAME:$TOKEN -sX GET "$APPLINK" | jq -r '.description')"
+
+DESCRIPTION=" !!! DEVERLOP STATUS !!!
+   DO NOT TRY TO PULL THE IMAGE
+   YOU NEED ACCESS TO THE REPOSITORY"
+
 BASEIMAGE="alpine"
 PICTURE="./images/$APP.png"
 APPFOLDER="./$FOLDER/$APP"
