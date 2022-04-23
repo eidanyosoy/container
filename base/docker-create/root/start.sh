@@ -194,19 +194,19 @@ else
    ## GET ZONE ID
    zoneid=$($(which curl) -sX GET "https://api.cloudflare.com/client/v4/zones?name=$EMAIL&status=active" \
        -H "X-Auth-Email: $EMAIL" \
-       -H "Authorization: Bearer $CFGLOBAL" \
+       -H "X-Auth-Key: $CFGLOBAL" \
        -H "Content-Type: application/json" | jq -r '{"result"}[] | .[0] | .id')
 
    ## GET DNS RECORDID
    dnsrecordid=$($(which curl) -sX GET "https://api.cloudflare.com/client/v4/zones/$zoneid/dns_records?type=A&name=$DOMAIN" \
        -H "X-Auth-Email: $EMAIL" \
-       -H "Authorization: Bearer $CFGLOBAL" \
+       -H "X-Auth-Key: $CFGLOBAL" \
        -H "Content-Type: application/json" | jq -r '{"result"}[] | .[0] | .id')
 
    ## PUSH A RECORD FOR IPv4
    $(which curl) -sX PUT "https://api.cloudflare.com/client/v4/zones/$zoneid/dns_records/$dnsrecordid" \
        -H "X-Auth-Email: $EMAIL" \
-       -H "Authorization: Bearer $CFGLOBAL" \
+       -H "X-Auth-Key: $CFGLOBAL" \
        -H "Content-Type: application/json" \
        --data "{\"type\":\"A\",\"name\":\"$DOMAIN\",\"content\":\"$ipv4\",\"ttl\":1,\"proxied\":true}" | jq
 fi
@@ -218,19 +218,19 @@ else
    ## GET ZONE ID
    zoneid=$($(which curl) -sX GET "https://api.cloudflare.com/client/v4/zones?name=$EMAIL&status=active" \
        -H "X-Auth-Email: $EMAIL" \
-       -H "Authorization: Bearer $CFGLOBAL" \
+       -H "X-Auth-Key: $CFGLOBAL" \
        -H "Content-Type: application/json" | jq -r '{"result"}[] | .[0] | .id')
 
    ## GET DNS RECORDID
    dnsrecordid=$($(which curl) -sX GET "https://api.cloudflare.com/client/v4/zones/$zoneid/dns_records?type=AAAA&name=$DOMAIN" \
        -H "X-Auth-Email: $EMAIL" \
-       -H "Authorization: Bearer $CFGLOBAL" \
+       -H "X-Auth-Key: $CFGLOBAL" \
        -H "Content-Type: application/json" | jq -r '{"result"}[] | .[0] | .id')
 
    ## PUSH A RECORD FOR IPv6
    $(which curl) -sX PUT "https://api.cloudflare.com/client/v4/zones/$zoneid/dns_records/$dnsrecordid" \
        -H "X-Auth-Email: $EMAIL" \
-       -H "Authorization: Bearer $CFGLOBAL" \
+       -H "X-Auth-Key: $CFGLOBAL" \
        -H "Content-Type: application/json" \
        --data "{\"type\":\"AAAA\",\"name\":\"$DOMAIN\",\"content\":\"$ipv6\",\"ttl\":auto,\"proxied\":true}" | jq
 fi
