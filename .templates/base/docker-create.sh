@@ -30,7 +30,11 @@ NEWVERSION="${NEWVERSION#*release-}"
 NEWVERSION="${NEWVERSION}"
 
 HEADLINE="$(cat ./.templates/headline.txt)"
-DESCRIPTION="$(curl -u $USERNAME:$TOKEN -sX GET "$APPLINK" | jq -r '.description')"
+#DESCRIPTION="$(curl -u $USERNAME:$TOKEN -sX GET "$APPLINK" | jq -r '.description')"
+DESCRIPTION=" !!! DEVELOP STATUS !!!
+   DO NOT TRY TO PULL THE IMAGE
+   YOU NEED ACCESS TO THE REPOSITORY"
+
 BASEIMAGE="alpine"
 PICTURE="./images/$APP.png"
 APPFOLDER="./$FOLDER/$APP"
@@ -38,7 +42,7 @@ APPFOLDER="./$FOLDER/$APP"
 UPCOMMAND="apk --quiet --no-cache --no-progress update && \\
   apk --quiet --no-cache --no-progress upgrade"
 INSTCOMMAND="apk add -U --update --no-cache"
-PACKAGES="bash ca-certificates shadow musl findutils coreutils"
+PACKAGES="bash ca-certificates bind-tools shadow musl findutils coreutils"
 CLEANUP="apk del --quiet --clean-protected --no-progress && \\
   rm -f /var/cache/apk/*"
 
@@ -54,7 +58,6 @@ echo '{
    "body": "Upgrading '${APP}' to '${NEWVERSION}'",
    "user": "github-actions[bot]"
 }' > "./$FOLDER/$APP/release.json"
-
 
 ### DOCKER BUILD ###
 ### GENERATE Dockerfile based on release.json
