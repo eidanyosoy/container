@@ -31,6 +31,7 @@ echo "**** install build packages ****" && \
     ca-certificates \
     shadow \
     musl \
+    curl \
     findutils \
     coreutils \
     bind-tools \
@@ -64,6 +65,9 @@ echo "*** cleanup system ****" && \
   apk del --quiet --clean-protected --no-progress && \
     rm -f /var/cache/apk/* /tmp/get-pip.py
 
+[[ ! -d "/etc/docker" ]] && \
+  $(which mkdir) -p "/etc/docker"
+
 echo '{
     "storage-driver": "overlay2",
     "userland-proxy": false,
@@ -82,7 +86,6 @@ else
    export DOCKER_HOST='tcp://docker:2375'
 fi
 
-
 ####### START HERE THE MAIN SETTINGS #######
 function domain() {
 printf "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -98,6 +101,9 @@ printf "━━━━━━━━━━━━━━━━━━━━━━━━
    records yourself via the Cloudflare dashboard.
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
    read -erp "Which domain would you like to use?: " DOMAIN </dev/tty
+
+   echo $DOMAIN && sleep 20
+
    if [ -z "$(dig +short "$DOMAIN")" ]; then
       echo "$DOMAIN  is valid" && \
         export $DOMAIN && \
@@ -112,6 +118,7 @@ printf "━━━━━━━━━━━━━━━━━━━━━━━━
    🚀   Authelia Username
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
    read -erp "Enter your username for Authelia (eg. John Doe): " AUTH_USERNAME </dev/tty
+
    if test -z "$AUTH_USERNAME";then
       echo "Username cannot be empty" && \
         displayname
@@ -126,6 +133,7 @@ function password() {
    🚀   Authelia Password
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
    read -erp "Enter a password for $AUTH_USERNAME: " AUTH_PASSWORD </dev/tty
+
    if test -z "$AUTH_PASSWORD";then
       echo "Password cannot be empty" && \
         password
@@ -143,6 +151,7 @@ printf "━━━━━━━━━━━━━━━━━━━━━━━━
    read -erp "What is your CloudFlare Email Address : " EMAIL </dev/tty
 
    regex="^[a-z0-9!#\$%&'*+/=?^_\`{|}~-]+(\.[a-z0-9!#$%&'*+/=?^_\`{|}~-]+)*@([a-z0-9]([a-z0-9-]*[a-z0-9])?\.)+[a-z0-9]([a-z0-9-]*[a-z0-9])?\$"
+
    if test -z "$EMAIL"; then
      if [[ $EMAIL =~ $regex ]] ; then
         echo "OK" && \
@@ -164,6 +173,7 @@ printf "━━━━━━━━━━━━━━━━━━━━━━━━
    🚀   Cloudflare Global-Key
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
    read -erp "What is your CloudFlare Global Key: " CFGLOBAL </dev/tty
+
    if test -z "$CFGLOBAL"; then
       export $CFGLOBAL && traefik
    else
@@ -176,6 +186,7 @@ printf "━━━━━━━━━━━━━━━━━━━━━━━━
    🚀   Cloudflare Zone-ID
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
    read -erp "Whats your CloudFlare Zone ID: " CFZONEID </dev/tty
+
    if test -z "$CFZONEID"; then
       export $CFZONEID && traefik
    else
