@@ -41,6 +41,7 @@ echo "**** install build packages ****" && \
     libffi-dev \
     openssl-dev \
     gcc \
+    git \
     libc-dev \
     make \
     tzdata \
@@ -147,15 +148,13 @@ printf "━━━━━━━━━━━━━━━━━━━━━━━━
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
    read -erp "What is your CloudFlare Email Address : " EMAIL </dev/tty
    regex="^[a-z0-9!#\$%&'*+/=?^_\`{|}~-]+(\.[a-z0-9!#$%&'*+/=?^_\`{|}~-]+)*@([a-z0-9]([a-z0-9-]*[a-z0-9])?\.)+[a-z0-9]([a-z0-9-]*[a-z0-9])?\$"
-   if test -z "$EMAIL"; then
-     if [[ $EMAIL =~ $regex ]] ; then
-        echo "OK" && \
-          export CFEMAIL=$EMAIL && \
-            traefik
-     else
-        echo "CloudFlare Email is not valid" && \
-          echo "CloudFlare Email Address cannot be empty" && \
-            cfemail
+   if ! test -z "$EMAIL"; then
+      if [[ $EMAIL =~ $regex ]] ; then
+         export CFEMAIL=$EMAIL && \
+           traefik
+      else
+         echo "CloudFlare Email is not valid" && \
+           cfemail
       fi
    else
       echo "CloudFlare Email Address cannot be empty" && \
@@ -168,7 +167,7 @@ printf "━━━━━━━━━━━━━━━━━━━━━━━━
    🚀   Cloudflare Global-Key
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
    read -erp "What is your CloudFlare Global Key: " CFGLOBAL </dev/tty
-   if test -z "$CFGLOBAL"; then
+   if ! test -z "$CFGLOBAL"; then
       export CFGLOBALKEY=$CFGLOBAL && traefik
    else
       echo "CloudFlare Global-Key cannot be empty" && cfkey
@@ -180,7 +179,7 @@ printf "━━━━━━━━━━━━━━━━━━━━━━━━
    🚀   Cloudflare Zone-ID
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
    read -erp "Whats your CloudFlare Zone ID: " CFZONEID </dev/tty
-   if test -z "$CFZONEID"; then
+   if ! test -z "$CFZONEID"; then
       export CFZONEIDENT=$CFZONEID && traefik
    else
       echo "CloudFlare Zone ID cannot be empty" && cfzoneid
