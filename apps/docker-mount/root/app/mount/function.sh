@@ -235,12 +235,12 @@ fi
 function folderunmount() {
 
 for fod in /mnt/* ;do
-  basename "$fod" >/dev/null
-  FOLDER="$(basename -- $fod)"
-  IFS=- read -r <<< "$ACT"
-  if ! ls -1p "$fod/" >/dev/null ; then
-     $(which fusermount) -uzq /mnt/$FOLDER
-  fi
+    basename "$fod" >/dev/null
+    FOLDER="$(basename -- $fod)"
+    IFS=- read -r <<< "$ACT"
+    if ! ls -1p "$fod/" >/dev/null ; then
+       $(which fusermount) -uzq /mnt/$FOLDER && log "unmounting $FOLDER" || log "failed to unmounting $FOLDER"
+    fi
 done
 
 }
@@ -250,7 +250,6 @@ function rcmount() {
 if test -f "/tmp/rclone.sh"; then $(which rm) -f /tmp/rclone.sh; fi
 
 source /system/mount/mount.env
-folderunmount
 
 export MLOG=/system/mount/logs/rclone-union.log \
 CONFIG=/app/rclone/rclone.conf
@@ -310,14 +309,29 @@ fi
 ## EXECUTION IN BACKGROUND
 $(which screen) -S rclonerc -dm bash -c "$(which bash) /tmp/rclone.sh";
 
+## WAIT FOR RUNNING
+for i in rclone; do
+   if ! $(which pgrep) -x "$i" > /dev/null ; then
+      sleep 5
+   else
+      break
+   fi
+done
+
 }
 
 function rcmergerfs() {
 
 UFSPATH="/mnt/downloads=RW:/mnt/remotes=NC"
 MGFS="allow_other,rw,async_read=true,statfs_ignore=nc,use_ino,func.getattr=newest,category.action=all,category.create=mspmfs,cache.writeback=true,cache.symlinks=true,cache.files=auto-full,dropcacheonclose=true,nonempty,minfreespace=0,fsname=mergerfs"
-$(which mergerfs) -o ${MGFS} ${UFSPATH} /mnt/unionfs &>/dev/null
- 
+
+## TO RUN JUST ONCE
+if ! $(which pgrep) -x "mergerfs" > /dev/null; then
+   $(which mergerfs) -o ${MGFS} ${UFSPATH} /mnt/unionfs &>/dev/null
+else
+   $(which mergerfs) -o ${MGFS} ${UFSPATH} /mnt/unionfs &>/dev/null
+fi
+
 }
 
 function refreshVFS() {
@@ -334,9 +348,9 @@ function rckill() {
 
 source /system/mount/mount.env
 log ">> kill it with fire <<"
-screen -S rclonerc -X quit
+## GET NAME TO KILL ##
+$(which screen) -S $($(which screen) -ls | grep Detached | cut -d. -f2 | awk '{print $1}') -X quit
 folderunmount
-$(which fusermount) -uzq ${REMOTE} && log "unmounting ${REMOTE}" || { log "failed to unmounting ${REMOTE}"; exit 1; }
 
 }
 
@@ -373,16 +387,17 @@ function drivecheck() {
 function testrun() {
 
 ## force a start sleeping to fetch all options 
-rlog && sleep 30
+  rlog && sleep 5
+## FINAL LOOP
 
 while true; do
    source /system/mount/mount.env
-   if [ "$(ls -1p /mnt/remotes)" ] &&  [ "$(ls -1p /mnt/unionfs)" ]; then
-      log "${startuprcloneworks}" && sleep 30
+   if [ "$(ls -1p /mnt/remotes)" ] && [ "$(ls -1p /mnt/unionfs)" ]; then
+      log "${startuprcloneworks}" && sleep 360
    else
       rckill && rcmount && rcmergerfs && rcclean
    fi
-   envrenew && lang && sleep 360 && checkban
+   envrenew && lang && checkban && sleep 360
 done
 
 }
