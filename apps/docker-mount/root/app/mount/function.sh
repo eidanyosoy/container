@@ -322,7 +322,14 @@ done
 
 function rcmergerfs() {
 
-UFSPATH="/mnt/downloads=RW:/mnt/remotes=NC"
+source /system/mount/mount.env
+
+if [[ -d "${ADDITIONAL_MOUNT}" ]];then
+   UFSPATH="/mnt/downloads=RW:${ADDITIONAL_MOUNT}=${ADDITIONAL_MOUNT_PERMISSION}:/mnt/remotes=NC"
+else
+   UFSPATH="/mnt/downloads=RW:/mnt/remotes=NC"
+fi
+
 MGFS="allow_other,rw,async_read=true,statfs_ignore=nc,use_ino,func.getattr=newest,category.action=all,category.create=mspmfs,cache.writeback=true,cache.symlinks=true,cache.files=auto-full,dropcacheonclose=true,nonempty,minfreespace=0,fsname=mergerfs"
 
 ## TO RUN JUST ONCE
