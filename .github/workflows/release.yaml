@@ -117,7 +117,7 @@ jobs:
 
     - name: Install cosign
       if: ${{ steps.prep.outputs.version != '' }}
-      uses: sigstore/cosign-installer@bb61838e7ee5bf314f85f2e219b3706835fa6306
+      uses: sigstore/cosign-installer@536b37ec5d5b543420bdfd9b744c5965bd4d8730
       with:
         cosign-release: 'v1.7.1'
 
