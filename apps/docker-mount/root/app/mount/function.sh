@@ -209,26 +209,11 @@ function lang() {
 
 function rlog() {
 
-if [[ ! -f "/etc/logrotate.d/mount.conf" ]]; then
-cat > /etc/logrotate.d/mount.conf << EOF; $(echo)
-/system/mount/logs/*.log {
-    daily
-    copytruncate
-    create
-    maxage 7
-    compress
-    compresscmd /command/bzip2
-    dateformat ".%Y-%m-%d"
-    dateext
-    compressext ".bz2"
-    missingok
-    create 0777 abc abc
-}
-EOF
-logrotate -d /etc/logrotate.d/mount.conf &>/dev/null
-else
-   logrotate -d /etc/logrotate.d/mount.conf &>/dev/null
-fi
+  SIZE=$(du /system/mount/logs/ | cut -f 1)
+  ## 200MB max size of file
+  if [[ $SIZE -gt 200000 ]]; then
+     $(which truncate) -s 0 /system/mount/logs/*.log &>/dev/null
+  fi
 
 }
 
@@ -404,7 +389,7 @@ while true; do
    else
       rckill && rcmount && rcmergerfs && rcclean
    fi
-   envrenew && lang && checkban && sleep 360
+   rlog && envrenew && lang && checkban && sleep 360
 done
 
 }

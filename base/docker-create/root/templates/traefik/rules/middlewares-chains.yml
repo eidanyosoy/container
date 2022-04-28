@@ -1,0 +1,20 @@
+###########################################
+#          Traefik configuration          #
+###########################################
+
+http:
+  middlewares:
+    chain-no-auth:
+      chain:
+        middlewares:
+          - middlewares-rate-limit
+          - middlewares-secure-headers
+          - traefik-error-pages@docker
+
+    chain-authelia:
+      chain:
+        middlewares:
+          - middlewares-rate-limit
+          - middlewares-secure-headers
+          - traefik-error-pages@docker
+          - middlewares-authelia
