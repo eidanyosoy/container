@@ -389,7 +389,7 @@ while true; do
    else
       rckill && rcmount && rcmergerfs && rcclean
    fi
-   envrenew && lang && checkban && sleep 360
+   rlog && envrenew && lang && checkban && sleep 360
 done
 
 }
