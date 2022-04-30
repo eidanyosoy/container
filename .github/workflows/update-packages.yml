@@ -3,14 +3,14 @@ name: Update Packages
 on:
   workflow_dispatch:
   schedule:
-  - cron: "0 */12 * * *"
+  - cron: "0 0 */7 * *"
 
 permissions: read-all
 
 jobs:
   get-packages:
-    #runs-on: ubuntu-20.04
-    runs-on: self-hosted
+    runs-on: ubuntu-20.04
+    #runs-on: self-hosted
     permissions:
       packages: write
       id-token: write

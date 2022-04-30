@@ -23,8 +23,8 @@ env:
 jobs:
   changes:
     name: Get changes
-    #runs-on: ubuntu-20.04
-    runs-on: self-hosted
+    runs-on: ubuntu-20.04
+    #runs-on: self-hosted
     outputs:
       matrix: "{\"container\": ${{ steps.reduce.outputs.containers }} }"
     steps:
@@ -52,8 +52,8 @@ jobs:
         echo ::set-output name=containers::${CONTAINERS}
   build:
     name: Build Docker
-    #runs-on: ubuntu-20.04
-    runs-on: self-hosted
+    runs-on: ubuntu-20.04
+    #runs-on: self-hosted
     continue-on-error: true
 
     permissions:
@@ -119,7 +119,7 @@ jobs:
       if: ${{ steps.prep.outputs.version != '' }}
       uses: sigstore/cosign-installer@536b37ec5d5b543420bdfd9b744c5965bd4d8730
       with:
-        cosign-release: 'v1.7.1'
+        cosign-release: 'v1.8.0'
 
     - name: Login in Registry || major
       if: ${{ steps.prep.outputs.version != '' }}
