@@ -9,7 +9,7 @@ services:
     environment:
       - TRAEFIK_VERSION=2
       - CF_EMAIL=email@example.com
-      - CF_TOKEN=fbSx3dk3A3mJ6UukLQ7zRbo63H5UdsGSCqQnTvbJDgyQaTp
+      - CF_TOKEN=fbSx3dk"3.9"mJ6UukLQ7zRbo63H5UdsGSCqQnTvbJDgyQaTp
 
       - TARGET_DOMAIN=host.example.org
       - DOMAIN1=example.org
