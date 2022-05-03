@@ -54,12 +54,12 @@ sed -i "s/max_execution_time = 30/max_execution_time = 120/" /etc/php/7.4/fpm/ph
 sed -i "s/memory_limit = -1/memory_limit = 2048M/" /etc/php/7.4/fpm/php.ini
 echo "date.timezone = $TZ" >> /etc/php/7.4/fpm/php.ini
 
-sed -i "s/max_execution_time = 30/max_execution_time = 120/" /etc/php/7.4/cli/php.ini
-sed -i "s/memory_limit = -1/memory_limit = 2048M/" /etc/php/7.4/apache2/php.ini
+sed -i "s/max_execution_time = 30/max_execution_time = 120/" /etc/php/8.1/cli/php.ini
+sed -i "s/memory_limit = -1/memory_limit = 2048M/" /etc/php/8.1/apache2/php.ini
 echo "date.timezone = $TZ" >> /etc/php/7.4/cli/php.ini
 
-sed -i "s/max_execution_time = 30/max_execution_time = 120/" /etc/php/7.4/apache2/php.ini
-sed -i "s/memory_limit = 128M/memory_limit = -1/" /etc/php/7.4/apache2/php.ini
+sed -i "s/max_execution_time = 30/max_execution_time = 120/" /etc/php/8.1/apache2/php.ini
+sed -i "s/memory_limit = 128M/memory_limit = -1/" /etc/php/8.1/apache2/php.ini
 echo "date.timezone = $TZ" >> /etc/php/7.4/apache2/php.ini
 
 # install elasticsearch
@@ -72,9 +72,9 @@ apt update -yqq && apt install openjdk-8-jdk elasticsearch -yqq
 a2dissite 000-default.conf
 a2ensite newznab.conf
 a2enmod proxy_fcgi setenvif
-a2enconf php7.4-fpm
+a2enconf php8.1-fpm
 a2enmod rewrite
-service php7.4-fpm reload
+service php8.1-fpm reload
 service memcached start
 service apache2 restart
 service elasticsearch start
