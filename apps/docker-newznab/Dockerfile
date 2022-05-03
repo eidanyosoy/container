@@ -1,5 +1,4 @@
 FROM ubuntu:latest 
-MAINTAINER Fekhoo <fekhoo@fekhoo.net>
 ARG DEBIAN_FRONTEND=noninteractive
 
 # Add Variables
@@ -7,13 +6,16 @@ ENV NNUSER="svnplus" \
     NNPASS="svnplu5"
     
 # Install required packages
-RUN apt-get -y update && \
-    apt-get install -yq ssh screen tmux apache2 php php-fpm php-dev \
-    php-pear php-gd php-mysql php-memcache php-curl php-json php-mbstring \
-    unrar lame mediainfo subversion ffmpeg memcached nano
+RUN apt update -yqq && apt upgrade -yqq && \
+    apt-get install -yq \
+       ssh screen tmux apache2 php php-fpm php-dev \
+       php-pear php-gd php-mysql php-memcache php-curl php-json php-mbstring \
+       unrar lame mediainfo subversion ffmpeg memcached nano
     
 # Creating Newznab Folders from SVN
-RUN mkdir /var/www/newznab/ && \
+RUN mkdir /var/www/newznab/ \
+          /var/www/newznab/htdocs \
+          /var/www/newznab/logs && \
     svn export --no-auth-cache --force --username $NNUSER --password $NNPASS svn://svn.newznab.com/nn/branches/nnplus /var/www/newznab/ && \
     chmod 777 /var/www/newznab/www/lib/smarty/templates_c && \
     chmod 777 /var/www/newznab/www/covers/movies && \
@@ -26,14 +28,14 @@ RUN mkdir /var/www/newznab/ && \
     chmod -R 777 /var/www/newznab/www/covers
     
 #Add Newznab Config File  
-COPY config.php /var/www/newznab/www/config.php
+COPY ./apps/docker-newznab/config.php /var/www/newznab/www/config.php
 RUN chmod 777 /var/www/newznab/www/config.php
 
 # Configure Apache for Newznab site
-COPY newznab.conf /etc/apache2/sites-available/newznab.conf
+COPY ./apps/docker-newznab/newznab.conf /etc/apache2/sites-available/newznab.conf
 
 #Add newznab processing & Config script
-COPY entrypoint.sh /entrypoint.sh
+COPY ./apps/docker-newznab/entrypoint.sh /entrypoint.sh
 RUN chmod u+x /entrypoint.sh
 
 EXPOSE 80
