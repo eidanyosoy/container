@@ -1,0 +1,10 @@
+{
+   "appname": "docker-newznab",
+   "apppic": "./images/docker-newznab.png",
+   "appfolder": "./apps/docker-newznab",
+   "newversion": "20.04",
+   "baseimage": "ubuntu",
+   "description": "Docker image  for docker-newznab",
+   "body": "Upgrading docker-newznab to baseimage: ubuntu:20.04",
+   "user": "dockserver image update[bot]"
+}

@@ -22,4 +22,8 @@
    git clone --quiet --depth 1  https://github.com/clinton-hall/nzbToMedia.git /config/scripts/ && \
    rm -rf /config/scripts/.gi*
 
-chown -R abc:abc "/config/scripts" &> /dev/null
+chown -R abc:abc "/config/scripts" &>/dev/null
+
+for i in `ls /config/scripts/`; do
+    chmod a+x /config/scripts/$i &>/dev/null
+done
