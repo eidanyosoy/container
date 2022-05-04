@@ -3,10 +3,10 @@
    "apppic": "./images/docker-dockserverupdate.png",
    "appfolder": "./apps/docker-dockserverupdate",
    "appbranch": "master",
-   "newversion": "3.15.4",
-   "appversion": "3.15.4",
+   "newversion": "",
+   "appversion": "",
    "baseimage": "alpine",
    "description": "Docker + Traefik with Authelia and Cloudflare Protection",
-   "body": "Upgrading docker-dockserverupdate to 3.15.4",
+   "body": "Upgrading docker-dockserverupdate to ",
    "user": "github-actions[bot]"
 }
