@@ -111,7 +111,7 @@ jobs:
 
     - name: Set up QEMU
       if: ${{ steps.prep.outputs.version != '' }}
-      uses: docker/setup-qemu-action@v1.2.0
+      uses: docker/setup-qemu-action@v2.0.0
       with:
         platforms: ${{ steps.prep.outputs.platformout }}
 
