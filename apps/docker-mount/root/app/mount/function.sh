@@ -247,10 +247,16 @@ cat > /tmp/rclone.sh << EOF; $(echo)
 ## remove test file
 if test -f "/tmp/rclone.running"; then rm -f /tmp/rclone.running ; fi
 
-## minimal rcd
+## minimal rcd with rclone gui
 $(which rclone) rcd \\
---rc-user=${RC_USER} --rc-pass=${RC_PASSWORD} \\
---config=${CONFIG} &
+--rc-user=${RC_USER} \\
+--rc-pass=${RC_PASSWORD} \\
+--config=${CONFIG} \\
+--rc-web-gui \\
+--rc-realm=dockserver \\
+--rc-web-gui-force-update=force \\
+--rc-web-gui-no-open-browser \\
+--rc-addr "0.0.0.0:5572" &
 
 #####
 ## start rclone mount
@@ -258,16 +264,22 @@ $(which rclone) mount remote: /mnt/remotes \\
 --config=${CONFIG} \\
 --log-file=${MLOG} \\
 --log-level=${LOGLEVEL} \\
---uid=${PUID} --gid=${PGID} \\
---umask=${UMASK} --no-checksum \\
---allow-other --allow-non-empty \\
---timeout=1h --use-mmap \\
---ignore-errors --poll-interval=${POLL_INTERVAL} \\
+--uid=${PUID} \\
+--gid=${PGID} \\
+--umask=${UMASK} \\
+--no-checksum \\
+--allow-other \\
+--allow-non-empty \\
+--timeout=1h \\
+--use-mmap \\
+--ignore-errors \\
+--poll-interval=${POLL_INTERVAL} \\
 --user-agent=${UAGENT} \\
 --cache-dir=${TMPRCLONE} \\
 --tpslimit=${TPSLIMIT} \\
 --tpslimit-burst=${TPSBURST} \\
---no-modtime --no-seek \\
+--no-modtime \\
+--no-seek \\
 --drive-use-trash=${DRIVETRASH} \\
 --drive-stop-on-upload-limit \\
 --drive-server-side-across-configs \\
@@ -330,9 +342,13 @@ function refreshVFS() {
 
 source /system/mount/mount.env
 log ">> run vfs refresh <<"
-$(which rclone) rc vfs/refresh recursive=true --fast-list \
---rc-user=${RC_USER} --rc-pass=${RC_PASSWORD} --config=${CONFIG} \
---log-file=${RLOG} --log-level=${LOGLEVEL_RC} &>/dev/null
+$(which rclone) rc vfs/refresh recursive=true \
+--fast-list \
+--rc-user=${RC_USER} \
+--rc-pass=${RC_PASSWORD} \
+--config=${CONFIG} \
+--log-file=${RLOG} \
+--log-level=${LOGLEVEL_RC} &>/dev/null
 
 }
 
@@ -350,7 +366,8 @@ function rcclean() {
 
 source /system/mount/mount.env
 log ">> run fs cache clear <<"
-$(which rclone) rc fscache/clear --fast-list \
+$(which rclone) rc fscache/clear \
+--fast-list \
 --rc-user=${RC_USER} --rc-pass=${RC_PASSWORD} \
 --config=${CONFIG} --log-file=${CLOG} --log-level=${LOGLEVEL_RC}
 
