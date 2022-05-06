@@ -254,7 +254,6 @@ $(which rclone) rcd \\
 --config=${CONFIG} \\
 --rc-web-gui \\
 --rc-realm=dockserver \\
---rc-web-gui-force-update=force \\
 --rc-web-gui-no-open-browser \\
 --rc-addr "0.0.0.0:5572" &
 
