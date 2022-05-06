@@ -123,14 +123,14 @@ jobs:
 
     - name: Login in Registry || major
       if: ${{ steps.prep.outputs.version != '' }}
-      uses: docker/login-action@v1.14.1
+      uses: docker/login-action@v2.0.0
       with:
         registry: ${{ secrets.DOCKER_REGISTRY }}
         username: ${{ github.actor }}
         password: ${{ secrets.CR_PAT }}
 
     - name: Login in Registry || mirror
-      uses: docker/login-action@v1.14.1
+      uses: docker/login-action@v2.0.0
       if: ${{ steps.prep.outputs.version != '' }}
       with:
         registry: ${{ secrets.OWN_REGISTRY }}
