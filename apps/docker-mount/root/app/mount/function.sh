@@ -249,8 +249,7 @@ if test -f "/tmp/rclone.running"; then rm -f /tmp/rclone.running ; fi
 
 ## minimal rcd with rclone gui
 $(which rclone) rcd \\
---rc-user=${RC_USER} \\
---rc-pass=${RC_PASSWORD} \\
+--rc-no-auth  \\
 --config=${CONFIG} \\
 --rc-web-gui \\
 --rc-realm=dockserver \\
