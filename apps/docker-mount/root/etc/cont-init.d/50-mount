@@ -347,9 +347,6 @@ chmod -cR 777 \
    /system \
    /app \
    /root \
-   /mnt \
-   /tmp/screens \
-   /tmp/uscreens \
    /etc/logrotate.d \
    $(which rclone) \
    $(which mergerfs) &>/dev/null
@@ -358,7 +355,6 @@ chown -cR abc:abc \
    /system \
    /app \
    /root \
-   /mnt \
    /tmp/uscreens \
    /etc/logrotate.d \
    $(which rclone) \
