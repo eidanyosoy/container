@@ -49,7 +49,7 @@ INSTCOMMAND="apk add -U --update --no-cache"
 PACKAGES="git bash ca-certificates shadow"
 
 GITAPP="git clone --quiet https://github.com/MauriceNino/dashdot.git /app"
-CLEANUP="rm -rf /app/*.md /app/_doc /app/cli /app/Dockerfile docker-compose.yml"
+CLEANUP="rm -rf /app/*.md /app/_doc /app/Dockerfile /app/docker-compose.yml"
 
 ## FINALIMAGE
 FINALIMAGE="node:16-alpine3.15"
