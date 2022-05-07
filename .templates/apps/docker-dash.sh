@@ -43,7 +43,8 @@ NEWVERSION="${NEWVERSION}"
 
 HEADLINE="$(cat ./.templates/headline.txt)"
 DESCRIPTION="$(curl -u $USERNAME:$TOKEN -sX GET "$APPLINK" | jq -r '.description')"
-##BASEIMAGE="alpine"
+BASEIMAGE="alpine"
+
 INSTCOMMAND="apk add -U --update --no-cache"
 PACKAGES="git bash ca-certificates shadow"
 
