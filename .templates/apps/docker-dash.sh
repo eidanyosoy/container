@@ -19,12 +19,6 @@ APP=$2
 USERNAME=$3
 TOKEN=$4
 
-if [ ! -f "./$FOLDER/$APP/Dockerfile" ];then 
-   mkdir -p ./$FOLDER/$APP && \
-   touch ./$FOLDER/$APP/Dockerfile && \
-   touch ./$FOLDER/$APP/release.json
-fi
-
 ### APP SETTINGS ###
 
 BASENEWVERSION=$(curl -sX GET "https://registry.hub.docker.com/v1/repositories/library/alpine/tags" \
@@ -98,7 +92,16 @@ FROM '"${FINALIMAGE}"'
 
 COPY '"${BUILDSTAGE}"'
 
+ENV DASHDOT_OS_WIDGET_ENABLE="'"true"'" \
+    DASHDOT_CPU_WIDGET_ENABLE="'"true"'" \
+    DASHDOT_CPU_DATAPOINTS="'"20"'" \
+    DASHDOT_CPU_POLL_INTERVAL="'"1000"'" \
+    DASHDOT_RAM_WIDGET_ENABLE="'"true"'" \
+    DASHDOT_RAM_POLL_INTERVAL="'"1000"'" \
+    DASHDOT_STORAGE_WIDGET_ENABLE="'"true"'"
+
 WORKDIR /app
+
 RUN \
   echo "'"**** install final packages ****"'" && \
     '"${INSTCOMMAND}"' '"${PACKAGESBUILD}"' && \
