@@ -33,7 +33,16 @@ FROM node:16-alpine3.15
 
 COPY --from=buildstage /app /app
 
+ENV DASHDOT_OS_WIDGET_ENABLE="true" \
+    DASHDOT_CPU_WIDGET_ENABLE="true" \
+    DASHDOT_CPU_DATAPOINTS="20" \
+    DASHDOT_CPU_POLL_INTERVAL="1000" \
+    DASHDOT_RAM_WIDGET_ENABLE="true" \
+    DASHDOT_RAM_POLL_INTERVAL="1000" \
+    DASHDOT_STORAGE_WIDGET_ENABLE="true"
+
 WORKDIR /app
+
 RUN \
   echo "**** install final packages ****" && \
     apk add -U --update --no-cache ca-certificates dmidecode util-linux lsblk && \
