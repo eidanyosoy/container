@@ -60,6 +60,19 @@ apps docker-cloudflared
    "user": "github-actions[bot]"
 }
 
+apps docker-dash
+{
+   "appname": "docker-dash",
+   "apppic": "",
+   "appfolder": "./apps/docker-dash",
+   "newversion": "1054b4e2d7262d841fa83cde624f1138ad7bd23a",
+   "baseimage": "",
+   "baseversion": "3.15.4",
+   "description": "A simple, modern server dashboard, primarily used by smaller private servers",
+   "body": "Upgrading docker-dash to 1054b4e2d7262d841fa83cde624f1138ad7bd23a",
+   "user": "dockserver-image[bot]"
+}
+
 apps docker-deluge
 {
    "appname": "docker-deluge",
