@@ -27,7 +27,7 @@ RUN \
     apk add -U --update --no-cache git bash ca-certificates shadow && \
     mkdir -p /app && \
     git clone --quiet https://github.com/MauriceNino/dashdot.git /app && \
-    rm -rf /app/*.md /app/_doc /app/cli /app/Dockerfile docker-compose.yml
+    rm -rf /app/*.md /app/_doc /app/Dockerfile /app/docker-compose.yml
 
 FROM node:16-alpine3.15
 
