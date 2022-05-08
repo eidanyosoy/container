@@ -249,12 +249,10 @@ if test -f "/tmp/rclone.running"; then rm -f /tmp/rclone.running ; fi
 
 ## minimal rcd with rclone gui
 $(which rclone) rcd \\
---rc-user=${RC_USER} \\
---rc-pass=${RC_PASSWORD} \\
+--rc-no-auth  \\
 --config=${CONFIG} \\
 --rc-web-gui \\
 --rc-realm=dockserver \\
---rc-web-gui-force-update=force \\
 --rc-web-gui-no-open-browser \\
 --rc-addr "0.0.0.0:5572" &
 
@@ -301,9 +299,10 @@ touch /tmp/rclone.running
 EOF
 ## SET PERMISSIONS 
 if test -f "/tmp/rclone.sh"; then
-   $(which chmod) 755 /tmp/rclone.sh
+   $(which chmod) 755 /tmp/rclone.sh &>/dev/null
 fi
 ## EXECUTION IN BACKGROUND
+$(which chmod) 700 /tmp/screens/S-root &>/dev/null
 $(which screen) -S rclonerc -dm bash -c "$(which bash) /tmp/rclone.sh";
 
 ## WAIT FOR RUNNING

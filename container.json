@@ -60,6 +60,19 @@ apps docker-cloudflared
    "user": "github-actions[bot]"
 }
 
+apps docker-dash
+{
+   "appname": "docker-dash",
+   "apppic": "",
+   "appfolder": "./apps/docker-dash",
+   "newversion": "1054b4e2d7262d841fa83cde624f1138ad7bd23a",
+   "baseimage": "alpine",
+   "baseversion": "3.15.4",
+   "description": "A simple, modern server dashboard, primarily used by smaller private servers",
+   "body": "Upgrading docker-dash to 1054b4e2d7262d841fa83cde624f1138ad7bd23a",
+   "user": "dockserver-image[bot]"
+}
+
 apps docker-deluge
 {
    "appname": "docker-deluge",
@@ -159,9 +172,9 @@ apps docker-fenrus
    "newversion": "3.15.4",
    "appbranch": "master",
    "baseimage": "alpine",
-   "appversion": "43bd87bcf2a26b65589427dde9610a7dd8486995",
+   "appversion": "42085f832dea3e426a106f0ca3ed36769529d05c",
    "description": "A personal home page for quick access to all your personal apps/sites.",
-   "body": "Upgrading docker-fenrus to 43bd87bcf2a26b65589427dde9610a7dd8486995",
+   "body": "Upgrading docker-fenrus to 42085f832dea3e426a106f0ca3ed36769529d05c",
    "user": "github-actions[bot]"
 }
 
@@ -182,11 +195,11 @@ apps docker-jackett
    "appname": "docker-jackett",
    "apppic": "./images/docker-jackett.png",
    "appfolder": "./apps/docker-jackett",
-   "newversion": "0.20.1018",
+   "newversion": "0.20.1027",
    "appbranch": "master",
    "baseimage": "ghcr.io/linuxserver/baseimage-ubuntu:bionic",
    "description": "API Support for your favorite torrent trackers",
-   "body": "Upgrading docker-jackett to 0.20.1018",
+   "body": "Upgrading docker-jackett to 0.20.1027",
    "user": "github-actions[bot]"
 }
 
@@ -341,11 +354,11 @@ apps docker-prowlarr
    "appname": "docker-prowlarr",
    "apppic": "./images/docker-prowlarr.png",
    "appfolder": "./apps/docker-prowlarr",
-   "newversion": "0.3.0.1730",
+   "newversion": "0.3.0.1755",
    "appbranch": "nightly",
    "baseimage": "ghcr.io/dockserver/docker-alpine:latest",
    "description": "null",
-   "body": "Upgrading docker-prowlarr to 0.3.0.1730",
+   "body": "Upgrading docker-prowlarr to 0.3.0.1755",
    "user": "github-actions[bot]"
 }
 
@@ -393,11 +406,11 @@ apps docker-readarr
    "appname": "docker-readarr",
    "apppic": "./images/docker-readarr.png",
    "appfolder": "./apps/docker-readarr",
-   "newversion": "0.1.1.1314",
+   "newversion": "0.1.1.1318",
    "appbranch": "nightly",
    "baseimage": "ghcr.io/dockserver/docker-alpine:latest",
    "description": "null",
-   "body": "Upgrading docker-readarr to 0.1.1.1314",
+   "body": "Upgrading docker-readarr to 0.1.1.1318",
    "user": "github-actions[bot]"
 }
 
@@ -508,7 +521,7 @@ apps docker-wiki
    "appbranch": "master",
    "newversion": "3.15.4",
    "appversion": "1.4.25",
-   "wikiversion": "8.2.13",
+   "wikiversion": "8.2.14",
    "baseimage": "alpine",
    "description": "Docker + Traefik with Authelia and Cloudflare Protection",
    "body": "Upgrading docker-wiki to 3.15.4",
@@ -685,11 +698,11 @@ nightly docker-radarr-nightly
    "appname": "docker-radarr-nightly",
    "apppic": "./images/docker-radarr-nightly.png",
    "appfolder": "./nightly/docker-radarr-nightly",
-   "newversion": "4.2.0.6243",
+   "newversion": "4.2.0.6246",
    "appbranch": "nightly",
    "baseimage": "ghcr.io/dockserver/docker-alpine:latest",
    "description": "A fork of Sonarr to work with movies à la Couchpotato.",
-   "body": "Upgrading docker-radarr-nightly to 4.2.0.6243",
+   "body": "Upgrading docker-radarr-nightly to 4.2.0.6246",
    "user": "github-actions[bot]"
 }
 
@@ -698,10 +711,10 @@ nightly docker-sabnzbd-nightly
    "appname": "docker-sabnzbd-nightly",
    "apppic": "./images/docker-sabnzbd-nightly.png",
    "appfolder": "./nightly/docker-sabnzbd-nightly",
-   "newversion": "cb25e0dcb3dada2c4eea6b5c95d20e9b1616a7cf",
+   "newversion": "087326ed3248878c4a9249972ce43129bf298471",
    "appbranch": "develop",
    "description": "SABnzbd - The automated Usenet download tool",
-   "body": "Upgrading docker-sabnzbd-nightly to cb25e0dcb3dada2c4eea6b5c95d20e9b1616a7cf",
+   "body": "Upgrading docker-sabnzbd-nightly to 087326ed3248878c4a9249972ce43129bf298471",
    "user": "github-actions[bot]"
 }
 

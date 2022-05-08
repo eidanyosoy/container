@@ -1,4 +1,5 @@
-#!/usr/bin/with-contenv bash
+#!/usr/bin/env bash
+# shellcheck shell=bash
 
 if [[ ${VERSION} == "" ]]; then
    VERSION=latest
@@ -9,7 +10,9 @@ fi
 PLEX_TOKEN=$(sed -n 's/.*PlexOnlineToken="//p' "/config/Library/Application Support/Plex Media Server/Preferences.xml" | sed "s/\".*//")
 INSTALLED_VERSION=$(dpkg-query -W -f='${Version}' plexmediaserver)
 PLEX_ARCH=$(arch)
-apt-get update -y && apt-get install -y curl wget jq aria2
+
+apt-get update -yqq &>/dev/null
+ apt-get install -yqq curl wget jq aria2 &>/dev/null
 
 if [[ "${PLEX_ARCH}" = x86_64 ]]; then
     PLEX_URL_ARCH="amd64"
@@ -31,16 +34,17 @@ if [[ "$REMOTE_VERSION" == $INSTALLED_VERSION ]]; then
    exit 0
 else
    echo "Atempting to upgrade to: $REMOTE_VERSION"
-   rm -f /tmp/plex*.deb
-   aria2c -d /tmp -o plex.deb "${PLEX_DOWNLOAD}/${REMOTE_VERSION}/debian/plexmediaserver_${REMOTE_VERSION}_${PLEX_URL_ARCH}.deb"
+     rm -f /tmp/plex*.deb
+       aria2c -d /tmp -o plex.deb "${PLEX_DOWNLOAD}/${REMOTE_VERSION}/debian/plexmediaserver_${REMOTE_VERSION}_${PLEX_URL_ARCH}.deb" &>/dev/null
    last=$?
    if [[ "$last" -gt "0" ]] || [[ $(stat -c %s /tmp/plex.deb) -lt 10000 ]]; then
-      apt-get remove -yqq wget jq aria2 && apt-get purge -yqq \
-      && rm -rf /tmp/plex*.deb \
-      && exit 0
+      apt-get remove -yqq wget jq aria2 &>/dev/null
+       apt-get purge -yqq &>/dev/null
+        rm -rf /tmp/plex*.deb
+          exit 0
    else
-      dpkg -i --force-confold /tmp/plex*.deb \
-      && rm -rf /tmp/plex*.deb \
-      && exit 0
+      dpkg -i --force-confold /tmp/plex*.deb &>/dev/null
+        rm -rf /tmp/plex*.deb \
+          exit 0
    fi
 fi
