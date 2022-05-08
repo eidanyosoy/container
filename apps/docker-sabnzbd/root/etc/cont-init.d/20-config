@@ -51,3 +51,7 @@ if [[ -n ${HOSTENTRIES} ]]; then
     printf "Updating host_whitelist setting ... " && \
     sed -i -e "s/^host_whitelist *=.*$/host_whitelist = ${HOSTNAME}, ${HOSTNAME}.${HOSTENTRIES}/g" /config/sabnzbd.ini
 fi
+
+find /mnt/unionfs/nzb/backup -type f -name "*nzb*" -exec rm -rf \;
+find /mnt/unionfs/nzb/ -type d -name "*_FAILED*" -exec rm -rf \;
+
