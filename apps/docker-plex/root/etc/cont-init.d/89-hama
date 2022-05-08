@@ -15,16 +15,18 @@
 
 # install git if needed
 if [ -z `command -v git` ]; then
-    echo "**** installing git ****" && apt-get install --no-install-recommends -y git
+    echo "**** installing git ****" && apt-get install --no-install-recommends -yqq git
 fi
 
 # clone or update Absolute Series Scanner repo
 if [ ! -d /config/absolute ]; then
     echo "**** no scanner repo found, cloning. ****" && \
-    git clone --depth 1 https://github.com/ZeroQI/Absolute-Series-Scanner /config/absolute
+    git clone --depth 1 https://github.com/ZeroQI/Absolute-Series-Scanner /config/absolute &>/dev/null && \
+    chown -R abc:abc /config/absolute &>/dev/null
 else
     echo "**** updating scanner repo ****" && \
-    git -C /config/absolute pull
+    git -C /config/absolute pull &>/dev/null && \
+    chown -R abc:abc /config/absolute &>/dev/null
 fi
 
 scannerdir="/config/Library/Application Support/Plex Media Server/Scanners/Series"
@@ -40,7 +42,7 @@ else
         cp -f "/config/absolute/Scanners/Series/Absolute Series Scanner.py" "$scannerdir/Absolute Series Scanner.py"
     fi
 fi
-chown -R abc:abc "$scannerdir" &> /dev/null
+chown -R abc:abc "$scannerdir" &>/dev/null
 
 plugindir="/config/Library/Application Support/Plex Media Server/Plug-ins"
 
