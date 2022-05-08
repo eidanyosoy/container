@@ -1,41 +1,57 @@
 #!/usr/bin/with-contenv bash
 
 mkdir -p \
-    /mnt/downloads/nzb \
-    /mnt/incomplete/nzb
+    /mnt/unionfs/nzb \
+    /mnt/unionfs/nzb/incomplete \
+    /mnt/unionfs/nzb/watch \
+    /mnt/unionfs/nzb/backup
 
 chown abc:abc \
-    /mnt/downloads/nzb \
-    /mnt/incomplete/nzb
+    /mnt/unionfs/nzb \
+    /mnt/unionfs/nzb/incomplete \
+    /mnt/unionfs/nzb/watch \
+    /mnt/unionfs/nzb/backup
 
 if [[ ! -f "/config/sabnzbd.ini" ]]; then
-    printf "Copying over default configuration ... "
-    mkdir -p /config/sabnzbd && cp /app/sabnzbd/sabnzbd.ini /config/sabnzbd.ini
+     printf "Copying over default configuration ... "
+     mkdir -p /config/sabnzbd && cp /app/sabnzbd/sabnzbd.ini /config/sabnzbd.ini
 
-    printf "Creating api keys ... "
-
-    api_key=$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 32 | head -n 1)
-    nzb_key=$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 32 | head -n 1)
-
-    printf "Change Values ... "
-    dlfolder="/mnt/downloads/nzb"
-    infolder="/mnt/incomplete/nzb"
-    wtnzb="/mnt/nzb"
-    cfree="25G"
-    wtn2="/mnt/nzb/watch"
-
-    sed -i -e "s/^api_key *=.*$/api_key = ${api_key}/g" /config/sabnzbd.ini
-    sed -i -e "s/^nzb_key *=.*$/nzb_key = ${nzb_key}/g" /config/sabnzbd.ini
-    sed -i -e "s/^download_dir *=.*$/download_dir = ${dlfolder}/g" /config/sabnzbd.ini
-    sed -i -e "s/^complete_dir *=.*$/complete_dir = ${infolder}/g" /config/sabnzbd.ini
-    sed -i -e "s/^nzb_backup_dir *=.*$/nzb_backup_dir = ${wtnzb}/g" /config/sabnzbd.ini
-    sed -i -e "s/^complete_free *=.*$/complete_free = ${cfree}/g" /config/sabnzbd.ini
-    sed -i -e "s/^dirscan_dir *=.*$/dirscan_dir = ${wtn2}/g" /config/sabnzbd.ini
-    sed -i -e "s/^download_free *=.*$/download_free = ${cfree}/g" /config/sabnzbd.ini
-
+     printf "Creating api keys ... "
+     api_key=$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 32 | head -n 1)
+     nzb_key=$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 32 | head -n 1)
+     printf "Change Values ... "
+     dlfolder="/mnt/unionfs/nzb/"
+     infolder="/mnt/unionfs/nzb/incomplete"
+     wtnzb="/mnt/unionfs/nzb/backup"
+     cfree="50G"
+     wtn2="/mnt/unionfs/nzb/watch"
+     sed -i -e "s/^api_key *=.*$/api_key = ${api_key}/g" /config/sabnzbd.ini
+     sed -i -e "s/^nzb_key *=.*$/nzb_key = ${nzb_key}/g" /config/sabnzbd.ini
+     sed -i -e "s/^download_dir *=.*$/download_dir = ${dlfolder}/g" /config/sabnzbd.ini
+     sed -i -e "s/^complete_dir *=.*$/complete_dir = ${infolder}/g" /config/sabnzbd.ini
+     sed -i -e "s/^nzb_backup_dir *=.*$/nzb_backup_dir = ${wtnzb}/g" /config/sabnzbd.ini
+     sed -i -e "s/^complete_free *=.*$/complete_free = ${cfree}/g" /config/sabnzbd.ini
+     sed -i -e "s/^dirscan_dir *=.*$/dirscan_dir = ${wtn2}/g" /config/sabnzbd.ini
+     sed -i -e "s/^download_free *=.*$/download_free = ${cfree}/g" /config/sabnzbd.ini
+else
+     dlfolder="/mnt/unionfs/nzb/"
+     infolder="/mnt/unionfs/nzb/incomplete"
+     wtnzb="/mnt/unionfs/nzb/backup"
+     cfree="50G"
+     wtn2="/mnt/unionfs/nzb/watch"
+     sed -i -e "s/^download_dir *=.*$/download_dir = ${dlfolder}/g" /config/sabnzbd.ini
+     sed -i -e "s/^complete_dir *=.*$/complete_dir = ${infolder}/g" /config/sabnzbd.ini
+     sed -i -e "s/^nzb_backup_dir *=.*$/nzb_backup_dir = ${wtnzb}/g" /config/sabnzbd.ini
+     sed -i -e "s/^complete_free *=.*$/complete_free = ${cfree}/g" /config/sabnzbd.ini
+     sed -i -e "s/^dirscan_dir *=.*$/dirscan_dir = ${wtn2}/g" /config/sabnzbd.ini
+     sed -i -e "s/^download_free *=.*$/download_free = ${cfree}/g" /config/sabnzbd.ini
 fi
 
 if [[ -n ${HOSTENTRIES} ]]; then
     printf "Updating host_whitelist setting ... " && \
     sed -i -e "s/^host_whitelist *=.*$/host_whitelist = ${HOSTNAME}, ${HOSTNAME}.${HOSTENTRIES}/g" /config/sabnzbd.ini
 fi
+
+find /mnt/unionfs/nzb/backup -type f -name "*nzb*" -exec rm -rf \;
+find /mnt/unionfs/nzb/ -type d -name "*_FAILED*" -exec rm -rf \;
+
