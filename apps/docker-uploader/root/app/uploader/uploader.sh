@@ -157,16 +157,16 @@ function rcloneupload() {
           USED=$(( $RANDOM % ${ARRAY} + 1 ))
    fi
 
+   ## CRYPTED HACK
+   if `rclone config show --config=${CONFIG} | grep ":/encrypt" &>/dev/null`;then
+       CRYPTED=C
+   fi
+
    touch "${LOGFILE}/${FILE}.txt" && \
    echo "{\"filedir\": \"${DIR}\",\"filebase\": \"${FILE}\",\"filesize\": \"${SIZE}\",\"logfile\": \"${LOGFILE}/${FILE}.txt\",\"gdsa\": \"${KEY}$[USED]${CRYPTED}\"}" > "${START}/${FILE}.json"
 
    if [[ "${BANDWITHLIMIT}" =~ ^[0-9][0-9]+([.][0-9]+)?$ ]]; then
       BWLIMIT="--bwlimit=${BANDWITHLIMIT}"
-   fi
-
-   ## CRYPTED HACK
-   if `rclone config show --config=${CONFIG} | grep ":/encrypt" &>/dev/null`;then
-       CRYPTED=C
    fi
 
    ## RUN MOVE
@@ -208,7 +208,7 @@ do
       do
         LCT=$(df --output=pcent ${DLFOLDER} --exclude={${DLFOLDER}/nzb,${DLFOLDER}/torrent,${DLFOLDER}/torrents} | tr -dc '0-9')
         if [[ "${DRIVEUSEDSPACE}" =~ ^[0-9][0-9]+([.][0-9]+)?$ ]]; then
-           if [[ "${DRIVEUSEDSPACE}" -gt "${LCT}" ]]; then
+           if [[ "${LCT}" -gt "${DRIVEUSEDSPACE}" ]]; then
               sleep 5 && break
           else
               sleep 5
