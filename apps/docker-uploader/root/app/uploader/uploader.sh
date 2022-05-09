@@ -150,8 +150,8 @@ function rcloneupload() {
    done
 
    if test -f "${CUSTOM}/${UPP}.conf";then
-      CONFIG=/${CUSTOM}/${UPP}.conf && \
-      USED=$($(which rclone) listremotes --config="${CONFIG}" | grep "$1" | sed -e 's/://g' | sed -e 's/GDSA//g' | sort))
+      CONFIG=${CUSTOM}/${UPP}.conf && \
+      USED="$($(which rclone) listremotes --config=${CONFIG} | grep "$1" | sed -e 's/://g' | sed -e 's/GDSA//g' | sort))"
    else
       CONFIG=/system/servicekeys/rclonegdsa.conf && \
       ARRAY=$(ls -A ${KEYLOCAL} | wc -w ) && \
