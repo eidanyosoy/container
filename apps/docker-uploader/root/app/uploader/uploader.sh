@@ -232,12 +232,20 @@ do
       TRANSFERS=${TRANSFERS:-2}
       # shellcheck disable=SC2086
       cat "${CHK}" | while IFS=$'|' read -ra UPP; do
-         for (( ; ; ))
-         do
+
+         while true; do
+           source /system/uploader/uploader.env
            ## -I [ exclude check.log files ]
            ACTIVETRANSFERS=$(ls -A ${LOGFILE} -I "check.log" | wc -l)
-           if [[ "${ACTIVETRANSFERS}" -ge "${TRANSFERS}" ]]; then
-              sleep 5 && break
+           if [[ ! ${ACTIVETRANSFERS} -ge ${TRANSFERS} ]]; then
+              sleep 5
+                 ## REMOVE ACTIVE UPLOAD from check file
+                 ## to prevent double upload trying 
+              sed -i -e '1 w /dev/stdout' -e '1d' "${CHK}" &>/dev/null
+              FILE=$(basename "${UPP[1]}")
+              touch "${LOGFILE}/${FILE}.txt" 
+                 ## for correct reading of activities 
+              break
            else
               log "Already ${ACTIVETRANSFERS} transfers running, waiting for next loop" && \
                 sleep 10
