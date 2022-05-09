@@ -236,7 +236,7 @@ do
          do
            ## -I [ exclude check.log files ]
            ACTIVETRANSFERS=$(ls -A ${LOGFILE} -I "check.log" | wc -l)
-           if [[ "${ACTIVETRANSFERS}" -ge "${TRANSFERS}" ]]; then
+           if [[ ! ${ACTIVETRANSFERS} -ge ${TRANSFERS} ]]; then
               sleep 5 && break
            else
               log "Already ${ACTIVETRANSFERS} transfers running, waiting for next loop" && \
