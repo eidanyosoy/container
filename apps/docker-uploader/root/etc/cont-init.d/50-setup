@@ -51,7 +51,7 @@ EOF
    wget -qO- https://rclone.org/install.sh | bash &>/dev/null
 
    KEYLOCAL=/system/servicekeys/keys/
-   ARRAY=$(ls -A ${KEYLOCAL} | wc -w )
+   ARRAY=$(ls -A ${KEYLOCAL} | wc -l )
    if [[ "${ARRAY}" -eq "0" ]]; then
       log "-->> [ WARNING ] ----------------- [ WARNING ] <<--"
       log "-->> [ WARNING ]  no match found   [ WARNING ] <<--"
@@ -71,14 +71,13 @@ EOF
 
   mkdir -p /system/uploader/.keys \
            /system/uploader/{logs,json} \
-           /system/uploader/json/{done,upload} &>/dev/null
+           /system/uploader/json/{done,upload} \
+           /root/.config/rclone/ &>/dev/null
 
-  apk add --quiet --no-progress --update coreutils
   find /mnt/downloads -type f -name '*.lck' -delete
-  mkdir -p /root/.config/rclone/
-  chown -cR abc:abc /root/.config/rclone /app /system/* &>/dev/null
+
+  chown -cR abc:abc /root/.config /app /system/* &>/dev/null
   chmod -cR 755 /root/.config/rclone/ /app /system/* &>/dev/null
-  chown -cR abc:abc /root/.config/ &>/dev/null
 
   USERAGENT=${USERAGENT:-null}
   if [[ ${USERAGENT} == 'null' ]]; then
@@ -87,8 +86,13 @@ EOF
 
   sample=/app/uploader/.sample.uploader.env
   uploaderenv=/system/uploader/uploader.env
-  if [[ -f ${uploaderenv} ]]; then
-source $uploaderenv
+
+  if test -f ${uploaderenv} ; then
+    source $uploaderenv
+  else
+    source $sample
+  fi
+
 echo -e "#-------------------------------------------------------
 #   UPLOADER ENVIROMENTS
 #-------------------------------------------------------
@@ -101,35 +105,15 @@ BANDWITHLIMIT=${BANDWITHLIMIT:-40}
 LOG_LEVEL=${LOG_LEVEL:-INFO}
 DLFOLDER=${DLFOLDER:-/mnt/downloads}
 USERAGENT=${USERAGENT}
+TRANSFERS=${TRANSFERS:-2}
 
 ## USER - SETTINGS
 DRIVEUSEDSPACE=${DRIVEUSEDSPACE:-10}
 MIN_AGE_FILE=${MIN_AGE_FILE:-10m}
+
 #-------------------------------------------------------
 #   UPLOADER ENVIROMENTS
 #-------------------------------------------------------" >$uploaderenv
-else
-source $sample
-echo -e "#-------------------------------------------------------
-#   UPLOADER ENVIROMENTS
-#-------------------------------------------------------
-## USER VALUES
-PUID=${PUID:-1000}
-PGID=${PGID:-1000}
-
-## RCLONE - SETTINGS
-BANDWITHLIMIT=${BANDWITHLIMIT:-40}
-LOG_LEVEL=${LOG_LEVEL:-INFO}
-DLFOLDER=${DLFOLDER:-/mnt/downloads}
-USERAGENT=${USERAGENT}
-
-## USER - SETTINGS
-DRIVEUSEDSPACE=${DRIVEUSEDSPACE:-10}
-MIN_AGE_FILE=${MIN_AGE_FILE:-10m}
-#-------------------------------------------------------
-#   UPLOADER ENVIROMENTS
-#-------------------------------------------------------" >$uploaderenv
-fi
 
 echo "------------------------------
     _____   _   _  __  __
