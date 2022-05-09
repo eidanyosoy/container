@@ -148,19 +148,27 @@ function rcloneupload() {
          sleep 1
       fi
    done
-   if test -f "${CUSTOM}/${UPP}.conf";then
+   if test -f "${CUSTOM}/${UPP}.conf" ; then
       CONFIG=${CUSTOM}/${UPP}.conf && \
-      USED="$($(which rclone) listremotes --config=${CONFIG} | grep "$1" | sed -e 's/://g' | sed -e 's/GDSA//g' | sort))"
+        USED=`rclone listremotes --config=${CONFIG} | grep "$1" | sed -e 's/://g' | sed -e 's/GDSA//g' | sort`
    else
       CONFIG=/system/servicekeys/rclonegdsa.conf && \
-      ARRAY=$(ls -A ${KEYLOCAL} | wc -w ) && \
-      USED=$(( $RANDOM % ${ARRAY} + 1 ))
+        ARRAY=$(ls -A ${KEYLOCAL} | wc -w ) && \
+          USED=$(( $RANDOM % ${ARRAY} + 1 ))
    fi
+
    touch "${LOGFILE}/${FILE}.txt" && \
    echo "{\"filedir\": \"${DIR}\",\"filebase\": \"${FILE}\",\"filesize\": \"${SIZE}\",\"logfile\": \"${LOGFILE}/${FILE}.txt\",\"gdsa\": \"${KEY}$[USED]${CRYPTED}\"}" > "${START}/${FILE}.json"
+
    if [[ "${BANDWITHLIMIT}" =~ ^[0-9][0-9]+([.][0-9]+)?$ ]]; then
       BWLIMIT="--bwlimit=${BANDWITHLIMIT}"
    fi
+
+   ## CRYPTED HACK
+   if `rclone config show --config=${CONFIG} | grep ":/encrypt" &>/dev/null`;then
+       CRYPTED=C
+   fi
+
    ## RUN MOVE
    $(which rclone) move "${DLFOLDER}/${UPP[1]}" "${KEY}$[USED]${CRYPTED}:/${DIR}/" \
       --config="${CONFIG}" \
@@ -178,6 +186,7 @@ function rcloneupload() {
       --min-age="${MIN_AGE_FILE}"
    ENDZ=$(date +%s)
    echo "{\"filedir\": \"${DIR}\",\"filebase\": \"${FILE}\",\"filesize\": \"${SIZE}\",\"gdsa\": \"${KEY}$[USED]${CRYPTED}\",\"starttime\": \"${STARTZ}\",\"endtime\": \"${ENDZ}\"}" > "${DONE}/${FILE}.json"
+
    ## END OF MOVE
    $(which rm) -rf "${LOGFILE}/${FILE}.txt" "${START}/${FILE}.json" 
    $(which chmod) 755 "${DONE}/${FILE}.json"
@@ -258,6 +267,5 @@ do
          sleep 60
    fi
 done
-
 
 ## END OF FILE
