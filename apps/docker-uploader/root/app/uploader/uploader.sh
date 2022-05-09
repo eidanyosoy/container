@@ -232,8 +232,8 @@ do
       TRANSFERS=${TRANSFERS:-2}
       # shellcheck disable=SC2086
       cat "${CHK}" | while IFS=$'|' read -ra UPP; do
-         for (( ; ; ))
-         do
+
+         while true; do 
            ## -I [ exclude check.log files ]
            ACTIVETRANSFERS=$(ls -A ${LOGFILE} -I "check.log" | wc -l)
            if [[ ! ${ACTIVETRANSFERS} -ge ${TRANSFERS} ]]; then
