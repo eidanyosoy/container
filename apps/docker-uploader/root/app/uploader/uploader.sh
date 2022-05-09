@@ -153,7 +153,7 @@ function rcloneupload() {
         USED=`rclone listremotes --config=${CONFIG} | grep "$1" | sed -e 's/://g' | sed -e 's/GDSA//g' | sort`
    else
       CONFIG=/system/servicekeys/rclonegdsa.conf && \
-        ARRAY=$(ls -A ${KEYLOCAL} | wc -w ) && \
+        ARRAY=$(ls -A ${KEYLOCAL} | wc -l ) && \
           USED=$(( $RANDOM % ${ARRAY} + 1 ))
    fi
 
@@ -188,7 +188,8 @@ function rcloneupload() {
    echo "{\"filedir\": \"${DIR}\",\"filebase\": \"${FILE}\",\"filesize\": \"${SIZE}\",\"gdsa\": \"${KEY}$[USED]${CRYPTED}\",\"starttime\": \"${STARTZ}\",\"endtime\": \"${ENDZ}\"}" > "${DONE}/${FILE}.json"
 
    ## END OF MOVE
-   $(which rm) -rf "${LOGFILE}/${FILE}.txt" "${START}/${FILE}.json" 
+   $(which rm) -rf "${LOGFILE}/${FILE}.txt" \
+                   "${START}/${FILE}.json" 
    $(which chmod) 755 "${DONE}/${FILE}.json"
    if test -f "/${CUSTOM}/${UPP}.conf";then
       $(which rm) -rf /${CUSTOM}/${UPP}.conf
@@ -233,9 +234,10 @@ do
       cat "${CHK}" | while IFS=$'|' read -ra UPP; do
          for (( ; ; ))
          do
-           ACTIVETRANSFERS=$(ls -1p ${LOGFILE} | wc -w)
-           if [[ ! "${ACTIVETRANSFERS}" -ge "${TRANSFERS}" ]]; then
-              sleep 1 && break
+           ## -I [ exclude check.log files ]
+           ACTIVETRANSFERS=$(ls -A ${LOGFILE} -I "check.log" | wc -l)
+           if [[ "${ACTIVETRANSFERS}" -ge "${TRANSFERS}" ]]; then
+              sleep 5 && break
            else
               log "Already ${ACTIVETRANSFERS} transfers running, waiting for next loop" && \
                 sleep 10
@@ -246,7 +248,7 @@ do
          if test -f ${CSV}; then loopcsv ; fi
 
          ## upload function startup
-         rcloneupload
+         rcloneupload &  ## DEMONISED UPLOAD
          ## upload function shutdown
 
          LCT=$(df --output=pcent ${DLFOLDER} --exclude={${DLFOLDER}/nzb,${DLFOLDER}/torrent,${DLFOLDER}/torrents} | tr -dc '0-9')
