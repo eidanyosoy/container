@@ -233,7 +233,8 @@ do
       # shellcheck disable=SC2086
       cat "${CHK}" | while IFS=$'|' read -ra UPP; do
 
-         while true; do 
+         while true; do
+           source /system/uploader/uploader.env
            ## -I [ exclude check.log files ]
            ACTIVETRANSFERS=$(ls -A ${LOGFILE} -I "check.log" | wc -l)
            if [[ ! ${ACTIVETRANSFERS} -ge ${TRANSFERS} ]]; then
