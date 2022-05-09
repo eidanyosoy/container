@@ -148,7 +148,6 @@ function rcloneupload() {
          sleep 1
       fi
    done
-
    if test -f "${CUSTOM}/${UPP}.conf";then
       CONFIG=${CUSTOM}/${UPP}.conf && \
       USED="$($(which rclone) listremotes --config=${CONFIG} | grep "$1" | sed -e 's/://g' | sed -e 's/GDSA//g' | sort))"
@@ -157,14 +156,11 @@ function rcloneupload() {
       ARRAY=$(ls -A ${KEYLOCAL} | wc -w ) && \
       USED=$(( $RANDOM % ${ARRAY} + 1 ))
    fi
-
    touch "${LOGFILE}/${FILE}.txt" && \
    echo "{\"filedir\": \"${DIR}\",\"filebase\": \"${FILE}\",\"filesize\": \"${SIZE}\",\"logfile\": \"${LOGFILE}/${FILE}.txt\",\"gdsa\": \"${KEY}$[USED]${CRYPTED}\"}" > "${START}/${FILE}.json"
-
    if [[ "${BANDWITHLIMIT}" =~ ^[0-9][0-9]+([.][0-9]+)?$ ]]; then
       BWLIMIT="--bwlimit=${BANDWITHLIMIT}"
    fi
-
    ## RUN MOVE
    $(which rclone) move "${DLFOLDER}/${UPP[1]}" "${KEY}$[USED]${CRYPTED}:/${DIR}/" \
       --config="${CONFIG}" \
@@ -180,14 +176,11 @@ function rcloneupload() {
       --tpslimit 50 \
       --tpslimit-burst 50 \
       --min-age="${MIN_AGE_FILE}"
-
    ENDZ=$(date +%s)
    echo "{\"filedir\": \"${DIR}\",\"filebase\": \"${FILE}\",\"filesize\": \"${SIZE}\",\"gdsa\": \"${KEY}$[USED]${CRYPTED}\",\"starttime\": \"${STARTZ}\",\"endtime\": \"${ENDZ}\"}" > "${DONE}/${FILE}.json"
-
    ## END OF MOVE
    $(which rm) -rf "${LOGFILE}/${FILE}.txt" "${START}/${FILE}.json" 
    $(which chmod) 755 "${DONE}/${FILE}.json"
-
    if test -f "/${CUSTOM}/${UPP}.conf";then
       $(which rm) -rf /${CUSTOM}/${UPP}.conf
    fi
@@ -206,10 +199,10 @@ do
       do
         LCT=$(df --output=pcent ${DLFOLDER} --exclude={${DLFOLDER}/nzb,${DLFOLDER}/torrent,${DLFOLDER}/torrents} | tr -dc '0-9')
         if [[ "${DRIVEUSEDSPACE}" =~ ^[0-9][0-9]+([.][0-9]+)?$ ]]; then
-          if [[ ! "${LCT}" -ge "${DRIVEUSEDSPACE}" ]]; then
-             sleep 5 && break
+           if [[ "${DRIVEUSEDSPACE}" -gt "${LCT}" ]]; then
+              sleep 5 && break
           else
-             sleep 30
+              sleep 5
           fi
         fi
       done
@@ -229,15 +222,14 @@ do
       TRANSFERS=${TRANSFERS:-2}
       # shellcheck disable=SC2086
       cat "${CHK}" | while IFS=$'|' read -ra UPP; do
-
          for (( ; ; ))
          do
            ACTIVETRANSFERS=$(ls -1p ${LOGFILE} | wc -w)
-           if [[ ! ${ACTIVETRANSFERS} -ge ${TRANSFERS} ]]; then
+           if [[ ! "${ACTIVETRANSFERS}" -ge "${TRANSFERS}" ]]; then
               sleep 1 && break
            else
-              log "Already ${ACTIVETRANSFERS} transfers running, waiting for next loop"
-              sleep 10
+              log "Already ${ACTIVETRANSFERS} transfers running, waiting for next loop" && \
+                sleep 10
            fi
          done
 
@@ -250,23 +242,20 @@ do
 
          LCT=$(df --output=pcent ${DLFOLDER} --exclude={${DLFOLDER}/nzb,${DLFOLDER}/torrent,${DLFOLDER}/torrents} | tr -dc '0-9')
          if [[ "${DRIVEUSEDSPACE}" =~ ^[0-9][0-9]+([.][0-9]+)?$ ]]; then
-            if [[ ! "${LCT}" -ge "${DRIVEUSEDSPACE}" ]]; then
-               $(which rm) -rf "${CHK}" "${LOGFILE}/${FILE}.txt" "${START}/${FILE}.json" && \
+            if [[ "${DRIVEUSEDSPACE}" -gt "${LCT}" ]]; then
+               $(which rm) -rf "${CHK}" \
+                               "${LOGFILE}/${FILE}.txt" \
+                               "${START}/${FILE}.json" && \
                $(which chmod) 755 "${DONE}/${FILE}.json" && \
                break
             fi
          fi
-
       done
-
       $(which rm) -rf "${CHK}" && \
-      log "MOVE FINISHED from ${DLFOLDER} to REMOTE"
-
+         log "MOVE FINISHED from ${DLFOLDER} to REMOTE"
    else
-
       log "MOVE skipped || less then 1 file" && \
-      sleep 60
-
+         sleep 60
    fi
 done
 
