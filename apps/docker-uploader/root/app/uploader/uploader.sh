@@ -73,20 +73,23 @@ fi
 
 function loopcsv() {
 
-mkdir -p /app/custom/
+   $(which mkdir) -p /app/custom/
+
 if test -f ${CSV} ; then
    UPP=${UPP}
    MOVE=${MOVE:-/}
 
    FILE=$(basename "${UPP[1]}")
-   DIR=$(dirname "${UPP[1]}" | sed "s#${DLFOLDER}/${MOVE}##g")
+   # echo correct folder from log file
+   DIR=$(dirname "${UPP[1]}" | sed "s#${DLFOLDER}/${MOVE}##g" | cut -d ' ' -f 1 | sed 's|/.*||' )
+   #
    ENDCONFIG=${CUSTOM}/${UPP}.conf
    ARRAY=$(ls -A ${KEYLOCAL} | wc -l )
    USED=$(( $RANDOM % ${ARRAY} + 1 ))
 
    $(which cat) ${CSV} | grep -E ${DIR} | sed '/^\s*#.*$/d'| while IFS=$'|' read -ra myArray; do
-   if [[ ${myArray[2]} == "" && ${myArray[3]} == "" ]]; then
 
+   if [[ ${myArray[2]} == "" && ${myArray[3]} == "" ]]; then
 cat > ${ENDCONFIG} << EOF; $(echo)
 ## CUSTOM RCLONE.CONF
 [${KEY}$[USED]]
@@ -116,11 +119,8 @@ directory_name_encryption = true
 password = ${myArray[2]}
 password2 = ${myArray[3]}
 EOF
-
    fi
-
    done
-
 fi
 
 }
@@ -159,7 +159,9 @@ function rcloneupload() {
 
    ## CRYPTED HACK
    if `rclone config show --config=${CONFIG} | grep ":/encrypt" &>/dev/null`;then
-       CRYPTED=C
+       export CRYPTED=C
+   else
+       export CRYPTED=""
    fi
 
    touch "${LOGFILE}/${FILE}.txt" && \
@@ -187,12 +189,13 @@ function rcloneupload() {
    ENDZ=$(date +%s)
    echo "{\"filedir\": \"${DIR}\",\"filebase\": \"${FILE}\",\"filesize\": \"${SIZE}\",\"gdsa\": \"${KEY}$[USED]${CRYPTED}\",\"starttime\": \"${STARTZ}\",\"endtime\": \"${ENDZ}\"}" > "${DONE}/${FILE}.json"
 
+   unset CRYPTED
    ## END OF MOVE
    $(which rm) -rf "${LOGFILE}/${FILE}.txt" \
                    "${START}/${FILE}.json" 
    $(which chmod) 755 "${DONE}/${FILE}.json"
-   if test -f "/${CUSTOM}/${UPP}.conf";then
-      $(which rm) -rf /${CUSTOM}/${UPP}.conf
+   if test -f "${CUSTOM}/${UPP}.conf";then
+      $(which rm) -rf ${CUSTOM}/${UPP}.conf
    fi
 
 }
@@ -229,26 +232,24 @@ do
 
    #### FIRST LOOP
    if [ `cat ${CHK} | wc -l` -gt 0 ]; then
-      TRANSFERS=${TRANSFERS:-2}
       # shellcheck disable=SC2086
       cat "${CHK}" | while IFS=$'|' read -ra UPP; do
-
          while true; do
            source /system/uploader/uploader.env
            ## -I [ exclude check.log files ]
            ACTIVETRANSFERS=$(ls -A ${LOGFILE} -I "check.log" | wc -l)
-           if [[ ! ${ACTIVETRANSFERS} -ge ${TRANSFERS} ]]; then
-              sleep 5
-                 ## REMOVE ACTIVE UPLOAD from check file
-                 ## to prevent double upload trying 
+           TRANSFERS=${TRANSFERS:-2}
+           if [[ ${ACTIVETRANSFERS} -lt ${TRANSFERS} ]]; then
+              sleep t
+              ## REMOVE ACTIVE UPLOAD from check file
+              ## to prevent double upload trying 
               sed -i -e '1 w /dev/stdout' -e '1d' "${CHK}" &>/dev/null
               FILE=$(basename "${UPP[1]}")
               touch "${LOGFILE}/${FILE}.txt" 
-                 ## for correct reading of activities 
+              ## for correct reading of activities 
               break
            else
-              log "Already ${ACTIVETRANSFERS} transfers running, waiting for next loop" && \
-                sleep 10
+              sleep 10
            fi
          done
 
@@ -256,7 +257,7 @@ do
          if test -f ${CSV}; then loopcsv ; fi
 
          ## upload function startup
-         rcloneupload &  ## DEMONISED UPLOAD
+         rcloneupload & ## DEMONISED UPLOAD
          ## upload function shutdown
 
          LCT=$(df --output=pcent ${DLFOLDER} --exclude={${DLFOLDER}/nzb,${DLFOLDER}/torrent,${DLFOLDER}/torrents} | tr -dc '0-9')
