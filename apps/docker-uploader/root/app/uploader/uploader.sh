@@ -194,7 +194,7 @@ function rcloneupload() {
    ENDZ=$(date +%s)
 
    # ADD check is file exists now own drive
-   $(which rclone) check "${KEY}$[USED]${CRYPTED}:${UPP[1]}"
+   $(which rclone) check "${DLFOLDER}/${UPP[1]}" "${KEY}$[USED]${CRYPTED}:${UPP[1]}" --one-way
    if [[ $? == 0 ]]; then
       $(which rclone) deletefile "${DLFOLDER}/${UPP[1]}" &>/dev/null
    fi
