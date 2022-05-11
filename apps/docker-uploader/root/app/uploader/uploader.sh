@@ -76,12 +76,12 @@ function loopcsv() {
    $(which mkdir) -p /app/custom/
 
 if test -f ${CSV} ; then
-   UPP=${UPP}
-   MOVE=${MOVE:-/}
 
-   FILE=$(basename "${UPP[1]}")
+   #FILE=$(basename "${UPP[1]}")
    # echo correct folder from log file
-   DIR=$(dirname "${UPP[1]}" | sed "s#${DLFOLDER}/${MOVE}##g" | cut -d ' ' -f 1 | sed 's|/.*||' )
+   #DIR=$(dirname "${UPP[1]}" | sed "s#${DLFOLDER}/${MOVE}##g" | cut -d ' ' -f 1 | sed 's|/.*||' )
+   DIR=${SETDIR}
+   FILE=${FILE}
    #
    ENDCONFIG=${CUSTOM}/${FILE}.conf
    ## USE FILE NAME AS RCLONE CONF
@@ -181,7 +181,6 @@ function rcloneupload() {
       --no-traverse \
       --check-first \
       --create-empty-src-dirs \
-      --delete-empty-src-dirs \
       --drive-chunk-size=64M \
       --drive-stop-on-upload-limit \
       --log-level="${LOG_LEVEL}" \
@@ -191,16 +190,13 @@ function rcloneupload() {
       --tpslimit-burst 50 \
       --min-age="${MIN_AGE_FILE}"
 
+   if [[ $? == 0 ]]; then
+      $(which rclone) deletefile --config="${CONFIG}" "${DLFOLDER}/${UPP[1]}" &>/dev/null && \
+        $(which find) "${DLFOLDER}/${SETDIR}" -type d -empty -delete &>/dev/null
+   fi
    ENDZ=$(date +%s)
 
-   # ADD check is file exists now own drive
-   $(which rclone) check "${DLFOLDER}/${UPP[1]}" "${KEY}$[USED]${CRYPTED}:${UPP[1]}" --one-way
-   if [[ $? == 0 ]]; then
-      $(which rclone) deletefile "${DLFOLDER}/${UPP[1]}" &>/dev/null
-   fi
-
    echo "{\"filedir\": \"${DIR}\",\"filebase\": \"${FILE}\",\"filesize\": \"${SIZE}\",\"gdsa\": \"${KEY}$[USED]${CRYPTED}\",\"starttime\": \"${STARTZ}\",\"endtime\": \"${ENDZ}\"}" > "${DONE}/${FILE}.json"
-
    unset CRYPTED
    ## END OF MOVE
    $(which rm) -rf "${LOGFILE}/${FILE}.txt" \
@@ -266,6 +262,7 @@ do
          done
 
          ## Looping to correct drive
+         SETDIR=$(dirname "${UPP[1]}" | sed "s#${DLFOLDER}/${MOVE}##g" | cut -d ' ' -f 1 | sed 's|/.*||' )
          if test -f ${CSV}; then loopcsv ; fi
 
          ## upload function startup
