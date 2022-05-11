@@ -73,14 +73,14 @@ fi
 function cleanuplog() {
    RMLOG=/system/uploader/logs/rmcheck.log
    #### RCLONE LIST FILE
-   $(which rclone) lsf "${LOGFILE}/done/" \
+   $(which rclone) lsf "${DONE}" \
       --files-only -R \
       --separator "|" \
       --format="tp" \
       --order-by="modtime" | sort  > "${RMLOG}" 2>&1
    if [ `cat ${RMLOG} | wc -l` -gt 1000 ]; then
       cat "${RMLOG}" | while IFS=$'|' read -ra RMLO; do
-         $(which rm) -rf "${LOGFILE}/done/${RMLO[1]}"
+         $(which rm) -rf "${DONE}/${RMLO[1]}"
       done
    else
       $(which rm) "${RMLOG}"
