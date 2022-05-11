@@ -83,7 +83,8 @@ if test -f ${CSV} ; then
    # echo correct folder from log file
    DIR=$(dirname "${UPP[1]}" | sed "s#${DLFOLDER}/${MOVE}##g" | cut -d ' ' -f 1 | sed 's|/.*||' )
    #
-   ENDCONFIG=${CUSTOM}/${UPP}.conf
+   ENDCONFIG=${CUSTOM}/${FILE}.conf
+   ## USE FILE NAME AS RCLONE CONF
    ARRAY=$(ls -A ${KEYLOCAL} | wc -l )
    USED=$(( $RANDOM % ${ARRAY} + 1 ))
 
@@ -91,7 +92,7 @@ if test -f ${CSV} ; then
 
    if [[ ${myArray[2]} == "" && ${myArray[3]} == "" ]]; then
 cat > ${ENDCONFIG} << EOF; $(echo)
-## CUSTOM RCLONE.CONF
+## CUSTOM RCLONE.CONF for ${FILE}
 [${KEY}$[USED]]
 type = drive
 scope = drive
@@ -172,21 +173,32 @@ function rcloneupload() {
    fi
 
    ## RUN MOVE
-   $(which rclone) move "${DLFOLDER}/${UPP[1]}" "${KEY}$[USED]${CRYPTED}:/${DIR}/" \
+   $(which rclone) copy "${DLFOLDER}/${UPP[1]}" "${KEY}$[USED]${CRYPTED}:/${DIR}/" \
       --config="${CONFIG}" \
       --stats=1s \
       --checkers=32 \
       --use-mmap \
       --no-traverse \
       --check-first \
+      --create-empty-src-dirs \
+      --delete-empty-src-dirs \
       --drive-chunk-size=64M \
+      --drive-stop-on-upload-limit \
       --log-level="${LOG_LEVEL}" \
       --user-agent="${USERAGENT}" ${BWLIMIT} \
       --log-file="${LOGFILE}/${FILE}.txt" \
       --tpslimit 50 \
       --tpslimit-burst 50 \
       --min-age="${MIN_AGE_FILE}"
+
    ENDZ=$(date +%s)
+
+   # ADD check is file exists now own drive
+   $(which rclone) check "${KEY}$[USED]${CRYPTED}:${UPP[1]}"
+   if [[ $? == 0 ]]; then
+      $(which rclone) deletefile "${DLFOLDER}/${UPP[1]}" &>/dev/null
+   fi
+
    echo "{\"filedir\": \"${DIR}\",\"filebase\": \"${FILE}\",\"filesize\": \"${SIZE}\",\"gdsa\": \"${KEY}$[USED]${CRYPTED}\",\"starttime\": \"${STARTZ}\",\"endtime\": \"${ENDZ}\"}" > "${DONE}/${FILE}.json"
 
    unset CRYPTED
@@ -240,7 +252,7 @@ do
            ACTIVETRANSFERS=$(ls -A ${LOGFILE} -I "check.log" | wc -l)
            TRANSFERS=${TRANSFERS:-2}
            if [[ ${ACTIVETRANSFERS} -lt ${TRANSFERS} ]]; then
-              sleep t
+              sleep 5
               ## REMOVE ACTIVE UPLOAD from check file
               ## to prevent double upload trying 
               sed -i -e '1 w /dev/stdout' -e '1d' "${CHK}" &>/dev/null
