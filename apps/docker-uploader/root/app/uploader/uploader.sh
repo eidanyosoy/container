@@ -257,7 +257,13 @@ do
          if test -f ${CSV}; then loopcsv ; fi
 
          ## upload function startup
-         rcloneupload & ## DEMONISED UPLOAD
+         if [[ ${TRANSFERS} != "1" ]];then
+            ## DEMONISED UPLOAD
+            rcloneupload &
+         else
+            ## SINGLE UPLOAD
+            rcloneupload
+         fi
          ## upload function shutdown
 
          LCT=$(df --output=pcent ${DLFOLDER} --exclude={${DLFOLDER}/nzb,${DLFOLDER}/torrent,${DLFOLDER}/torrents} | tr -dc '0-9')
