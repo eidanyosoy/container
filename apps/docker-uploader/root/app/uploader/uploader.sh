@@ -191,7 +191,7 @@ function rcloneupload() {
    $(which rm) -rf "${LOGFILE}/${FILE}.txt" \
                    "${START}/${FILE}.json" 
    $(which chmod) 755 "${DONE}/${FILE}.json"
-   if test -f "/${CUSTOM}/${UPP}.conf";then
+   if test -f "${CUSTOM}/${UPP}.conf";then
       $(which rm) -rf /${CUSTOM}/${UPP}.conf
    fi
 
@@ -229,26 +229,24 @@ do
 
    #### FIRST LOOP
    if [ `cat ${CHK} | wc -l` -gt 0 ]; then
-      TRANSFERS=${TRANSFERS:-2}
       # shellcheck disable=SC2086
       cat "${CHK}" | while IFS=$'|' read -ra UPP; do
-
          while true; do
            source /system/uploader/uploader.env
            ## -I [ exclude check.log files ]
            ACTIVETRANSFERS=$(ls -A ${LOGFILE} -I "check.log" | wc -l)
-           if [[ ! ${ACTIVETRANSFERS} -ge ${TRANSFERS} ]]; then
-              sleep 5
-                 ## REMOVE ACTIVE UPLOAD from check file
-                 ## to prevent double upload trying 
+           TRANSFERS=${TRANSFERS:-2}
+           if [[ ${ACTIVETRANSFERS} -lt ${TRANSFERS} ]]; then
+              sleep t
+              ## REMOVE ACTIVE UPLOAD from check file
+              ## to prevent double upload trying 
               sed -i -e '1 w /dev/stdout' -e '1d' "${CHK}" &>/dev/null
               FILE=$(basename "${UPP[1]}")
               touch "${LOGFILE}/${FILE}.txt" 
-                 ## for correct reading of activities 
+              ## for correct reading of activities 
               break
            else
-              log "Already ${ACTIVETRANSFERS} transfers running, waiting for next loop" && \
-                sleep 10
+              sleep 10
            fi
          done
 
@@ -256,7 +254,7 @@ do
          if test -f ${CSV}; then loopcsv ; fi
 
          ## upload function startup
-         rcloneupload &  ## DEMONISED UPLOAD
+         rcloneupload & ## DEMONISED UPLOAD
          ## upload function shutdown
 
          LCT=$(df --output=pcent ${DLFOLDER} --exclude={${DLFOLDER}/nzb,${DLFOLDER}/torrent,${DLFOLDER}/torrents} | tr -dc '0-9')
