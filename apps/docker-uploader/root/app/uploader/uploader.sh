@@ -73,20 +73,23 @@ fi
 
 function loopcsv() {
 
-mkdir -p /app/custom/
+   $(which mkdir) -p /app/custom/
+
 if test -f ${CSV} ; then
    UPP=${UPP}
    MOVE=${MOVE:-/}
 
    FILE=$(basename "${UPP[1]}")
-   DIR=$(dirname "${UPP[1]}" | sed "s#${DLFOLDER}/${MOVE}##g")
+   # echo correct folder from log file
+   DIR=$(dirname "${UPP[1]}" | sed "s#${DLFOLDER}/${MOVE}##g" | cut -d ' ' -f 1 | sed 's|/.*||' )
+   #
    ENDCONFIG=${CUSTOM}/${UPP}.conf
    ARRAY=$(ls -A ${KEYLOCAL} | wc -l )
    USED=$(( $RANDOM % ${ARRAY} + 1 ))
 
    $(which cat) ${CSV} | grep -E ${DIR} | sed '/^\s*#.*$/d'| while IFS=$'|' read -ra myArray; do
-   if [[ ${myArray[2]} == "" && ${myArray[3]} == "" ]]; then
 
+   if [[ ${myArray[2]} == "" && ${myArray[3]} == "" ]]; then
 cat > ${ENDCONFIG} << EOF; $(echo)
 ## CUSTOM RCLONE.CONF
 [${KEY}$[USED]]
@@ -116,11 +119,8 @@ directory_name_encryption = true
 password = ${myArray[2]}
 password2 = ${myArray[3]}
 EOF
-
    fi
-
    done
-
 fi
 
 }
@@ -159,7 +159,9 @@ function rcloneupload() {
 
    ## CRYPTED HACK
    if `rclone config show --config=${CONFIG} | grep ":/encrypt" &>/dev/null`;then
-       CRYPTED=C
+       export CRYPTED=C
+   else
+       export CRYPTED=""
    fi
 
    touch "${LOGFILE}/${FILE}.txt" && \
@@ -187,12 +189,13 @@ function rcloneupload() {
    ENDZ=$(date +%s)
    echo "{\"filedir\": \"${DIR}\",\"filebase\": \"${FILE}\",\"filesize\": \"${SIZE}\",\"gdsa\": \"${KEY}$[USED]${CRYPTED}\",\"starttime\": \"${STARTZ}\",\"endtime\": \"${ENDZ}\"}" > "${DONE}/${FILE}.json"
 
+   unset CRYPTED
    ## END OF MOVE
    $(which rm) -rf "${LOGFILE}/${FILE}.txt" \
                    "${START}/${FILE}.json" 
    $(which chmod) 755 "${DONE}/${FILE}.json"
    if test -f "${CUSTOM}/${UPP}.conf";then
-      $(which rm) -rf /${CUSTOM}/${UPP}.conf
+      $(which rm) -rf ${CUSTOM}/${UPP}.conf
    fi
 
 }
