@@ -16,12 +16,12 @@
 #####################################
 # shellcheck disable=SC2086
 # shellcheck disable=SC2046
-FROM gcr.io/google.com/cloudsdktool/cloud-sdk:384.0.1-alpine
+FROM gcr.io/google.com/cloudsdktool/cloud-sdk:385.0.0-alpine
 LABEL org.opencontainers.image.source="https://github.com/dockserver/container"
 
 ARG TARGETPLATFORM
 ARG BUILDPLATFORM
-ARG VERSION="384.0.1-alpine"
+ARG VERSION="385.0.0-alpine"
 
 RUN \
   echo "**** update packages ****" && \
