@@ -161,14 +161,14 @@ function rcloneupload() {
    done
    if test -f "${CUSTOM}/${FILE}.conf" ; then
       CONFIG=${CUSTOM}/${FILE}.conf && \
-        USED=`rclone listremotes --config=${CONFIG} | grep "$1" | sed -e 's/://g' | sed -e 's/GDSA//g' | sort`
+        USED=`$(which rclone) listremotes --config=${CONFIG} | grep "$1" | sed -e 's/://g' | sed -e 's/GDSA//g' | sort`
    else
       CONFIG=/system/servicekeys/rclonegdsa.conf && \
-        ARRAY=$(ls -A ${KEYLOCAL} | wc -l ) && \
+        ARRAY=$($(which ls) -A ${KEYLOCAL} | wc -l ) && \
           USED=$(( $RANDOM % ${ARRAY} + 1 ))
    fi
    ## CRYPTED HACK
-   if `rclone config show --config=${CONFIG} | grep ":/encrypt" &>/dev/null`;then
+   if `$(which rclone) config show --config=${CONFIG} | grep ":/encrypt" &>/dev/null`;then
        export CRYPTED=C
    else
        export CRYPTED=""
@@ -239,19 +239,19 @@ do
       --exclude-from="${EXCLUDE}" | sort  > "${CHK}" 2>&1
 
    #### FIRST LOOP
-   if [ `cat ${CHK} | wc -l` -gt 0 ]; then
+   if [ `$(which cat) ${CHK} | wc -l` -gt 0 ]; then
       # shellcheck disable=SC2086
-      cat "${CHK}" | while IFS=$'|' read -ra UPP; do
+      $(which cat) "${CHK}" | while IFS=$'|' read -ra UPP; do
          while true; do
            source /system/uploader/uploader.env
            ## -I [ exclude check.log files ]
-           ACTIVETRANSFERS=$(ls -A ${LOGFILE} -I "check.log" | wc -l)
+           ACTIVETRANSFERS=`ls -A ${LOGFILE} -I "check.log" | wc -l`
            TRANSFERS=${TRANSFERS:-2}
            if [[ ${ACTIVETRANSFERS} -lt ${TRANSFERS} ]]; then
               ## REMOVE ACTIVE UPLOAD from check file
-              sed -i -e '1 w /dev/stdout' -e '1d' "${CHK}" &>/dev/null   ## to prevent double upload trying
+              $(which sed) -i -e '1 w /dev/stdout' -e '1d' "${CHK}" &>/dev/null   ## to prevent double upload trying
               FILE=$(basename "${UPP[1]}")
-              touch "${LOGFILE}/${FILE}.txt" 
+              $(which touch) "${LOGFILE}/${FILE}.txt" 
               ## for correct reading of activities 
               break
            else
@@ -262,13 +262,13 @@ do
          SETDIR=$(dirname "${UPP[1]}" | sed "s#${DLFOLDER}/${MOVE}##g" | cut -d ' ' -f 1 | sed 's|/.*||' )
          if test -f ${CSV}; then loopcsv ; fi
          ## upload function startup
-         if [[ ${TRANSFERS} != "1" ]];then
+         if [[ "${TRANSFERS}" != 1 ]];then
             rcloneupload &     ## DEMONISED UPLOAD
          else
             rcloneupload       ## SINGLE UPLOAD
          fi
          ## upload function shutdown
-         LCT=$(df --output=pcent ${DLFOLDER} --exclude={${DLFOLDER}/nzb,${DLFOLDER}/torrent,${DLFOLDER}/torrents} | tr -dc '0-9')
+         LCT=$($(which df) --output=pcent ${DLFOLDER} --exclude={${DLFOLDER}/nzb,${DLFOLDER}/torrent,${DLFOLDER}/torrents} | tr -dc '0-9')
          if [[ "${DRIVEUSEDSPACE}" =~ ^[0-9][0-9]+([.][0-9]+)?$ ]]; then
             if [[ "${DRIVEUSEDSPACE}" -gt "${LCT}" ]]; then
                $(which rm) -rf "${CHK}" \
