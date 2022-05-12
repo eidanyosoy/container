@@ -13,7 +13,7 @@ env:
 jobs:
   metrics:
     name: Metrics
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     #runs-on: self-hosted
     steps:
       - name: GitHub metrics as SVG image
