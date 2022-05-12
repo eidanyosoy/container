@@ -9,7 +9,7 @@ permissions: read-all
 
 jobs:
   contrib:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     #runs-on: self-hosted
     permissions:
       packages: write
@@ -35,8 +35,8 @@ jobs:
         AVATAR_SHAPE: 'round'
 
   run-changelog:
-    #runs-on: ubuntu-20.04
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
+    #runs-on: self-hosted
     needs:
     - contrib
     permissions:
