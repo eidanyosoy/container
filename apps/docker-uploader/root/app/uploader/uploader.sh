@@ -77,9 +77,10 @@ function cleanuplog() {
       --files-only -R \
       --separator "|" \
       --format="tp" \
-      --order-by="modtime" | sort  > "${RMLOG}" 2>&1
+      --order-by="modtime" | sort > "${RMLOG}" 2>&1
+   ### REMOVE LAST 1000 FILES
    if [ `cat ${RMLOG} | wc -l` -gt 1000 ]; then
-      cat "${RMLOG}" | while IFS=$'|' read -ra RMLO; do
+      cat "${RMLOG}" | head -n 1000 | while IFS=$'|' read -ra RMLO; do
          $(which rm) -rf "${DONE}/${RMLO[1]}"
       done
    else
@@ -91,9 +92,7 @@ function loopcsv() {
 
 $(which mkdir) -p /app/custom/
 if test -f ${CSV} ; then
-   #FILE=$(basename "${UPP[1]}")
    # echo correct folder from log file
-   #DIR=$(dirname "${UPP[1]}" | sed "s#${DLFOLDER}/${MOVE}##g" | cut -d ' ' -f 1 | sed 's|/.*||' )
    DIR=${SETDIR}
    FILE=${FILE}
    ENDCONFIG=${CUSTOM}/${FILE}.conf
@@ -219,7 +218,7 @@ do
    if [[ "${DRIVEUSEDSPACE}" =~ ^[0-9][0-9]+([.][0-9]+)?$ ]]; then
       for (( ; ; ))
       do
-        LCT=$(df --output=pcent ${DLFOLDER} --exclude={${DLFOLDER}/nzb,${DLFOLDER}/torrent,${DLFOLDER}/torrents} | tr -dc '0-9')
+        LCT=$(df --output=pcent ${DLFOLDER} | tr -dc '0-9')
         if [[ "${DRIVEUSEDSPACE}" =~ ^[0-9][0-9]+([.][0-9]+)?$ ]]; then
            if [[ "${LCT}" -gt "${DRIVEUSEDSPACE}" ]]; then
               sleep 5 && break
@@ -236,7 +235,7 @@ do
       --separator "|" \
       --format="tp" \
       --order-by="modtime" \
-      --exclude-from="${EXCLUDE}" | sort  > "${CHK}" 2>&1
+      --exclude-from="${EXCLUDE}" | sort > "${CHK}" 2>&1
 
    #### FIRST LOOP
    if [ `$(which cat) ${CHK} | wc -l` -gt 0 ]; then
@@ -244,8 +243,8 @@ do
       $(which cat) "${CHK}" | while IFS=$'|' read -ra UPP; do
          while true; do
            source /system/uploader/uploader.env
-           ## -I [ exclude check.log files ]
-           ACTIVETRANSFERS=`ls -A ${LOGFILE} -I "check.log" | wc -l`
+           ## -I [ exclude check.log & rmcheck.log file ]
+           ACTIVETRANSFERS=`ls -A ${LOGFILE} -I "check.log" -I "rmcheck.log" | wc -l`
            TRANSFERS=${TRANSFERS:-2}
            if [[ ${ACTIVETRANSFERS} -lt ${TRANSFERS} ]]; then
               ## REMOVE ACTIVE UPLOAD from check file
@@ -268,7 +267,7 @@ do
             rcloneupload       ## SINGLE UPLOAD
          fi
          ## upload function shutdown
-         LCT=$($(which df) --output=pcent ${DLFOLDER} --exclude={${DLFOLDER}/nzb,${DLFOLDER}/torrent,${DLFOLDER}/torrents} | tr -dc '0-9')
+         LCT=$($(which df) --output=pcent ${DLFOLDER} | tr -dc '0-9')
          if [[ "${DRIVEUSEDSPACE}" =~ ^[0-9][0-9]+([.][0-9]+)?$ ]]; then
             if [[ "${DRIVEUSEDSPACE}" -gt "${LCT}" ]]; then
                $(which rm) -rf "${CHK}" \
