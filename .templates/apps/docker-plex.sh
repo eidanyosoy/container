@@ -31,7 +31,7 @@ NEWVERSION="${NEWVERSION}"
 HEADLINE="$(cat ./.templates/headline.txt)"
 
 DESCRIPTION="Docker Container for Plex Media Server"
-BASEIMAGE="ghcr.io/linuxserver/baseimage-ubuntu:focal"
+BASEIMAGE="ghcr.io/linuxserver/baseimage-ubuntu:jammy"
 
 PLEX_DOWNLOAD="https://downloads.plex.tv/plex-media-server-new"
 
