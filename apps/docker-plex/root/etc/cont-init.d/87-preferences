@@ -17,13 +17,12 @@ export DEBIAN_FRONTEND=noninteractive
 echo "**** update system  ****" && \
   apt-get -yqq update &>/dev/null && \
   apt-get -yqq upgrade &>/dev/null && \
-  apt-get install -yqq  \
-     beignet-opencl-icd jq \
-     ocl-icd-libopencl1 udev \
+  apt-get install -yqq \
+     jq ocl-icd-libopencl1 udev \
      unrar wget git curl xmlstarlet \
      sqlite i965-va-driver-shaders \
      va-driver-all mesa-vulkan-drivers \
-     vulkan-utils ffmpeg &>/dev/null
+     ffmpeg &>/dev/null
 
   if [ "${DEBUG,,}" = "true" ]; then set -x ; fi
 
