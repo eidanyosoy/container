@@ -31,14 +31,14 @@ NEWVERSION="${NEWVERSION}"
 HEADLINE="$(cat ./.templates/headline.txt)"
 
 DESCRIPTION="Docker Container for Plex Media Server"
-BASEIMAGE="ghcr.io/linuxserver/baseimage-ubuntu:focal"
+BASEIMAGE="ghcr.io/linuxserver/baseimage-ubuntu:jammy"
 
 PLEX_DOWNLOAD="https://downloads.plex.tv/plex-media-server-new"
 
 INSTCOMMAND="apt-get install --no-install-recommends -yqq"
 UPTCOMMAND="apt-get update -yqq"
 PACKAGES="aria2 uuid-runtime udev jq wget curl unzip unrar gpg-agent software-properties-common"
-PACKAGESINTEL="intel-opencl-icd intel-gpu-tools i965-va-driver-shaders va-driver-all beignet-opencl-icd mesa-vulkan-drivers gpg-agent libmfx1 ocl-icd-libopencl1"
+PACKAGESINTEL="intel-opencl-icd intel-gpu-tools i965-va-driver-shaders va-driver-all mesa-vulkan-drivers gpg-agent libmfx1 ocl-icd-libopencl1"
 PLEXINST="dpkg -i --force-confold /tmp/plex.deb"
 CLEANUP="apt-get remove -yqq aria2 jq software-properties-common gpg-agent && \\
    apt-get autoremove -yqq && apt-get clean -yqq && \\
@@ -46,8 +46,6 @@ CLEANUP="apt-get remove -yqq aria2 jq software-properties-common gpg-agent && \\
 
 PICTURE="./images/$APP.png"
 APPFOLDER="./$FOLDER/$APP"
-PORT="EXPOSE 32400"
-VOLUMEN="VOLUME /config"
 
 ### RELEASE SETTINGS ###
 
@@ -94,10 +92,6 @@ RUN \
    apt-get update -yqq && apt-get install gnupg2 wget ca-certificates lsb-release software-properties-common -yqq && \
    case $TARGETPLATFORM in \
     '"'linux/amd64'"') \
-     echo "'"**** add Intel repo ****"'" && \
-         mkdir -p /usr/share/keyrings && \
-         curl -o /usr/share/keyrings/intel-graphics.key -L https://repositories.intel.com/graphics/intel-graphics.key && \
-         echo "'"deb [trusted=yes arch=amd64 signed-by=/usr/share/keyrings/intel-graphics.key] https://repositories.intel.com/graphics/ubuntu focal main"'" > /etc/apt/sources.list.d/intel.list && \
          export ARCH=amd64 && \
       echo "'"**** install runtime packages ****"'" && \
          '"${UPTCOMMAND}"' && \
@@ -121,7 +115,4 @@ RUN \
 
 COPY --chown=abc '"${APPFOLDER}"'/root/ /
 
-'"${PORT}"'
-
-'"${VOLUMEN}"'
 ##EOF' > ./$FOLDER/$APP/Dockerfile
