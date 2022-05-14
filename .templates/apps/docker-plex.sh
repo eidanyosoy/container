@@ -46,8 +46,6 @@ CLEANUP="apt-get remove -yqq aria2 jq software-properties-common gpg-agent && \\
 
 PICTURE="./images/$APP.png"
 APPFOLDER="./$FOLDER/$APP"
-PORT="EXPOSE 32400"
-VOLUMEN="VOLUME /config"
 
 ### RELEASE SETTINGS ###
 
@@ -117,7 +115,4 @@ RUN \
 
 COPY --chown=abc '"${APPFOLDER}"'/root/ /
 
-'"${PORT}"'
-
-'"${VOLUMEN}"'
 ##EOF' > ./$FOLDER/$APP/Dockerfile
