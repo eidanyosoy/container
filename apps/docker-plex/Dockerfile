@@ -16,7 +16,7 @@
 #####################################
 # shellcheck disable=SC2086
 # shellcheck disable=SC2046
-FROM ghcr.io/linuxserver/baseimage-ubuntu:focal
+FROM ghcr.io/linuxserver/baseimage-ubuntu:jammy
 LABEL org.opencontainers.image.source="https://github.com/dockserver/container"
 
 ARG TARGETPLATFORM
@@ -39,15 +39,11 @@ RUN \
    apt-get update -yqq && apt-get install gnupg2 wget ca-certificates lsb-release software-properties-common -yqq && \
    case $TARGETPLATFORM in \
     'linux/amd64') \
-     echo "**** add Intel repo ****" && \
-         mkdir -p /usr/share/keyrings && \
-         curl -o /usr/share/keyrings/intel-graphics.key -L https://repositories.intel.com/graphics/intel-graphics.key && \
-         echo "deb [trusted=yes arch=amd64 signed-by=/usr/share/keyrings/intel-graphics.key] https://repositories.intel.com/graphics/ubuntu focal main" > /etc/apt/sources.list.d/intel.list && \
          export ARCH=amd64 && \
       echo "**** install runtime packages ****" && \
          apt-get update -yqq && \
       echo "**** install Intel packages ****" && \
-         apt-get install --no-install-recommends -yqq intel-opencl-icd intel-gpu-tools i965-va-driver-shaders va-driver-all beignet-opencl-icd mesa-vulkan-drivers gpg-agent libmfx1 ocl-icd-libopencl1; \
+         apt-get install --no-install-recommends -yqq intel-opencl-icd intel-gpu-tools i965-va-driver-shaders va-driver-all mesa-vulkan-drivers gpg-agent libmfx1 ocl-icd-libopencl1; \
     ;; \
     'linux/arm64') export ARCH=arm64 && unset NVIDIA_DRIVER_CAPABILITIES ;; \
    esac \
@@ -68,7 +64,4 @@ RUN \
 
 COPY --chown=abc ./apps/docker-plex/root/ /
 
-EXPOSE 32400
-
-VOLUME /config
 ##EOF

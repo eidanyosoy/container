@@ -4,7 +4,7 @@
    "appfolder": "./apps/docker-plex",
    "newversion": "1.26.0.5715-8cf78dab3",
    "appbranch": "master",
-   "baseimage": "ghcr.io/linuxserver/baseimage-ubuntu:focal",
+   "baseimage": "ghcr.io/linuxserver/baseimage-ubuntu:jammy",
    "description": "Docker Container for Plex Media Server",
    "body": "Upgrading docker-plex to 1.26.0.5715-8cf78dab3",
    "user": "github-actions[bot]"
