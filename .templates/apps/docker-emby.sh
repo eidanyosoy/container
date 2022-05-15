@@ -31,7 +31,7 @@ NEWVERSION="${NEWVERSION}"
 HEADLINE="$(cat ./.templates/headline.txt)"
 
 DESCRIPTION="Docker Container for Emby Server"
-BASESTAGE="ghcr.io/linuxserver/baseimage-ubuntu:bionic as buildstage"
+BASESTAGE="ghcr.io/linuxserver/baseimage-ubuntu:jammy as buildstage"
 INSTCOMMAND="apt-get install -yqq"
 UPTCOMMAND="apt-get update -yqq"
 
@@ -50,9 +50,9 @@ BASEMLINK="mv -t /app/emby \\
      /tmp/opt/emby-server/etc"
 
 ## FINALIMAGE
-FINALIMAGE="ghcr.io/linuxserver/baseimage-ubuntu:focal"
+FINALIMAGE="ghcr.io/linuxserver/baseimage-ubuntu:jammy"
 PACKAGESFINAL="aria2 jq unrar unzip curl uuid-runtime mesa-va-drivers"
-PACKAGESINTEL="intel-opencl-icd intel-gpu-tools i965-va-driver-shaders va-driver-all beignet-opencl-icd mesa-vulkan-drivers gpg-agent libmfx1 ocl-icd-libopencl1"
+PACKAGESINTEL="intel-opencl-icd intel-gpu-tools i965-va-driver-shaders va-driver-all mesa-vulkan-drivers gpg-agent libmfx1 ocl-icd-libopencl1"
 CLEANUP="apt-get remove -yqq aria2 jq software-properties-common gpg-agent && \\
      apt-get autoremove -yqq && apt-get clean -yqq && \\
      rm -rf /tmp/* /var/lib/apt/lists/* /var/tmp/"
@@ -138,10 +138,6 @@ RUN \
    case $TARGETPLATFORM in \
     '"'linux/amd64'"') \
          export NVIDIA_DRIVER_CAPABILITIES="'"compute,video,utility"'" && \
-     echo "'"**** add Intel repo ****"'" && \
-         mkdir -p /usr/share/keyrings && \
-         curl -o /usr/share/keyrings/intel-graphics.key -L https://repositories.intel.com/graphics/intel-graphics.key && \
-         echo "'"deb [trusted=yes arch=amd64 signed-by=/usr/share/keyrings/intel-graphics.key] https://repositories.intel.com/graphics/ubuntu focal main"'" > /etc/apt/sources.list.d/intel.list && \
          export ARCH=amd64 && \
       echo "'"**** install runtime packages ****"'" && \
          '"${UPTCOMMAND}"' && \
