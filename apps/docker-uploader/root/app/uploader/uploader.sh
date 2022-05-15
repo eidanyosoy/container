@@ -251,9 +251,9 @@ function transfercheck() {
             $(which touch) -m "${DLFOLDER}/${UPP[1]}"
             listfile
             ## $(which sed) -i -e '1 w /dev/stdout' -e '1d' "${CHK}" &>/dev/null   ## to prevent double upload trying
-            $(which sleep) 2 && break
+            $(which sleep) 10 && break
          else
-            $(which sleep) 10
+            $(which sleep) 1
          fi
    done
 }
