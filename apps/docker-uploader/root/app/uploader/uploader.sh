@@ -180,20 +180,15 @@ function rcloneupload() {
    ## RUN MOVE
    $(which rclone) moveto "${DLFOLDER}/${UPP[1]}" "${KEY}$[USED]${CRYPTED}:/${DIR}/${FILE}" \
       --config="${CONFIG}" \
-      --stats=1s \
+      --stats=2s \
       --checkers=2 \
-      --create-empty-src-dirs \
-      --drive-chunk-size=32M \
-      --drive-stop-on-upload-limit \
+      --drive-chunk-size=8M \
       --log-level="${LOG_LEVEL}" \
       --user-agent="${USERAGENT}" ${BWLIMIT} \
       --log-file="${LOGFILE}/${FILE}.txt" \
       --tpslimit 20
 
-   if [[ $? == 0 ]]; then
-      $(which rclone) deletefile --config="${CONFIG}" "${DLFOLDER}/${UPP[1]}" &>/dev/null && \
-      $(which find) "${DLFOLDER}/${SETDIR}" -type d -empty -delete &>/dev/null
-   fi
+   $(which find) "${DLFOLDER}/${SETDIR}" -type d -empty -delete &>/dev/null
 
    ENDZ=$(date +%s)
    echo "{\"filedir\": \"${DIR}\",\"filebase\": \"${FILE}\",\"filesize\": \"${SIZE}\",\"gdsa\": \"${KEY}$[USED]${CRYPTED}\",\"starttime\": \"${STARTZ}\",\"endtime\": \"${ENDZ}\"}" > "${DONE}/${FILE}.json"
