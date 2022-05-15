@@ -76,6 +76,14 @@ echo '{
    "user": "github-actions[bot]"
 }' > "./$FOLDER/$APP/release.json"
 
+## HAXK for Intel
+echo '# Packages and Updates from the Hetzner Ubuntu Mirror
+deb http://mirror.hetzner.com/ubuntu/packages jammy           main restricted universe multiverse
+deb http://mirror.hetzner.com/ubuntu/packages jammy-updates   main restricted universe multiverse
+deb http://mirror.hetzner.com/ubuntu/packages jammy-backports main restricted universe multiverse
+deb http://mirror.hetzner.com/ubuntu/packages jammy-security  main restricted universe multiverse' > "./$FOLDER/$APP/root/etc/apt/sources.list.d/extra.list"
+
+
 ### DOCKER BUILD ###
 ### GENERATE Dockerfile based on release.json
 
