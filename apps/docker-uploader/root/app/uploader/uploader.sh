@@ -71,7 +71,6 @@ fi
 ##### FUNCTIONS
 
 function cleanuplog() {
-
    RMLOG=/system/uploader/logs/rmcheck.log
    #### RCLONE LIST FILE
    $(which rclone) lsf "${DONE}" \
@@ -79,7 +78,6 @@ function cleanuplog() {
       --separator "|" \
       --format="tp" \
       --order-by="modtime" | sort > "${RMLOG}" 2>&1
-
    ### REMOVE LAST 1000 FILES
    if [ `cat ${RMLOG} | wc -l` -gt 1000 ]; then
       $(which cat) "${RMLOG}" | head -n 1000 | while IFS=$'|' read -ra RMLO; do
@@ -91,7 +89,6 @@ function cleanuplog() {
 }
 
 function loopcsv() {
-
 $(which mkdir) -p /app/custom/
 if test -f ${CSV} ; then
    # echo correct folder from log file
@@ -136,11 +133,9 @@ EOF
    fi
    done
 fi
-
 }
 
 function rcloneupload() {
-
    source /system/uploader/uploader.env
    DLFOLDER=${DLFOLDER}
    MOVE=${MOVE:-/}
@@ -214,10 +209,9 @@ function rcloneupload() {
    fi
 }
 
-function listfile() {
+function listfiles() {
    source /system/uploader/uploader.env
    DLFOLDER=${DLFOLDER}
-
    #### RCLONE LIST FILE
    $(which rclone) lsf "${DLFOLDER}" \
       --files-only -R \
@@ -228,7 +222,6 @@ function listfile() {
 }
 
 function checkspace() {
-
    source /system/uploader/uploader.env
    DLFOLDER=${DLFOLDER}
    if [[ "${DRIVEUSEDSPACE}" =~ ^[0-9][0-9]+([.][0-9]+)?$ ]]; then
@@ -243,11 +236,9 @@ function checkspace() {
         fi
       done
    fi
-
 }
 
 function transfercheck() {
-
    while true; do
        source /system/uploader/uploader.env
        ## -I [ exclude check.log & rmcheck.log file ]
@@ -268,7 +259,6 @@ function transfercheck() {
 }
 
 function rclonedown() {
-
    source /system/uploader/uploader.env
    ## upload function shutdown
    LCT=$($(which df) --output=pcent ${DLFOLDER} | tr -dc '0-9')
