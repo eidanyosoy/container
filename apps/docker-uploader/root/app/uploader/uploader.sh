@@ -178,26 +178,23 @@ function rcloneupload() {
       BWLIMIT="--bwlimit=${BANDWITHLIMIT}"
    fi
    ## RUN MOVE
-   $(which rclone) copy "${DLFOLDER}/${UPP[1]}" "${KEY}$[USED]${CRYPTED}:/${DIR}/" \
+   $(which rclone) moveto "${DLFOLDER}/${UPP[1]}" "${KEY}$[USED]${CRYPTED}:/${DIR}/${FILE}" \
       --config="${CONFIG}" \
       --stats=1s \
-      --checkers=32 \
-      --use-mmap \
-      --no-traverse \
-      --check-first \
+      --checkers=2 \
       --create-empty-src-dirs \
-      --drive-chunk-size=64M \
+      --drive-chunk-size=32M \
       --drive-stop-on-upload-limit \
       --log-level="${LOG_LEVEL}" \
       --user-agent="${USERAGENT}" ${BWLIMIT} \
       --log-file="${LOGFILE}/${FILE}.txt" \
-      --tpslimit 50 \
-      --tpslimit-burst 50 \
-      --min-age="${MIN_AGE_FILE}"
+      --tpslimit 20
+
    if [[ $? == 0 ]]; then
       $(which rclone) deletefile --config="${CONFIG}" "${DLFOLDER}/${UPP[1]}" &>/dev/null && \
-        $(which find) "${DLFOLDER}/${SETDIR}" -type d -empty -delete &>/dev/null
+      $(which find) "${DLFOLDER}/${SETDIR}" -type d -empty -delete &>/dev/null
    fi
+
    ENDZ=$(date +%s)
    echo "{\"filedir\": \"${DIR}\",\"filebase\": \"${FILE}\",\"filesize\": \"${SIZE}\",\"gdsa\": \"${KEY}$[USED]${CRYPTED}\",\"starttime\": \"${STARTZ}\",\"endtime\": \"${ENDZ}\"}" > "${DONE}/${FILE}.json"
    unset CRYPTED
