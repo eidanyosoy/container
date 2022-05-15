@@ -78,13 +78,13 @@ function cleanuplog() {
       --separator "|" \
       --format="tp" \
       --order-by="modtime" | sort > "${RMLOG}" 2>&1
-   ### REMOVE LAST 1000 FILES
+   #### REMOVE LAST 1000 FILES
    if [ `cat ${RMLOG} | wc -l` -gt 1000 ]; then
       $(which cat) "${RMLOG}" | head -n 1000 | while IFS=$'|' read -ra RMLO; do
-         $(which rm) -rf "${DONE}/${RMLO[1]}"
+         $(which rm) -rf "${DONE}/${RMLO[1]}" "${CHK}" &>/dev/null
       done
    else
-      $(which rm) "${RMLOG}"
+      $(which rm) -rf "${RMLOG}" "${CHK}" &>/dev/null
    fi
 }
 
@@ -141,7 +141,7 @@ function rcloneupload() {
    MOVE=${MOVE:-/}
    FILE=$(basename "${UPP[1]}")
    DIR=$(dirname "${UPP[1]}" | sed "s#${DLFOLDER}/${MOVE}##g")
-   STARTZ=$(date +%s)
+   ####STARTZ=$(date +%s)
    SIZE=$(stat -c %s "${DLFOLDER}/${UPP[1]}" | numfmt --to=iec-i --suffix=B --padding=7)
 
    while true ; do
@@ -182,6 +182,9 @@ function rcloneupload() {
       $(which sleep) 5 ## sleep 5 for duplicati folders
    fi
 
+   ## START TIME UPLOAD ##
+   STARTZ=$(date +%s)
+
    #### RUN MOVE
    $(which rclone) moveto "${DLFOLDER}/${UPP[1]}" "${KEY}$[USED]${CRYPTED}:/${DIR}/${FILE}" \
       --config="${CONFIG}" \
@@ -192,10 +195,12 @@ function rcloneupload() {
       --user-agent="${USERAGENT}" ${BWLIMIT} \
       --log-file="${LOGFILE}/${FILE}.txt" \
       --tpslimit 20
+ 
+   ## END TIME UPLOAD ##
+   ENDZ=$(date +%s)
 
    $(which find) "${DLFOLDER}/${SETDIR}" -type d -empty -delete &>/dev/null
 
-   ENDZ=$(date +%s)
    $(which echo) "{\"filedir\": \"${DIR}\",\"filebase\": \"${FILE}\",\"filesize\": \"${SIZE}\",\"gdsa\": \"${KEY}$[USED]${CRYPTED}\",\"starttime\": \"${STARTZ}\",\"endtime\": \"${ENDZ}\"}" > "${DONE}/${FILE}.json"
    unset CRYPTED
    #### END OF MOVE
@@ -230,27 +235,28 @@ function checkspace() {
         if [[ "${DRIVEUSEDSPACE}" =~ ^[0-9][0-9]+([.][0-9]+)?$ ]]; then
            if [[ "${LCT}" -gt "${DRIVEUSEDSPACE}" ]]; then
               $(which sleep) 5 && break
-          else
+           else
               $(which sleep) 10
-          fi
+           fi
         fi
       done
    fi
 }
 
 function transfercheck() {
-   while true; do
+   while true ; do
        source /system/uploader/uploader.env
-       ## -I [ exclude check.log & rmcheck.log file ]
-       ## moved to pgrep
+       #### -I [ exclude check.log & rmcheck.log file ]
+       #### moved to pgrep
        ACTIVETRANSFERS=`$(which pgrep) -x rclone | wc -l`
        TRANSFERS=${TRANSFERS:-2}
          if [[ ${ACTIVETRANSFERS} -lt ${TRANSFERS} ]]; then
-            ## REMOVE ACTIVE UPLOAD from check file
-            ## change modtime of file
+            #### REMOVE ACTIVE UPLOAD from check file
+            #### change modtime of file
             $(which touch) -m "${DLFOLDER}/${UPP[1]}"
-            listfile
-            ## $(which sed) -i -e '1 w /dev/stdout' -e '1d' "${CHK}" &>/dev/null   ## to prevent double upload trying
+            #### reload check file
+            listfiles
+            #### $(which sed) -i -e '1 w /dev/stdout' -e '1d' "${CHK}" &>/dev/null   ## to prevent double upload trying
             $(which sleep) 10 && break
          else
             $(which sleep) 1
@@ -265,8 +271,7 @@ function rclonedown() {
    if [[ "${DRIVEUSEDSPACE}" =~ ^[0-9][0-9]+([.][0-9]+)?$ ]]; then
       if [[ "${DRIVEUSEDSPACE}" -gt "${LCT}" ]]; then
           $(which rm) -rf "${CHK}" "${LOGFILE}/${FILE}.txt" "${START}/${FILE}.json" && \
-          $(which chmod) 755 "${DONE}/${FILE}.json" && \
-          break
+          $(which chmod) 755 "${DONE}/${FILE}.json" && break
       fi
    fi
 }
@@ -288,18 +293,17 @@ while true ; do
          SETDIR=$(dirname "${UPP[1]}" | sed "s#${DLFOLDER}/${MOVE}##g" | cut -d ' ' -f 1 | sed 's|/.*||' )
          #### checking multiple drive setup
          if test -f ${CSV}; then loopcsv ; fi
-         ## upload function startup
+         #### upload function startup
          if [[ "${TRANSFERS}" != 1 ]];then
             #### DEMONISED UPLOAD
             rcloneupload &
          else
-            ##£# SINGLE UPLOAD
+            #### SINGLE UPLOAD
             rcloneupload
          fi
          #### shutdown rclone upload process
          rclonedown
       done
-      $(which rm) -rf "${CHK}"
       cleanuplog
    else
       sleep 120
