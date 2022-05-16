@@ -131,11 +131,11 @@
    "appname": "docker-embystat",
    "apppic": "./images/docker-embystat.png",
    "appfolder": "./apps/docker-embystat",
-   "newversion": "0.2.0-beta.26",
+   "newversion": "0.2.0-beta.30",
    "appbranch": "master",
    "baseimage": "ghcr.io/linuxserver/baseimage-ubuntu:bionic",
    "description": "null",
-   "body": "Upgrading docker-embystat to 0.2.0-beta.26",
+   "body": "Upgrading docker-embystat to 0.2.0-beta.30",
    "user": "github-actions[bot]"
 }
 {
@@ -145,9 +145,9 @@
    "newversion": "3.15.4",
    "appbranch": "master",
    "baseimage": "alpine",
-   "appversion": "6d163ea39cd26a38753a1bd5a6a3024d9e8bf471",
+   "appversion": "20e195cc2d59b364be97c144d2f01230e468a269",
    "description": "A personal home page for quick access to all your personal apps/sites.",
-   "body": "Upgrading docker-fenrus to 6d163ea39cd26a38753a1bd5a6a3024d9e8bf471",
+   "body": "Upgrading docker-fenrus to 20e195cc2d59b364be97c144d2f01230e468a269",
    "user": "github-actions[bot]"
 }
 {
@@ -164,11 +164,11 @@
    "appname": "docker-jackett",
    "apppic": "./images/docker-jackett.png",
    "appfolder": "./apps/docker-jackett",
-   "newversion": "0.20.1062",
+   "newversion": "0.20.1066",
    "appbranch": "master",
    "baseimage": "ghcr.io/linuxserver/baseimage-ubuntu:bionic",
    "description": "API Support for your favorite torrent trackers",
-   "body": "Upgrading docker-jackett to 0.20.1062",
+   "body": "Upgrading docker-jackett to 0.20.1066",
    "user": "github-actions[bot]"
 }
 {
@@ -299,11 +299,11 @@
    "appname": "docker-prowlarr",
    "apppic": "./images/docker-prowlarr.png",
    "appfolder": "./apps/docker-prowlarr",
-   "newversion": "0.4.0.1787",
+   "newversion": "0.4.0.1788",
    "appbranch": "nightly",
    "baseimage": "ghcr.io/dockserver/docker-alpine:latest",
    "description": "null",
-   "body": "Upgrading docker-prowlarr to 0.4.0.1787",
+   "body": "Upgrading docker-prowlarr to 0.4.0.1788",
    "user": "github-actions[bot]"
 }
 {
@@ -343,11 +343,11 @@
    "appname": "docker-readarr",
    "apppic": "./images/docker-readarr.png",
    "appfolder": "./apps/docker-readarr",
-   "newversion": "0.1.1.1320",
+   "newversion": "0.1.1.1323",
    "appbranch": "nightly",
    "baseimage": "ghcr.io/dockserver/docker-alpine:latest",
    "description": "null",
-   "body": "Upgrading docker-readarr to 0.1.1.1320",
+   "body": "Upgrading docker-readarr to 0.1.1.1323",
    "user": "github-actions[bot]"
 }
 {
@@ -599,31 +599,31 @@
    "appname": "docker-radarr-nightly",
    "apppic": "./images/docker-radarr-nightly.png",
    "appfolder": "./nightly/docker-radarr-nightly",
-   "newversion": "4.2.0.6269",
+   "newversion": "4.2.0.6272",
    "appbranch": "nightly",
    "baseimage": "ghcr.io/dockserver/docker-alpine:latest",
    "description": "A fork of Sonarr to work with movies à la Couchpotato.",
-   "body": "Upgrading docker-radarr-nightly to 4.2.0.6269",
+   "body": "Upgrading docker-radarr-nightly to 4.2.0.6272",
    "user": "github-actions[bot]"
 }
 {
    "appname": "docker-sabnzbd-nightly",
    "apppic": "./images/docker-sabnzbd-nightly.png",
    "appfolder": "./nightly/docker-sabnzbd-nightly",
-   "newversion": "81d27ece5488c1c627b140c71bd8a01bf4546c47",
+   "newversion": "51ce7b657c9540967799b2b4676bbe511606d501",
    "appbranch": "develop",
    "description": "SABnzbd - The automated Usenet download tool",
-   "body": "Upgrading docker-sabnzbd-nightly to 81d27ece5488c1c627b140c71bd8a01bf4546c47",
+   "body": "Upgrading docker-sabnzbd-nightly to 51ce7b657c9540967799b2b4676bbe511606d501",
    "user": "github-actions[bot]"
 }
 {
    "appname": "docker-sonarr-nightly",
    "apppic": "./images/docker-sonarr-nightly.png",
    "appfolder": "./nightly/docker-sonarr-nightly",
-   "newversion": "3.0.8.1519",
+   "newversion": "3.0.8.1520",
    "appbranch": "develop",
    "description": "Smart PVR for newsgroup and bittorrent users.",
-   "body": "Upgrading docker-sonarr-nightly to 3.0.8.1519",
+   "body": "Upgrading docker-sonarr-nightly to 3.0.8.1520",
    "user": "github-actions[bot]"
 }
 {
