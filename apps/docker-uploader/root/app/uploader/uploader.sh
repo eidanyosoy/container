@@ -149,9 +149,9 @@ function rcloneupload() {
       $(which sleep) 5
       SUMTEST=$(stat -c %s "${DLFOLDER}/${UPP[1]}")
       if [[ "$SUMSTART" -eq "$SUMTEST" ]]; then
-         $(which sleep) 5 && break
+         $(which sleep) 2 && break
       else
-         $(which sleep) 5
+         $(which sleep) 10 ### longer sleeps for old drives
       fi
    done
 
@@ -164,7 +164,7 @@ function rcloneupload() {
           USED=$(( $RANDOM % ${ARRAY} + 1 ))
    fi
 
-   #### CRYPTED HACK
+   #### CRYPTED HACK ####
    if `$(which rclone) config show --config=${CONFIG} | grep ":/encrypt" &>/dev/null`;then
        export CRYPTED=C
    else
@@ -174,21 +174,24 @@ function rcloneupload() {
    touch "${LOGFILE}/${FILE}.txt" && \
       $(which echo) "{\"filedir\": \"${DIR}\",\"filebase\": \"${FILE}\",\"filesize\": \"${SIZE}\",\"logfile\": \"${LOGFILE}/${FILE}.txt\",\"gdsa\": \"${KEY}$[USED]${CRYPTED}\"}" > "${START}/${FILE}.json"
 
+   #### READ BWLIMIT ####
    if [[ "${BANDWITHLIMIT}" =~ ^[0-9][0-9]+([.][0-9]+)?$ ]]; then
       BWLIMIT="--bwlimit=${BANDWITHLIMIT}"
    fi
 
    if [[ "${TRANSFERS}" != 1 ]];then
-      $(which sleep) 5 ## sleep 5 for duplicati folders
+      $(which sleep) 2 ## sleep 5 for duplicati folders
+      ### make folder on correct drive
+      $(which rclone) mkdir "${KEY}$[USED]${CRYPTED}:/${DIR}/" --config="${CONFIG}"
    fi
 
-   ## START TIME UPLOAD ##
+   #### START TIME UPLOAD ####
    STARTZ=$(date +%s)
 
-   #### RUN MOVE
+   #### RUN MOVE ####
    $(which rclone) moveto "${DLFOLDER}/${UPP[1]}" "${KEY}$[USED]${CRYPTED}:/${DIR}/${FILE}" \
       --config="${CONFIG}" \
-      --stats=2s \
+      --stats=1s \
       --checkers=2 \
       --drive-chunk-size=8M \
       --log-level="${LOG_LEVEL}" \
@@ -204,7 +207,6 @@ function rcloneupload() {
    $(which echo) "{\"filedir\": \"${DIR}\",\"filebase\": \"${FILE}\",\"filesize\": \"${SIZE}\",\"gdsa\": \"${KEY}$[USED]${CRYPTED}\",\"starttime\": \"${STARTZ}\",\"endtime\": \"${ENDZ}\"}" > "${DONE}/${FILE}.json"
    unset CRYPTED
    #### END OF MOVE
-   sleep 5
 
    $(which rm) -rf "${LOGFILE}/${FILE}.txt" "${START}/${FILE}.json" 
    $(which chmod) 755 "${DONE}/${FILE}.json"
@@ -259,9 +261,9 @@ function transfercheck() {
             #### reload check file
             listfiles
             #### $(which sed) -i -e '1 w /dev/stdout' -e '1d' "${CHK}" &>/dev/null   ## to prevent double upload trying
-            $(which sleep) 10 && break
+            $(which sleep) 5 && break
          else
-            $(which sleep) 1
+            $(which sleep) 10
          fi
    done
 }
@@ -277,9 +279,9 @@ function rclonedown() {
       fi
    fi
 }
+#### END OF ALL FUNCTIONS ####
 
-
-## START HERE UPLOADER LIVE
+#### START HERE UPLOADER LIVE
 while true ; do
    #### run check space
    checkspace
