@@ -248,10 +248,12 @@ function transfercheck() {
        source /system/uploader/uploader.env
        #### -I [ exclude check.log & rmcheck.log file ]
        #### moved to pgrep
-       ACTIVETRANSFERS=`$(which pgrep) -x rclone | wc -l`
+       #### ACTIVETRANSFERS=`$(which pgrep) -x rclone | wc -l`
+       ACTIVETRANSFERS=`ls -A ${LOGFILE} -I "check.log" -I "rmcheck.log" | wc -l`
        TRANSFERS=${TRANSFERS:-2}
          if [[ ${ACTIVETRANSFERS} -lt ${TRANSFERS} ]]; then
             #### REMOVE ACTIVE UPLOAD from check file
+            $(which touch) "${LOGFILE}/${FILE}.txt"
             #### change modtime of file
             $(which touch) -m "${DLFOLDER}/${UPP[1]}"
             #### reload check file
