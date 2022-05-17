@@ -141,7 +141,9 @@ function rcloneupload() {
       SUMSTART=$(stat -c %s "${DLFOLDER}/${UPP[1]}")
       $(which sleep) 5
       SUMTEST=$(stat -c %s "${DLFOLDER}/${UPP[1]}")
-      if [[ "$SUMSTART" -eq "$SUMTEST" ]]; then
+      if [ "$SUMTEST" -eq 0 ] && [ "$SUMSTART" -eq 0 ]; then
+         $(which sleep) 5 ### FIX FOR 0 BYTE UPLOADS
+      elif [ "$SUMSTART" -eq "$SUMTEST" ]; then
          $(which sleep) 2 && break
       else
          $(which sleep) 10 ### longer sleeps for old drives
@@ -267,7 +269,7 @@ while true ; do
    listfiles
    #### FIRST LOOP
    source /system/uploader/uploader.env
-   if [ `$(which cat) ${CHK} | wc -l` -gt ${TRANSFERS} ]; then
+   if [ `$(which cat) ${CHK} | wc -l` -gt "${TRANSFERS}" ]; then
       # shellcheck disable=SC2086
       $(which cat) "${CHK}" | head -n 1 | while IFS=$'|' read -ra UPP; do
          #### RUN TRANSFERS CHECK ####
