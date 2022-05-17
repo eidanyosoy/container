@@ -266,7 +266,8 @@ while true ; do
    #### RUN LIST COMMAND-FUNCTION ####
    listfiles
    #### FIRST LOOP
-   if [ `$(which cat) ${CHK} | wc -l` -gt 0 ]; then
+   source /system/uploader/uploader.env
+   if [ `$(which cat) ${CHK} | wc -l` -gt ${TRANSFERS} ]; then
       # shellcheck disable=SC2086
       $(which cat) "${CHK}" | head -n 1 | while IFS=$'|' read -ra UPP; do
          #### RUN TRANSFERS CHECK ####
@@ -276,7 +277,10 @@ while true ; do
          #### CHECK IS CSV AVAILABLE AND LOOP TO CORRECT DRIVE ####
          if test -f ${CSV}; then loopcsv ; fi
          #### UPLOAD FUNCTIONS STARTUP ####
-         if [[ "${TRANSFERS}" != 1 ]];then
+         if [[ `$(which cat) ${CHK} | wc -l` -eq ${TRANSFERS} ]]; then
+            #### FALLBACK TO SINGLE UPLOAD
+            rcloneupload
+         elif [[ "${TRANSFERS}" != 1 ]];then
             #### DEMONISED UPLOAD
             rcloneupload &
          else
