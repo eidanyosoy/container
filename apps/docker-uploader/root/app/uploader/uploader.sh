@@ -190,7 +190,7 @@ function rcloneupload() {
    #### CHECK IS TRANSFERS GREAT AS 1 TO PREVENT DOUBLE FOLDER ON GOOGLE ####
    if [[ "${TRANSFERS}" != 1 ]];then
       #### MAKE FOLDER ON CORRECT DRIVE #### 
-      $(which rclone) mkdir -p "${KEY}$[USED]${CRYPTED}:/${DIR}/" --config="${CONFIG}"
+      $(which rclone) mkdir "${KEY}$[USED]${CRYPTED}:/${DIR}/" --config="${CONFIG}"
    fi
    #### START TIME UPLOAD ####
    STARTZ=$(date +%s)
