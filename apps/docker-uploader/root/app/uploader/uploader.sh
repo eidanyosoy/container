@@ -141,10 +141,6 @@ function rcloneupload() {
    #### FILE TO UPLOAD ####
    SUSER=$(stat -c %u "${DLFOLDER}/${UPP[1]}")
    PERMI=$(stat -c %a "${DLFOLDER}/${UPP[1]}")
-   #### LOG FILES ON SERVER ####
-   SLOGFILE=$(stat -c %u "${DONE}/${FILE}.json")
-   PERMILOG=$(stat -c %a "${DONE}/${FILE}.json")
-
    #### CHECK IS FILE SIZE NOT CHANGE ####
    while true ; do
       SUMSTART=$(stat -c %s "${DLFOLDER}/${UPP[1]}")
@@ -216,6 +212,9 @@ function rcloneupload() {
    unset CRYPTED
    #### END OF MOVE ####
    $(which rm) -rf "${LOGFILE}/${FILE}.txt" "${START}/${FILE}.json"
+   #### LOG FILES ON SERVER ####
+   SLOGFILE=$(stat -c %u "${DONE}/${FILE}.json")
+   PERMILOG=$(stat -c %a "${DONE}/${FILE}.json")
    #### SET PERMISSIONS BACK TO UID 1000 AND 755 FOR UI READING ###
    if [ ! "$SLOGFILE" = "$PUID" ];then
       $(which chown) abc:abc -R "${DONE}/${FILE}.json" &>/dev/null 
