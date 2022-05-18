@@ -136,6 +136,15 @@ function rcloneupload() {
    FILE=$(basename "${UPP[1]}")
    DIR=$(dirname "${UPP[1]}" | sed "s#${DLFOLDER}/${MOVE}##g")
    SIZE=$(stat -c %s "${DLFOLDER}/${UPP[1]}" | numfmt --to=iec-i --suffix=B --padding=7)
+
+   #### PERMISSIONS STATS COMMANDS ####
+   #### FILE TO UPLOAD ####
+   SUSER=$(stat -c %u "${DLFOLDER}/${UPP[1]}")
+   PERMI=$(stat -c %a "${DLFOLDER}/${UPP[1]}")
+   #### LOG FILES ON SERVER ####
+   SLOGFILE=$(stat -c %u "${DONE}/${FILE}.json")
+   PERMILOG=$(stat -c %a "${DONE}/${FILE}.json")
+
    #### CHECK IS FILE SIZE NOT CHANGE ####
    while true ; do
       SUMSTART=$(stat -c %s "${DLFOLDER}/${UPP[1]}")
@@ -154,10 +163,10 @@ function rcloneupload() {
       fi
    done
    #### SET PERMISSIONS BACK TO UID 1000 AND 755 FOR UI READING ###
-   if [ ! "$(stat -c %u ${DLFOLDER}/${UPP[1]})" = "$PUID" ];then
+   if [ ! "$SUSER" = "$PUID" ];then
       $(which chown) abc:abc -R "${DLFOLDER}/${UPP[1]}" &>/dev/null 
    fi
-   if [ ! "$(stat -c %a ${DLFOLDER}/${UPP[1]})" = "755" ];then
+   if [ ! "$PERMI" = "755" ];then
       $(which chmod) 0755 -R "${DLFOLDER}/${UPP[1]}" &>/dev/null
    fi
    #### CHECK IS CUSTOM RCLONE.CONF IS AVAILABLE ####
@@ -208,10 +217,10 @@ function rcloneupload() {
    #### END OF MOVE ####
    $(which rm) -rf "${LOGFILE}/${FILE}.txt" "${START}/${FILE}.json"
    #### SET PERMISSIONS BACK TO UID 1000 AND 755 FOR UI READING ###
-   if [ ! "$(stat -c %u ${DONE}/${FILE}.json)" = "$PUID" ];then
-      $(which chown) abc:abc -R "${DONE}/${FILE}.json" &>/dev/null
+   if [ ! "$SLOGFILE" = "$PUID" ];then
+      $(which chown) abc:abc -R "${DONE}/${FILE}.json" &>/dev/null 
    fi
-   if [ ! "$(stat -c %a ${DONE}/${FILE}.json)" = "755" ];then
+   if [ ! "$PERMILOG" = "755" ];then
       $(which chmod) 755 -R "${DONE}/${FILE}.json" &>/dev/null
    fi
    #### REMOVE CUSTOM RCLONE.CONF ####
@@ -272,9 +281,8 @@ function rclonedown() {
    if [[ "${DRIVEUSEDSPACE}" =~ ^[0-9][0-9]+([.][0-9]+)?$ ]]; then
       if [[ "${DRIVEUSEDSPACE}" -gt "${LCT}" ]]; then
           $(which rm) -rf "${CHK}" "${LOGFILE}/${FILE}.txt" "${START}/${FILE}.json" && \
-          if [ ! "$(stat -c %a ${DONE}/${FILE}.json)" != "755" ];then
-            $(which chmod) 755 -R "${DONE}/${FILE}.json" &>/dev/null
-          fi
+            $(which chown) abc:abc -R "${DONE}/${FILE}.json" &>/dev/null && \
+            $(which chmod) 755 -R "${DONE}/${FILE}.json" &>/dev/null && \
           break
       fi
    fi
