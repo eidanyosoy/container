@@ -257,10 +257,11 @@ function transfercheck() {
    while true ; do
        source /system/uploader/uploader.env
        #### -I [ exclude check.log & rmcheck.log file ] ####
-       ACTIVETRANSFERS=`ls -A ${LOGFILE} -I "check.log" -I "rmcheck.log" | wc -l`
+       ACTIVETRANSFERS=`ls ${LOGFILE} -I "check.log" -I "rmcheck.log" | wc -l`
        TRANSFERS=${TRANSFERS:-2}
          if [[ ${ACTIVETRANSFERS} -lt ${TRANSFERS} ]]; then
             #### REMOVE ACTIVE UPLOAD FROM CHECK FILE ####
+            FILE=$(basename "${UPP[1]}")
             $(which touch) "${LOGFILE}/${FILE}.txt"
             #### CHANGE MODTIME OF FILE ####
             $(which touch) -m "${DLFOLDER}/${UPP[1]}"
