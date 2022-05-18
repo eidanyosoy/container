@@ -70,9 +70,9 @@ fi
 #### START OF ALL FUNCTIONS ####
 function cleanuplog() {
    RMLOG=/system/uploader/logs/rmcheck.log
-   #### RCLONE LIST FILE
+   #### RCLONE LIST FILE ####
    $(which rclone) lsf "${DONE}" --files-only -R -s "|" -F "tp" | sort -n > "${RMLOG}" 2>&1
-   #### REMOVE LAST 1000 FILES
+   #### REMOVE LAST 1000 FILES ####
    if [ `cat ${RMLOG} | wc -l` -gt 1000 ]; then
       $(which cat) "${RMLOG}" | head -n 1000 | while IFS=$'|' read -ra RMLO; do
          $(which rm) -rf "${DONE}/${RMLO[1]}" &>/dev/null
@@ -85,11 +85,11 @@ function cleanuplog() {
 function loopcsv() {
 $(which mkdir) -p /app/custom/
 if test -f ${CSV} ; then
-   # echo correct folder from log file
+   #### ECHO CORRECT FOLDER FROM LOG FILE ####
    DIR=${SETDIR}
    FILE=${FILE}
    ENDCONFIG=${CUSTOM}/${FILE}.conf
-   #### USE FILE NAME AS RCLONE CONF
+   #### USE FILE NAME AS RCLONE CONF ####
    ARRAY=$(ls -A ${KEYLOCAL} | wc -l )
    USED=$(( $RANDOM % ${ARRAY} + 1 ))
 
@@ -142,13 +142,24 @@ function rcloneupload() {
       $(which sleep) 5
       SUMTEST=$(stat -c %s "${DLFOLDER}/${UPP[1]}")
       if [ "$SUMTEST" -eq 0 ] && [ "$SUMSTART" -eq 0 ]; then
-         $(which sleep) 5 ### FIX FOR 0 BYTE UPLOADS
+         #### WHEN FILE SIZE A IS ZERO AND FILES SIZE B IS ZERO LOOP AND WAIT ####
+         $(which sleep) 5
+         #### FIX FOR 0 BYTE UPLOADS ###£
       elif [ "$SUMSTART" -eq "$SUMTEST" ]; then
+         #### WHEN FILE SIZE A IS EQUAL TO B THEN BREAK LOOP ###
          $(which sleep) 2 && break
       else
-         $(which sleep) 10 ### longer sleeps for old drives
+         #### WHEN FILE SIZE A IS NOT EQAUL TO B THEN LOOP AGAIN TO CHECK THE FILE SIZE ####
+         $(which sleep) 10
       fi
    done
+   #### SET PERMISSIONS BACK TO UID 1000 AND 755 FOR UI READING ###
+   if [ ! "$(stat -c %u ${DLFOLDER}/${UPP[1]})" = "$PUID" ];then
+      $(which chown) abc:abc -R "${DLFOLDER}/${UPP[1]}" &>/dev/null 
+   fi
+   if [ ! "$(stat -c %a ${DLFOLDER}/${UPP[1]})" = "755" ];then
+      $(which chmod) 0755 -R "${DLFOLDER}/${UPP[1]}" &>/dev/null
+   fi
    #### CHECK IS CUSTOM RCLONE.CONF IS AVAILABLE ####
    if test -f "${CUSTOM}/${FILE}.conf" ; then
       CONFIG=${CUSTOM}/${FILE}.conf && \
@@ -171,10 +182,10 @@ function rcloneupload() {
    if [[ "${BANDWITHLIMIT}" =~ ^[0-9][0-9]+([.][0-9]+)?$ ]]; then
       BWLIMIT="--bwlimit=${BANDWITHLIMIT}"
    fi
+   #### CHECK IS TRANSFERS GREAT AS 1 TO PREVENT DOUBLE FOLDER ON GOOGLE ####
    if [[ "${TRANSFERS}" != 1 ]];then
-      $(which sleep) 2 ## sleep 5 for duplicati folders
-      ### make folder on correct drive
-      $(which rclone) mkdir "${KEY}$[USED]${CRYPTED}:/${DIR}/" --config="${CONFIG}"
+      #### MAKE FOLDER ON CORRECT DRIVE #### 
+      $(which rclone) mkdir -p "${KEY}$[USED]${CRYPTED}:/${DIR}/" --config="${CONFIG}"
    fi
    #### START TIME UPLOAD ####
    STARTZ=$(date +%s)
@@ -195,8 +206,14 @@ function rcloneupload() {
    #### UNSET CRYPTED WHEN USED CRYPTED KEYS ####
    unset CRYPTED
    #### END OF MOVE ####
-   $(which rm) -rf "${LOGFILE}/${FILE}.txt" "${START}/${FILE}.json" 
-   $(which chmod) 755 "${DONE}/${FILE}.json"
+   $(which rm) -rf "${LOGFILE}/${FILE}.txt" "${START}/${FILE}.json"
+   #### SET PERMISSIONS BACK TO UID 1000 AND 755 FOR UI READING ###
+   if [ ! "$(stat -c %u ${DONE}/${FILE}.json)" = "$PUID" ];then
+      $(which chown) abc:abc -R "${DONE}/${FILE}.json" &>/dev/null
+   fi
+   if [ ! "$(stat -c %a ${DONE}/${FILE}.json)" = "755" ];then
+      $(which chmod) 755 -R "${DONE}/${FILE}.json" &>/dev/null
+   fi
    #### REMOVE CUSTOM RCLONE.CONF ####
    if test -f "${CUSTOM}/${FILE}.conf";then
       $(which rm) -rf ${CUSTOM}/${FILE}.conf
@@ -235,7 +252,7 @@ function transfercheck() {
        ACTIVETRANSFERS=`ls -A ${LOGFILE} -I "check.log" -I "rmcheck.log" | wc -l`
        TRANSFERS=${TRANSFERS:-2}
          if [[ ${ACTIVETRANSFERS} -lt ${TRANSFERS} ]]; then
-            #### REMOVE ACTIVE UPLOAD from check file
+            #### REMOVE ACTIVE UPLOAD FROM CHECK FILE ####
             $(which touch) "${LOGFILE}/${FILE}.txt"
             #### CHANGE MODTIME OF FILE ####
             $(which touch) -m "${DLFOLDER}/${UPP[1]}"
@@ -255,10 +272,14 @@ function rclonedown() {
    if [[ "${DRIVEUSEDSPACE}" =~ ^[0-9][0-9]+([.][0-9]+)?$ ]]; then
       if [[ "${DRIVEUSEDSPACE}" -gt "${LCT}" ]]; then
           $(which rm) -rf "${CHK}" "${LOGFILE}/${FILE}.txt" "${START}/${FILE}.json" && \
-          $(which chmod) 755 "${DONE}/${FILE}.json" && break
+          if [ ! "$(stat -c %a ${DONE}/${FILE}.json)" != "755" ];then
+            $(which chmod) 755 -R "${DONE}/${FILE}.json" &>/dev/null
+          fi
+          break
       fi
    fi
 }
+
 #### END OF ALL FUNCTIONS ####
 
 #### START HERE UPLOADER LIVE
@@ -267,7 +288,7 @@ while true ; do
    checkspace
    #### RUN LIST COMMAND-FUNCTION ####
    listfiles
-   #### FIRST LOOP
+   #### FIRST LOOP ####
    source /system/uploader/uploader.env
    if [ `$(which cat) ${CHK} | wc -l` -gt "${TRANSFERS}" ]; then
       # shellcheck disable=SC2086
@@ -283,16 +304,16 @@ while true ; do
             #### FALLBACK TO SINGLE UPLOAD
             rcloneupload
          elif [[ "${TRANSFERS}" != 1 ]];then
-            #### DEMONISED UPLOAD
+            #### DEMONISED UPLOAD ####
             rcloneupload &
          else
-            #### SINGLE UPLOAD
+            #### SINGLE UPLOAD ####
             rcloneupload
          fi
          #### SHUTDOWN RCLONE UPLOAD PROCESS ####
          rclonedown
       done
-      #### CLEANUP OLD JSON FILES WHEN OVER 1000 FILES ###
+      #### CLEANUP OLD JSON FILES WHEN OVER 1000 FILES ####
       cleanuplog
    else
       #### SLEEP REDUCES CPU AND RAM USED ####
