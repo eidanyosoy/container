@@ -257,7 +257,7 @@ function transfercheck() {
    while true ; do
        source /system/uploader/uploader.env
        #### -I [ exclude check.log & rmcheck.log file ] ####
-       ACTIVETRANSFERS=`ls -l ${LOGFILE} -I "check.log" -I "rmcheck.log" | egrep -c "*.log"`
+       ACTIVETRANSFERS=`ls -l ${LOGFILE} -I "check.log" -I "rmcheck.log" | egrep -c "*.txt"`
        TRANSFERS=${TRANSFERS:-2}
          if [[ ${ACTIVETRANSFERS} -lt ${TRANSFERS} ]]; then
             #### REMOVE ACTIVE UPLOAD FROM CHECK FILE ####
