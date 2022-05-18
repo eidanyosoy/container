@@ -171,7 +171,7 @@ function rcloneupload() {
         USED=`$(which rclone) listremotes --config=${CONFIG} | grep "$1" | sed -e 's/://g' | sed -e 's/GDSA//g' | sort`
    else
       CONFIG=/system/servicekeys/rclonegdsa.conf && \
-        ARRAY=$($(which ls) -A ${KEYLOCAL} | wc -l ) && \
+        ARRAY=$($(which ls) -l ${KEYLOCAL} | wc -l) && \
           USED=$(( $RANDOM % ${ARRAY} + 1 ))
    fi
    #### CRYPTED HACK ####
@@ -257,7 +257,7 @@ function transfercheck() {
    while true ; do
        source /system/uploader/uploader.env
        #### -I [ exclude check.log & rmcheck.log file ] ####
-       ACTIVETRANSFERS=`ls ${LOGFILE} -I "check.log" -I "rmcheck.log" | wc -l`
+       ACTIVETRANSFERS=`ls -l ${LOGFILE} -I "check.log" -I "rmcheck.log" | egrep -c "*.log"`
        TRANSFERS=${TRANSFERS:-2}
          if [[ ${ACTIVETRANSFERS} -lt ${TRANSFERS} ]]; then
             #### REMOVE ACTIVE UPLOAD FROM CHECK FILE ####
