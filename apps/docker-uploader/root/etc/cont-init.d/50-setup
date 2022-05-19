@@ -109,7 +109,6 @@ TRANSFERS=${TRANSFERS:-2}
 
 ## USER - SETTINGS
 DRIVEUSEDSPACE=${DRIVEUSEDSPACE:-10}
-MIN_AGE_FILE=${MIN_AGE_FILE:-10m}
 
 #-------------------------------------------------------
 #   UPLOADER ENVIROMENTS
