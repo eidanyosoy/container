@@ -1,0 +1,5 @@
+
+/app
+@types/node@16.11.6
+prettier@2.4.1
+typescript@4.4.4
