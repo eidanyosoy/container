@@ -171,7 +171,7 @@ function rcloneupload() {
         USED=`$(which rclone) listremotes --config=${CONFIG} | grep "$1" | sed -e 's/://g' | sed -e 's/GDSA//g' | sort`
    else
       CONFIG=/system/servicekeys/rclonegdsa.conf && \
-        ARRAY=$($(which ls) -l ${KEYLOCAL} | wc -l) && \
+        ARRAY=$($(which ls) ${KEYLOCAL} | wc -l) && \
           USED=$(( $RANDOM % ${ARRAY} + 1 ))
    fi
    #### CRYPTED HACK ####
