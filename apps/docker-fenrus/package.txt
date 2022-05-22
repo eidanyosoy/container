@@ -11,7 +11,7 @@ cabextract-1.9.1-r0
 cairo-1.16.0-r3
 expat-2.4.7-r0
 fontconfig-2.13.1-r4
-freetype-2.11.1-r1
+freetype-2.11.1-r2
 fribidi-1.0.11-r0
 giflib-5.2.1-r0
 glib-2.70.1-r0
