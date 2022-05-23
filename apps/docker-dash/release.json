@@ -4,7 +4,7 @@
    "appfolder": "./apps/docker-dash",
    "newversion": "90095bb18548dfd663a78df1908c40dbf2f99faf",
    "baseimage": "alpine",
-   "baseversion": "3.15.4",
+   "baseversion": "3.16.0",
    "description": "A simple, modern server dashboard, primarily used by smaller private servers",
    "body": "Upgrading docker-dash to 90095bb18548dfd663a78df1908c40dbf2f99faf",
    "user": "dockserver-image[bot]"
