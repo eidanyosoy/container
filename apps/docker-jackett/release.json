@@ -2,10 +2,10 @@
    "appname": "docker-jackett",
    "apppic": "./images/docker-jackett.png",
    "appfolder": "./apps/docker-jackett",
-   "newversion": "0.20.1078",
+   "newversion": "0.20.1101",
    "appbranch": "master",
    "baseimage": "ghcr.io/linuxserver/baseimage-ubuntu:bionic",
    "description": "API Support for your favorite torrent trackers",
-   "body": "Upgrading docker-jackett to 0.20.1078",
+   "body": "Upgrading docker-jackett to 0.20.1101",
    "user": "github-actions[bot]"
 }

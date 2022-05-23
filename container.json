@@ -65,11 +65,11 @@ apps docker-dash
    "appname": "docker-dash",
    "apppic": "",
    "appfolder": "./apps/docker-dash",
-   "newversion": "14519ef5559038b0d9d037a2bdc5d98e63c9db6f",
+   "newversion": "90095bb18548dfd663a78df1908c40dbf2f99faf",
    "baseimage": "alpine",
    "baseversion": "3.15.4",
    "description": "A simple, modern server dashboard, primarily used by smaller private servers",
-   "body": "Upgrading docker-dash to 14519ef5559038b0d9d037a2bdc5d98e63c9db6f",
+   "body": "Upgrading docker-dash to 90095bb18548dfd663a78df1908c40dbf2f99faf",
    "user": "dockserver-image[bot]"
 }
 
@@ -172,9 +172,9 @@ apps docker-fenrus
    "newversion": "3.15.4",
    "appbranch": "master",
    "baseimage": "alpine",
-   "appversion": "0b1766f8363a0f492799fdac12be94558167043e",
+   "appversion": "cf716e610144beb9e324dc43b8470baebc0cee03",
    "description": "A personal home page for quick access to all your personal apps/sites.",
-   "body": "Upgrading docker-fenrus to 0b1766f8363a0f492799fdac12be94558167043e",
+   "body": "Upgrading docker-fenrus to cf716e610144beb9e324dc43b8470baebc0cee03",
    "user": "github-actions[bot]"
 }
 
@@ -195,11 +195,11 @@ apps docker-jackett
    "appname": "docker-jackett",
    "apppic": "./images/docker-jackett.png",
    "appfolder": "./apps/docker-jackett",
-   "newversion": "0.20.1078",
+   "newversion": "0.20.1101",
    "appbranch": "master",
    "baseimage": "ghcr.io/linuxserver/baseimage-ubuntu:bionic",
    "description": "API Support for your favorite torrent trackers",
-   "body": "Upgrading docker-jackett to 0.20.1078",
+   "body": "Upgrading docker-jackett to 0.20.1101",
    "user": "github-actions[bot]"
 }
 
@@ -354,11 +354,11 @@ apps docker-prowlarr
    "appname": "docker-prowlarr",
    "apppic": "./images/docker-prowlarr.png",
    "appfolder": "./apps/docker-prowlarr",
-   "newversion": "0.4.0.1791",
+   "newversion": "0.4.0.1793",
    "appbranch": "nightly",
    "baseimage": "ghcr.io/dockserver/docker-alpine:latest",
    "description": "null",
-   "body": "Upgrading docker-prowlarr to 0.4.0.1791",
+   "body": "Upgrading docker-prowlarr to 0.4.0.1793",
    "user": "github-actions[bot]"
 }
 
@@ -697,11 +697,11 @@ nightly docker-overseerr-nightly
    "appname": "docker-overseerr-nightly",
    "apppic": "./images/docker-overseerr-nightly.png",
    "appfolder": "./nightly/docker-overseerr-nightly",
-   "newversion": "14519ef5559038b0d9d037a2bdc5d98e63c9db6f",
+   "newversion": "90095bb18548dfd663a78df1908c40dbf2f99faf",
    "appbranch": "develop",
    "baseimage": "ghcr.io/dockserver/docker-alpine:latest",
    "description": "Request management and media discovery tool for the Plex ecosystem",
-   "body": "Upgrading docker-overseerr-nightly to 14519ef5559038b0d9d037a2bdc5d98e63c9db6f",
+   "body": "Upgrading docker-overseerr-nightly to 90095bb18548dfd663a78df1908c40dbf2f99faf",
    "user": "github-actions[bot]"
 }
 
@@ -723,10 +723,10 @@ nightly docker-sabnzbd-nightly
    "appname": "docker-sabnzbd-nightly",
    "apppic": "./images/docker-sabnzbd-nightly.png",
    "appfolder": "./nightly/docker-sabnzbd-nightly",
-   "newversion": "debc59744f09c3c1f8a35fe973a36af401d037a9",
+   "newversion": "54f33a72c49068edddddc1f2df6efadf18ec7d4c",
    "appbranch": "develop",
    "description": "SABnzbd - The automated Usenet download tool",
-   "body": "Upgrading docker-sabnzbd-nightly to debc59744f09c3c1f8a35fe973a36af401d037a9",
+   "body": "Upgrading docker-sabnzbd-nightly to 54f33a72c49068edddddc1f2df6efadf18ec7d4c",
    "user": "github-actions[bot]"
 }
 
@@ -747,11 +747,11 @@ nightly docker-whisparr-nightly
    "appname": "docker-whisparr-nightly",
    "apppic": "./images/docker-whisparr-nightly.png",
    "appfolder": "./nightly/docker-whisparr-nightly",
-   "newversion": "0.1.0.41",
+   "newversion": "0.1.0.46",
    "appbranch": "nightly",
    "baseimage": "ghcr.io/dockserver/docker-alpine:latest",
    "description": "Whisparr is an adult movie collection manager for Usenet and BitTorrent users.",
-   "body": "Upgrading docker-whisparr-nightly to 0.1.0.41",
+   "body": "Upgrading docker-whisparr-nightly to 0.1.0.46",
    "user": "github-actions[bot]"
 }
 
