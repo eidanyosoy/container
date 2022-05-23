@@ -90,7 +90,7 @@ if test -f ${CSV} ; then
    FILE=${FILE}
    ENDCONFIG=${CUSTOM}/${FILE}.conf
    #### USE FILE NAME AS RCLONE CONF ####
-   ARRAY=$(ls -A ${KEYLOCAL} | wc -l )
+   ARRAY=$(ls ${KEYLOCAL} | wc -l )
    USED=$(( $RANDOM % ${ARRAY} + 1 ))
 
    $(which cat) ${CSV} | grep -E ${DIR} | sed '/^\s*#.*$/d'| while IFS=$'|' read -ra myArray; do
@@ -171,7 +171,7 @@ function rcloneupload() {
         USED=`$(which rclone) listremotes --config=${CONFIG} | grep "$1" | sed -e 's/://g' | sed -e 's/GDSA//g' | sort`
    else
       CONFIG=/system/servicekeys/rclonegdsa.conf && \
-        ARRAY=$($(which ls) -l ${KEYLOCAL} | wc -l) && \
+        ARRAY=$($(which ls) ${KEYLOCAL} | wc -l) && \
           USED=$(( $RANDOM % ${ARRAY} + 1 ))
    fi
    #### CRYPTED HACK ####
@@ -254,37 +254,48 @@ function checkspace() {
 }
 
 function transfercheck() {
+   FILE=${SETFILE}
    while true ; do
-       source /system/uploader/uploader.env
-       #### -I [ exclude check.log & rmcheck.log file ] ####
-       ACTIVETRANSFERS=`ls -l ${LOGFILE} -I "check.log" -I "rmcheck.log" | egrep -c "*.txt"`
-       TRANSFERS=${TRANSFERS:-2}
-         if [[ ${ACTIVETRANSFERS} -lt ${TRANSFERS} ]]; then
-            #### REMOVE ACTIVE UPLOAD FROM CHECK FILE ####
-            FILE=$(basename "${UPP[1]}")
-            $(which touch) "${LOGFILE}/${FILE}.txt"
-            #### CHANGE MODTIME OF FILE ####
-            $(which touch) -m "${DLFOLDER}/${UPP[1]}"
-            #### RELOAD CHECK FILE ####
-            listfiles
-            $(which sleep) 5 && break
-         else
-            $(which sleep) 10
-         fi
+      source /system/uploader/uploader.env
+      #### -I [ exclude check.log & rmcheck.log file ] ####
+      ACTIVETRANSFERS=`ls ${LOGFILE} -I "check.log" -I "rmcheck.log" | egrep -c "*.txt"`
+      TRANSFERS=${TRANSFERS:-2}
+      if [[ "${TRANSFERS}" -eq 0 ]]; then
+         TRANSFERS=1
+      else
+         TRANSFERS=${TRANSFERS:-2}
+      fi
+      if [[ ${ACTIVETRANSFERS} -lt "${TRANSFERS}" ]]; then
+         #### REMOVE ACTIVE UPLOAD FROM CHECK FILE ####
+         $(which touch) "${LOGFILE}/${FILE}.txt"
+         #### CHANGE MODTIME OF FILE ####
+         $(which touch) -m "${DLFOLDER}/${UPP[1]}"
+         #### RELOAD CHECK FILE ####
+         listfiles
+         $(which sleep) 5 && break
+      else
+         $(which sleep) 10
+      fi
    done
 }
 
 function rclonedown() {
    source /system/uploader/uploader.env
+   #### SHUTDOWN UPLOAD LOOP WHEN TP UPLOAD IS LESS THEN 5 ####
+   if [[ `$(which cat) ${CHK} | wc -l` -lt 5 ]]; then
+      $(which rm) -rf "${CHK}" "${LOGFILE}/${FILE}.txt" "${START}/${FILE}.json" && \
+      $(which chown) abc:abc -R "${DONE}/${FILE}.json" &>/dev/null && \
+      $(which chmod) 755 -R "${DONE}" &>/dev/null
    #### SHUTDOWN UPLOAD LOOP WHEN DRIVE SPACE IS LESS THEN SETTINGS ####
    LCT=$($(which df) --output=pcent ${DLFOLDER} | tr -dc '0-9')
-   if [[ "${DRIVEUSEDSPACE}" =~ ^[0-9][0-9]+([.][0-9]+)?$ ]]; then
+   elif [[ "${DRIVEUSEDSPACE}" =~ ^[0-9][0-9]+([.][0-9]+)?$ ]]; then
       if [[ "${DRIVEUSEDSPACE}" -gt "${LCT}" ]]; then
-          $(which rm) -rf "${CHK}" "${LOGFILE}/${FILE}.txt" "${START}/${FILE}.json" && \
-            $(which chown) abc:abc -R "${DONE}/${FILE}.json" &>/dev/null && \
-            $(which chmod) 755 -R "${DONE}/${FILE}.json" &>/dev/null && \
-          break
+         $(which rm) -rf "${CHK}" "${LOGFILE}/${FILE}.txt" "${START}/${FILE}.json" && \
+         $(which chown) abc:abc -R "${DONE}/${FILE}.json" &>/dev/null && \
+         $(which chmod) 755 -R "${DONE}/${FILE}.json" &>/dev/null
       fi
+   else
+      sleep 3
    fi
 }
 
@@ -298,20 +309,23 @@ while true ; do
    listfiles
    #### FIRST LOOP ####
    source /system/uploader/uploader.env
-   if [ `$(which cat) ${CHK} | wc -l` -gt "${TRANSFERS}" ]; then
+   CHECKFILES=$($(which cat) ${CHK} | wc -l)
+   if [[ "${CHECKFILES}" -gt 5 ]]; then
       # shellcheck disable=SC2086
       $(which cat) "${CHK}" | head -n 1 | while IFS=$'|' read -ra UPP; do
          #### RUN TRANSFERS CHECK ####
+         SETFILE=$(basename "${UPP[1]}")     
          transfercheck
          #### SET CORRECT FOLDER FOR CUSTOM UPLOAD RCLONE.CONF ####
          SETDIR=$(dirname "${UPP[1]}" | sed "s#${DLFOLDER}/${MOVE}##g" | cut -d ' ' -f 1 | sed 's|/.*||' )
          #### CHECK IS CSV AVAILABLE AND LOOP TO CORRECT DRIVE ####
          if test -f ${CSV}; then loopcsv ; fi
          #### UPLOAD FUNCTIONS STARTUP ####
-         if [[ `$(which cat) ${CHK} | wc -l` -eq ${TRANSFERS} ]]; then
+         CHECKFILES=$($(which cat) ${CHK} | wc -l)
+         if [[ "${CHECKFILES}" -eq "${TRANSFERS}" ]]; then
             #### FALLBACK TO SINGLE UPLOAD
             rcloneupload
-         elif [[ "${TRANSFERS}" != 1 ]];then
+         elif [[ "${TRANSFERS}" -ne 1 ]];then
             #### DEMONISED UPLOAD ####
             rcloneupload &
          else
