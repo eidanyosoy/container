@@ -90,7 +90,7 @@ if test -f ${CSV} ; then
    FILE=${FILE}
    ENDCONFIG=${CUSTOM}/${FILE}.conf
    #### USE FILE NAME AS RCLONE CONF ####
-   ARRAY=$(ls -A ${KEYLOCAL} | wc -l )
+   ARRAY=$(ls ${KEYLOCAL} | wc -l )
    USED=$(( $RANDOM % ${ARRAY} + 1 ))
 
    $(which cat) ${CSV} | grep -E ${DIR} | sed '/^\s*#.*$/d'| while IFS=$'|' read -ra myArray; do
@@ -258,7 +258,7 @@ function transfercheck() {
    while true ; do
       source /system/uploader/uploader.env
       #### -I [ exclude check.log & rmcheck.log file ] ####
-      ACTIVETRANSFERS=`ls -l ${LOGFILE} -I "check.log" -I "rmcheck.log" | egrep -c "*.txt"`
+      ACTIVETRANSFERS=`ls ${LOGFILE} -I "check.log" -I "rmcheck.log" | egrep -c "*.txt"`
       TRANSFERS=${TRANSFERS:-2}
       if [[ "${TRANSFERS}" -eq 0 ]]; then
          TRANSFERS=1
