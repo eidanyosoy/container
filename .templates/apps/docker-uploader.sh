@@ -96,6 +96,5 @@ RUN \
 
 COPY '"${APPFOLDER}"'/root/ /
 
-'"${VOLUMEN}"'
 '"${EPOINT}"'
 ##EOF' > ./$FOLDER/$APP/Dockerfile
