@@ -146,11 +146,11 @@ function rcloneupload() {
       SUMSTART=$(stat -c %s "${DLFOLDER}/${UPP[1]}")
       $(which sleep) 5
       SUMTEST=$(stat -c %s "${DLFOLDER}/${UPP[1]}")
-      if [ "$SUMTEST" -eq 0 ] && [ "$SUMSTART" -eq 0 ]; then
+      if [ "$SUMTEST" -eq 0 ] || [ "$SUMSTART" -eq 0 ]; then
          #### WHEN FILE SIZE A IS ZERO AND FILES SIZE B IS ZERO LOOP AND WAIT ####
          $(which sleep) 5
          #### FIX FOR 0 BYTE UPLOADS ###£
-      elif [ "$SUMSTART" -eq "$SUMTEST" ]; then
+      elif [ "$SUMSTART" -eq "$SUMTEST" ] || [ "$SUMTEST" -eq "$SUMSTART" ]; then
          #### WHEN FILE SIZE A IS EQUAL TO B THEN BREAK LOOP ###
          $(which sleep) 2 && break
       else
@@ -243,7 +243,7 @@ function checkspace() {
       while true ; do
         LCT=$($(which df) --output=pcent ${DLFOLDER} | tr -dc '0-9')
         if [[ "${DRIVEUSEDSPACE}" =~ ^[0-9][0-9]+([.][0-9]+)?$ ]]; then
-           if [[ "${LCT}" -gt "${DRIVEUSEDSPACE}" ]]; then
+           if [[ "${LCT}" -ge "${DRIVEUSEDSPACE}" ]]; then
               $(which sleep) 5 && break
            else
               $(which sleep) 10
@@ -259,9 +259,7 @@ function transfercheck() {
       source /system/uploader/uploader.env
       ACTIVETRANSFERS=`ls ${LOGFILE} | egrep -c "*.txt"`
       TRANSFERS=${TRANSFERS:-2}
-      if [ ! "${TRANSFERS}" =~ '^[0-9][0-9]+$' ];then
-         TRANSFERS=1
-      elif [ "${TRANSFERS}" -eq 0 ]; then
+      if [ ! "${TRANSFERS}" =~ '^[0-9][0-9]+$' ] || [ ! "${TRANSFERS}" -gt 99 ] || [ "${TRANSFERS}" -eq 0 ];then
          TRANSFERS=1
       else
          TRANSFERS=${TRANSFERS:-2}
@@ -290,7 +288,7 @@ function rclonedown() {
    #### SHUTDOWN UPLOAD LOOP WHEN DRIVE SPACE IS LESS THEN SETTINGS ####
    LCT=$($(which df) --output=pcent ${DLFOLDER} | tr -dc '0-9')
    elif [[ "${DRIVEUSEDSPACE}" =~ ^[0-9][0-9]+([.][0-9]+)?$ ]]; then
-      if [[ "${DRIVEUSEDSPACE}" -gt "${LCT}" ]]; then
+      if [[ "${DRIVEUSEDSPACE}" -ge "${LCT}" ]]; then
          $(which rm) -rf "${CHK}" "${LOGFILE}/${FILE}.txt" "${START}/${FILE}.json" && \
          $(which chown) abc:abc -R "${DONE}/${FILE}.json" &>/dev/null && \
          $(which chmod) 755 -R "${DONE}/${FILE}.json" &>/dev/null
@@ -311,7 +309,7 @@ while true ; do
    #### FIRST LOOP ####
    source /system/uploader/uploader.env
    CHECKFILES=$($(which cat) ${CHK} | wc -l)
-   if [ "${CHECKFILES}" -gt "${TRANSFERS}" ] || [ "${CHECKFILES}" -eq "${TRANSFERS}" ]; then
+   if [ "${CHECKFILES}" -ge "${TRANSFERS}" ] || [ "${CHECKFILES}" -eq "${TRANSFERS}" ]; then
       # shellcheck disable=SC2086
       $(which cat) "${CHK}" | head -n 1 | while IFS=$'|' read -ra UPP; do
          #### REPULL SOURCE FILE FOR LIVE EDITS ####
@@ -329,7 +327,7 @@ while true ; do
          if [ "${CHECKFILES}" -eq "${TRANSFERS}" ] || [ "${CHECKFILES}" -lt "${TRANSFERS}" ]; then
             #### FALLBACK TO SINGLE UPLOAD ####
             rcloneupload
-         elif [[ "${ACTIVETRANSFERS}" -lt "${TRANSFERS}" ]];then
+         elif [ "${ACTIVETRANSFERS}" -lt "${TRANSFERS}" ] || [ "${CHECKFILES}" -gt "${TRANSFERS}"]; then
             #### DEMONISED UPLOAD ####
             rcloneupload &
          else
