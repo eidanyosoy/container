@@ -312,6 +312,8 @@ while true ; do
    if [[ "${CHECKFILES}" -gt 0 ]]; then
       # shellcheck disable=SC2086
       $(which cat) "${CHK}" | head -n 1 | while IFS=$'|' read -ra UPP; do
+         #### REPULL SOURCE FILE FOR LIVE EDITS ####
+         source /system/uploader/uploader.env
          #### RUN TRANSFERS CHECK ####
          SETFILE=$(basename "${UPP[1]}")     
          transfercheck
