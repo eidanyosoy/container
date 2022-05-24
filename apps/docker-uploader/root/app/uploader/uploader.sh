@@ -309,7 +309,7 @@ while true ; do
    #### FIRST LOOP ####
    source /system/uploader/uploader.env
    CHECKFILES=$($(which cat) ${CHK} | wc -l)
-   if [[ "${CHECKFILES}" -gt 0 ]]; then
+   if [[ "${CHECKFILES}" -gt "${TRANSFERS}" ]]; then
       # shellcheck disable=SC2086
       $(which cat) "${CHK}" | head -n 1 | while IFS=$'|' read -ra UPP; do
          #### REPULL SOURCE FILE FOR LIVE EDITS ####
@@ -325,18 +325,15 @@ while true ; do
          CHECKFILES=$($(which cat) ${CHK} | wc -l)
          ACTIVETRANSFERS=`ls ${LOGFILE} | egrep -c "*.txt"`
          if [[ "${CHECKFILES}" -eq "${TRANSFERS}" ]]; then
-            #### REMOVE ACTIVE UPLOAD FROM CHECK FILE ####
-            $(which touch) "${LOGFILE}/${FILE}.txt"
-            #### FALLBACK TO SINGLE UPLOAD
+            #### FALLBACK TO SINGLE UPLOAD ####
+            rcloneupload
+         elif [[ "${CHECKFILES}" -lt "${TRANSFERS}" ]]; then
+            #### FALLBACK TO SINGLE UPLOAD ####
             rcloneupload
          elif [[ "${ACTIVETRANSFERS}" -lt "${TRANSFERS}" ]];then
-            #### REMOVE ACTIVE UPLOAD FROM CHECK FILE ####
-            $(which touch) "${LOGFILE}/${FILE}.txt"
             #### DEMONISED UPLOAD ####
             rcloneupload &
          else
-            #### REMOVE ACTIVE UPLOAD FROM CHECK FILE ####
-            $(which touch) "${LOGFILE}/${FILE}.txt"
             #### SINGLE UPLOAD ####
             rcloneupload
          fi
