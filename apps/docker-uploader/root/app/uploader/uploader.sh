@@ -281,8 +281,8 @@ function transfercheck() {
 
 function rclonedown() {
    source /system/uploader/uploader.env
-   #### SHUTDOWN UPLOAD LOOP WHEN TP UPLOAD IS LESS THEN 5 ####
-   if [[ `$(which cat) ${CHK} | wc -l` -lt 5 ]]; then
+   #### SHUTDOWN UPLOAD LOOP WHEN TP UPLOAD IS LESS THEN "${TRANSFERS}" ####
+   if [[ `$(which cat) ${CHK} | wc -l` -eq "${TRANSFERS}" ]]; then
       $(which rm) -rf "${CHK}" "${LOGFILE}/${FILE}.txt" "${START}/${FILE}.json" && \
       $(which chown) abc:abc -R "${DONE}/${FILE}.json" &>/dev/null && \
       $(which chmod) 755 -R "${DONE}" &>/dev/null
@@ -310,7 +310,7 @@ while true ; do
    #### FIRST LOOP ####
    source /system/uploader/uploader.env
    CHECKFILES=$($(which cat) ${CHK} | wc -l)
-   if [[ "${CHECKFILES}" -gt 5 ]]; then
+   if [[ "${CHECKFILES}" -gt 0 ]]; then
       # shellcheck disable=SC2086
       $(which cat) "${CHK}" | head -n 1 | while IFS=$'|' read -ra UPP; do
          #### RUN TRANSFERS CHECK ####
@@ -325,7 +325,7 @@ while true ; do
          if [[ "${CHECKFILES}" -eq "${TRANSFERS}" ]]; then
             #### FALLBACK TO SINGLE UPLOAD
             rcloneupload
-         elif [[ "${TRANSFERS}" -ne 1 ]];then
+         elif [[ "${TRANSFERS}" -gt "${TRANSFERS}" ]];then
             #### DEMONISED UPLOAD ####
             rcloneupload &
          else
