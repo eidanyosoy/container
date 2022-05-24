@@ -257,15 +257,14 @@ function transfercheck() {
    FILE=${SETFILE}
    while true ; do
       source /system/uploader/uploader.env
-      #### -I [ exclude check.log & rmcheck.log file ] ####
-      ACTIVETRANSFERS=`ls ${LOGFILE} -I "check.log" -I "rmcheck.log" | egrep -c "*.txt"`
+      ACTIVETRANSFERS=`ls ${LOGFILE} | egrep -c "*.txt"`
       TRANSFERS=${TRANSFERS:-2}
       if [[ "${TRANSFERS}" -eq 0 ]]; then
          TRANSFERS=1
       else
          TRANSFERS=${TRANSFERS:-2}
       fi
-      if [[ ${ACTIVETRANSFERS} -lt "${TRANSFERS}" ]]; then
+      if [[ "${ACTIVETRANSFERS}" -lt "${TRANSFERS}" ]]; then
          #### REMOVE ACTIVE UPLOAD FROM CHECK FILE ####
          $(which touch) "${LOGFILE}/${FILE}.txt"
          #### CHANGE MODTIME OF FILE ####
@@ -322,14 +321,20 @@ while true ; do
          if test -f ${CSV}; then loopcsv ; fi
          #### UPLOAD FUNCTIONS STARTUP ####
          CHECKFILES=$($(which cat) ${CHK} | wc -l)
-         ACTIVETRANSFERS=`ls ${LOGFILE} -I "check.log" -I "rmcheck.log" | egrep -c "*.txt"`
+         ACTIVETRANSFERS=`ls ${LOGFILE} | egrep -c "*.txt"`
          if [[ "${CHECKFILES}" -eq "${TRANSFERS}" ]]; then
+            #### REMOVE ACTIVE UPLOAD FROM CHECK FILE ####
+            $(which touch) "${LOGFILE}/${FILE}.txt"
             #### FALLBACK TO SINGLE UPLOAD
             rcloneupload
-         elif [[ "${ACTIVETRANSFERS}" -nq "${TRANSFERS}" ]];then
+         elif [[ "${ACTIVETRANSFERS}" -lt "${TRANSFERS}" ]];then
+            #### REMOVE ACTIVE UPLOAD FROM CHECK FILE ####
+            $(which touch) "${LOGFILE}/${FILE}.txt"
             #### DEMONISED UPLOAD ####
             rcloneupload &
          else
+            #### REMOVE ACTIVE UPLOAD FROM CHECK FILE ####
+            $(which touch) "${LOGFILE}/${FILE}.txt"
             #### SINGLE UPLOAD ####
             rcloneupload
          fi
