@@ -259,7 +259,9 @@ function transfercheck() {
       source /system/uploader/uploader.env
       ACTIVETRANSFERS=`ls ${LOGFILE} | egrep -c "*.txt"`
       TRANSFERS=${TRANSFERS:-2}
-      if [[ "${TRANSFERS}" -eq 0 ]]; then
+      if [ ! "${TRANSFERS}" =~ '^[0-9][0-9]+$' ];then
+         TRANSFERS=1
+      elif [ "${TRANSFERS}" -eq 0 ]; then
          TRANSFERS=1
       else
          TRANSFERS=${TRANSFERS:-2}
@@ -309,7 +311,7 @@ while true ; do
    #### FIRST LOOP ####
    source /system/uploader/uploader.env
    CHECKFILES=$($(which cat) ${CHK} | wc -l)
-   if [[ "${CHECKFILES}" -gt "${TRANSFERS}" ]]; then
+   if [ "${CHECKFILES}" -gt "${TRANSFERS}" ] || [ "${CHECKFILES}" -eq "${TRANSFERS}" ]; then
       # shellcheck disable=SC2086
       $(which cat) "${CHK}" | head -n 1 | while IFS=$'|' read -ra UPP; do
          #### REPULL SOURCE FILE FOR LIVE EDITS ####
@@ -324,10 +326,7 @@ while true ; do
          #### UPLOAD FUNCTIONS STARTUP ####
          CHECKFILES=$($(which cat) ${CHK} | wc -l)
          ACTIVETRANSFERS=`ls ${LOGFILE} | egrep -c "*.txt"`
-         if [[ "${CHECKFILES}" -eq "${TRANSFERS}" ]]; then
-            #### FALLBACK TO SINGLE UPLOAD ####
-            rcloneupload
-         elif [[ "${CHECKFILES}" -lt "${TRANSFERS}" ]]; then
+         if [ "${CHECKFILES}" -eq "${TRANSFERS}" ] || [ "${CHECKFILES}" -lt "${TRANSFERS}" ]; then
             #### FALLBACK TO SINGLE UPLOAD ####
             rcloneupload
          elif [[ "${ACTIVETRANSFERS}" -lt "${TRANSFERS}" ]];then
