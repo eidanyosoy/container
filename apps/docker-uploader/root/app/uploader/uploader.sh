@@ -19,6 +19,7 @@ log "dockserver.io Multi-Thread Uploader started"
 
 BASE=/system/uploader
 CSV=/system/servicekeys/uploader.csv
+UPPED=/system/servicekeys/uploaded.json
 KEYLOCAL=/system/servicekeys/keys/
 LOGFILE=/system/uploader/logs
 START=/system/uploader/json/upload
@@ -129,6 +130,36 @@ EOF
 fi
 }
 
+# Replace the line of the given line number with the given replacement in the given file.
+function replace-used() {
+
+   #### CHECK IS CUSTOM RCLONE.CONF IS AVAILABLE ####
+   if test -f "${CUSTOM}/${FILE}.conf" ; then
+      CONFIG=${CUSTOM}/${FILE}.conf && \
+        USED=`$(which rclone) listremotes --config=${CONFIG} | grep "$1" | sed -e 's/://g' | sed -e 's/GDSA//g' | sort`
+   else
+      CONFIG=/system/servicekeys/rclonegdsa.conf && \
+        ARRAY=$($(which ls) ${KEYLOCAL} | wc -l) && \
+          USED=$(( $RANDOM % ${ARRAY} + 1 ))
+   fi
+   #### PUSH INFORMATION TO FILE ####
+   USEDKEY=$($(which cat) "${UPPED}" | jq -r '.KEY')
+   USEDUPLOADGB=$($(which cat) "${UPPED}" | jq -r '.USED')                                                                    
+   if [[ ${USEDKEY} =~ '^[0-9][0-9]+$' ]];then
+      USEDKEY=${KEY}
+   fi                             
+   if [[ $(date +%H:%M) == "00:01" ]]; then
+      USEDUPLOADGB=0
+   elif [[ ${USEDUPLOADGB} == null ]];then
+       USEDUPLOADGB=0      
+   else
+      USEDUPLOADGB=$($(which cat) "${UPPED}" | jq -r '.USED')
+   fi
+   NEWVALUE=$(( ${USEDUPLOADGB} + ${SIZE}))
+   echo '{"KEY" : "'${KEY}'","USED" : "'${NEWVALUE}'"}' | jq . > "${UPPED}"
+
+}
+
 function rcloneupload() {
    source /system/uploader/uploader.env
    DLFOLDER=${DLFOLDER}
@@ -166,6 +197,12 @@ function rcloneupload() {
       $(which chmod) 0755 -R "${DLFOLDER}/${UPP[1]}" &>/dev/null
    fi
    #### CHECK IS CUSTOM RCLONE.CONF IS AVAILABLE ####
+   ##if test -f "${CUSTOM}/${FILE}.conf" ; then
+   ##   CONFIG=${CUSTOM}/${FILE}.conf
+   ##else
+   ##   CONFIG=/system/servicekeys/rclonegdsa.conf && \
+   ##fi
+   #### CHECK IS CUSTOM RCLONE.CONF IS AVAILABLE ####
    if test -f "${CUSTOM}/${FILE}.conf" ; then
       CONFIG=${CUSTOM}/${FILE}.conf && \
         USED=`$(which rclone) listremotes --config=${CONFIG} | grep "$1" | sed -e 's/://g' | sed -e 's/GDSA//g' | sort`
@@ -174,6 +211,8 @@ function rcloneupload() {
         ARRAY=$($(which ls) ${KEYLOCAL} | wc -l) && \
           USED=$(( $RANDOM % ${ARRAY} + 1 ))
    fi
+   #### REPLACED UPLOADED FILESIZE ####
+   #### replace-used
    #### CRYPTED HACK ####
    if `$(which rclone) config show --config=${CONFIG} | grep ":/encrypt" &>/dev/null`;then
        export CRYPTED=C
