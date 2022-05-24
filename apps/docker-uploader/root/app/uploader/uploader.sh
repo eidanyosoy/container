@@ -322,10 +322,11 @@ while true ; do
          if test -f ${CSV}; then loopcsv ; fi
          #### UPLOAD FUNCTIONS STARTUP ####
          CHECKFILES=$($(which cat) ${CHK} | wc -l)
+         ACTIVETRANSFERS=`ls ${LOGFILE} -I "check.log" -I "rmcheck.log" | egrep -c "*.txt"`
          if [[ "${CHECKFILES}" -eq "${TRANSFERS}" ]]; then
             #### FALLBACK TO SINGLE UPLOAD
             rcloneupload
-         elif [[ "${TRANSFERS}" -gt "${TRANSFERS}" ]];then
+         elif [[ "${ACTIVETRANSFERS}" -nq "${TRANSFERS}" ]];then
             #### DEMONISED UPLOAD ####
             rcloneupload &
          else
