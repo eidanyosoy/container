@@ -19,6 +19,7 @@ log "dockserver.io Multi-Thread Uploader started"
 
 BASE=/system/uploader
 CSV=/system/servicekeys/uploader.csv
+UPPED=/system/servicekeys/uploaded.json
 KEYLOCAL=/system/servicekeys/keys/
 LOGFILE=/system/uploader/logs
 START=/system/uploader/json/upload
@@ -129,6 +130,36 @@ EOF
 fi
 }
 
+# Replace the line of the given line number with the given replacement in the given file.
+function replace-used() {
+
+   #### CHECK IS CUSTOM RCLONE.CONF IS AVAILABLE ####
+   if test -f "${CUSTOM}/${FILE}.conf" ; then
+      CONFIG=${CUSTOM}/${FILE}.conf && \
+        USED=`$(which rclone) listremotes --config=${CONFIG} | grep "$1" | sed -e 's/://g' | sed -e 's/GDSA//g' | sort`
+   else
+      CONFIG=/system/servicekeys/rclonegdsa.conf && \
+        ARRAY=$($(which ls) ${KEYLOCAL} | wc -l) && \
+          USED=$(( $RANDOM % ${ARRAY} + 1 ))
+   fi
+   #### PUSH INFORMATION TO FILE ####
+   USEDKEY=$($(which cat) "${UPPED}" | jq -r '.KEY')
+   USEDUPLOADGB=$($(which cat) "${UPPED}" | jq -r '.USED')                                                                    
+   if [[ ${USEDKEY} =~ '^[0-9][0-9]+$' ]];then
+      USEDKEY=${KEY}
+   fi                             
+   if [[ $(date +%H:%M) == "00:01" ]]; then
+      USEDUPLOADGB=0
+   elif [[ ${USEDUPLOADGB} == null ]];then
+       USEDUPLOADGB=0      
+   else
+      USEDUPLOADGB=$($(which cat) "${UPPED}" | jq -r '.USED')
+   fi
+   NEWVALUE=$(( ${USEDUPLOADGB} + ${SIZE}))
+   echo '{"KEY" : "'${KEY}'","USED" : "'${NEWVALUE}'"}' | jq . > "${UPPED}"
+
+}
+
 function rcloneupload() {
    source /system/uploader/uploader.env
    DLFOLDER=${DLFOLDER}
@@ -146,11 +177,11 @@ function rcloneupload() {
       SUMSTART=$(stat -c %s "${DLFOLDER}/${UPP[1]}")
       $(which sleep) 5
       SUMTEST=$(stat -c %s "${DLFOLDER}/${UPP[1]}")
-      if [ "$SUMTEST" -eq 0 ] && [ "$SUMSTART" -eq 0 ]; then
+      if [ "$SUMTEST" -eq 0 ] || [ "$SUMSTART" -eq 0 ]; then
          #### WHEN FILE SIZE A IS ZERO AND FILES SIZE B IS ZERO LOOP AND WAIT ####
          $(which sleep) 5
          #### FIX FOR 0 BYTE UPLOADS ###£
-      elif [ "$SUMSTART" -eq "$SUMTEST" ]; then
+      elif [ "$SUMSTART" -eq "$SUMTEST" ] || [ "$SUMTEST" -eq "$SUMSTART" ]; then
          #### WHEN FILE SIZE A IS EQUAL TO B THEN BREAK LOOP ###
          $(which sleep) 2 && break
       else
@@ -166,6 +197,12 @@ function rcloneupload() {
       $(which chmod) 0755 -R "${DLFOLDER}/${UPP[1]}" &>/dev/null
    fi
    #### CHECK IS CUSTOM RCLONE.CONF IS AVAILABLE ####
+   ##if test -f "${CUSTOM}/${FILE}.conf" ; then
+   ##   CONFIG=${CUSTOM}/${FILE}.conf
+   ##else
+   ##   CONFIG=/system/servicekeys/rclonegdsa.conf && \
+   ##fi
+   #### CHECK IS CUSTOM RCLONE.CONF IS AVAILABLE ####
    if test -f "${CUSTOM}/${FILE}.conf" ; then
       CONFIG=${CUSTOM}/${FILE}.conf && \
         USED=`$(which rclone) listremotes --config=${CONFIG} | grep "$1" | sed -e 's/://g' | sed -e 's/GDSA//g' | sort`
@@ -174,6 +211,8 @@ function rcloneupload() {
         ARRAY=$($(which ls) ${KEYLOCAL} | wc -l) && \
           USED=$(( $RANDOM % ${ARRAY} + 1 ))
    fi
+   #### REPLACED UPLOADED FILESIZE ####
+   #### replace-used
    #### CRYPTED HACK ####
    if `$(which rclone) config show --config=${CONFIG} | grep ":/encrypt" &>/dev/null`;then
        export CRYPTED=C
@@ -243,7 +282,7 @@ function checkspace() {
       while true ; do
         LCT=$($(which df) --output=pcent ${DLFOLDER} | tr -dc '0-9')
         if [[ "${DRIVEUSEDSPACE}" =~ ^[0-9][0-9]+([.][0-9]+)?$ ]]; then
-           if [[ "${LCT}" -gt "${DRIVEUSEDSPACE}" ]]; then
+           if [[ "${LCT}" -ge "${DRIVEUSEDSPACE}" ]]; then
               $(which sleep) 5 && break
            else
               $(which sleep) 10
@@ -257,15 +296,14 @@ function transfercheck() {
    FILE=${SETFILE}
    while true ; do
       source /system/uploader/uploader.env
-      #### -I [ exclude check.log & rmcheck.log file ] ####
-      ACTIVETRANSFERS=`ls ${LOGFILE} -I "check.log" -I "rmcheck.log" | egrep -c "*.txt"`
+      ACTIVETRANSFERS=`ls ${LOGFILE} | egrep -c "*.txt"`
       TRANSFERS=${TRANSFERS:-2}
-      if [[ "${TRANSFERS}" -eq 0 ]]; then
+      if [ '^[0-9][0-9]+$' == "${TRANSFERS}" ] || [ "${TRANSFERS}" -gt 99 ] || [ "${TRANSFERS}" -eq 0 ];then
          TRANSFERS=1
       else
          TRANSFERS=${TRANSFERS:-2}
       fi
-      if [[ ${ACTIVETRANSFERS} -lt "${TRANSFERS}" ]]; then
+      if [[ "${ACTIVETRANSFERS}" -lt "${TRANSFERS}" ]]; then
          #### REMOVE ACTIVE UPLOAD FROM CHECK FILE ####
          $(which touch) "${LOGFILE}/${FILE}.txt"
          #### CHANGE MODTIME OF FILE ####
@@ -281,15 +319,15 @@ function transfercheck() {
 
 function rclonedown() {
    source /system/uploader/uploader.env
-   #### SHUTDOWN UPLOAD LOOP WHEN TP UPLOAD IS LESS THEN 5 ####
-   if [[ `$(which cat) ${CHK} | wc -l` -lt 5 ]]; then
+   #### SHUTDOWN UPLOAD LOOP WHEN TP UPLOAD IS LESS THEN "${TRANSFERS}" ####
+   if [[ `$(which cat) ${CHK} | wc -l` -eq "${TRANSFERS}" ]]; then
       $(which rm) -rf "${CHK}" "${LOGFILE}/${FILE}.txt" "${START}/${FILE}.json" && \
       $(which chown) abc:abc -R "${DONE}/${FILE}.json" &>/dev/null && \
       $(which chmod) 755 -R "${DONE}" &>/dev/null
    #### SHUTDOWN UPLOAD LOOP WHEN DRIVE SPACE IS LESS THEN SETTINGS ####
    LCT=$($(which df) --output=pcent ${DLFOLDER} | tr -dc '0-9')
    elif [[ "${DRIVEUSEDSPACE}" =~ ^[0-9][0-9]+([.][0-9]+)?$ ]]; then
-      if [[ "${DRIVEUSEDSPACE}" -gt "${LCT}" ]]; then
+      if [[ "${DRIVEUSEDSPACE}" -ge "${LCT}" ]]; then
          $(which rm) -rf "${CHK}" "${LOGFILE}/${FILE}.txt" "${START}/${FILE}.json" && \
          $(which chown) abc:abc -R "${DONE}/${FILE}.json" &>/dev/null && \
          $(which chmod) 755 -R "${DONE}/${FILE}.json" &>/dev/null
@@ -310,9 +348,11 @@ while true ; do
    #### FIRST LOOP ####
    source /system/uploader/uploader.env
    CHECKFILES=$($(which cat) ${CHK} | wc -l)
-   if [[ "${CHECKFILES}" -gt 5 ]]; then
+   if [ "${CHECKFILES}" -ge "${TRANSFERS}" ] || [ "${CHECKFILES}" -eq "${TRANSFERS}" ]; then
       # shellcheck disable=SC2086
       $(which cat) "${CHK}" | head -n 1 | while IFS=$'|' read -ra UPP; do
+         #### REPULL SOURCE FILE FOR LIVE EDITS ####
+         source /system/uploader/uploader.env
          #### RUN TRANSFERS CHECK ####
          SETFILE=$(basename "${UPP[1]}")     
          transfercheck
@@ -322,10 +362,11 @@ while true ; do
          if test -f ${CSV}; then loopcsv ; fi
          #### UPLOAD FUNCTIONS STARTUP ####
          CHECKFILES=$($(which cat) ${CHK} | wc -l)
-         if [[ "${CHECKFILES}" -eq "${TRANSFERS}" ]]; then
-            #### FALLBACK TO SINGLE UPLOAD
+         ACTIVETRANSFERS=`ls ${LOGFILE} | egrep -c "*.txt"`
+         if [ "${CHECKFILES}" -eq "${TRANSFERS}" ] || [ "${CHECKFILES}" -lt "${TRANSFERS}" ]; then
+            #### FALLBACK TO SINGLE UPLOAD ####
             rcloneupload
-         elif [[ "${TRANSFERS}" -ne 1 ]];then
+         elif [ "${ACTIVETRANSFERS}" -lt "${TRANSFERS}" ] || [ "${CHECKFILES}" -gt "${TRANSFERS}"]; then
             #### DEMONISED UPLOAD ####
             rcloneupload &
          else
