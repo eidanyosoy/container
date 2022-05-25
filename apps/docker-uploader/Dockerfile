@@ -22,6 +22,9 @@ LABEL org.opencontainers.image.source="https://github.com/dockserver/container"
 ARG TARGETPLATFORM
 ARG BUILDPLATFORM
 
+ENV LANG=en_US.UTF-8 \
+    LANGUAGE=en_US.UTF-8
+
 RUN \
   echo "**** update packages ****" && \
     apk --quiet --no-cache --no-progress update && \
