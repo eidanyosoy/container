@@ -298,7 +298,7 @@ function transfercheck() {
       source /system/uploader/uploader.env
       ACTIVETRANSFERS=`ls ${LOGFILE} | egrep -c "*.txt"`
       TRANSFERS=${TRANSFERS:-2}
-      if [ ! "${TRANSFERS}" =~ '^[0-9][0-9]+$' ] || [ ! "${TRANSFERS}" -gt 99 ] || [ "${TRANSFERS}" -eq 0 ];then
+      if [ '^[0-9][0-9]+$' == "${TRANSFERS}" ] || [ "${TRANSFERS}" -gt 99 ] || [ "${TRANSFERS}" -eq 0 ];then
          TRANSFERS=1
       else
          TRANSFERS=${TRANSFERS:-2}
