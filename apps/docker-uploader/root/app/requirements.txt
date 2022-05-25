@@ -11,6 +11,7 @@ tar
 findutils
 coreutils
 logrotate
+musl-locales
 git
 libxml2-utils
 tzdata
