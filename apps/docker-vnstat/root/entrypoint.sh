@@ -4,10 +4,12 @@ NEWVERSION="${NEWVERSION#*v}"
 NEWVERSION="${NEWVERSION}"
 
 #### CLONE REPOSITORIE ####
-git clone --quiet https://github.com/Hulxv/vnstat-client.git
+
+apk add git yarn curl && \
+   git clone https://github.com/Hulxv/vnstat-client.git
 
 #### RUN INSTALL ####
-cd ./vnstat-client && \
+cd vnstat-client && \
    yarn --frozen-lockfile && \
    yarn install && \
    yarn build
@@ -15,5 +17,5 @@ cd ./vnstat-client && \
 #### ECHO VERSION FOR EXECUTE ####
 echo "${NEWVERSION} vnstat-client"
 
-cd ./dist && \
-./vnstat-client-${NEWVERSION}.AppImage
+cd dist && \
+   vnstat-client-${NEWVERSION}.AppImage
