@@ -37,7 +37,7 @@ RUN \
     apk del --quiet --clean-protected --no-progress && \
     rm -f /var/cache/apk/*
 
-COPY ./apps/docker-vnstat/root/ /
+COPY ./apps/docker-vnstat/root/entrypoint.sh /app/entrypoint.sh
 
 CMD ["/bin/bash", "/app/entrypoint.sh"]
 ##EOF
