@@ -27,7 +27,7 @@ BASENEWVERSION=$(curl -sX GET "https://registry.hub.docker.com/v1/repositories/l
 
 BASENEWVERSION="${BASENEWVERSION#*v}"
 BASENEWVERSION="${BASENEWVERSION#*release-}"
-BASRNEWVERSION="${BASENEWVERSION}"
+BASENEWVERSION="${BASENEWVERSION}"
 
 APPBRANCH="main"
 
@@ -52,7 +52,6 @@ FINALIMAGE="node:16-alpine3.15"
 BUILDSTAGE="--from=buildstage /app /app"
 PACKAGESBUILD="ca-certificates dmidecode util-linux lsblk"
 NPMINSTALL="yarn --frozen-lockfile && yarn build"
-
 APPFOLDER="./$FOLDER/$APP"
 
 ### RELEASE SETTINGS ###
