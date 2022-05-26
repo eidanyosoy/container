@@ -22,7 +22,7 @@ TOKEN=$4
 ### APP SETTINGS ###
 APPLINK="https://api.github.com/repos/Hulxv/vnstat-client"
 
-NEWVERSION=$(curl -sX GET "https://api.github.com/repos/Hulxv/vnstat-client/releases/latest" | jq -r '. | .tag_name')
+NEWVERSION=$(curl -u $USERNAME:$TOKE -sX GET "https://api.github.com/repos/Hulxv/vnstat-client/releases/latest" | jq -r '. | .tag_name')
 NEWVERSION="${NEWVERSION#*v}"
 NEWVERSION="${NEWVERSION#*v}"
 NEWVERSION="${NEWVERSION#*release-}"
@@ -33,6 +33,12 @@ DESCRIPTION="$(curl -u $USERNAME:$TOKEN -sX GET "$APPLINK" | jq -r '.description
 
 INSTCOMMAND="apk add -U --update --no-cache"
 PACKAGES="wget curl jq bash ca-certificates shadow"
+
+UPCOMMAND="apk --quiet --no-cache --no-progress update && \\
+    apk --quiet --no-cache --no-progress upgrade"
+
+CLEANUP="apk del --quiet --clean-protected --no-progress && \\
+    rm -f /var/cache/apk/*"
 
 ## IMAGE
 FINALIMAGE="node:alpine3.15"
@@ -71,9 +77,13 @@ ENV DOCKER=true
 WORKDIR /app
 
 RUN \
+  echo "'"**** update packages ****"'" && \
+    '"${UPCOMMAND}"' && \
   echo "'"**** install final packages ****"'" && \
     '"${INSTCOMMAND}"' '"${PACKAGESBUILD}"' && \
-     mkdir -p /app
+     mkdir -p /app && \
+  echo "'"*** cleanup system ****"'" && \
+    '"${CLEANUP}"'
 
 COPY '"${APPFOLDER}"'/root/ /
 
