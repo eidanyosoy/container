@@ -29,8 +29,10 @@ BASENEWVERSION="${BASENEWVERSION#*v}"
 BASENEWVERSION="${BASENEWVERSION#*release-}"
 BASRNEWVERSION="${BASENEWVERSION}"
 
+APPBRANCH="main"
+
 APPLINK="https://api.github.com/repos/MauriceNino/dashdot"
-NEWVERSION=$(curl -sX GET "https://api.github.com/repos/sct/overseerr/commits?sha=${APPBRANCH}" | jq -r 'first(.[] | select(.commit.message | contains("[skip ci]") | not)) | .sha')
+NEWVERSION=$(curl -sX GET "https://api.github.com/repos/MauriceNino/dashdot/commits?sha=${APPBRANCH}" | jq -r 'first(.[] | select(.commit.message | contains("[skip ci]") | not)) | .sha')
 NEWVERSION="${NEWVERSION#*v}"
 NEWVERSION="${NEWVERSION#*release-}"
 NEWVERSION="${NEWVERSION}"
