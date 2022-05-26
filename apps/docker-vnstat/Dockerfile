@@ -68,5 +68,7 @@ EXPOSE ${HTTP_PORT}
 COPY ./apps/docker-vnstat/root/favicon.ico /var/www/localhost/htdocs/favicon.ico
 COPY ./apps/docker-vnstat/root/start.sh /start.sh
 
+RUN chmod 777 /start.sh
+
 CMD [ "/start.sh" ]
 ##EOF
