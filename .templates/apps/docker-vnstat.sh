@@ -118,5 +118,7 @@ EXPOSE ${HTTP_PORT}
 COPY '"${APPFOLDER}"'/root/favicon.ico /var/www/localhost/htdocs/favicon.ico
 COPY '"${APPFOLDER}"'/root/start.sh /start.sh
 
+RUN chmod 777 /start.sh
+
 CMD [ "'"/start.sh"'" ]
 ##EOF' > ./$FOLDER/$APP/Dockerfile
