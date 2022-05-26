@@ -24,8 +24,6 @@ ARG BUILDPLATFORM
 ARG VERSION="22.2.11"
 ENV DOCKER=true
 
-WORKDIR /app
-
 RUN \
   echo "**** update packages ****" && \
     apk --quiet --no-cache --no-progress update && \
@@ -33,11 +31,11 @@ RUN \
   echo "**** install final packages ****" && \
     apk add -U --update --no-cache curl wget jq yarn ca-certificates bash && \
      mkdir -p /app && \
-     wget https://github.com/Hulxv/vnstat-client/releases/download/v22.2.11/vnstat-client-22.2.11.AppImage && \
-     chmod +x /app/vnstat-client-22.2.11.AppImage && \
+     wget https://github.com/Hulxv/vnstat-client/releases/download/v22.2.11/vnstat-client-22.2.11.AppImage -O /app/vnstat-client.AppImage && \
+     chmod +x /app/vnstat-client.AppImage && \
   echo "*** cleanup system ****" && \
     apk del --quiet --clean-protected --no-progress && \
     rm -f /var/cache/apk/*
 
-ENTRYPOINT ["/app/vnstat-client-22.2.11.AppImage"]
+ENTRYPOINT ["/app/vnstat-client.AppImage"]
 ##EOF
