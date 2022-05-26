@@ -106,8 +106,6 @@ COPY --from=builder /usr/sbin/vnstatd /usr/sbin/vnstatd
 COPY --from=builder /etc/vnstat.conf /etc/vnstat.conf
 COPY --from=builder vnstat/examples/vnstat.cgi /var/www/localhost/htdocs/index.cgi
 COPY --from=builder vnstat/examples/vnstat-json.cgi /var/www/localhost/htdocs/json.cgi
-COPY --from=builder vnstat/start.sh /start.sh
-COPY --from=builder vnstat/favicon.ico /var/www/localhost/htdocs/favicon.ico
 
 RUN true \
     && set -ex \
@@ -116,6 +114,9 @@ RUN true \
 
 VOLUME /var/lib/vnstat
 EXPOSE ${HTTP_PORT}
+
+COPY '"${APPFOLDER}"'/root/favicon.ico /var/www/localhost/htdocs/favicon.ico
+COPY '"${APPFOLDER}"'/root/start.sh /start.sh
 
 CMD [ "'"/start.sh"'" ]
 ##EOF' > ./$FOLDER/$APP/Dockerfile
