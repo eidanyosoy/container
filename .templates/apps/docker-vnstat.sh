@@ -91,14 +91,7 @@ FROM alpine:latest AS builder
 
 RUN true \
     && set -ex \
-    && apk add --no-cache \
-        gcc \
-        make \
-        musl-dev \
-        linux-headers \
-        gd-dev \
-        sqlite-dev \
-        git \
+    && apk add --no-cache gcc make musl-dev linux-headers gd-dev sqlite-dev git \
     && git clone --depth 1 https://github.com/vergoh/vnstat \
     && cd vnstat \
     && ./configure --prefix=/usr --sysconfdir=/etc \
@@ -113,18 +106,16 @@ COPY --from=builder /usr/sbin/vnstatd /usr/sbin/vnstatd
 COPY --from=builder /etc/vnstat.conf /etc/vnstat.conf
 COPY --from=builder vnstat/examples/vnstat.cgi /var/www/localhost/htdocs/index.cgi
 COPY --from=builder vnstat/examples/vnstat-json.cgi /var/www/localhost/htdocs/json.cgi
+COPY --from=builder vnstat/start.sh /start.sh
+COPY --from=builder vnstat/favicon.ico /var/www/localhost/htdocs/favicon.ico
 
 RUN true \
     && set -ex \
     && addgroup -S vnstat  \
     && adduser -S -h /var/lib/vnstat -s /sbin/nologin -g vnStat -D -H -G vnstat vnstat
 
-COPY '"${APPFOLDER}"'/root/favicon.ico /var/www/localhost/htdocs/favicon.ico
-COPY COPY '"${APPFOLDER}"'/root/start.sh /start.sh
-
 VOLUME /var/lib/vnstat
 EXPOSE ${HTTP_PORT}
 
 CMD [ "'"/start.sh"'" ]
-
 ##EOF' > ./$FOLDER/$APP/Dockerfile
