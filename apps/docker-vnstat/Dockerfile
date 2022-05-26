@@ -16,26 +16,56 @@
 #####################################
 # shellcheck disable=SC2086
 # shellcheck disable=SC2046
-FROM node:alpine3.15
+FROM alpine:latest AS base
 LABEL org.opencontainers.image.source="https://github.com/dockserver/container"
 
-ARG TARGETPLATFORM
-ARG BUILDPLATFORM
-ARG VERSION="22.2.11"
-ENV DOCKER=true
+ENV HTTP_PORT=8685
+ENV HTTP_BIND=*
+ENV HTTP_LOG=/dev/stdout
+ENV LARGE_FONTS=0
+ENV CACHE_TIME=1
+ENV RATE_UNIT=1
+ENV PAGE_REFRESH=0
+ENV RUN_VNSTATD=1
 
-RUN \
-  echo "**** update packages ****" && \
-    apk --quiet --no-cache --no-progress update && \
-    apk --quiet --no-cache --no-progress upgrade && \
-  echo "**** install final packages ****" && \
-    apk add -U --update --no-cache curl wget jq yarn ca-certificates bash && \
-     mkdir -p /app && \
-     wget https://github.com/Hulxv/vnstat-client/releases/download/v22.2.11/vnstat-client-22.2.11.AppImage -O /app/vnstat-client.AppImage && \
-     chmod +x /app/vnstat-client.AppImage && \
-  echo "*** cleanup system ****" && \
-    apk del --quiet --clean-protected --no-progress && \
-    rm -f /var/cache/apk/*
+RUN true \
+    && set -ex \
+    && apk add --no-cache \
+        gd \
+        perl \
+        lighttpd \
+        sqlite-libs \
+        curl
 
-ENTRYPOINT ["/app/vnstat-client.AppImage"]
+FROM alpine:latest AS builder
+
+RUN true \
+    && set -ex \
+    && apk add --no-cache gcc make musl-dev linux-headers gd-dev sqlite-dev git \
+    && git clone --depth 1 https://github.com/vergoh/vnstat \
+    && cd vnstat \
+    && ./configure --prefix=/usr --sysconfdir=/etc \
+    && make \
+    && make install
+
+FROM base AS runtime
+
+COPY --from=builder /usr/bin/vnstat /usr/bin/vnstat
+COPY --from=builder /usr/bin/vnstati /usr/bin/vnstati
+COPY --from=builder /usr/sbin/vnstatd /usr/sbin/vnstatd
+COPY --from=builder /etc/vnstat.conf /etc/vnstat.conf
+COPY --from=builder vnstat/examples/vnstat.cgi /var/www/localhost/htdocs/index.cgi
+COPY --from=builder vnstat/examples/vnstat-json.cgi /var/www/localhost/htdocs/json.cgi
+COPY --from=builder vnstat/start.sh /start.sh
+COPY --from=builder vnstat/favicon.ico /var/www/localhost/htdocs/favicon.ico
+
+RUN true \
+    && set -ex \
+    && addgroup -S vnstat  \
+    && adduser -S -h /var/lib/vnstat -s /sbin/nologin -g vnStat -D -H -G vnstat vnstat
+
+VOLUME /var/lib/vnstat
+EXPOSE ${HTTP_PORT}
+
+CMD [ "/start.sh" ]
 ##EOF
