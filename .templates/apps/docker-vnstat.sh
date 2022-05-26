@@ -85,7 +85,7 @@ RUN \
   echo "'"*** cleanup system ****"'" && \
     '"${CLEANUP}"'
 
-COPY '"${APPFOLDER}"'/root/ /
+COPY '"${APPFOLDER}"'/root/entrypoint.sh /app/entrypoint.sh
 
 CMD ["'"/bin/bash"'", "'"/app/entrypoint.sh"'"]
 ##EOF' > ./$FOLDER/$APP/Dockerfile
