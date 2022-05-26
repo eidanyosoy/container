@@ -54,11 +54,11 @@
    "appname": "docker-dash",
    "apppic": "",
    "appfolder": "./apps/docker-dash",
-   "newversion": "90095bb18548dfd663a78df1908c40dbf2f99faf",
+   "newversion": "d3864e9fb9adae0fb998cf3cba6fb8fa7e6552dc",
    "baseimage": "alpine",
    "baseversion": "3.16.0",
    "description": "A simple, modern server dashboard, primarily used by smaller private servers",
-   "body": "Upgrading docker-dash to 90095bb18548dfd663a78df1908c40dbf2f99faf",
+   "body": "Upgrading docker-dash to d3864e9fb9adae0fb998cf3cba6fb8fa7e6552dc",
    "user": "dockserver-image[bot]"
 }
 {
@@ -164,11 +164,11 @@
    "appname": "docker-jackett",
    "apppic": "./images/docker-jackett.png",
    "appfolder": "./apps/docker-jackett",
-   "newversion": "0.20.1102",
+   "newversion": "0.20.1104",
    "appbranch": "master",
    "baseimage": "ghcr.io/linuxserver/baseimage-ubuntu:bionic",
    "description": "API Support for your favorite torrent trackers",
-   "body": "Upgrading docker-jackett to 0.20.1102",
+   "body": "Upgrading docker-jackett to 0.20.1104",
    "user": "github-actions[bot]"
 }
 {
@@ -343,11 +343,11 @@
    "appname": "docker-readarr",
    "apppic": "./images/docker-readarr.png",
    "appfolder": "./apps/docker-readarr",
-   "newversion": "0.1.1.1323",
+   "newversion": "0.1.1.1337",
    "appbranch": "nightly",
    "baseimage": "ghcr.io/dockserver/docker-alpine:latest",
    "description": "null",
-   "body": "Upgrading docker-readarr to 0.1.1.1323",
+   "body": "Upgrading docker-readarr to 0.1.1.1337",
    "user": "github-actions[bot]"
 }
 {
@@ -432,6 +432,16 @@
    "description": "",
    "body": "Upgrading docker-uploader to ",
    "user": "github-actions[bot]"
+}
+{
+   "appname": "docker-vnstat",
+   "apppic": "",
+   "appfolder": "./apps/docker-vnstat",
+   "newversion": "22.2.11",
+   "finalimage": "node:alpine3.15",
+   "description": "GUI Client for vnStat Network Monitor for Linux or GNU/Linux",
+   "body": "Upgrading docker-vnstat to 22.2.11",
+   "user": "dockserver-image[bot]"
 }
 {
    "appname": "docker-wiki",
@@ -588,11 +598,11 @@
    "appname": "docker-overseerr-nightly",
    "apppic": "./images/docker-overseerr-nightly.png",
    "appfolder": "./nightly/docker-overseerr-nightly",
-   "newversion": "90095bb18548dfd663a78df1908c40dbf2f99faf",
+   "newversion": "db05172d8b924a591ece4fae72d076eb59ee5f82",
    "appbranch": "develop",
    "baseimage": "ghcr.io/dockserver/docker-alpine:latest",
    "description": "Request management and media discovery tool for the Plex ecosystem",
-   "body": "Upgrading docker-overseerr-nightly to 90095bb18548dfd663a78df1908c40dbf2f99faf",
+   "body": "Upgrading docker-overseerr-nightly to db05172d8b924a591ece4fae72d076eb59ee5f82",
    "user": "github-actions[bot]"
 }
 {
@@ -610,10 +620,10 @@
    "appname": "docker-sabnzbd-nightly",
    "apppic": "./images/docker-sabnzbd-nightly.png",
    "appfolder": "./nightly/docker-sabnzbd-nightly",
-   "newversion": "cd337cb1643615d481aed9a57ddbd139edb307d4",
+   "newversion": "19fc60a1d8562800cba353baa2bb66e7f0597629",
    "appbranch": "develop",
    "description": "SABnzbd - The automated Usenet download tool",
-   "body": "Upgrading docker-sabnzbd-nightly to cd337cb1643615d481aed9a57ddbd139edb307d4",
+   "body": "Upgrading docker-sabnzbd-nightly to 19fc60a1d8562800cba353baa2bb66e7f0597629",
    "user": "github-actions[bot]"
 }
 {

@@ -1,0 +1,10 @@
+{
+   "appname": "docker-vnstat",
+   "apppic": "",
+   "appfolder": "./apps/docker-vnstat",
+   "newversion": "22.2.11",
+   "finalimage": "node:alpine3.15",
+   "description": "GUI Client for vnStat Network Monitor for Linux or GNU/Linux",
+   "body": "Upgrading docker-vnstat to 22.2.11",
+   "user": "dockserver-image[bot]"
+}
