@@ -37,7 +37,6 @@ PACKAGES="wget curl jq bash ca-certificates shadow"
 ## IMAGE
 FINALIMAGE="node:alpine3.15"
 PACKAGESBUILD="curl wget jq yarn ca-certificates bash"
-NPMINSTALL="yarn --frozen-lockfile && yarn build"
 APPFOLDER="./$FOLDER/$APP"
 
 ### RELEASE SETTINGS ###
@@ -74,9 +73,9 @@ WORKDIR /app
 RUN \
   echo "'"**** install final packages ****"'" && \
     '"${INSTCOMMAND}"' '"${PACKAGESBUILD}"' && \
-     mkdir -p /app && \
-     curl -fsSL "'"https://github.com/Hulxv/vnstat-client/releases/download/v"'${VERSION}'"/vnstat-client-"'${VERSION}'".tar.gz | tar xzf - -C /app --strip-components=1 && \
-    '"${NPMINSTALL}"'
+     mkdir -p /app
+
+COPY '"${APPFOLDER}"'/root/ /
 
 CMD ["'"/bin/bash"'", "'"/app/entrypoint.sh"'"]
 ##EOF' > ./$FOLDER/$APP/Dockerfile
