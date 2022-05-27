@@ -15,10 +15,10 @@ apps docker-backup
    "appname": "docker-backup",
    "apppic": "./images/docker-backup.png",
    "appfolder": "./apps/docker-backup",
-   "newversion": "3.16.0",
+   "newversion": "",
    "baseimage": "alpine",
    "description": "Official Alpine Linux Docker image. Win at minimalism!",
-   "body": "Upgrading docker-backup to 3.16.0",
+   "body": "Upgrading docker-backup to ",
    "user": "github-actions[bot]"
 }
 
@@ -65,11 +65,11 @@ apps docker-dash
    "appname": "docker-dash",
    "apppic": "",
    "appfolder": "./apps/docker-dash",
-   "newversion": "d3864e9fb9adae0fb998cf3cba6fb8fa7e6552dc",
+   "newversion": "c3454683cb6356ab503afa1f28946b01df145303",
    "baseimage": "alpine",
    "baseversion": "3.16.0",
    "description": "A simple, modern server dashboard, primarily used by smaller private servers",
-   "body": "Upgrading docker-dash to d3864e9fb9adae0fb998cf3cba6fb8fa7e6552dc",
+   "body": "Upgrading docker-dash to c3454683cb6356ab503afa1f28946b01df145303",
    "user": "dockserver-image[bot]"
 }
 
@@ -195,11 +195,11 @@ apps docker-jackett
    "appname": "docker-jackett",
    "apppic": "./images/docker-jackett.png",
    "appfolder": "./apps/docker-jackett",
-   "newversion": "0.20.1104",
+   "newversion": "0.20.1108",
    "appbranch": "master",
    "baseimage": "ghcr.io/linuxserver/baseimage-ubuntu:bionic",
    "description": "API Support for your favorite torrent trackers",
-   "body": "Upgrading docker-jackett to 0.20.1104",
+   "body": "Upgrading docker-jackett to 0.20.1108",
    "user": "github-actions[bot]"
 }
 
@@ -367,12 +367,12 @@ apps docker-qbittorrent
    "appname": "docker-qbittorrent",
    "apppic": "./images/docker-qbittorrent.png",
    "appfolder": "./apps/docker-qbittorrent",
-   "newversion": "4.4.3-r0",
+   "newversion": "4.4.3.1-r0",
    "appversion": "1.7",
    "appbranch": "master",
    "baseimage": "ghcr.io/linuxserver/baseimage-alpine:edge",
    "description": "Cli to manage qBittorrent",
-   "body": "Upgrading docker-qbittorrent to 4.4.3-r0 with 1.7",
+   "body": "Upgrading docker-qbittorrent to 4.4.3.1-r0 with 1.7",
    "user": "github-actions[bot]"
 }
 
@@ -735,10 +735,10 @@ nightly docker-sabnzbd-nightly
    "appname": "docker-sabnzbd-nightly",
    "apppic": "./images/docker-sabnzbd-nightly.png",
    "appfolder": "./nightly/docker-sabnzbd-nightly",
-   "newversion": "19fc60a1d8562800cba353baa2bb66e7f0597629",
+   "newversion": "c80012e3674caa529d0768653a4b9ba3332f556f",
    "appbranch": "develop",
    "description": "SABnzbd - The automated Usenet download tool",
-   "body": "Upgrading docker-sabnzbd-nightly to 19fc60a1d8562800cba353baa2bb66e7f0597629",
+   "body": "Upgrading docker-sabnzbd-nightly to c80012e3674caa529d0768653a4b9ba3332f556f",
    "user": "github-actions[bot]"
 }
 
