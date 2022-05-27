@@ -75,8 +75,15 @@ function cleanuplog() {
    $(which rclone) lsf "${DONE}" --files-only -R -s "|" -F "tp" | sort -n > "${RMLOG}" 2>&1
    #### REMOVE LAST 1000 FILES ####
    if [ `cat ${RMLOG} | wc -l` -gt 1000 ]; then
-      $(which cat) "${RMLOG}" | head -n 1000 | while IFS=$'|' read -ra RMLO; do
-         $(which rm) -rf "${DONE}/${RMLO[1]}" &>/dev/null
+      #### PRINT TOTAL LINE NUMBER ####
+      line_count=`awk 'END{print NR}' ${RMLOG}`
+      ##### EXCLUDE LAST 1000 LINES ####
+      remove_line=`expr $line_count - 1000`
+      ##### REMOVE EVERYTHING EXCEPT LAST 1000 LINES ####
+      $(which sed) -i '1,'$remove_line'd' ${RMLOG}
+      ##### REMOVE LEFT OVER FROM RMLOG FILE WHEN OVER 1000 FILES ####
+      $(which cat) "${RMLOG}" | while IFS=$'|' read -ra RMLO; do
+          $(which rm) -rf "${DONE}/${RMLO[1]}" &>/dev/null
       done
    else
       $(which rm) -rf "${RMLOG}" "${CHK}" &>/dev/null
@@ -306,8 +313,10 @@ function transfercheck() {
       if [[ "${ACTIVETRANSFERS}" -lt "${TRANSFERS}" ]]; then
          #### REMOVE ACTIVE UPLOAD FROM CHECK FILE ####
          $(which touch) "${LOGFILE}/${FILE}.txt"
-         #### CHANGE MODTIME OF FILE ####
-         $(which touch) -m "${DLFOLDER}/${UPP[1]}"
+         if test -f "${DLFOLDER}/${UPP[1]}" ; then
+            #### CHANGE MODTIME OF FILE ####
+            $(which touch) -m "${DLFOLDER}/${UPP[1]}"
+         fi
          #### RELOAD CHECK FILE ####
          listfiles
          $(which sleep) 5 && break
@@ -351,30 +360,36 @@ while true ; do
    if [ "${CHECKFILES}" -ge "${TRANSFERS}" ] || [ "${CHECKFILES}" -eq "${TRANSFERS}" ]; then
       # shellcheck disable=SC2086
       $(which cat) "${CHK}" | head -n 1 | while IFS=$'|' read -ra UPP; do
-         #### REPULL SOURCE FILE FOR LIVE EDITS ####
-         source /system/uploader/uploader.env
-         #### RUN TRANSFERS CHECK ####
-         SETFILE=$(basename "${UPP[1]}")     
-         transfercheck
-         #### SET CORRECT FOLDER FOR CUSTOM UPLOAD RCLONE.CONF ####
-         SETDIR=$(dirname "${UPP[1]}" | sed "s#${DLFOLDER}/${MOVE}##g" | cut -d ' ' -f 1 | sed 's|/.*||' )
-         #### CHECK IS CSV AVAILABLE AND LOOP TO CORRECT DRIVE ####
-         if test -f ${CSV}; then loopcsv ; fi
-         #### UPLOAD FUNCTIONS STARTUP ####
-         CHECKFILES=$($(which cat) ${CHK} | wc -l)
-         ACTIVETRANSFERS=`ls ${LOGFILE} | egrep -c "*.txt"`
-         if [ "${CHECKFILES}" -eq "${TRANSFERS}" ] || [ "${CHECKFILES}" -lt "${TRANSFERS}" ]; then
-            #### FALLBACK TO SINGLE UPLOAD ####
-            rcloneupload
-         elif [ "${ACTIVETRANSFERS}" -lt "${TRANSFERS}" ] || [ "${CHECKFILES}" -gt "${TRANSFERS}"]; then
-            #### DEMONISED UPLOAD ####
-            rcloneupload &
+         #### TO CHECK IS IT A FILE OR NOT ####
+         if test -f "${DLFOLDER}/${UPP[1]}"; then
+            #### REPULL SOURCE FILE FOR LIVE EDITS ####
+            source /system/uploader/uploader.env
+            #### RUN TRANSFERS CHECK ####
+            SETFILE=$(basename "${UPP[1]}")     
+            transfercheck
+            #### SET CORRECT FOLDER FOR CUSTOM UPLOAD RCLONE.CONF ####
+            SETDIR=$(dirname "${UPP[1]}" | sed "s#${DLFOLDER}/${MOVE}##g" | cut -d ' ' -f 1 | sed 's|/.*||' )
+            #### CHECK IS CSV AVAILABLE AND LOOP TO CORRECT DRIVE ####
+            if test -f ${CSV}; then loopcsv ; fi
+            #### UPLOAD FUNCTIONS STARTUP ####
+            CHECKFILES=$($(which cat) ${CHK} | wc -l)
+            ACTIVETRANSFERS=`ls ${LOGFILE} | egrep -c "*.txt"`
+            if [ "${CHECKFILES}" -eq "${TRANSFERS}" ] || [ "${CHECKFILES}" -lt "${TRANSFERS}" ]; then
+               #### FALLBACK TO SINGLE UPLOAD ####
+               rcloneupload
+            elif [ "${ACTIVETRANSFERS}" -lt "${TRANSFERS}" ] || [ "${CHECKFILES}" -gt "${TRANSFERS}"]; then
+               #### DEMONISED UPLOAD ####
+               rcloneupload &
+            else
+               #### SINGLE UPLOAD ####
+               rcloneupload
+            fi
+            #### SHUTDOWN RCLONE UPLOAD PROCESS ####
+            rclonedown
          else
-            #### SINGLE UPLOAD ####
-            rcloneupload
+            #### WHEN NOT THEN SLEEP 1 SEC ####
+            sleep 1
          fi
-         #### SHUTDOWN RCLONE UPLOAD PROCESS ####
-         rclonedown
       done
       #### CLEANUP OLD JSON FILES WHEN OVER 1000 FILES ####
       cleanuplog
