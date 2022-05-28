@@ -342,8 +342,8 @@ SECURITYOPSSET=${SECURITYOPSSET:-true}
 ## CF SETTINGS ?!                || muss python werden das bash limits hat
 ## python oder doch bash ?!      {{ SIEHE LINE DRÜBER 
 
-echo " not done yet but should not token so long"
-echo " don't need 18 months , to get it working"
+echo " not done yet but should not take so long"
+echo " don't need 22 months , to get it working"
 
 }
 
