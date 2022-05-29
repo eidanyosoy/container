@@ -102,7 +102,7 @@ if test -f ${CSV} ; then
    USED=$(( $RANDOM % ${ARRAY} + 1 ))
 
    ### TEST IS FOLDER AND CSV CORRECT ####
-   if [[ $(which cat) ${CSV} | grep -E ${DIR}) == ${DIR} ]]; then
+   if [[ $($(which cat) ${CSV} | grep -E ${DIR}) == ${DIR} ]]; then
       $(which cat) ${CSV} | grep -E ${DIR} | sed '/^\s*#.*$/d'| while IFS=$'|' read -ra myArray; do
       if [[ ${myArray[2]} == "" && ${myArray[3]} == "" ]]; then
 ### UNENCRYPTED RCLONE.CONF ####
