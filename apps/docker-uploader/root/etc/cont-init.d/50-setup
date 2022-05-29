@@ -24,7 +24,7 @@ groupmod -o -g "$PGID" abc &>/dev/null
 usermod -o -u "$PUID" abc &>/dev/null
 
 if [[ -f /donate.txt ]]; then
-   cat /donate.txt
+   $(which cat) /donate.txt
 fi
 echo '
 -------------------------------------
@@ -35,23 +35,26 @@ User uid:    $(id -u abc)
 User gid:    $(id -g abc)
 -------------------------------------
 "
-   cat > /etc/apk/repositories << EOF; $(echo)
+   $(which cat) > /etc/apk/repositories << EOF; $(echo)
 http://dl-cdn.alpinelinux.org/alpine/v$(cat /etc/alpine-release | cut -d'.' -f1,2)/main
 http://dl-cdn.alpinelinux.org/alpine/v$(cat /etc/alpine-release | cut -d'.' -f1,2)/community
 http://dl-cdn.alpinelinux.org/alpine/edge/testing
 EOF
 
-   apk --quiet --no-progress update && \
-   apk --quiet --no-progress upgrade
+   log "**** update packages ****"
+   $(which apk) --quiet --no-progress update && \
+   $(which apk) --quiet --no-progress upgrade
 
-   cat /app/requirements.txt | while IFS=$'\n' read -ra myArray; do
-      apk add --quiet --no-progress --update ${myArray[@]}
+   log "**** install build packages ****"
+   $(which cat) /app/requirements.txt | while IFS=$'\n' read -ra myArray; do
+      $(which apk) add --quiet --no-progress --update ${myArray[@]}
    done
 
-   wget -qO- https://rclone.org/install.sh | bash &>/dev/null
+   log "**** install rclone ****"
+   $(which wget) -qO- https://rclone.org/install.sh | bash &>/dev/null
 
    KEYLOCAL=/system/servicekeys/keys/
-   ARRAY=$(ls -A ${KEYLOCAL} | wc -l )
+   ARRAY=$(ls ${KEYLOCAL} | wc -l )
    if [[ "${ARRAY}" -eq "0" ]]; then
       log "-->> [ WARNING ] ----------------- [ WARNING ] <<--"
       log "-->> [ WARNING ]  no match found   [ WARNING ] <<--"
@@ -61,37 +64,36 @@ EOF
       sleep infinity
    fi
 
-  cp -r /conf/nginx.conf /etc/nginx/nginx.conf
-  cp -r /conf/fpm-pool.conf /etc/php8/php-fpm.d/www.conf
-  cp -r /conf/php.j2 /etc/php8/conf.d/custom.ini
+   log "**** copy dependencies ****"
+   $(which cp) -r /conf/nginx.conf /etc/nginx/nginx.conf
+   $(which cp) -r /conf/fpm-pool.conf /etc/php8/php-fpm.d/www.conf
+   $(which cp) -r /conf/php.j2 /etc/php8/conf.d/custom.ini
 
-  rm -rf /system/uploader/.keys/{usedupload,lastday} \
-         /app/uploader/{pid,discord} \
-         /system/uploader/vfsforget &>/dev/null
+   $(which rm) -rf /system/uploader/.keys/{usedupload,lastday} \
+          /app/uploader/{pid,discord} \
+          /system/uploader/vfsforget \
+          /var/cache/apk/* &>/dev/null
 
-  mkdir -p /system/uploader/.keys \
-           /system/uploader/{logs,json} \
+   log "**** creating folders ****"
+   $(which mkdir) -p /system/uploader/.keys \
+           /system/uploader/{logs,json,sample} \
            /system/uploader/json/{done,upload} \
            /root/.config/rclone/ &>/dev/null
 
-  find /mnt/downloads -type f -name '*.lck' -delete
+   ## COPY SAMPLE FILES ###
+   $(which cp) -r /conf/*.csv /system/uploader/sample/*.csv
+   ## SET PERMS ##
+   $(which chown) -cR abc:abc /root/.config /app /system/* &>/dev/null
+   $(which chmod) -cR 755 /root/.config/rclone/ /app /system/* &>/dev/null
 
-  chown -cR abc:abc /root/.config /app /system/* &>/dev/null
-  chmod -cR 755 /root/.config/rclone/ /app /system/* &>/dev/null
+   sample=/app/uploader/.sample.uploader.env
+   uploaderenv=/system/uploader/uploader.env
 
-  USERAGENT=${USERAGENT:-null}
-  if [[ ${USERAGENT} == 'null' ]]; then
-     USERAGENT=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
-  fi
-
-  sample=/app/uploader/.sample.uploader.env
-  uploaderenv=/system/uploader/uploader.env
-
-  if test -f ${uploaderenv} ; then
-    source $uploaderenv
-  else
-    source $sample
-  fi
+   if test -f ${uploaderenv} ; then
+     source $uploaderenv
+   else
+     source $sample
+   fi
 
 echo -e "#-------------------------------------------------------
 #   UPLOADER ENVIROMENTS
@@ -104,7 +106,6 @@ PGID=${PGID:-1000}
 BANDWITHLIMIT=${BANDWITHLIMIT:-40}
 LOG_LEVEL=${LOG_LEVEL:-INFO}
 DLFOLDER=${DLFOLDER:-/mnt/downloads}
-USERAGENT=${USERAGENT}
 TRANSFERS=${TRANSFERS:-2}
 
 ## USER - SETTINGS

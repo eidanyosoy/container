@@ -101,8 +101,10 @@ if test -f ${CSV} ; then
    ARRAY=$(ls ${KEYLOCAL} | wc -l )
    USED=$(( $RANDOM % ${ARRAY} + 1 ))
 
-   $(which cat) ${CSV} | grep -E ${DIR} | sed '/^\s*#.*$/d'| while IFS=$'|' read -ra myArray; do
-   if [[ ${myArray[2]} == "" && ${myArray[3]} == "" ]]; then
+   ### TEST IS FOLDER AND CSV CORRECT ####
+   if [[ $(which cat) ${CSV} | grep -E ${DIR}) == ${DIR} ]]; then
+      $(which cat) ${CSV} | grep -E ${DIR} | sed '/^\s*#.*$/d'| while IFS=$'|' read -ra myArray; do
+      if [[ ${myArray[2]} == "" && ${myArray[3]} == "" ]]; then
 ### UNENCRYPTED RCLONE.CONF ####
 cat > ${ENDCONFIG} << EOF; $(echo)
 ## CUSTOM RCLONE.CONF for ${FILE}
@@ -132,8 +134,9 @@ directory_name_encryption = true
 password = ${myArray[2]}
 password2 = ${myArray[3]}
 EOF
+      fi
+      done
    fi
-   done
 fi
 }
 
@@ -238,6 +241,8 @@ function rcloneupload() {
       #### MAKE FOLDER ON CORRECT DRIVE #### 
       $(which rclone) mkdir "${KEY}$[USED]${CRYPTED}:/${DIR}/" --config="${CONFIG}"
    fi
+   #### GENERATE FOR EACH UPLOAD A NRW AGENT ####
+   USERAGENT=$($(which cat) /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
    #### START TIME UPLOAD ####
    STARTZ=$(date +%s)
    #### RUN RCLONE UPLOAD COMMAND ####
@@ -328,8 +333,9 @@ function transfercheck() {
 
 function rclonedown() {
    source /system/uploader/uploader.env
+   CHECKFILES=$($(which cat) ${CHK} | wc -l)
    #### SHUTDOWN UPLOAD LOOP WHEN TP UPLOAD IS LESS THEN "${TRANSFERS}" ####
-   if [[ `$(which cat) ${CHK} | wc -l` -eq "${TRANSFERS}" ]]; then
+   if [[ "${CHECKFILES}" -eq "${TRANSFERS}" ]]; then
       $(which rm) -rf "${CHK}" "${LOGFILE}/${FILE}.txt" "${START}/${FILE}.json" && \
       $(which chown) abc:abc -R "${DONE}/${FILE}.json" &>/dev/null && \
       $(which chmod) 755 -R "${DONE}" &>/dev/null
