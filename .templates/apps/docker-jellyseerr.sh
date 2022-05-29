@@ -99,7 +99,7 @@ RUN \
     export COMMIT_TAG="'"v${NEWVERSION}"'" && \
   echo "'"**** install '"${APP}"' ****"'" && \
     mkdir -p /app/jellyseerr && \
-    curl -fsSL "'"https://github.com/Fallenbagel/jellyseerr/archive/refs/tags/v"'${VERSION}'".tar.gz"'" | tar xzf - -C /app/overseerr --strip-components=1 && \
+    curl -fsSL "'"https://github.com/Fallenbagel/jellyseerr/archive/refs/tags/v"'${VERSION}'".tar.gz"'" | tar xzf - -C /app/jellyseerr --strip-components=1 && \
     '"${YARN}"' && \
     '"${LEFTOVER}"' && \
   echo "{\"commitTag\": \"${COMMIT_TAG}\"}" > committag.json && \
