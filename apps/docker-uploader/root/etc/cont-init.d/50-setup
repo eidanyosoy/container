@@ -81,7 +81,9 @@ EOF
            /root/.config/rclone/ &>/dev/null
 
    ## COPY SAMPLE FILES ###
-   $(which cp) -r /conf/*.csv /system/uploader/sample/*.csv
+   $(which cp) -r /conf/crypt_multi_tdrive-example.csv /system/uploader/sample/crypt_multi_tdrive-example.csv
+   $(which cp) -r /conf/uncrypt_multi_tdrive-example.csv /system/uploader/sample/uncrypt_multi_tdrive-example.csv
+
    ## SET PERMS ##
    $(which chown) -cR abc:abc /root/.config /app /system/* &>/dev/null
    $(which chmod) -cR 755 /root/.config/rclone/ /app /system/* &>/dev/null
