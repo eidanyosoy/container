@@ -36,7 +36,7 @@ RUN \
     export COMMIT_TAG="v1.1.0" && \
   echo "**** install 'docker-jellyseerr' ****" && \
     mkdir -p /app/jellyseerr && \
-    curl -fsSL "https://github.com/Fallenbagel/jellyseerr/archive/refs/tags/v${VERSION}.tar.gz" | tar xzf - -C /app/overseerr --strip-components=1 && \
+    curl -fsSL "https://github.com/Fallenbagel/jellyseerr/archive/refs/tags/v${VERSION}.tar.gz" | tar xzf - -C /app/jellyseerr --strip-components=1 && \
     cd /app/jellyseerr && \
     export NODE_OPTIONS=--max_old_space_size=2048 && \
     yarn --frozen-lockfile --network-timeout 1000000 && \
