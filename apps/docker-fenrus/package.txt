@@ -9,7 +9,7 @@ c-ares-1.18.1-r0
 ca-certificates-20211220-r0
 ca-certificates-bundle-20211220-r0
 cabextract-1.9.1-r0
-cairo-1.17.4-r1
+cairo-1.17.4-r2
 expat-2.4.8-r0
 fontconfig-2.14.0-r0
 freetype-2.12.1-r0
@@ -27,7 +27,7 @@ libc-utils-0.7.2-r3
 libcrypto1.1-1.1.1o-r0
 libffi-3.4.2-r1
 libgcc-11.2.1_git20220219-r2
-libidn2-2.3.2-r1
+libidn2-2.3.2-r2
 libintl-0.21-r2
 libjpeg-turbo-2.1.3-r1
 libjpeg-turbo-utils-2.1.3-r1
