@@ -1,18 +1,49 @@
 #!/bin/bash
-$(which apt) update -yqq
-$(which apt) upgrade -yqq
-$(which apt) install wget jq curl locales ffmpeg -yqq
+####################################
+# All rights reserved.              #
+# started from Zero                 #
+# Docker owned dockserver           #
+# Docker Maintainer dockserver      #
+#####################################
+#####################################
+# THIS DOCKER IS UNDER LICENSE      #
+# NO CUSTOMIZING IS ALLOWED         #
+# NO REBRANDING IS ALLOWED          #
+# NO CODE MIRRORING IS ALLOWED      #
+#####################################
+# shellcheck disable=SC2086
+# shellcheck disable=SC2046
 
-$(which mkdir) -p /app/{crunchy,downloads}
+$(which apt) update -y &>/dev/null && \
+$(which apt) upgrade -y &>/dev/null && \
+$(which apt) install wget jq curl locales libavcodec-extra ffmpeg -y &>/dev/null
 
+### CREATE BASIC FOLDERS ###
+$(which mkdir) -p /app/{crunchy,downloads} && \
+$(which mkdir) -p /config
+
+### REMOVE EXISTING ###
+if [[ -f "/app/crunchy/crunchy" ]]; then
+   $(which rm) -rf /app/crunchy/crunchy
+fi
+
+### GET LATEST VERSION ###
 VERSION=$(curl -sX GET "https://api.github.com/repos/ByteDream/crunchyroll-go/releases/latest" | jq --raw-output '.tag_name')
 $(which wget) --silent https://github.com/ByteDream/crunchyroll-go/releases/download/${VERSION}/crunchy-${VERSION}_linux -O /app/crunchy/crunchy
-$(which chmod) a+x /app/crunchy/crunchy
-$(which mkdir) -p /app/downloads
 
+$(which chmod) a+x /app/crunchy/crunchy && \
+$(which chmod) 777 /app/crunchy/crunchy
+
+
+### RUN LOGIN ###
 /app/crunchy/crunchy login ${EMAIL} ${PASSWORD} --persistent
 
-CHK=/app/download.txt
+### READ TO DOWNLOAD FILE ###
+CHK=/config/download.txt
+### TEMP DOWNLOAD LOCATION ###
+TMP=/app/downloads
+### FINAL FOLDER ###
+FINAL=/mnt/downloads/crunchy
 
 #### RUN LOOP ####
 
@@ -20,9 +51,10 @@ while true ; do
    CHECK=$($(which cat) ${CHK} | wc -l)
    if [ "${CHECK}" -gt 0 ]; then
    ### READ FROM FILE AND PARSE ###
-   $(which cat) /app/download.txt | head -n 1 | while IFS=$'|' | read -ra SHOWLINK ; do
+   $(which cat) "${CHK}" | head -n 1 | while IFS=$'|' | read -ra SHOWLINK ; do
      ### CREATE FOLDER ###
-     $(which mkdir) -p /app/downloads/${SHOWLINK[0]}/${SHOWLINK[1]}
+     ### sample : .../tv or movie/show or movie name/filename....
+     $(which mkdir) -p ${TMP}/${SHOWLINK[0]}/${SHOWLINK[1]} &>/dev/null
        if [[ "${SHOWLINK[0]}" == tv ]]; then
        ### DOWNLOAD SHOW ###
        /app/crunchy/crunchy archive \
@@ -30,52 +62,54 @@ while true ; do
         --language en-US \
         --language jp-Jp \
         --language de-DE \
-        --directory /app/downloads/${SHOWLINK[0]}/${SHOWLINK[1]} \
+        --directory ${TMP}/${SHOWLINK[0]}/${SHOWLINK[1]} \
         --merge auto \
-        --goroutines 4 \
+        --goroutines 8 \
         --output "{series_name}.S{season_number}E{episode_number}.{title}.GERMAN.DL.DUBBED.{resolution}.WebHD.AC3.x264-dserver.mkv" \
         https://www.crunchyroll.com/${SHOWLINK[1]}
 
-       elif [[ "${SHOWLINK[0]}" == tv ]]; then
+       elif [[ "${SHOWLINK[0]}" == movie ]]; then
        ### DOWNLOAD MOVIE ###
        /app/crunchy/crunchy archive \
         --resolution best \
         --language en-US \
         --language jp-Jp \
         --language de-DE \
-        --directory /app/downloads/${SHOWLINK[0]}/${SHOWLINK[1]} \
+        --directory ${TMP}/${SHOWLINK[0]}/${SHOWLINK[1]} \
         --merge auto \
-        --goroutines 4 \
+        --goroutines 8 \
         --output "{series_name}.{title}.GERMAN.DL.DUBBED.{resolution}.WebHD.AC3.x264-dserver.mkv" \
         https://www.crunchyroll.com/${SHOWLINK[1]}
 
        else
-         sed -i 1d /app/download.txt && break
+         $(which sed) -i 1d "${CHK}" && break
        fi
 
-       for f in /app/downloads/${SHOWLINK[0]}/${SHOWLINK[1]}/*; do
+       for f in ${TMP}/${SHOWLINK[0]}/${SHOWLINK[1]}/*; do
          ### REPLACE EMPTY SPACES WITH DOTS ####
          mv "$f" "${f// /.}"
          ### REMOVE CC FORMAT ###
          if grep -Fxq "1080" "$f" ;then
-            mv "$f" "${f//1920x1080/1080p}"
+            $(which mv) "$f" "${f//1920x1080/1080p}" &>/dev/null
          elif grep -Fxq "720" "$f" ;then
-            mv "$f" "${f//1280x720/720p}"
+            $(which mv) "$f" "${f//1280x720/720p}" &>/dev/null
          elif grep -Fxq "480" "$f" ;then
-            mv "$f" "${f//640x480/SD}"
+            $(which mv) "$f" "${f//640x480/SD}" &>/dev/null
          elif grep -Fxq "360" "$f" ;then
-            mv "$f" "${f//480x360/SD}"
+            $(which mv) "$f" "${f//480x360/SD}" &>/dev/null
          else
-            echo " can't find result "
+            echo " cant find result "
          fi
 
-         $(which chown) -cR 1000:1000 /app/downloads/${SHOWLINK[0]}/${SHOWLINK[1]}
-         $(which mkdir) /mnt/downloads/crunchy/${SHOWLINK[0]}
-         $(which mv) /app/downloads/${SHOWLINK[0]}/${SHOWLINK[1]} /mnt/downloads/crunchy/${SHOWLINK[0]}/${SHOWLINK[1]}
-
+         ### MOVE ALL FILES FOR THE ARRS ###
+         $(which chown) -cR 1000:1000 ${TMP}/${SHOWLINK[0]}/${SHOWLINK[1]} &>/dev/null
+         $(which mkdir) ${TMP}/crunchy/${SHOWLINK[0]} &>/dev/null
+         $(which mv) ${TMP}/${SHOWLINK[0]}/${SHOWLINK[1]} ${FINAL}/${SHOWLINK[0]}/${SHOWLINK[1]} &>/dev/null
+         $(which chown) -cR 1000:1000 ${FINAL}/${SHOWLINK[0]}/${SHOWLINK[1]} &>/dev/null
+ 
       done
       ### REMOVE LINE ###
-      $(which sed) -i 1d /app/download.txt
+      $(which sed) -i 1d "${CHK}"
    done
    else
       $(which sleep) 240
