@@ -68,9 +68,9 @@ ENV HOME="'"/root"'" \
     LANGUAGE="'"en_US.UTF-8"'" \
     LANG="'"en_US.UTF-8"'"
 
-RUN apt-get update -yqq && \
-    apt-get upgrade -yqq && \
-    apt-get install wget jq curl locales ffmpeg apt-utils bash -yqq
+RUN apt-get update -y && \
+    apt-get upgrade -y && \
+    apt-get install wget jq curl locales apt-utils bash -y
 
 COPY '"${APPFOLDER}"'/entrypoint.sh /entrypoint.sh
 
