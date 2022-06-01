@@ -16,9 +16,9 @@ ENV HOME="/root" \
     LANGUAGE="en_US.UTF-8" \
     LANG="en_US.UTF-8"
 
-RUN apt update -yqq && \
-    apt upgrade -yqq && \
-    apt install bash -yqq
+RUN apt-get update -yqq && \
+    apt-get upgrade -yqq && \
+    apt-get install wget jq curl locales ffmpeg apt-utils bash -yqq
 
 COPY ./apps/docker-crunchy/entrypoint.sh /entrypoint.sh
 
