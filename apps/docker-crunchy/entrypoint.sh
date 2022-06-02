@@ -69,7 +69,7 @@ while true ; do
            --merge auto \
            --goroutines 8 \
            --output "{series_name}.S{season_number}E{episode_number}.{title}.GERMAN.DL.DUBBED.{resolution}.WebHD.AC3.x264-dserver.mkv" \
-           https://www.crunchyroll.com/${SHOWLINK[1]} &>/dev/null
+           https://www.crunchyroll.com/${SHOWLINK[1]}
 
         elif [[ "${SHOWLINK[0]}" == movie ]]; then
              ### DOWNLOAD MOVIE ###
@@ -82,39 +82,42 @@ while true ; do
              --merge auto \
              --goroutines 8 \
              --output "{series_name}.{title}.GERMAN.DL.DUBBED.{resolution}.WebHD.AC3.x264-dserver.mkv" \
-             https://www.crunchyroll.com/${SHOWLINK[1]} &>/dev/null
+             https://www.crunchyroll.com/${SHOWLINK[1]}
 
          else
              $(which sed) -i 1d "${CHK}" && break
          fi
 
-         echo " downloading complete ${SHOWLINK[1]} into ${SHOWLINK[0]}"
-         sleep 5
+         echo " downloading complete ${SHOWLINK[1]} into ${SHOWLINK[0]}" && \
+         sleep 5 && \
          echo " rename now ${SHOWLINK[1]} into ${SHOWLINK[0]}"
 
          ### FIRST RENAME ###
-         for f in ${TMP}/${SHOWLINK[0]}/${SHOWLINK[1]}/*; do
-             ### REPLACE EMPTY SPACES WITH DOTS ####
-             $(which mv) "$f" "${f// /.}" &>/dev/null
-         done
+         if [[ -d "${TMP}/${SHOWLINK[0]}/${SHOWLINK[1]}" ]]; then
+            for f in ${TMP}/${SHOWLINK[0]}/${SHOWLINK[1]}/*; do
+                ### REPLACE EMPTY SPACES WITH DOTS ####
+                $(which mv) "$f" "${f// /.}" &>/dev/null
+             done
+         fi
 
-         ### SECONDARY RENAME ###
-         for f in ${TMP}/${SHOWLINK[0]}/${SHOWLINK[1]}/*; do
-             ### REMOVE CC FORMAT ###
-             if grep -Fxq "1080" "$f" ; then
-                $(which mv) "$f" "${f//1920x1080/1080p}" &>/dev/null
-             elif grep -Fxq "720" "$f" ; then
-                $(which mv) "$f" "${f//1280x720/720p}" &>/dev/null
-             elif grep -Fxq "480" "$f" ; then
-                $(which mv) "$f" "${f//640x480/SD}" &>/dev/null
-             elif grep -Fxq "360" "$f" ; then
-                $(which mv) "$f" "${f//480x360/SD}" &>/dev/null
-             else
-                echo "cant find result"
-             fi
-         done
-
-         echo " rename completely ${SHOWLINK[1]} into ${SHOWLINK[0]}"
+         if [[ -d "${TMP}/${SHOWLINK[0]}/${SHOWLINK[1]}" ]]; then
+            ### SECONDARY RENAME ###
+            for f in ${TMP}/${SHOWLINK[0]}/${SHOWLINK[1]}/*; do
+                ### REMOVE CC FORMAT ###
+                if grep -Fxq "1080" "$f" ; then
+                   $(which mv) "$f" "${f//1920x1080/1080p}" &>/dev/null
+                elif grep -Fxq "720" "$f" ; then
+                   $(which mv) "$f" "${f//1280x720/720p}" &>/dev/null
+                elif grep -Fxq "480" "$f" ; then
+                   $(which mv) "$f" "${f//640x480/SD}" &>/dev/null
+                elif grep -Fxq "360" "$f" ; then
+                   $(which mv) "$f" "${f//480x360/SD}" &>/dev/null
+                else
+                   echo "cant find result"
+                fi
+            done
+            echo " rename completely ${SHOWLINK[1]} into ${SHOWLINK[0]}"
+         fi
          sleep 5
          echo " moving now ${SHOWLINK[1]} into ${SHOWLINK[0]}"
 
