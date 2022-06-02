@@ -46,11 +46,22 @@ TMP=/app/downloads
 FINAL=/mnt/downloads/crunchy
 
 ### SETTING FOR LANGUAGE  ###
-LANGUAGEST=${LANGUAGE}
-LANGUAGTAG=${LANGUAGTAG}
+LANGUAGESET=${LANGUAGESET}
+if [[ ! "${LANGUAGESET}" ]];then
+   LANGUAGESET=en-US
+fi
+LANGUAGETAG=${LANGUAGETAG}
+if [[ ! "${LANGUAGESET}" ]];then
+   LANGUAGESET=ENGLISH
+fi
 
-export LANGUAGE=${LANGUAGE}
-export TAG=${LANGUAGTAG}
+export LANGUAGESET=${LANGUAGESET}
+export LANGUAGETAG=${LANGUAGETAG}
+
+echo " LANGUAGESET is set to ${LANGUAGESET}"
+echo " LANGUAGETAG is set to ${LANGUAGETAG}"
+
+sleep 5
 
 ###ar-SA, de-DE, en-US, es-419, es-ES, fr-FR, it-IT, ja-JP, pt-BR, pt-PT, ru-RU
 
@@ -70,22 +81,22 @@ while true ; do
            ### DOWNLOAD SHOW ###
            /app/crunchy/crunchy archive \
            --resolution best \
-           --language ${LANGUAGE} \
+           --language ${LANGUAGESET} \
            --directory ${TMP}/${SHOWLINK[0]}/${SHOWLINK[1]} \
            --merge auto \
            --goroutines 8 \
-           --output "{series_name}.S{season_number}E{episode_number}.{title}.${TAG}.DL.DUBBED.{resolution}.WebHD.AAC.H264-dserver.mkv" \
+           --output "{series_name}.S{season_number}E{episode_number}.{title}.${LANGUAGETAG}.DL.DUBBED.{resolution}.WebHD.AAC.H264-dockserver.mkv" \
            https://www.crunchyroll.com/${SHOWLINK[1]}
 
         elif [[ "${SHOWLINK[0]}" == movie ]]; then
              ### DOWNLOAD MOVIE ###
              /app/crunchy/crunchy archive \
              --resolution best \
-             --language ${LANGUAGE} \
+             --language ${LANGUAGESET} \
              --directory ${TMP}/${SHOWLINK[0]}/${SHOWLINK[1]} \
              --merge auto \
              --goroutines 8 \
-             --output "{series_name}.{title}.${TAG}.DL.DUBBED.{resolution}.WebHD.AAC.H264-dserver.mkv" \
+             --output "{series_name}.{title}.${LANGUAGETAG}.DL.DUBBED.{resolution}.WebHD.AAC.H264-dockserver.mkv" \
              https://www.crunchyroll.com/${SHOWLINK[1]}
 
          else
