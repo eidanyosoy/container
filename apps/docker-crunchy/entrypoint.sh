@@ -29,7 +29,7 @@ fi
 
 ### GET LATEST VERSION ###
 VERSION=$(curl -sX GET "https://api.github.com/repos/ByteDream/crunchyroll-go/releases/latest" | jq --raw-output '.tag_name')
-$(which wget) --silent https://github.com/ByteDream/crunchyroll-go/releases/download/${VERSION}/crunchy-${VERSION}_linux -O /app/crunchy/crunchy
+$(which wget) https://github.com/ByteDream/crunchyroll-go/releases/download/${VERSION}/crunchy-${VERSION}_linux -O /app/crunchy/crunchy &>/dev/null
 
 $(which chmod) a+x /app/crunchy/crunchy && \
 $(which chmod) 777 /app/crunchy/crunchy
