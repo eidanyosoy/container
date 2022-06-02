@@ -26,7 +26,7 @@ fi
 echo "**** install packages ****" && \
   $(which apt) update -y &>/dev/null && \
     $(which apt) upgrade -y &>/dev/null && \
-      $(which apt) install wget jq curl locales libavcodec-extra ffmpeg -y &>/dev/null
+      $(which apt) install wget jq rsync curl locales libavcodec-extra ffmpeg -y &>/dev/null
 
 ### CREATE BASIC FOLDERS ###
 echo "**** setup folders ****" && \
@@ -89,7 +89,7 @@ while true ; do
         ### CREATE FOLDER ###
         ### sample : .../tv or movie/show or movie name/filename....
         $(which mkdir) -p ${TMP}/${SHOWLINK[0]}/${SHOWLINK[1]} &>/dev/null
-
+        $(which touch) /config/log/${SHOWLINK[1]}
         if [[ "${SHOWLINK[0]}" == tv ]]; then
 
            ### DOWNLOAD SHOW ###
@@ -100,7 +100,7 @@ while true ; do
            --merge auto \
            --goroutines 8 \
            --output "{series_name}.S{season_number}E{episode_number}.{title}.${LANGUAGETAG}.DL.DUBBED.{resolution}.WebHD.AAC.H264-dockserver.mkv" \
-           https://www.crunchyroll.com/${SHOWLINK[1]} > /confi/log/${SHOWLINK[1]}
+           https://www.crunchyroll.com/${SHOWLINK[1]} > /config/log/${SHOWLINK[1]}
            retVal=$?
 
         elif [[ "${SHOWLINK[0]}" == movie ]]; then
@@ -113,7 +113,7 @@ while true ; do
              --merge auto \
              --goroutines 8 \
              --output "{series_name}.{title}.${LANGUAGETAG}.DL.DUBBED.{resolution}.WebHD.AAC.H264-dockserver.mkv" \
-             https://www.crunchyroll.com/${SHOWLINK[1]} > /confi/log/${SHOWLINK[1]}
+             https://www.crunchyroll.com/${SHOWLINK[1]} > /config/log/${SHOWLINK[1]}
              retVal=$?
 
          else
@@ -123,7 +123,7 @@ while true ; do
          if [ $retVal -ne 0 ]; then
             echo "**** ERROR --- DOWNLOAD FAILED ****" && break
          else
-            $(which rm) -rf /confi/log/${SHOWLINK[1]}
+            $(which rm) -rf /config/log/${SHOWLINK[1]}
          fi
 
          echo "**** downloading complete ${SHOWLINK[1]} into ${SHOWLINK[0]} ****" && \
@@ -140,7 +140,7 @@ while true ; do
 
          if [[ -d "${TMP}/${SHOWLINK[0]}/${SHOWLINK[1]}" ]]; then
             ### SECONDARY RENAME ###
-            for f in ${TMP}/${SHOWLINK[0]}/*/*; do
+            for f in ${TMP}/${SHOWLINK[0]}/${SHOWLINK[1]}/*; do
                 ### REMOVE CC FORMAT ###
                 $(which mv) "$f" "${f//1920x1080/1080p}" &>/dev/null
                 $(which mv) "$f" "${f//1280x720/720p}" &>/dev/null
@@ -151,15 +151,10 @@ while true ; do
          fi
          sleep 5 && \
          echo "**** moving now ${SHOWLINK[1]} into ${SHOWLINK[0]} *****"
-
          ### MOVE ALL FILES FOR THE ARRS ###
          $(which mkdir) -p ${FINAL}/${SHOWLINK[0]}/${SHOWLINK[1]} &>/dev/null
-         ## $(which cp) -rv ${TMP}/${SHOWLINK[0]}/${SHOWLINK[1]} ${FINAL}/${SHOWLINK[0]}/${SHOWLINK[1]}
-
-         for f in `find ${TMP}/${SHOWLINK[0]}/${SHOWLINK[1]} -name "**"`; do
-             $(which mv) $f ${FINAL}/${SHOWLINK[0]}
-         done
-
+         ### moved to rsync ###
+         $(which rsync) --remove-source-files -zvh ${TMP}/${SHOWLINK[0]} ${FINAL}/${SHOWLINK[0]} &>/dev/null
          $(which chown) -cR 1000:1000 ${FINAL}/${SHOWLINK[0]}/${SHOWLINK[1]} &>/dev/null
          $(which find) ${TMP}/${SHOWLINK[0]} -type d -empty -delete &>/dev/null
          echo "**** moving completely ${SHOWLINK[1]} into ${SHOWLINK[0]} ****"
