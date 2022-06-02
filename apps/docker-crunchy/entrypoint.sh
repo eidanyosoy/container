@@ -109,10 +109,15 @@ while true ; do
      echo " moving now ${SHOWLINK[1]} into ${SHOWLINK[0]}"
 
          ### MOVE ALL FILES FOR THE ARRS ###
-         $(which chown) -cR 1000:1000 ${TMP}/${SHOWLINK[0]}/${SHOWLINK[1]} &>/dev/null
-         $(which mkdir) ${TMP}/crunchy/${SHOWLINK[0]} &>/dev/null
-         $(which mv) ${TMP}/${SHOWLINK[0]}/${SHOWLINK[1]} ${FINAL}/${SHOWLINK[0]}/${SHOWLINK[1]} &>/dev/null
+         $(which mkdir) -p ${FINAL}/${SHOWLINK[0]}/${SHOWLINK[1]} &>/dev/null
+
+         #### MOVE FILES AFTER DOWNLOAD ####
+         for f in `find ${TMP}/${SHOWLINK[0]}/${SHOWLINK[1]} -name "**"`; do
+             $(which mv) $f ${FINAL}/${SHOWLINK[0]}/${SHOWLINK[1]}
+         done
+
          $(which chown) -cR 1000:1000 ${FINAL}/${SHOWLINK[0]}/${SHOWLINK[1]} &>/dev/null
+         $(which find) ${TMP}/${SHOWLINK[0]} -type d -empty -delete &>/dev/null
       echo " moving completely ${SHOWLINK[1]} into ${SHOWLINK[0]}"
 
       done
