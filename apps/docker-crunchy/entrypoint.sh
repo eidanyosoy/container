@@ -61,7 +61,7 @@ while true ; do
        /app/crunchy/crunchy archive \
         --resolution best \
         --language en-US \
-        --language jp-JP \
+        --language ja-JP \
         --language de-DE \
         --directory ${TMP}/${SHOWLINK[0]}/${SHOWLINK[1]} \
         --merge auto \
@@ -74,7 +74,7 @@ while true ; do
        /app/crunchy/crunchy archive \
         --resolution best \
         --language en-US \
-        --language jp-JP \
+        --language ja-JP \
         --language de-DE \
         --directory ${TMP}/${SHOWLINK[0]}/${SHOWLINK[1]} \
         --merge auto \
