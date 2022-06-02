@@ -14,29 +14,40 @@
 # shellcheck disable=SC2086
 # shellcheck disable=SC2046
 
-$(which apt) update -y &>/dev/null && \
-$(which apt) upgrade -y &>/dev/null && \
-$(which apt) install wget jq curl locales libavcodec-extra ffmpeg -y &>/dev/null
+
+if [[ ! -n "${EMAIL}" ]];then
+    echo "**** NO EMAIL WAS SET *****" && $(which sleep) infinity
+fi
+
+if [[ ! -n "${PASSWORD}" ]];then
+    echo "**** NO PASSWORD WAS SET ****" && $(which sleep) infinity
+fi
+
+echo "**** install packages ****" && \
+  $(which apt) update -y &>/dev/null && \
+    $(which apt) upgrade -y &>/dev/null && \
+      $(which apt) install wget jq curl locales libavcodec-extra ffmpeg -y &>/dev/null
 
 ### CREATE BASIC FOLDERS ###
-$(which mkdir) -p /app/{crunchy,downloads} && \
-$(which mkdir) -p /config
+echo "**** setup folders ****" && \
+  $(which mkdir) -p /app/{crunchy,downloads} && \
+    $(which mkdir) -p /config/log
 
 ### REMOVE EXISTING ###
 if [[ -f "/app/crunchy/crunchy" ]]; then
-   $(which rm) -rf /app/crunchy/crunchy
+   $(which rm) -rf /app/crunchy/crunchy &>/dev/null
 fi
 
 ### GET LATEST VERSION ###
-VERSION=$(curl -sX GET "https://api.github.com/repos/ByteDream/crunchyroll-go/releases/latest" | jq --raw-output '.tag_name')
-$(which wget) https://github.com/ByteDream/crunchyroll-go/releases/download/${VERSION}/crunchy-${VERSION}_linux -O /app/crunchy/crunchy &>/dev/null
-
-$(which chmod) a+x /app/crunchy/crunchy && \
-$(which chmod) 777 /app/crunchy/crunchy
+echo "**** Install requirements ****" && \
+  VERSION=$(curl -sX GET "https://api.github.com/repos/ByteDream/crunchyroll-go/releases/latest" | jq --raw-output '.tag_name')
+    $(which wget) https://github.com/ByteDream/crunchyroll-go/releases/download/${VERSION}/crunchy-${VERSION}_linux -O /app/crunchy/crunchy &>/dev/null
+      $(which chmod) a+x /app/crunchy/crunchy && \
+        $(which chmod) 777 /app/crunchy/crunchy
 
 ### RUN LOGIN ###
-echo "---> login into crunchyroll as ${EMAIL} with ${PASSWORD} <---"
-/app/crunchy/crunchy login ${EMAIL} ${PASSWORD} --persistent  &>/dev/null
+echo "**** login into crunchyroll as ${EMAIL} with ${PASSWORD} ****"
+  /app/crunchy/crunchy login ${EMAIL} ${PASSWORD} --persistent &>/dev/null
 
 ### READ TO DOWNLOAD FILE ###
 CHK=/config/download.txt
@@ -47,19 +58,19 @@ FINAL=/mnt/downloads/crunchy
 
 ### SETTING FOR LANGUAGE  ###
 LANGUAGESET=${LANGUAGESET}
-if [[ ! "${LANGUAGESET}" ]];then
+if [[ ! -n "${LANGUAGESET}" ]];then
    LANGUAGESET=en-US
 fi
 LANGUAGETAG=${LANGUAGETAG}
-if [[ ! "${LANGUAGESET}" ]];then
+if [[ ! -n "${LANGUAGESET}" ]];then
    LANGUAGESET=ENGLISH
 fi
 
 export LANGUAGESET=${LANGUAGESET}
 export LANGUAGETAG=${LANGUAGETAG}
 
-echo " LANGUAGESET is set to ${LANGUAGESET}"
-echo " LANGUAGETAG is set to ${LANGUAGETAG}"
+echo "**** LANGUAGESET is set to ${LANGUAGESET} ****" && \
+  echo "**** LANGUAGETAG is set to ${LANGUAGETAG} ****"
 
 sleep 5
 
@@ -72,12 +83,15 @@ while true ; do
   if [ "${CHECK}" -gt 0 ]; then
      ### READ FROM FILE AND PARSE ###
      $(which cat) "${CHK}" | head -n 1 | while IFS=$'|' read -ra SHOWLINK ; do
-        echo " downloading now ${SHOWLINK[1]} into ${SHOWLINK[0]}"
+
+        echo "**** downloading now ${SHOWLINK[1]} into ${SHOWLINK[0]} ****"
         $(which sed) -i 1d "${CHK}"
         ### CREATE FOLDER ###
         ### sample : .../tv or movie/show or movie name/filename....
         $(which mkdir) -p ${TMP}/${SHOWLINK[0]}/${SHOWLINK[1]} &>/dev/null
+
         if [[ "${SHOWLINK[0]}" == tv ]]; then
+
            ### DOWNLOAD SHOW ###
            /app/crunchy/crunchy archive \
            --resolution best \
@@ -86,9 +100,11 @@ while true ; do
            --merge auto \
            --goroutines 8 \
            --output "{series_name}.S{season_number}E{episode_number}.{title}.${LANGUAGETAG}.DL.DUBBED.{resolution}.WebHD.AAC.H264-dockserver.mkv" \
-           https://www.crunchyroll.com/${SHOWLINK[1]}
+           https://www.crunchyroll.com/${SHOWLINK[1]} > /confi/log/${SHOWLINK[1]}
+           retVal=$?
 
         elif [[ "${SHOWLINK[0]}" == movie ]]; then
+
              ### DOWNLOAD MOVIE ###
              /app/crunchy/crunchy archive \
              --resolution best \
@@ -97,19 +113,26 @@ while true ; do
              --merge auto \
              --goroutines 8 \
              --output "{series_name}.{title}.${LANGUAGETAG}.DL.DUBBED.{resolution}.WebHD.AAC.H264-dockserver.mkv" \
-             https://www.crunchyroll.com/${SHOWLINK[1]}
+             https://www.crunchyroll.com/${SHOWLINK[1]} > /confi/log/${SHOWLINK[1]}
+             retVal=$?
 
          else
              $(which sed) -i 1d "${CHK}" && break
          fi
 
-         echo " downloading complete ${SHOWLINK[1]} into ${SHOWLINK[0]}" && \
+         if [ $retVal -ne 0 ]; then
+            echo "**** ERROR --- DOWNLOAD FAILED ****" && break
+         else
+            $(which rm) -rf /confi/log/${SHOWLINK[1]}
+         fi
+
+         echo "**** downloading complete ${SHOWLINK[1]} into ${SHOWLINK[0]} ****" && \
          sleep 5 && \
-         echo " rename now ${SHOWLINK[1]} into ${SHOWLINK[0]}"
+         echo "**** rename now ${SHOWLINK[1]} into ${SHOWLINK[0]} *****"
 
          ### FIRST RENAME ###
          if [[ -d "${TMP}/${SHOWLINK[0]}/${SHOWLINK[1]}" ]]; then
-            for f in ${TMP}/${SHOWLINK[0]}/${SHOWLINK[1]}/*; do
+            for f in ${TMP}/${SHOWLINK[0]}/*/*; do
                 ### REPLACE EMPTY SPACES WITH DOTS ####
                 $(which mv) "$f" "${f// /.}" &>/dev/null
              done
@@ -117,24 +140,17 @@ while true ; do
 
          if [[ -d "${TMP}/${SHOWLINK[0]}/${SHOWLINK[1]}" ]]; then
             ### SECONDARY RENAME ###
-            for f in ${TMP}/${SHOWLINK[0]}/${SHOWLINK[1]}/*; do
+            for f in ${TMP}/${SHOWLINK[0]}/*/*; do
                 ### REMOVE CC FORMAT ###
-                if grep -F "1080" "$f" ; then
-                   $(which mv) "$f" "${f//1920x1080/1080p}" &>/dev/null
-                elif grep -F "720" "$f" ; then
-                   $(which mv) "$f" "${f//1280x720/720p}" &>/dev/null
-                elif grep -F "480" "$f" ; then
-                   $(which mv) "$f" "${f//640x480/SD}" &>/dev/null
-                elif grep -F "360" "$f" ; then
-                   $(which mv) "$f" "${f//480x360/SD}" &>/dev/null
-                else
-                   echo "cant find result"
-                fi
+                $(which mv) "$f" "${f//1920x1080/1080p}" &>/dev/null
+                $(which mv) "$f" "${f//1280x720/720p}" &>/dev/null
+                $(which mv) "$f" "${f//640x480/SD}" &>/dev/null
+                $(which mv) "$f" "${f//480x360/SD}" &>/dev/null
             done
-            echo " rename completely ${SHOWLINK[1]} into ${SHOWLINK[0]}"
+            echo "**** rename completely ${SHOWLINK[1]} into ${SHOWLINK[0]} ****"
          fi
-         sleep 5
-         echo " moving now ${SHOWLINK[1]} into ${SHOWLINK[0]}"
+         sleep 5 && \
+         echo "**** moving now ${SHOWLINK[1]} into ${SHOWLINK[0]} *****"
 
          ### MOVE ALL FILES FOR THE ARRS ###
          $(which mkdir) -p ${FINAL}/${SHOWLINK[0]}/${SHOWLINK[1]} &>/dev/null
@@ -146,10 +162,11 @@ while true ; do
 
          $(which chown) -cR 1000:1000 ${FINAL}/${SHOWLINK[0]}/${SHOWLINK[1]} &>/dev/null
          $(which find) ${TMP}/${SHOWLINK[0]} -type d -empty -delete &>/dev/null
-         echo " moving completely ${SHOWLINK[1]} into ${SHOWLINK[0]}"
+         echo "**** moving completely ${SHOWLINK[1]} into ${SHOWLINK[0]} ****"
       done
   else
-      $(which sleep) 240
+      echo "**** nothing to download yet ****" && \
+         $(which sleep) 240
   fi
 done
 
