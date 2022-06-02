@@ -36,7 +36,8 @@ $(which chmod) 777 /app/crunchy/crunchy
 
 
 ### RUN LOGIN ###
-/app/crunchy/crunchy login ${EMAIL} ${PASSWORD} --persistent
+echo "---> login into crunchyroll as ${EMAIL} with ${PASSWORD} <---"
+/app/crunchy/crunchy login ${EMAIL} ${PASSWORD} --persistent  &>/dev/null
 
 ### READ TO DOWNLOAD FILE ###
 CHK=/config/download.txt
@@ -53,6 +54,7 @@ while true ; do
    ### READ FROM FILE AND PARSE ###
    $(which cat) "${CHK}" | head -n 1 | while IFS=$'|' read -ra SHOWLINK ; do
      echo " downloading now ${SHOWLINK[1]} into ${SHOWLINK[0]}"
+     $(which sed) -i 1d "${CHK}" && break
      ### CREATE FOLDER ###
      ### sample : .../tv or movie/show or movie name/filename....
      $(which mkdir) -p ${TMP}/${SHOWLINK[0]}/${SHOWLINK[1]} &>/dev/null
@@ -67,7 +69,7 @@ while true ; do
         --merge auto \
         --goroutines 8 \
         --output "{series_name}.S{season_number}E{episode_number}.{title}.GERMAN.DL.DUBBED.{resolution}.WebHD.AC3.x264-dserver.mkv" \
-        https://www.crunchyroll.com/${SHOWLINK[1]}
+        https://www.crunchyroll.com/${SHOWLINK[1]} &>/dev/null
 
        elif [[ "${SHOWLINK[0]}" == movie ]]; then
        ### DOWNLOAD MOVIE ###
@@ -80,7 +82,7 @@ while true ; do
         --merge auto \
         --goroutines 8 \
         --output "{series_name}.{title}.GERMAN.DL.DUBBED.{resolution}.WebHD.AC3.x264-dserver.mkv" \
-        https://www.crunchyroll.com/${SHOWLINK[1]}
+        https://www.crunchyroll.com/${SHOWLINK[1]} &>/dev/null
 
        else
          $(which sed) -i 1d "${CHK}" && break
@@ -89,21 +91,29 @@ while true ; do
      echo " downloading complete ${SHOWLINK[1]} into ${SHOWLINK[0]}"
      sleep 5
      echo " rename now ${SHOWLINK[1]} into ${SHOWLINK[0]}"
+
+        ### FIRST RENAME ###
         for f in ${TMP}/${SHOWLINK[0]}/${SHOWLINK[1]}/*; do
-         ### REPLACE EMPTY SPACES WITH DOTS ####
-         mv "$f" "${f// /.}"
-         ### REMOVE CC FORMAT ###
-         if grep -Fxq "1080" "$f" ;then
-            $(which mv) "$f" "${f//1920x1080/1080p}" &>/dev/null
-         elif grep -Fxq "720" "$f" ;then
-            $(which mv) "$f" "${f//1280x720/720p}" &>/dev/null
-         elif grep -Fxq "480" "$f" ;then
-            $(which mv) "$f" "${f//640x480/SD}" &>/dev/null
-         elif grep -Fxq "360" "$f" ;then
-            $(which mv) "$f" "${f//480x360/SD}" &>/dev/null
-         else
-            echo " cant find result "
-         fi
+           ### REPLACE EMPTY SPACES WITH DOTS ####
+           $(which mv) "$f" "${f// /.}" &>/dev/null
+        done
+
+        ### SECONDARY RENAME ###
+        for f in ${TMP}/${SHOWLINK[0]}/${SHOWLINK[1]}/*; do
+           ### REMOVE CC FORMAT ###
+           if grep -Fxq "1080" "$f" ; then
+              $(which mv) "$f" "${f//1920x1080/1080p}" &>/dev/null
+           elif grep -Fxq "720" "$f" ; then
+              $(which mv) "$f" "${f//1280x720/720p}" &>/dev/null
+           elif grep -Fxq "480" "$f" ; then
+              $(which mv) "$f" "${f//640x480/SD}" &>/dev/null
+           elif grep -Fxq "360" "$f" ; then
+              $(which mv) "$f" "${f//480x360/SD}" &>/dev/null
+           else
+              echo "cant find result"
+           fi
+        done
+
      echo " rename completely ${SHOWLINK[1]} into ${SHOWLINK[0]}"
      sleep 5
      echo " moving now ${SHOWLINK[1]} into ${SHOWLINK[0]}"
@@ -111,9 +121,10 @@ while true ; do
          ### MOVE ALL FILES FOR THE ARRS ###
          $(which mkdir) -p ${FINAL}/${SHOWLINK[0]}/${SHOWLINK[1]} &>/dev/null
 
-         #### MOVE FILES AFTER DOWNLOAD ####
+         ## $(which cp) -rv ${TMP}/${SHOWLINK[0]}/${SHOWLINK[1]} ${FINAL}/${SHOWLINK[0]}/${SHOWLINK[1]}
+
          for f in `find ${TMP}/${SHOWLINK[0]}/${SHOWLINK[1]} -name "**"`; do
-             $(which mv) $f ${FINAL}/${SHOWLINK[0]}/${SHOWLINK[1]}
+           $(which mv) $f ${FINAL}/${SHOWLINK[0]}/${SHOWLINK[1]}
          done
 
          $(which chown) -cR 1000:1000 ${FINAL}/${SHOWLINK[0]}/${SHOWLINK[1]} &>/dev/null
