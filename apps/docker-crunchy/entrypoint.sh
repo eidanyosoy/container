@@ -54,7 +54,7 @@ while true ; do
    ### READ FROM FILE AND PARSE ###
    $(which cat) "${CHK}" | head -n 1 | while IFS=$'|' read -ra SHOWLINK ; do
      echo " downloading now ${SHOWLINK[1]} into ${SHOWLINK[0]}"
-     $(which sed) -i 1d "${CHK}" && break
+     $(which sed) -i 1d "${CHK}"
      ### CREATE FOLDER ###
      ### sample : .../tv or movie/show or movie name/filename....
      $(which mkdir) -p ${TMP}/${SHOWLINK[0]}/${SHOWLINK[1]} &>/dev/null
