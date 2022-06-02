@@ -51,7 +51,8 @@ while true ; do
    CHECK=$($(which cat) ${CHK} | wc -l)
    if [ "${CHECK}" -gt 0 ]; then
    ### READ FROM FILE AND PARSE ###
-   $(which cat) "${CHK}" | head -n 1 | while IFS=$'|' | read -ra SHOWLINK ; do
+   $(which cat) "${CHK}" | head -n 1 | while IFS=$'|' read -ra SHOWLINK ; do
+     echo " downloading now ${SHOWLINK[1]} into ${SHOWLINK[0]}"
      ### CREATE FOLDER ###
      ### sample : .../tv or movie/show or movie name/filename....
      $(which mkdir) -p ${TMP}/${SHOWLINK[0]}/${SHOWLINK[1]} &>/dev/null
@@ -60,7 +61,7 @@ while true ; do
        /app/crunchy/crunchy archive \
         --resolution best \
         --language en-US \
-        --language jp-Jp \
+        --language jp-JP \
         --language de-DE \
         --directory ${TMP}/${SHOWLINK[0]}/${SHOWLINK[1]} \
         --merge auto \
@@ -73,7 +74,7 @@ while true ; do
        /app/crunchy/crunchy archive \
         --resolution best \
         --language en-US \
-        --language jp-Jp \
+        --language jp-JP \
         --language de-DE \
         --directory ${TMP}/${SHOWLINK[0]}/${SHOWLINK[1]} \
         --merge auto \
@@ -85,7 +86,10 @@ while true ; do
          $(which sed) -i 1d "${CHK}" && break
        fi
 
-       for f in ${TMP}/${SHOWLINK[0]}/${SHOWLINK[1]}/*; do
+     echo " downloading complete ${SHOWLINK[1]} into ${SHOWLINK[0]}"
+     sleep 5
+     echo " rename now ${SHOWLINK[1]} into ${SHOWLINK[0]}"
+        for f in ${TMP}/${SHOWLINK[0]}/${SHOWLINK[1]}/*; do
          ### REPLACE EMPTY SPACES WITH DOTS ####
          mv "$f" "${f// /.}"
          ### REMOVE CC FORMAT ###
@@ -100,13 +104,17 @@ while true ; do
          else
             echo " cant find result "
          fi
+     echo " rename completely ${SHOWLINK[1]} into ${SHOWLINK[0]}"
+     sleep 5
+     echo " moving now ${SHOWLINK[1]} into ${SHOWLINK[0]}"
 
          ### MOVE ALL FILES FOR THE ARRS ###
          $(which chown) -cR 1000:1000 ${TMP}/${SHOWLINK[0]}/${SHOWLINK[1]} &>/dev/null
          $(which mkdir) ${TMP}/crunchy/${SHOWLINK[0]} &>/dev/null
          $(which mv) ${TMP}/${SHOWLINK[0]}/${SHOWLINK[1]} ${FINAL}/${SHOWLINK[0]}/${SHOWLINK[1]} &>/dev/null
          $(which chown) -cR 1000:1000 ${FINAL}/${SHOWLINK[0]}/${SHOWLINK[1]} &>/dev/null
- 
+      echo " moving completely ${SHOWLINK[1]} into ${SHOWLINK[0]}"
+
       done
       ### REMOVE LINE ###
       $(which sed) -i 1d "${CHK}"
