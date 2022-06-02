@@ -34,7 +34,6 @@ $(which wget) https://github.com/ByteDream/crunchyroll-go/releases/download/${VE
 $(which chmod) a+x /app/crunchy/crunchy && \
 $(which chmod) 777 /app/crunchy/crunchy
 
-
 ### RUN LOGIN ###
 echo "---> login into crunchyroll as ${EMAIL} with ${PASSWORD} <---"
 /app/crunchy/crunchy login ${EMAIL} ${PASSWORD} --persistent  &>/dev/null
@@ -45,6 +44,16 @@ CHK=/config/download.txt
 TMP=/app/downloads
 ### FINAL FOLDER ###
 FINAL=/mnt/downloads/crunchy
+
+### SETTING FOR LANGUAGE  ###
+LANGUAGE=${LANGUAGESET}
+if [[ ${LANGUAGESET} == de ]];then
+   export LANGUAGE=de-DE
+   export TAG=GERMAN
+else
+   export LANGUAGE=en-EN
+   export TAG=ENGLISH
+fi
 
 #### RUN LOOP ####
 
@@ -62,26 +71,22 @@ while true ; do
            ### DOWNLOAD SHOW ###
            /app/crunchy/crunchy archive \
            --resolution best \
-           --language en-US \
-           --language ja-JP \
-           --language de-DE \
+           --language ${LANGUAGE} \
            --directory ${TMP}/${SHOWLINK[0]}/${SHOWLINK[1]} \
            --merge auto \
            --goroutines 8 \
-           --output "{series_name}.S{season_number}E{episode_number}.{title}.GERMAN.DL.DUBBED.{resolution}.WebHD.AC3.x264-dserver.mkv" \
+           --output "{series_name}.S{season_number}E{episode_number}.{title}.${TAG}.DL.DUBBED.{resolution}.WebHD.AAC.H264-dserver.mkv" \
            https://www.crunchyroll.com/${SHOWLINK[1]}
 
         elif [[ "${SHOWLINK[0]}" == movie ]]; then
              ### DOWNLOAD MOVIE ###
              /app/crunchy/crunchy archive \
              --resolution best \
-             --language en-US \
-             --language ja-JP \
-             --language de-DE \
+             --language ${LANGUAGE} \
              --directory ${TMP}/${SHOWLINK[0]}/${SHOWLINK[1]} \
              --merge auto \
              --goroutines 8 \
-             --output "{series_name}.{title}.GERMAN.DL.DUBBED.{resolution}.WebHD.AC3.x264-dserver.mkv" \
+             --output "{series_name}.{title}.${TAG}.DL.DUBBED.{resolution}.WebHD.AAC.H264-dserver.mkv" \
              https://www.crunchyroll.com/${SHOWLINK[1]}
 
          else
@@ -104,13 +109,13 @@ while true ; do
             ### SECONDARY RENAME ###
             for f in ${TMP}/${SHOWLINK[0]}/${SHOWLINK[1]}/*; do
                 ### REMOVE CC FORMAT ###
-                if grep -Fxq "1080" "$f" ; then
+                if grep -F "1080" "$f" ; then
                    $(which mv) "$f" "${f//1920x1080/1080p}" &>/dev/null
-                elif grep -Fxq "720" "$f" ; then
+                elif grep -F "720" "$f" ; then
                    $(which mv) "$f" "${f//1280x720/720p}" &>/dev/null
-                elif grep -Fxq "480" "$f" ; then
+                elif grep -F "480" "$f" ; then
                    $(which mv) "$f" "${f//640x480/SD}" &>/dev/null
-                elif grep -Fxq "360" "$f" ; then
+                elif grep -F "360" "$f" ; then
                    $(which mv) "$f" "${f//480x360/SD}" &>/dev/null
                 else
                    echo "cant find result"
@@ -126,7 +131,7 @@ while true ; do
          ## $(which cp) -rv ${TMP}/${SHOWLINK[0]}/${SHOWLINK[1]} ${FINAL}/${SHOWLINK[0]}/${SHOWLINK[1]}
 
          for f in `find ${TMP}/${SHOWLINK[0]}/${SHOWLINK[1]} -name "**"`; do
-             $(which mv) $f ${FINAL}/${SHOWLINK[0]}/${SHOWLINK[1]}
+             $(which mv) $f ${FINAL}/${SHOWLINK[0]}
          done
 
          $(which chown) -cR 1000:1000 ${FINAL}/${SHOWLINK[0]}/${SHOWLINK[1]} &>/dev/null
