@@ -46,14 +46,13 @@ TMP=/app/downloads
 FINAL=/mnt/downloads/crunchy
 
 ### SETTING FOR LANGUAGE  ###
-LANGUAGE=${LANGUAGESET}
-if [[ ${LANGUAGESET} == de ]];then
-   export LANGUAGE=de-DE
-   export TAG=GERMAN
-else
-   export LANGUAGE=en-EN
-   export TAG=ENGLISH
-fi
+LANGUAGEST=${LANGUAGE}
+LANGUAGTAG=${LANGUAGTAG}
+
+export LANGUAGE=${LANGUAGE}
+export TAG=${LANGUAGTAG}
+
+###ar-SA, de-DE, en-US, es-419, es-ES, fr-FR, it-IT, ja-JP, pt-BR, pt-PT, ru-RU
 
 #### RUN LOOP ####
 
