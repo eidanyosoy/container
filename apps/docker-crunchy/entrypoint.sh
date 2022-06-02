@@ -154,7 +154,7 @@ while true ; do
          ### MOVE ALL FILES FOR THE ARRS ###
          $(which mkdir) -p ${FINAL}/${SHOWLINK[0]}/${SHOWLINK[1]} &>/dev/null
          ### moved to rsync ###
-         $(which rsync) --remove-source-files -zvh ${TMP}/${SHOWLINK[0]} ${FINAL}/${SHOWLINK[0]} &>/dev/null
+         $(which rsync) --remove-source-files -rvh ${TMP}/${SHOWLINK[0]} ${FINAL}/${SHOWLINK[0]} &>/dev/null
          $(which chown) -cR 1000:1000 ${FINAL}/${SHOWLINK[0]}/${SHOWLINK[1]} &>/dev/null
          $(which find) ${TMP}/${SHOWLINK[0]} -type d -empty -delete &>/dev/null
          echo "**** moving completely ${SHOWLINK[1]} into ${SHOWLINK[0]} ****"
