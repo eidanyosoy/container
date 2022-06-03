@@ -32,11 +32,11 @@ NEWVERSION="${NEWVERSION}"
 
 DESCRIPTION="$(curl -u $USERNAME:$TOKEN -sX GET "$APPLINK" | jq -r '.description')"
 HEADLINE="$(cat ./.templates/headline.txt)"
-BASEIMAGE="ghcr.io/linuxserver/baseimage-ubuntu:bionic"
+BASEIMAGE="ghcr.io/linuxserver/baseimage-ubuntu:focal"
 
 UPTCOMMAND="apt-get update -yqq"
 INSTCOMMAND="apt-get install -yqq"
-PACKAGES="jq libicu60 libssl1.0 unzip curl"
+PACKAGES="jq libicu66 libssl1.0 unzip curl"
 APPSPEC="chmod +x /opt/embystat/EmbyStat"
 CLEANUP="rm -rf /tmp/* /var/lib/apt/lists/* /var/tmp/*"
 
