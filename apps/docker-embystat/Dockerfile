@@ -16,7 +16,7 @@
 #####################################
 # shellcheck disable=SC2086
 # shellcheck disable=SC2046
-FROM ghcr.io/linuxserver/baseimage-ubuntu:bionic
+FROM ghcr.io/linuxserver/baseimage-ubuntu:focal
 LABEL org.opencontainers.image.source="https://github.com/dockserver/container"
 
 ARG TARGETPLATFORM
@@ -31,7 +31,7 @@ RUN  \
   echo "**** update system ****" && \
     apt-get update -yqq && \
   echo "**** install packages ****" && \
-    apt-get install -yqq jq libicu60 libssl1.0 unzip curl && \
+    apt-get install -yqq jq libicu66 libssl1.0 unzip curl && \
   echo "**** install 'docker-embystat' ****" && \
     mkdir -p /opt/embystat && \
     curl -o /tmp/embystat.zip -L "https://github.com/mregni/EmbyStat/releases/download/${VERSION}/EmbyStat-ubuntu-x64-v${VERSION}.zip" && \
