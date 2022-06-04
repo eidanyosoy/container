@@ -2,7 +2,7 @@
 #    User Database    #
 #######################
 users:
-  ${AUTH_USERNAME}:
+  ${ AUTHUSERNAME }:
     displayname: "'${ AUTHUSERNAME }'"
     password: "'${ AUTH_PASSWORD }'"
     email: ${ CFEMAIL }
