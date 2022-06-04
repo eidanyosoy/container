@@ -13,43 +13,41 @@
 #####################################
 # shellcheck disable=SC2086
 # shellcheck disable=SC2006
+### ECHO PARTS ###
+function progress() {
+  $(which echo) && \
+    $(which echo) -e "\e[1;31m[SETTING : CHECK]\e[0m \e[1m$1\e[0m"
+}
+function progressinst() {
+  $(which echo) && \
+    $(which echo) -e "\e[1;32m[INSTALL DEPENDS]\e[0m \e[1m$1\e[0m"
+}
+function pushlines() {
+  $(which echo) && \
+    $(which echo) -e "\e[0;33m[RUN NOW]\e[0m \e[1m$1\e[0m"
+}
+function pushstart() {
+  $(which echo) && \
+    $(which echo) -e "\e[0;33m[TRAEFIK HEAD INTERFACE]\e[0m \e[1m$1\e[0m"
+}
 
-## add repositories apk parts
-cat > /etc/apk/repositories << EOF; $(echo)
-http://dl-cdn.alpinelinux.org/alpine/v$(cat /etc/alpine-release | cut -d'.' -f1,2)/main
-http://dl-cdn.alpinelinux.org/alpine/v$(cat /etc/alpine-release | cut -d'.' -f1,2)/community
-http://dl-cdn.alpinelinux.org/alpine/edge/testing
-EOF
+function progressfail() {
+  $(which echo) && \
+    $(which echo) -e "\e[0;91m[SETTING : FAILED]\e[0m \e[1m$1\e[0m"
+}
 
-echo "**** update packages ****" && \
-  apk --quiet --no-cache --no-progress update &>/dev/null && \
-    apk --quiet --no-cache --no-progress upgrade &>/dev/null
-
-echo "**** install build packages ****" && \
-  apk add -U --update --no-cache \
-    bash \
-    ca-certificates \
-    shadow \
-    musl \
-    curl \
-    jq \
-    findutils \
-    coreutils \
-    bind-tools \
-    py3-pip \
-    python3-dev \
-    libffi-dev \
-    openssl-dev \
-    gcc \
-    git \
-    libc-dev \
-    make \
-    tzdata \
-    docker &>/dev/null
-
-$(which ln) -s $(which python3) /usr/bin/python &>/dev/null
-$(which ln) -s $(which pip3) /usr/bin/pip &>/dev/null
-
+### INSTALL PARTS ###
+function upptsys() {
+  $(which apk) --quiet --no-cache --no-progress update &>/dev/null && \
+    $(which apk) --quiet --no-cache --no-progress upgrade &>/dev/null
+}
+function insatpp() {
+  $(which apk) add -U --update --no-cache \
+    bash ca-certificates shadow musl curl jq \
+      findutils coreutils bind-tools py3-pip python3-dev libffi-dev \
+        openssl-dev gcc git libc-dev make tzdata docker &>/dev/null
+}
+function bootstrap() {
 $(which curl) -fsSL https://bootstrap.pypa.io/get-pip.py -o /tmp/get-pip.py && \
   $(which python) /tmp/get-pip.py \
     --disable-pip-version-check \
@@ -62,15 +60,42 @@ $(which curl) -fsSL https://bootstrap.pypa.io/get-pip.py -o /tmp/get-pip.py && \
         "jinja2==3.1.1" \
         "pyyaml" \
         "tld" &>/dev/null
+}
 
-echo "*** cleanup system ****" && \
-  apk del --quiet --clean-protected --no-progress && \
-    rm -f /var/cache/apk/* /tmp/get-pip.py
+### LINKING AND CLEANUP ###
+function linking() {
+$(which ln) -s $(which python3) /usr/bin/python &>/dev/null && \
+  $(which ln) -s $(which pip3) /usr/bin/pip &>/dev/null
+}
+
+function cleanup() {
+  $(which apk) del --quiet --clean-protected --no-progress && \
+    $(which rm) -f /var/cache/apk/* /tmp/get-pip.py
+}
+
+### FUNCTION ENDS ####
+## add repositories apk parts
+cat > /etc/apk/repositories << EOF; $(echo)
+http://dl-cdn.alpinelinux.org/alpine/v$(cat /etc/alpine-release | cut -d'.' -f1,2)/main
+http://dl-cdn.alpinelinux.org/alpine/v$(cat /etc/alpine-release | cut -d'.' -f1,2)/community
+http://dl-cdn.alpinelinux.org/alpine/edge/testing
+EOF
+
+progressinst "**** update packages ****" && \
+  upptsys && \
+progressinst "**** install build packages ****" && \
+  instapp && \
+progressinst "**** linking dependencies ****" && \
+  linking && \
+progressinst "**** install python packages ****" && \
+  bootstrap && \
+progress "*** cleanup system ****" && \
+  cleanup
 
 [[ ! -d "/etc/docker" ]] && \
   $(which mkdir) -p "/etc/docker"
 
-echo '{
+$(which echo) '{
     "storage-driver": "overlay2",
     "userland-proxy": false,
     "dns": ["8.8.8.8", "1.1.1.1"],
@@ -90,7 +115,7 @@ fi
 
 ####### START HERE THE MAIN SETTINGS #######
 function domain() {
-printf "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+pushlines "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
    🚀   Treafik Domain
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
      DNS records will not be automatically added
@@ -101,88 +126,108 @@ printf "━━━━━━━━━━━━━━━━━━━━━━━━
    records yourself via the Cloudflare dashboard.
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
    read -erp "Which domain would you like to use?: " DOMAIN </dev/tty
-   ##echo $DOMAIN && sleep 20
    if [ ! -z "$(dig +short "$DOMAIN")" ]; then
-      echo "$DOMAIN  is valid" && \
+      progress "$DOMAIN  is valid" && \
         export DOMAINNAME=$DOMAIN && \
           traefik
    else
-      echo "Domain cannot be empty" && domain
+      progressfail "Domain cannot be empty" && domain
    fi
 }
 
 function displayname() {
-printf "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+pushlines "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
    🚀   Authelia Username
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   This will be the main user for Authelia
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
    read -erp "Enter your username for Authelia (eg. John Doe): " AUTH_USERNAME </dev/tty
-
    if test -z "$AUTH_USERNAME";then
-      echo "Username cannot be empty" && \
+      progressfail "*** Username cannot be empty ***" && \
         displayname
    else
-      export AUTHUSERNAME=$AUTH_USERNAME && \
-        traefik
+      progress "**** AUTHELIA USER IS SET ****" && \
+        export AUTHUSERNAME=$AUTH_USERNAME && \
+          traefik
    fi
 }
 
 function password() {
- printf "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+pushlines "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
    🚀   Authelia Password
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   This will be the password for ${AUTH_USERNAME}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
    read -erp "Enter a password for $AUTH_USERNAME: " AUTH_PASSWORD </dev/tty
-
    if test -z "$AUTH_PASSWORD";then
-      echo "Password cannot be empty" && \
+      progressfail "*** Password cannot be empty ***" && \
         password
    else
-      export AUTHPASSWORD=$AUTH_PASSWORD && \
-        traefik
+      progress "*** AUTHELIA Password is set ***" && \
+        export AUTHPASSWORD=$AUTH_PASSWORD && \
+          traefik
    fi
 }
 
 function cfemail() {
-
-printf "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+pushlines "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
    🚀   Cloudflare Email-Address
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  Cloudflare Login Email
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-   read -erp "What is your CloudFlare Email Address : " EMAIL </dev/tty
+   read -erp "Enter your CloudFlare Email Address : " EMAIL </dev/tty
    regex="^[a-z0-9!#\$%&'*+/=?^_\`{|}~-]+(\.[a-z0-9!#$%&'*+/=?^_\`{|}~-]+)*@([a-z0-9]([a-z0-9-]*[a-z0-9])?\.)+[a-z0-9]([a-z0-9-]*[a-z0-9])?\$"
    if ! test -z "$EMAIL"; then
       if [[ $EMAIL =~ $regex ]] ; then
-         export CFEMAIL=$EMAIL && \
-           traefik
+         progress "*** Cloudflare EMail is set ***" && \
+           export CFEMAIL=$EMAIL && \
+             traefik
       else
-         echo "CloudFlare Email is not valid" && \
+         progressfail "*** CloudFlare Email is not valid ***" && \
            cfemail
       fi
    else
-      echo "CloudFlare Email Address cannot be empty" && \
+      progressfail "*** CloudFlare Email Address cannot be empty ***" && \
         cfemail
    fi
 }
 
 function cfkey() {
-printf "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+pushlines "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
    🚀   Cloudflare Global-Key
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  Cloudflare || https://dash.cloudflare.com/
+
+  Scroll down to API or use || https://dash.cloudflare.com/profile/api-tokens
+
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-   read -erp "What is your CloudFlare Global Key: " CFGLOBAL </dev/tty
+   read -erp "Enter your CloudFlare Global Key: " CFGLOBAL </dev/tty
    if ! test -z "$CFGLOBAL"; then
-      export CFGLOBALKEY=$CFGLOBAL && traefik
+      progress "*** CloudFlare Global Key is set ***" && \
+        export CFGLOBALKEY=$CFGLOBAL && \
+          traefik
    else
-      echo "CloudFlare Global-Key cannot be empty" && cfkey
+      progressfail "*** CloudFlare Global-Key cannot be empty ***" && cfkey
    fi
 }
 
 function cfzoneid() { 
-printf "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+pushlines "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
    🚀   Cloudflare Zone-ID
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  Cloudflare || https://dash.cloudflare.com/
+
+  Scroll down to Cloudflare Zone ID
+
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-   read -erp "Whats your CloudFlare Zone ID: " CFZONEID </dev/tty
+   read -erp "Enter your CloudFlare Zone ID: " CFZONEID </dev/tty
    if ! test -z "$CFZONEID"; then
-      export CFZONEIDENT=$CFZONEID && traefik
+      progress "*** CloudFlare Zone ID is set ***" && \
+        export CFZONEIDENT=$CFZONEID && \
+          traefik
    else
-      echo "CloudFlare Zone ID cannot be empty" && cfzoneid
+      progressfail "CloudFlare Zone ID cannot be empty" && cfzoneid
    fi
 }
 
@@ -194,6 +239,9 @@ ipv6=$($(which curl) -sX GET -6 https://ifconfig.co)
 checkipv4=$(dig @1.1.1.1 -4 ch txt whoami.cloudflare +short)
 checkipv6=$(dig @1.1.1.1 -6 ch txt whoami.cloudflare +short)
 
+pushlines "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   🚀  ADDING NOW CLOUDFLARE RECORDS NOW
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
    ## GET ZONE ID
    zoneid=$($(which curl) -sX GET "https://api.cloudflare.com/client/v4/zones?name=$EMAIL&status=active" \
        -H "X-Auth-Email: $EMAIL" \
@@ -227,7 +275,7 @@ function deploynow() {
 
 ## NOTE 
 ## env schreiben ( basis env )                                              {| done
-## Authelia config schreiben                                                {| jinja kann das lösen 
+## Authelia config schreiben                                                {| done 
 ## traefik compose live schreiben / oder nachrangiger compose in wget file  {| jinja-compose wird es lösen für uns
 ## Authelia Password ? Docker socket mounten?                               {| tcpsocket or socket beides wird klappen
 ## D-o-D system ?                                                           {| done
@@ -242,21 +290,23 @@ function deploynow() {
 ## IPv6 PULL
    for i in `curl -sX GET "https://www.cloudflare.com/ips-v6"`; do echo $i >>/tmp/temp_trustedips ; done
 
-   cat /tmp/temp_trustedips | while IFS=$'\n' read -ra CFTIPS; do echo -ne "${CFTIPS[0]}" >>/tmp/trusted_cf_ips ; done
+   $(which cat) /tmp/temp_trustedips | while IFS=$'\n' read -ra CFTIPS; do
+    $(which echo) -ne "${CFTIPS[0]}" >>/tmp/trusted_cf_ips
+   done
      if test -f "/tmp/endtrustedips";then $(which rm) -rf /tmp/endtrustedips ; fi
 
 ## REMOVE LATEST , TO PREVENT IP FAILS
-   cat /tmp/trusted_cf_ips | sed 's/.$//' >/tmp/endtrustedips
+   $(which cat) /tmp/trusted_cf_ips | sed 's/.$//' >/tmp/endtrustedips
      CFTRUSTEDIPS=$($(which cat) /tmp/endtrustedips)
 
 ## SERVERIP 
 SERVERIP=$($(which curl) -s http://whatismijnip.nl | cut -d " " -f 5)
 if [[ "$SERVERIP" =~ ^(([1-9]?[0-9]|1[0-9][0-9]|2([0-4][0-9]|5[0-5]))\.){3}([1-9]?[0-9]|1[0-9][0-9]|2([0-4][0-9]|5[0-5]))$ ]]; then
-   echo "We found a valid IP | $SERVERIP | success"
+   progress "*** We found a valid IP | $SERVERIP | success ***"
 else
-  echo "First test failed : Running secondary test now."
+  progressfail "*** First test failed : Running secondary test now. ***"
   if [[ $SERVERIP == "" ]];then
-     echo "We found a valid IP | $SERVERIP | success" && \
+     progress "*** We found a valid IP | $SERVERIP | success ***" && \
        SERVERIP=$($(which curl) ifconfig.me) && \
          export SERVERIP=$SERVERIP
   fi
@@ -282,25 +332,29 @@ $(which docker) pull authelia/authelia -q >/dev/null
   AUTHPASSWORDSECRET=$($(which docker) run authelia/authelia authelia hash-password $AUTH_PASSWORD -i 2 -k 32 -m 128 -p 8 -l 32 | sed 's/Password hash: //g')
     AUTHELIAPASSWORDSECRET=$AUTH_PASSWORD
 
-## ----
-
+## AUTHELIA USER CONFIG
+source /templates/authelia/users_database.yml
+  $(which cat) /templates/authelia/users_database.yml > /opt/appdata/authelia/users_database.yml
 ## AUTHELIA CONFIG
-
-## USER CONFIG 
-## AUTHELIA CONFIG
-
-## ----
+source /templates/authelia/configuration.yml
+  $(which cat) /templates/authelia/configuration.yml > /opt/appdata/authelia/configuration.yml
 
 ## TRAEFIK CONFIG HIER
-
-# TOMLS / RULES !!
+$(which cp) -r /templates/traefik/rules/middlewares.toml /opt/appdata/traefik/rules/middlewares.toml
+$(which echo) -e '
+  [http.middlewares.middlewares-authelia]
+    [http.middlewares.middlewares-authelia.forwardAuth]
+      address = "'http://authelia:9091/api/verify?rd=https://authelia.${DOMAIN}'"
+      trustForwardHeader = true
+      authResponseHeaders = ["'Remote-User'", "'Remote-Groups'"]
+' >> /opt/appdata/traefik/rules/middlewares.toml
 
 ## ENV FILE
-
 TZONE=$($(which timedatectl) | grep "Time zone:" | awk '{print $3}')
 CFTRUSTEDIPS=$($(which cat) /tmp/endtrustedips)
 
-echo -e "##Environment for Docker-Compose
+$(which echo) -e '##Environment for Docker-Compose
+
 ## TRAEFIK
 CLOUDFLARE_EMAIL=${CFEMAIL}
 CLOUDFLARE_API_KEY=${CFGLOBALKEY}
@@ -335,20 +389,17 @@ PORTBLOCK=${PORTBLOCK:-127.0.0.1}
 SOCKET=${DOCKERHOST:-/var/run/docker.sock}
 SECURITYOPS=${SECURITYOPS:-no-new-privileges}
 SECURITYOPSSET=${SECURITYOPSSET:-true}
-##EOF" >/opt/appdata/compose/.env
+##EOF' >/opt/appdata/compose/.env
 
 ## CLOUDFLARE A RECORD HIER !!!  || DONE
 ## ERLEICHTERT ALLES FÜR UNS     {| halb fertig
 ## CF SETTINGS ?!                || muss python werden das bash limits hat
 ## python oder doch bash ?!      {{ SIEHE LINE DRÜBER 
 
-echo " not done yet but should not take so long"
-echo " don't need 22 months , to get it working"
-
 }
 
 function traefik() {
-printf "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+pushstart "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
    🚀   Treafik with Authelia over Cloudflare
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
    [1] Domain                     =  ${DOMAIN}
@@ -360,7 +411,7 @@ printf "━━━━━━━━━━━━━━━━━━━━━━━━
    [5] Cloudflare Global Key      =  ${CFGLOBALKEY}
    [6] Cloudflare Zone ID         =  ${CFZONEIDENT}
    ━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   [D] Create all configs for Treafik with Authelia
+   [D] Create all configs for Treafik and Authelia
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
    [ EXIT or Z ] - Exit
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
