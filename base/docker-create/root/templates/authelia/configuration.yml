@@ -5,7 +5,7 @@
 theme: auto
 jwt_secret: ${JWTTOKEN}
 
-default_redirection_url: https://authelia.${DOMAIN}
+default_redirection_url: https://authelia.${DOMAINNAME}
 
 server:
   host: 0.0.0.0
@@ -15,21 +15,21 @@ server:
   enable_pprof: false
   enable_expvars: false
   disable_healthcheck: false
-  asset_path: '"/config/assets/"'
+  asset_path: "'/config/assets/'"
 
 log:
   level: info
   format: text
-  file_path: '"/config/authelia.log"'
+  file_path: "'/config/authelia.log'"
   keep_stdout: false
 
 totp:
-  issuer: ${DOMAIN}
+  issuer: ${DOMAINNAME}
   period: 30
   skew: 1
 
 #duo_api:
-#  hostname: duo_api.${DOMAIN}
+#  hostname: duo_api.${DOMAINNAME}
 #  integration_key: here-the-key
 #  secret_key: here-the-secret-key
 
@@ -37,7 +37,7 @@ authentication_backend:
   disable_reset_password: false
   refresh_interval: 5m
   file:
-    path: '"/config/users_database.yml"'
+    path: "'/config/users_database.yml'"
     password:
       algorithm: argon2id
       iterations: 4
@@ -50,43 +50,43 @@ authentication_backend:
 access_control:
   default_policy: deny
   rules:
-    ## bypass rule for login
-    - domain: authelia.${DOMAIN}
+    # bypass rule for login
+    - domain: authelia.${DOMAINNAME}
       policy: bypass
-    ## bypass rules for api / trigges / rss / xmltv
-    - domain: '"*.${DOMAIN}"'
+    # bypass rules for api / trigges / rss / xmltv
+    - domain: "'*.${DOMAINNAME}'"
       policy: bypass
       resources:
-        - '"^/api([/?].*)?$"'
-        - '"^/identity.*$"'
-        - '"^/triggers.*$"'
-        - '"^/rss/*$"'
-        - '"^/xmltv/*$"'
-        - '"^/liverel.*$"'
-        - '"^/meshagents.*$"'
-        - '"^/meshsettings.*$"'
-        - '"^/agent.*$"'
-        - '"^/control.*$"'
-        - '"^/meshrelay.*$"'
-        - '"^/wl/.*$"'
+        - "'^/api([/?].*)?$'"
+        - "'^/identity.*$'"
+        - "'^/triggers.*$'"
+        - "'^/rss/*$'"
+        - "'^/xmltv/*$'"
+        - "'^/liverel.*$'"
+        - "'^/meshagents.*$'"
+        - "'^/meshsettings.*$'"
+        - "'^/agent.*$'"
+        - "'^/control.*$'"
+        - "'^/meshrelay.*$'"
+        - "'^/wl/.*$"'
     ## bypass rule for Uptime-Kuma (Status Page)
-    - domain: '"uptime-kuma.{DOMAIN}"'
+    - domain: "'uptime-kuma.{DOMAINNAME}'"
       policy: bypass
       resources:
-        - '"^/status?.*$"'
-        - '"^/assets/.*$"'
-        - '"^/upload/logo.png.*$"'
-        - '"^/icon.svg"'
+        - "'^/status?.*$'"
+        - "'^/assets/.*$'"
+        - "'^/upload/logo.png.*$'"
+        - "'^/icon.svg'"
     ## block admin bitwarden resources
-    - domain: '"bitwarden.${DOMAIN}'"
+    - domain: "'bitwarden.${DOMAINNAME}'"
       policy: one_factor
       resources:
-        - '"^*/admin.*$"'
+        - "'^*/admin.*$'"
     ## one factor login
-    - domain: '"*.${DOMAIN}"'
+    - domain: "'*.${DOMAINNAME}'"
       policy: one_factor
     ## deny rule
-    - domain: '"${DOMAIN}"'
+    - domain: "'${DOMAIN}'"
       policy: deny
     - domain: ${SERVERIPID}
       policy: deny
@@ -116,7 +116,7 @@ notifier:
     filename: /config/notification.txt
 
 ntp:
-  address: '"time.cloudflare.com:123"'
+  address: "'time.cloudflare.com:123'"
   version: 3
   max_desync: 3s
   disable_startup_check: false
