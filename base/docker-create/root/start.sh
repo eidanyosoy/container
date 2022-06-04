@@ -288,6 +288,12 @@ function deploynow() {
 ## shell A Record hinzufügen bei CF ?                                       {| DONE
 ## CLOUDFLARE TRUSTED IPS ändert sich immer wieder                          {| done
 ## Muss also gepullt werden und in Traefik geadded werden                   {| done
+## CLOUDFLARE A RECORD HIER !!!  || DONE
+## ERLEICHTERT ALLES FÜR UNS     {| halb fertig
+## CF SETTINGS ?!                || muss python werden das bash limits hat
+## python oder doch bash ?!      {{ SIEHE LINE DRÜBER 
+## move and deploy in loop ##
+## /tmp/apps/docker-compose.override.yml \
 
 ## CF TRUSTED IPS LIVE PULL AND MAP
    if test -f "/tmp/trusted_cf_ips"; then $(which rm) -rf /tmp/trusted_cf_ips ; fi
@@ -397,17 +403,9 @@ SECURITYOPS=${SECURITYOPS:-no-new-privileges}
 SECURITYOPSSET=${SECURITYOPSSET:-true}
 ##EOF' >/opt/appdata/compose/.env
 
-## CLOUDFLARE A RECORD HIER !!!  || DONE
-## ERLEICHTERT ALLES FÜR UNS     {| halb fertig
-## CF SETTINGS ?!                || muss python werden das bash limits hat
-## python oder doch bash ?!      {{ SIEHE LINE DRÜBER 
-
-##move and deploy in loop ##
-  ### /tmp/apps/docker-compose.override.yml \
-
 app="traefik cf-companion authelia error-pages dockserver-ui"
 for app in ${apps}; do
-   if [[ -d "/tmp/docker-compose.yml"; then
+   if tesr -f "/opt/appdata/compose/$apps/docker-compose.yml"; then
       progressinstapp " $apps "
       $(which cd) $PWD && \
         $(which docker compose) -f /opt/appdata/compose/$apps/docker-compose.yml --env-file $basefolder/compose/.env pull &>/dev/null && \
