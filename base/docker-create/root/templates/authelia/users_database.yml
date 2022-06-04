@@ -3,11 +3,8 @@
 #######################
 users:
   ${AUTH_USERNAME}:
-    displayname: '"${AUTH_USERNAME}"'
-    password: '"${AUTH_PASSWORD}"'
+    displayname: "'${AUTH_USERNAME}'"
+    password: "'${AUTH_PASSWORD}'"
     email: ${CFEMAIL}
     groups:
       - admins
-
-
-
