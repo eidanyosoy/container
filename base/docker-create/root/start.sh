@@ -30,12 +30,18 @@ function pushstart() {
   $(which echo) && \
     $(which echo) -e "\e[0;33m[TRAEFIK HEAD INTERFACE]\e[0m \e[1m$1\e[0m"
 }
-
+function progressinstapp() {
+  $(which echo) && \
+    $(which echo) -e "\e[1;32m[DELPOY NOW APP]\e[0m \e[1m$1\e[0m"
+}
+function progressfailapp() {
+  $(which echo) && \
+    $(which echo) -e "\e[0;91m[FAILED TO DEPLOY]\e[0m \e[1m$1\e[0m"
+}
 function progressfail() {
   $(which echo) && \
     $(which echo) -e "\e[0;91m[SETTING : FAILED]\e[0m \e[1m$1\e[0m"
 }
-
 ### INSTALL PARTS ###
 function upptsys() {
   $(which apk) --quiet --no-cache --no-progress update &>/dev/null && \
@@ -395,6 +401,21 @@ SECURITYOPSSET=${SECURITYOPSSET:-true}
 ## ERLEICHTERT ALLES FÜR UNS     {| halb fertig
 ## CF SETTINGS ?!                || muss python werden das bash limits hat
 ## python oder doch bash ?!      {{ SIEHE LINE DRÜBER 
+
+##move and deploy in loop ##
+  ### /tmp/apps/docker-compose.override.yml \
+
+app="traefik cf-companion authelia error-pages dockserver-ui"
+for app in ${apps}; do
+   if [[ -d "/tmp/docker-compose.yml"; then
+      progressinstapp " $apps "
+      $(which cd) $PWD && \
+        $(which docker compose) -f /opt/appdata/compose/$apps/docker-compose.yml --env-file $basefolder/compose/.env pull &>/dev/null && \
+          $(which docker compose) -f /opt/appdata/compose/$apps/docker-compose.yml --env-file $basefolder/compose/.env up -d --force-recreate
+   else
+      progressfailapp " $apps " && $(which sleep) 10 && exit 
+   fi
+done
 
 }
 
