@@ -15,11 +15,11 @@
 # shellcheck disable=SC2046
 
 if [[ ! -n "${EMAIL}" ]];then
-    $(which echo) "**** NO EMAIL WAS SET *****" && $(which sleep) infinity
+   $(which echo) "**** NO EMAIL WAS SET *****" && $(which sleep) infinity
 fi
 
 if [[ ! -n "${PASSWORD}" ]];then
-    $(which echo) "**** NO PASSWORD WAS SET ****" && $(which sleep) infinity
+   $(which echo) "**** NO PASSWORD WAS SET ****" && $(which sleep) infinity
 fi
 
 $(which echo) "**** install packages ****" && \
@@ -40,17 +40,29 @@ fi
 
 ### GET LATEST VERSION ###
 $(which echo) "**** Install requirements ****" && \
-  VERSION=$(curl -sX GET "https://api.github.com/repos/ByteDream/crunchyroll-go/releases/latest" | jq --raw-output '.tag_name')
+  VERSION=$($(which curl) -sX GET "https://api.github.com/repos/ByteDream/crunchyroll-go/releases/latest" | jq --raw-output '.tag_name')
     $(which wget) https://github.com/ByteDream/crunchyroll-go/releases/download/${VERSION}/crunchy-${VERSION}_linux -O /app/crunchy/crunchy &>/dev/null
       $(which chmod) a+x /app/crunchy/crunchy && \
         $(which chmod) 777 /app/crunchy/crunchy
 
 ### RUN LOGIN ###
-$(which echo) "**** login into crunchyroll as ${EMAIL} with ${PASSWORD} ****"
-  /app/crunchy/crunchy login ${EMAIL} ${PASSWORD} --persistent &>/dev/null
+while true; do
+  $(which echo) "**** login into crunchyroll as ${EMAIL} with ${PASSWORD} ****"
+    /app/crunchy/crunchy login ${EMAIL} ${PASSWORD} --persistent &>/dev/null
+    if [[ $? -ne 0 ]]; then
+       $(which echo) "**** FAILED TO LOGIN ****" && \
+         $(which echo) "**** WAIT 600 SECONDS ****" && \
+           $(which echo) "**** FOR NEXT LOGIN ****" && \
+             $(which sleep) 600
+    else
+       $(which echo) "**** LOGED IN ****" && \
+         break
+    fi
+done
 
 ### READ TO DOWNLOAD FILE ###
 CHK=/config/download.txt
+LOCHK=/config/to-download.txt
 ### FINAL FOLDER ###
 FINAL=/mnt/downloads/crunchy
 
@@ -84,7 +96,6 @@ while true ; do
      ### READ FROM FILE AND PARSE ###
      $(which cat) "${CHK}" | head -n 1 | while IFS=$'|' read -ra SHOWLINK ; do
         $(which echo) "**** downloading now ${SHOWLINK[1]} into ${SHOWLINK[0]} ****"
-        $(which sed) -i 1d "${CHK}"
         if [[ "${SHOWLINK[0]}" == tv ]]; then
            $(which mkdir) -p ${FINAL}/${SHOWLINK[0]}/${SHOWLINK[1]} &>/dev/null && \
            $(which touch) /config/log/${SHOWLINK[1]}
@@ -97,7 +108,10 @@ while true ; do
            --goroutines 8 \
            --output "{series_name}.S{season_number}E{episode_number}.{title}.${LANGUAGETAG}.DL.DUBBED.{resolution}.WebHD.AAC.H264-dockserver.mkv" \
            ${SHOWLINK[2]} > /config/log/${SHOWLINK[1]}
-        elif [[ "${SHOWLINK[0]}" == movie ]]; then
+           if [ $? -ne 0 ]; then $(which sleep) 60 && break ; fi
+           $(which cat) "${CHK}" | awk 'NR==1; END{print}' >> "${LOCHK}"
+           $(which sed) -i 1d "${CHK}"
+       elif [[ "${SHOWLINK[0]}" == movie ]]; then
              $(which mkdir) -p ${FINAL}/${SHOWLINK[0]}/${SHOWLINK[1]} &>/dev/null && \
              $(which touch) /config/log/${SHOWLINK[1]}
              ### DOWNLOAD MOVIE ###
@@ -109,7 +123,11 @@ while true ; do
              --goroutines 8 \
              --output "{series_name}.{title}.${LANGUAGETAG}.DL.DUBBED.{resolution}.WebHD.AAC.H264-dockserver.mkv" \
              ${SHOWLINK[2]} > /config/log/${SHOWLINK[1]}
+             if [ $? -ne 0 ]; then $(which sleep) 60 && break ; fi
+             $(which cat) "${CHK}" | awk 'NR==1; END{print}' >> "${LOCHK}"
+             $(which sed) -i 1d "${CHK}"
          else
+             $(which cat) "${CHK}" | awk 'NR==1; END{print}' >> "${LOCHK}"
              $(which sed) -i 1d "${CHK}" && break
          fi
          if [ $? -ne 0 ]; then
@@ -137,6 +155,15 @@ while true ; do
   else
       $(which echo) "**** nothing to download yet ****" && \
          $(which sleep) 240
+      if [[ $(date +%H:%M) == "00:15" ]]; then
+         if test -f "${LOCHK}"; then
+            FAILEDLOAD=$(which cat) "${LOCHK}" | wc -l)
+            if [[ ${FAILEDLOAD} -gt 0 ]]; then
+               $(which cat) "${LOCHK}" > "${CHK}"
+               $(which rm) -rf "${LOCHK}"
+            fi
+         fi
+      fi
   fi
 done
 
