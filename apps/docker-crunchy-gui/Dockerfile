@@ -16,7 +16,7 @@
 #####################################
 # shellcheck disable=SC2086
 # shellcheck disable=SC2046
-FROM ghcr.io/dockserver/docker-alpine-v3:latest:3.0.7
+FROM ghcr.io/dockserver/docker-alpine-v3:latest
 
 LABEL org.opencontainers.image.source="https://github.com/dockserver/container"
 
