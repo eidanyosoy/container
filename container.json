@@ -72,6 +72,18 @@ apps docker-crunchy
    "user": "dockserver image update[bot]"
 }
 
+apps docker-crunchy-gui
+{
+   "appname": "docker-crunchy-gui",
+   "apppic": "./images/docker-crunchy-gui.png",
+   "appfolder": "./apps/docker-crunchy-gui",
+   "newversion": "3.16.0",
+   "baseimage": "alpine",
+   "description": "Official Alpine Linux Docker image. Win at minimalism!",
+   "body": "Upgrading docker-crunchy-gui to 3.16.0",
+   "user": "github-actions[bot]"
+}
+
 apps docker-dash
 {
    "appname": "docker-dash",
