@@ -1,0 +1,4 @@
+#!/usr/bin/with-contenv bash
+cd /app || exit
+export CONFIG_DIRECTORY="/config"
+serve -s -c -p 5099 build &>/dev/null
