@@ -29,6 +29,7 @@ BUILDVERSION="${BUILDVERSION#*release-}"
 BUILDVERSION="${BUILDVERSION}"
 
 BUILDIMAGE="ubuntu"
+HEADLINE="$(cat ./.templates/headline.txt)"
 
 PICTURE="./images/$APP.png"
 APPFOLDER="./$FOLDER/$APP"
