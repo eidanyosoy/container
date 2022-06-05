@@ -21,26 +21,32 @@ TOKEN=$4
 
 ### APP SETTINGS ###
 
-APPLINK="https://api.github.com/repos/alpinelinux/docker-alpine"
-NEWVERSION=$(curl -sX GET "https://registry.hub.docker.com/v1/repositories/library/alpine/tags" \
-   | jq --raw-output '.[] | select(.name | contains(".")) | .name' \
-   | sort -t "." -k1,1n -k2,2n -k3,3n | tail -n1)
+APPLINK="https://api.github.com/repos/ anidl/multi-downloader-nx"
+NEWVERSION="$(curl -u $USERNAME:$TOKEN -sX GET "https://api.github.com/repos/anidl/multi-downloader-nx/releases" | jq -r 'first(.[] | .tag_name)')"
 NEWVERSION="${NEWVERSION#*v}"
 NEWVERSION="${NEWVERSION#*release-}"
 NEWVERSION="${NEWVERSION}"
 
 DESCRIPTION="$(curl -u $USERNAME:$TOKEN -sX GET "$APPLINK" | jq -r '.description')"
 HEADLINE="$(cat ./.templates/headline.txt)"
-BASEIMAGE="alpine"
+BASEIMAGE="ghcr.io/dockserver/docker-alpine-v3:latest"
 PICTURE="./images/$APP.png"
 APPFOLDER="./$FOLDER/$APP"
 
 UPCOMMAND="apk --quiet --no-cache --no-progress update && \\
-  apk --quiet --no-cache --no-progress upgrade"
+    apk --quiet --no-cache --no-progress upgrade"
 INSTCOMMAND="apk add -U --update --no-cache"
+
+APPINSTALL="git clone https://github.com/anidl/multi-downloader-nx.git /app && \\
+    cd /app && \\
+    npm install -g ts-node serve --quiet && \\
+    npm install --quiet && \\
+    npm run tsc true"
+
+EPOINT="ENTRYPOINT /init"
 PACKAGES="nodejs npm git ffmpeg xsel mkvtoolnix bash ca-certificates shadow musl findutils coreutils"
 CLEANUP="apk del --quiet --clean-protected --no-progress && \\
-  rm -f /var/cache/apk/*"
+    rm -f /var/cache/apk/*"
 
 ### RELEASE SETTINGS ###
 
@@ -52,7 +58,7 @@ echo '{
    "baseimage": "'${BASEIMAGE}'",
    "description": "'${DESCRIPTION}'",
    "body": "Upgrading '${APP}' to '${NEWVERSION}'",
-   "user": "github-actions[bot]"
+   "user": "dockserver-image[bot]"
 }' > "./$FOLDER/$APP/release.json"
 
 
@@ -71,21 +77,19 @@ LABEL org.opencontainers.image.source="'"https://github.com/dockserver/container
 ARG TARGETPLATFORM
 ARG BUILDPLATFORM
 
+ENV LANG=en_US.UTF-8 \
+    LANGUAGE=en_US.UTF-8
+
 RUN \
   echo "'"**** update packages ****"'" && \
     '"${UPCOMMAND}"' && \
   echo "'"**** install build packages ****"'" && \
     '"${INSTCOMMAND}"' '"${PACKAGES}"' && \
+  echo "'"*** install app ****"'" && \
+    '"${APPINSTALL}"' && \
   echo "'"*** cleanup system ****"'" && \
     '"${CLEANUP}"'
 
-RUN \
-  git clone https://github.com/anidl/multi-downloader-nx.git /app && \
-  cd /app && \
-  npm install -g ts-node serve --quiet && \
-  npm install --quiet && \
-  npm run tsc true &>/dev/null
-
-COPY '"${APPFOLDER}"'/entrypoint.sh /entrypoint.sh
-ENTRYPOINT ["'"/bin/bash"'", "'"/entrypoint.sh"'"]
+COPY '"${APPFOLDER}"'/root/ /
+'"${EPOINT}"'
 ##EOF' > ./$FOLDER/$APP/Dockerfile
