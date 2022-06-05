@@ -38,7 +38,7 @@ APPFOLDER="./$FOLDER/$APP"
 UPCOMMAND="apk --quiet --no-cache --no-progress update && \\
   apk --quiet --no-cache --no-progress upgrade"
 INSTCOMMAND="apk add -U --update --no-cache"
-PACKAGES="bash ca-certificates shadow musl findutils coreutils"
+PACKAGES="nodejs npm git ffmpeg xsel mkvtoolnix bash ca-certificates shadow musl findutils coreutils"
 CLEANUP="apk del --quiet --clean-protected --no-progress && \\
   rm -f /var/cache/apk/*"
 
@@ -79,7 +79,13 @@ RUN \
   echo "'"*** cleanup system ****"'" && \
     '"${CLEANUP}"'
 
-COPY '"${APPFOLDER}"'/entrypoint.sh /entrypoint.sh
+RUN \
+  git clone https://github.com/anidl/multi-downloader-nx.git /app && \
+  cd /app && \
+  npm install -g ts-node serve --quiet && \
+  npm install --quiet && \
+  npm run tsc true &>/dev/null
 
+COPY '"${APPFOLDER}"'/entrypoint.sh /entrypoint.sh
 ENTRYPOINT ["'"/bin/bash"'", "'"/entrypoint.sh"'"]
 ##EOF' > ./$FOLDER/$APP/Dockerfile
