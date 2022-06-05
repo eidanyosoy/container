@@ -16,30 +16,32 @@
 #####################################
 # shellcheck disable=SC2086
 # shellcheck disable=SC2046
-FROM alpine:3.16.0
+FROM ghcr.io/dockserver/docker-alpine-v3:latest:3.0.7
 
 LABEL org.opencontainers.image.source="https://github.com/dockserver/container"
 
 ARG TARGETPLATFORM
 ARG BUILDPLATFORM
 
+ENV LANG=en_US.UTF-8 \
+    LANGUAGE=en_US.UTF-8
+
 RUN \
   echo "**** update packages ****" && \
     apk --quiet --no-cache --no-progress update && \
-  apk --quiet --no-cache --no-progress upgrade && \
+    apk --quiet --no-cache --no-progress upgrade && \
   echo "**** install build packages ****" && \
     apk add -U --update --no-cache nodejs npm git ffmpeg xsel mkvtoolnix bash ca-certificates shadow musl findutils coreutils && \
+  echo "*** install app ****" && \
+    git clone https://github.com/anidl/multi-downloader-nx.git /app && \
+    cd /app && \
+    npm install -g ts-node serve --quiet && \
+    npm install --quiet && \
+    npm run tsc true && \
   echo "*** cleanup system ****" && \
     apk del --quiet --clean-protected --no-progress && \
-  rm -f /var/cache/apk/*
+    rm -f /var/cache/apk/*
 
-RUN \
-  git clone https://github.com/anidl/multi-downloader-nx.git /app && \
-  cd /app && \
-  npm install -g ts-node serve --quiet && \
-  npm install --quiet && \
-  npm run tsc true &>/dev/null
-
-COPY ./apps/docker-crunchy-gui/entrypoint.sh /entrypoint.sh
-ENTRYPOINT ["/bin/bash", "/entrypoint.sh"]
+COPY ./apps/docker-crunchy-gui/root/ /
+ENTRYPOINT /init
 ##EOF
