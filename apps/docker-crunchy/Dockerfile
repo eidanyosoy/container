@@ -2,7 +2,20 @@
 ##
 ## Do not changes any lines here
 ##
-
+####################################
+# All rights reserved.              #
+# started from Zero                 #
+# Docker owned dockserver           #
+# Docker Maintainer dockserver      #
+#####################################
+#####################################
+# THIS DOCKER IS UNDER LICENSE      #
+# NO CUSTOMIZING IS ALLOWED         #
+# NO REBRANDING IS ALLOWED          #
+# NO CODE MIRRORING IS ALLOWED      #
+#####################################
+# shellcheck disable=SC2086
+# shellcheck disable=SC2046
 FROM ubuntu:22.10
 
 LABEL org.opencontainers.image.source="https://github.com/dockserver/container"
