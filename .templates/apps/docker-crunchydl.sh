@@ -45,7 +45,8 @@ PULLFILE="git -c advice.detachedHead=false clone --depth 1 --branch ${VERSION} \
         https://github.com/anidl/multi-downloader-nx.git && \
     cd /multi-downloader-nx && \
     npm ci && \
-    npm run build-linux64 && \
+    npm install -g npm@8.12.1 && \
+    npm run build-ubuntu-cli && \
     BUILD=lib/_builds/multi-downloader-nx-${VERSION}-linux64 &&  \
     mkdir /build && \
     cp $BUILD/aniDL /build && \
