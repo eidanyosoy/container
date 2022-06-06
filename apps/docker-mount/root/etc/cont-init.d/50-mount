@@ -75,6 +75,7 @@ VFS_CACHE_MAX_SIZE=${VFS_CACHE_MAX_SIZE:-null}
 rcloneenv=/system/mount/mount.env
 rclonetmp=/tmp/mount.env
 rclonesample=/app/env/sample.env
+
 if [[ ${VFS_CACHE_MAX_SIZE} == 'null' ]]; then
    VFS_CACHE_MAX_SIZE=${checkspace}G
 else
@@ -100,6 +101,7 @@ else
 fi
 
 source ${rclonetmp}
+
 echo -e "#!/command/with-contenv bash
 #-------------------------------------------------------
 #   MOUNT ENVIRONMENT
@@ -180,6 +182,7 @@ if [[ -d "/mnt/remotes" ]]; then fusermount -uzq /mnt/remotes; fi
 
 source /system/mount/mount.env
 ARRAY=$(ls -A ${JSONDIR} | wc -l)
+
 if [[ ${ARRAY} != 4 ]]; then
    if [[ ! -d "/system/mount/.keys" ]]; then
       mkdir -p /system/mount/.keys/ && chown -cR 1000:1000 /system/mount/.keys/
@@ -210,6 +213,7 @@ if [[ ${ARRAY} != 4 ]]; then
 fi
 
 source /system/mount/mount.env
+
 ARRAY=$(ls -A ${JSONDIR} | wc -l)
 if [[ ${ARRAY} != 0 ]]; then
    if [[ -f $TMPCONFIG ]]; then rm -rf $TMPCONFIG ; fi
@@ -363,5 +367,3 @@ chmod 700 /tmp/screens/S-root &>/dev/null
 chmod 700 /tmp/uscreens/S-abc &>/dev/null
 
 #E-o-F#
-##left over
-## action_policy 'all' create_policy 'all' search_policy 'all' cache_time 5 --config=${CONFIG}
