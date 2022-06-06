@@ -34,23 +34,25 @@ PICTURE="./images/$APP.png"
 APPFOLDER="./$FOLDER/$APP"
 
 DESCRIPTION="Docker Container for crunchyroll downloading Emby"
-BASEIMAGE="node:17-bullseye-slim"
+BASEIMAGE="alpine:latest"
 INSTCOMMAND="apt-get install"
 UPTCOMMAND="apt-get update -y && apt-get upgrade -y"
 
 CLEANUP="apt-get autoremove -yqq && apt-get clean -yqq && \\
      rm -rf /var/lib/apt/lists/*"
 
-PULLFILE="git -c advice.detachedHead=false clone --depth 1 --branch ${VERSION} \
-        https://github.com/anidl/multi-downloader-nx.git && \
-    cd /multi-downloader-nx && \
-    npm ci && \
-    npm install -g npm@8.12.1 && \
-    npm run build-ubuntu-cli && \
-    BUILD=lib/_builds/multi-downloader-nx-${VERSION}-linux64 &&  \
-    mkdir /build && \
-    cp $BUILD/aniDL /build && \
-    cp -r $BUILD/config /build"
+PULLFILE="RUN \
+  echo "**** update packages ****" && \
+    apk --quiet --no-cache --no-progress update && \
+    apk --quiet --no-cache --no-progress upgrade && \
+  echo "**** install build packages ****" && \
+    mkdir -p /app && \
+    apk add -U --update --no-cache \
+       p7zip bash ca-certificates shadow musl \
+       findutils linux-headers coreutils apk-tools busybox && \
+    wget https://github.com/anidl/multi-downloader-nx/releases/download/${VERSION}/multi-downloader-nx-ubuntu-cli.7z -O /app/crunchy.7z && \
+    7z e /app/crunchy.7z && \
+    rm -rf /app/crunchy.7z"
 
 ### RELEASE SETTINGS ###
 
@@ -78,18 +80,7 @@ ARG TARGETPLATFORM
 ARG BUILDPLATFORM
 ARG VERSION="'"${NEWVERSION}"'"
 
-RUN '"${UPTCOMMAND}"' && \
-    '"${INSTCOMMAND}"' -y --no-install-recommends ca-certificates p7zip-full git && \
-    '"${CLEANUP}"' && \
-    git -c advice.detachedHead=false clone --depth 1 --branch ${VERSION} \
-        https://github.com/anidl/multi-downloader-nx.git && \
-    cd /multi-downloader-nx && \
-    npm ci && \
-    npm run build-linux64 && \
-    BUILD=lib/_builds/multi-downloader-nx-${VERSION}-linux64 &&  \
-    mkdir /build && \
-    cp $BUILD/aniDL /build && \
-    cp -r $BUILD/config /build
+'"${PULLFILE}"'
 
 FROM debian:bullseye-slim
 
