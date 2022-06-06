@@ -37,7 +37,7 @@ RUN apt-get update -y && apt-get upgrade -y && \
     cp $BUILD/aniDL /build && \
     cp -r $BUILD/config /build
 
-FROM ubuntu:jammy
+FROM debian:bullseye-slim
 
 RUN apt-get update -y && apt-get upgrade -y && \
     apt-get install -y --no-install-recommends ffmpeg mkvtoolnix && \
