@@ -30,6 +30,9 @@ NEWVERSION="${NEWVERSION}"
 
 HEADLINE="$(cat ./.templates/headline.txt)"
 
+PICTURE="./images/$APP.png"
+APPFOLDER="./$FOLDER/$APP
+
 DESCRIPTION="Docker Container for crunchyroll downloading Emby"
 BASESTAGE="node:17-bullseye-slim"
 INSTCOMMAND="apt-get install"
