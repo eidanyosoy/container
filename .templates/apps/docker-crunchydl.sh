@@ -91,9 +91,7 @@ COPY --from=build build/* ./
 
 VOLUME /config
 VOLUME /videos
-
-COPY '"${APPFOLDER}"'/entrypoint.sh /entrypoint.sh
-ENTRYPOINT ["'". /aniDL"'"]
+ENTRYPOINT ["'"./aniDL"'"]
 ##EOF' > ./$FOLDER/$APP/Dockerfile
 
 #  $(which cat) "${CHK}" | head -n 1 | while IFS=$'|' read -ra SHOWLINK ; do
