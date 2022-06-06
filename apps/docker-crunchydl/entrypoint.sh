@@ -27,6 +27,16 @@ $(which echo) "**** install packages ****" && \
     $(which apt) upgrade -y &>/dev/null
       $(which apt) install wget jq rsync curl locales libavcodec-extra ffmpeg -y &>/dev/null
 
+while true; do
+   if [[ ! -f /config/download.txt ]];then
+      $(which echo) "**** NO download.txt found ****" && \
+      $(which sleep) 60
+   else
+      break
+   fi
+done
+   
+
 ### READ TO DOWNLOAD FILE ###
 CHK=/config/download.txt
 LOCHK=/config/to-download.txt
