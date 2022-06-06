@@ -33,7 +33,7 @@ HEADLINE="$(cat ./.templates/headline.txt)"
 PICTURE="./images/$APP.png"
 APPFOLDER="./$FOLDER/$APP"
 
-DESCRIPTION="Docker Container for crunchyroll downloading Emby"
+DESCRIPTION="Docker Container for crunchyroll download client"
 BASEIMAGE="alpine:latest"
 INSTCOMMAND="apt-get install"
 UPTCOMMAND="apt-get update -y && apt-get upgrade -y"
@@ -49,7 +49,8 @@ PULLFILE="RUN apk --quiet --no-cache --no-progress update && \\
       p7zip bash ca-certificates shadow musl \
       findutils linux-headers coreutils apk-tools busybox && \\
     wget https://github.com/anidl/multi-downloader-nx/releases/download/${VERSION}/multi-downloader-nx-ubuntu-cli.7z -O /app/crunchy.7z && \\
-    cd /app && 7z e crunchy.7z && \\
+    cd /app && \\
+    7z e crunchy.7z && \\
     rm -rf /app/crunchy.7z /app/multi-downloader-nx-ubuntu64-cli"
 
 ### RELEASE SETTINGS ###
