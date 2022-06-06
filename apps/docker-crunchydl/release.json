@@ -4,8 +4,8 @@
    "appfolder": "./apps/docker-crunchydl",
    "newversion": "3.0.7",
    "appbranch": "master",
-   "baseimage": "node:17-bullseye-slim",
-   "description": "Docker Container for crunchyroll downloading Emby",
+   "baseimage": "alpine:latest",
+   "description": "Docker Container for crunchyroll download client",
    "body": "Upgrading docker-crunchydl to 3.0.7",
    "user": "dockserver-image[bot]"
 }

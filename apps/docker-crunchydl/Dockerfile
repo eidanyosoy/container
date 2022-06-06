@@ -25,24 +25,22 @@ ARG VERSION="3.0.7"
 
 RUN apk --quiet --no-cache --no-progress update && \
     apk --quiet --no-cache --no-progress upgrade && \
-    rm -rf /app && mkdir -p /app && \
-    apk add -U --update --no-cache \
-      p7zip bash ca-certificates shadow musl \
-      findutils linux-headers coreutils apk-tools busybox && \
-    wget https://github.com/anidl/multi-downloader-nx/releases/download/${VERSION}/multi-downloader-nx-ubuntu-cli.7z -O /app/crunchy.7z && \
+    rm -rf /app && \
+    mkdir -p /app && \
+    apk add -U --update --no-cache       p7zip bash ca-certificates shadow musl       findutils linux-headers coreutils apk-tools busybox && \
+    wget https://github.com/anidl/multi-downloader-nx/releases/download//multi-downloader-nx-ubuntu-cli.7z -O /app/crunchy.7z && \
     cd /app && \
     7z e crunchy.7z && \
     rm -rf /app/crunchy.7z /app/multi-downloader-nx-ubuntu64-cli
 
 FROM debian:bullseye-slim
 
-RUN apt-get update -y && \
-    apt-get upgrade -y && \
-    apt-get install -y bash curl wget jq ffmpeg mkvtoolnix && \
-    apt-get autoremove -yqq && apt-get clean -yqq && \
-    rm -rf /var/lib/apt/lists/*
+RUN apt-get update -y && apt-get upgrade -y && \
+    apt-get install -y --no-install-recommends ffmpeg mkvtoolnix && \
+     apt-get autoremove -yqq && apt-get clean -yqq && \
+     rm -rf /var/lib/apt/lists/*
 
-COPY --from=build /app/ ./
+COPY --from=build build/* ./
 
 VOLUME /config
 VOLUME /videos
