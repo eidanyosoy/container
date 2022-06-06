@@ -42,16 +42,16 @@ CLEANUP="apt-get autoremove -yqq && apt-get clean -yqq && \\
      rm -rf /var/lib/apt/lists/*"
 
 PULLFILE="RUN \
-  echo "**** update packages ****" && \
-    apk --quiet --no-cache --no-progress update && \
-    apk --quiet --no-cache --no-progress upgrade && \
-  echo "**** install build packages ****" && \
-    mkdir -p /app && \
+  echo "'**** update packages ****'" && \\
+    apk --quiet --no-cache --no-progress update && \\
+    apk --quiet --no-cache --no-progress upgrade && \\
+  echo "'**** install build packages ****'" && \\
+    mkdir -p /app && \\
     apk add -U --update --no-cache \
        p7zip bash ca-certificates shadow musl \
-       findutils linux-headers coreutils apk-tools busybox && \
-    wget https://github.com/anidl/multi-downloader-nx/releases/download/${VERSION}/multi-downloader-nx-ubuntu-cli.7z -O /app/crunchy.7z && \
-    7z e /app/crunchy.7z && \
+       findutils linux-headers coreutils apk-tools busybox && \\
+    wget https://github.com/anidl/multi-downloader-nx/releases/download/${VERSION}/multi-downloader-nx-ubuntu-cli.7z -O /app/crunchy.7z && \\
+    7z e /app/crunchy.7z && \\
     rm -rf /app/crunchy.7z"
 
 ### RELEASE SETTINGS ###
