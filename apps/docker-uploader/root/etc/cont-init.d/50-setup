@@ -50,7 +50,7 @@ EOF
       $(which apk) add --quiet --no-progress --update ${myArray[@]}
    done
 
-   log "**** install rclone ****"
+   log "**** install rclone ****" && \
    $(which wget) -qO- https://rclone.org/install.sh | bash &>/dev/null
 
    KEYLOCAL=/system/servicekeys/keys/
