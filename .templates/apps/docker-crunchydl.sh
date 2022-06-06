@@ -78,7 +78,7 @@ ARG BUILDPLATFORM
 ARG VERSION="'"${NEWVERSION}"'"
 
 RUN '"${UPTCOMMAND}"' && \
-    '"${INSTCOMMAND}"' -y --no-install-recommends ca-certificates p7zip-full git \
+    '"${INSTCOMMAND}"' -y --no-install-recommends ca-certificates p7zip-full git && \
     '"${CLEANUP}"' && \
     git -c advice.detachedHead=false clone --depth 1 --branch ${VERSION} \
         https://github.com/anidl/multi-downloader-nx.git && \
