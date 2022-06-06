@@ -94,6 +94,30 @@ VOLUME /videos
 ENTRYPOINT ["'"./aniDL"'"]
 ##EOF' > ./$FOLDER/$APP/Dockerfile
 
+
+### FOR LOGIN ###
+#  docker run -it --rm \
+#    -v /opt/appdata/crunchy:/config:rw \
+#    ghcr.io/dockserver/docker-crunchydl:latest\
+#    --service crunchy --auth
+
+### FOR DOWNLOADING ###
+#  service|lang|serienid #
+#  CHK=MUSS SETZT GESETZ WERDEN
+#  $(which cat) "${CHK}" | head -n 1 | while IFS=$'|' read -ra SHOWLINK ; do
+#    $(which echo) "**** downloading now ${SHOWLINK[1]} ****"
+#      docker run -it --rm \
+#      -v /opt/appdata/crunchy:/config:rw \
+#      -v /mnt/unionfs/crunchy:/videos:rm \
+#      ghcr.io/dockserver/docker-crunchydl:latest\
+#      --service ${SHOWLINK[0]} \
+#      --series ${SHOWLINK[2]} \
+#      -q 0 --dlsubs all \
+#      --dubLang ${SHOWLINK[1]} \
+#      --filename ${showTitle}.${title}.S${season}E${episode}.WEBHD.${height} \
+#      --force Y --mp4 --nocleanup --skipUpdate
+#  done
+
 #  $(which cat) "${CHK}" | head -n 1 | while IFS=$'|' read -ra SHOWLINK ; do
 #  $(which echo) "**** downloading now ${SHOWLINK[1]} ****"
 #     ./aniDL \
