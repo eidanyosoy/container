@@ -90,7 +90,7 @@ RUN '"${UPTCOMMAND}"' && \
     cp $BUILD/aniDL /build && \
     cp -r $BUILD/config /build
 
-FROM ubuntu:jammy
+FROM debian:bullseye-slim
 
 RUN '"${UPTCOMMAND}"' && \
     '"${INSTCOMMAND}"' -y --no-install-recommends ffmpeg mkvtoolnix && \
