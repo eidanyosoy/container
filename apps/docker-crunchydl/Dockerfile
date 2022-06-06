@@ -24,7 +24,7 @@ ARG BUILDPLATFORM
 ARG VERSION="3.0.7"
 
 RUN apt-get update -y && apt-get upgrade -y && \
-    apt-get install -y --no-install-recommends ca-certificates p7zip-full git \
+    apt-get install -y --no-install-recommends ca-certificates p7zip-full git && \
     apt-get autoremove -yqq && apt-get clean -yqq && \
      rm -rf /var/lib/apt/lists/* && \
     git -c advice.detachedHead=false clone --depth 1 --branch ${VERSION} \
