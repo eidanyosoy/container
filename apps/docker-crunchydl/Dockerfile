@@ -16,36 +16,31 @@
 #####################################
 # shellcheck disable=SC2086
 # shellcheck disable=SC2046
-FROM node:17-bullseye-slim AS build
+FROM alpine:latest AS build
 LABEL org.opencontainers.image.source="https://github.com/dockserver/container"
 
 ARG TARGETPLATFORM
 ARG BUILDPLATFORM
 ARG VERSION="3.0.7"
 
-RUN apt-get update -y && apt-get upgrade -y && \
-    apt-get install -y --no-install-recommends ca-certificates p7zip-full git && \
-    apt-get autoremove -yqq && apt-get clean -yqq && \
-     rm -rf /var/lib/apt/lists/* && \
-    git -c advice.detachedHead=false clone --depth 1 --branch ${VERSION} \
-        https://github.com/anidl/multi-downloader-nx.git && \
-    cd /multi-downloader-nx && \
-    npm ci && \
-    npm install -g npm@8.12.1 && \
-    npm run build-ubuntu-cli && \
-    BUILD=lib/_builds/multi-downloader-nx-${VERSION}-linux64 &&  \
-    mkdir /build && \
-    cp $BUILD/aniDL /build && \
-    cp -r $BUILD/config /build
+RUN \
+    mkdir -p /app && \
+    apk update -y && \
+    apk upgrade -y && \
+    apk add 7z wget curl && \
+    wget https://github.com/anidl/multi-downloader-nx/releases/download/${VERSION}/multi-downloader-nx-ubuntu-cli.7z /app/crunchy.7z && \
+    7z e /app/crunchy.7z && \
+    rm -rf /app/crunchy.7z
+
 
 FROM debian:bullseye-slim
 
 RUN apt-get update -y && apt-get upgrade -y && \
     apt-get install -y --no-install-recommends ffmpeg mkvtoolnix && \
-     apt-get autoremove -yqq && apt-get clean -yqq && \
-     rm -rf /var/lib/apt/lists/*
+    apt-get autoremove -yqq && apt-get clean -yqq && \
+    rm -rf /var/lib/apt/lists/*
 
-COPY --from=build build/* ./
+COPY --from=build /app/ ./
 
 VOLUME /config
 VOLUME /videos
