@@ -44,7 +44,5 @@ COPY --from=build build/* ./
 
 VOLUME /config
 VOLUME /videos
-
-COPY ./apps/docker-crunchydl/entrypoint.sh /entrypoint.sh
-ENTRYPOINT ["/bin/bash", "/entrypoint.sh"]
+ENTRYPOINT ["./aniDL"]
 ##EOF
