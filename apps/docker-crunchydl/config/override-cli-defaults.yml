@@ -3,12 +3,11 @@ nServer: 1
 mp4mux: false
 hslang: en, es-419, es, pt, pt-BR, fr, de, ar, it, ru, tr, zh, ko, ja
 timeout: 5000
-partsize: 20
+partsize: 5
 fsRetryTime: 10
 mp4: true
 numbers: 1
 noCleanUp: false
 skipUpdate: true
 forceMuxer: ffmpeg
-fileNametv: ${showTitle}/${showTitle}.${title}.S${season}E${episode}.${height}.WEBHD.AAC.H265-DOCKSERVER
-fileNamemovie: ${showTitle}/${showTitle}.${title}.${height}.WEBHD.AAC.H265-DOCKSERVER
+fileName: ${showTitle}/${showTitle}.${title}.S${season}E${episode}.${height}.WEBHD.AAC.H264-DOCKSERVER
