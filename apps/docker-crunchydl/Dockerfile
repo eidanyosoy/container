@@ -37,12 +37,10 @@ RUN apk --quiet --no-cache --no-progress update && \
 
 FROM debian:bullseye-slim
 
-RUN apt-get update -y && \
-    apt-get upgrade -y && \
+RUN apt-get update -y && apt-get upgrade -y && \
     apt-get install -y --no-install-recommends ffmpeg mkvtoolnix && \
-    apt-get autoremove -yqq && \
-    apt-get clean -yqq && \
-    rm -rf /var/lib/apt/lists/*
+     apt-get autoremove -yqq && apt-get clean -yqq && \
+     rm -rf /var/lib/apt/lists/*
 
 COPY --from=build /app/* ./
 
