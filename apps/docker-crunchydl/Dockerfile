@@ -33,10 +33,12 @@ RUN apk --quiet --no-cache --no-progress update && \
     wget https://github.com/anidl/multi-downloader-nx/releases/download/$VERSION/multi-downloader-nx-ubuntu-cli.7z -O /app/crunchy.7z && \
     cd /app && \
     7z e crunchy.7z && \
-    rm -rf /app/crunchy.7z /app/multi-downloader-nx-ubuntu64-cli && \
-    mv /app/config/cli-defaults.yml /app/config/cli-defaults.yml.old
+    rm -rf \
+       /app/crunchy.7z \
+       /app/multi-downloader-nx-ubuntu64-cli \
+       /app/config/cli-defaults.yml
 
-COPY ./apps/docker-crunchydl/config/override-cli-defaults.yml /app/config/cli-defaults.yml
+ADD ./apps/docker-crunchydl/config/override-cli-defaults.yml /app/config/cli-defaults.yml
 
 FROM debian:bullseye-slim
 
