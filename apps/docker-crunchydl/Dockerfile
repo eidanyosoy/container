@@ -36,7 +36,7 @@ RUN apk --quiet --no-cache --no-progress update && \
     rm -rf /app/crunchy.7z /app/multi-downloader-nx-ubuntu64-cli && \
     mv /app/config/cli-defaults.yml /app/config/cli-defaults.yml.old
 
-COPY ./apps/docker-crunchydl/config/override-cli-defaults.yml /config/cli-defaults.yml
+COPY ./apps/docker-crunchydl/config/override-cli-defaults.yml /app/config/cli-defaults.yml
 
 FROM debian:bullseye-slim
 
