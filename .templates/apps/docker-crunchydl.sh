@@ -48,7 +48,7 @@ PULLFILE="RUN apk --quiet --no-cache --no-progress update && \\
     apk add -U --update --no-cache \
       p7zip bash ca-certificates shadow musl \
       findutils linux-headers coreutils apk-tools busybox && \\
-    wget https://github.com/anidl/multi-downloader-nx/releases/download/${VERSION}/multi-downloader-nx-ubuntu-cli.7z -O /app/crunchy.7z && \\
+    wget https://github.com/anidl/multi-downloader-nx/releases/download/$VERSION/multi-downloader-nx-ubuntu-cli.7z -O /app/crunchy.7z && \\
     cd /app && \\
     7z e crunchy.7z && \\
     rm -rf /app/crunchy.7z /app/multi-downloader-nx-ubuntu64-cli"
@@ -77,7 +77,7 @@ LABEL org.opencontainers.image.source="'"https://github.com/dockserver/container
 
 ARG TARGETPLATFORM
 ARG BUILDPLATFORM
-ARG VERSION="'"${NEWVERSION}"'"
+ARG VERSION='"${NEWVERSION}"'
 
 '"${PULLFILE}"'
 
