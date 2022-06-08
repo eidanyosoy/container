@@ -8,8 +8,6 @@ mp4: true
 noCleanUp: false
 skipUpdate: true
 forceMuxer: ffmpeg
-
-# Filenaming
-fileName: "${showTitle}/${showTitle}.${title}.S${season}E${episode}.${height}p.WEBHD.AAC.H264-{rel_group}"
-releaseGroup: DOCKSERVER
+fileName: "{showTitle}/{showTitle}.{title}.S{season}E{episode}.{height}p.WEBHD.AAC.H264-{relgroup}"
+relgroup: DOCKSERVER
 numbers: 1
