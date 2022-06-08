@@ -39,15 +39,15 @@ else
        aria2c -d /tmp -o plex.deb "${PLEX_DOWNLOAD}/${REMOTE_VERSION}/debian/plexmediaserver_${REMOTE_VERSION}_${PLEX_URL_ARCH}.deb" &>/dev/null
    last=$?
    if [[ "$last" -gt "0" ]] || [[ $(stat -c %s /tmp/plex.deb) -lt 10000 ]]; then
-      apt-get remove -yqq wget jq aria2 &>/dev/null
-       apt-get purge -yqq &>/dev/null
-        rm -rf /tmp/plex*.deb &>/dev/null
+      apt remove -yqq wget jq aria2
+       apt purge -yqq
+        rm -rf /tmp/plex*.deb
           exit 0
    else
-      dpkg -i --force-confold /tmp/plex*.deb &>/dev/null
-       apt-get remove -yqq wget jq aria2 &>/dev/null
-        apt-get purge -yqq &>/dev/null
-         rm -rf /tmp/plex*.deb &>/dev/null
+      dpkg -i --force-confold /tmp/plex*.deb
+       apt remove -yqq wget jq aria2
+        apt purge -yqq 
+         rm -rf /tmp/plex*.deb
           exit 0
    fi
 fi
