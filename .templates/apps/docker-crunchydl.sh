@@ -71,14 +71,16 @@ RUN apk --quiet --no-cache --no-progress update && \
     apk --quiet --no-cache --no-progress upgrade && \
     rm -rf /app && \
     mkdir -p /app && \
-    apk add -U --update --no-cache -no-progress \
+    apk add -U --update --no-cache --no-progress \
       p7zip bash ca-certificates shadow musl \
       findutils linux-headers coreutils apk-tools busybox && \
     wget https://github.com/anidl/multi-downloader-nx/releases/download/$VERSION/multi-downloader-nx-ubuntu-cli.7z -O /app/crunchy.7z && \
     cd /app && \
     7z e crunchy.7z && \
-    rm -rf /app/crunchy.7z /app/multi-downloader-nx-ubuntu64-cli && \
-    mv /app/config/cli-defaults.yml /app/config/cli-defaults.yml.old
+    rm -rf \
+       /app/crunchy.7z \
+       /app/multi-downloader-nx-ubuntu64-cli \
+       /app/config/cli-defaults.yml
 
 COPY '"${APPFOLDER}"'/config/override-cli-defaults.yml /app/config/cli-defaults.yml
 
