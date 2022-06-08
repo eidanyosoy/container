@@ -1,13 +1,15 @@
 q: 0
 nServer: 1
 mp4mux: false
-hslang: en, es-419, es, pt, pt-BR, fr, de, ar, it, ru, tr, zh, ko, ja
 timeout: 5000
 partsize: 5
 fsRetryTime: 10
 mp4: true
-numbers: 1
 noCleanUp: false
 skipUpdate: true
 forceMuxer: ffmpeg
-fileName: ${showTitle}/${showTitle}.${title}.S${season}E${episode}.${height}.WEBHD.AAC.H264-DOCKSERVER
+
+# Filenaming
+fileName: "${showTitle}/${showTitle}.${title}.S${season}E${episode}.${height}p.WEBHD.AAC.H264-{rel_group}"
+releaseGroup: DOCKSERVER
+numbers: 1
