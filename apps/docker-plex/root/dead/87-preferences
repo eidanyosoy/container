@@ -1,17 +1,9 @@
 #!/usr/bin/with-contenv bash
 
-export DEBIAN_FRONTEND=noninteractive
-echo "**** update system  ****" && \
-  apt -yqq update && \
-  apt -yqq upgrade && \
-  apt install -yqq \
-     jq ocl-icd-libopencl1 udev \
-     unrar wget git curl xmlstarlet \
-     sqlite i965-va-driver-shaders \
-     va-driver-all mesa-vulkan-drivers \
-     ffmpeg
+printf "**** update system  ****" && \
+apt-get install -yqq jq ocl-icd-libopencl1 udev unrar wget git curl xmlstarlet sqlite i965-va-driver-shaders va-driver-all mesa-vulkan-drivers ffmpeg
 
-  if [ "${DEBUG,,}" = "true" ]; then set -x ; fi
+if [ "${DEBUG,,}" = "true" ]; then set -x ; fi
 
 PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR="/config/Library/Application Support"
 
@@ -88,6 +80,7 @@ if [ -n "${ADVERTISE_IP}" ]; then
 fi
 
 FILE="/config/plex.env"
+export FILE=/config/plex.env
 sed '/^\s*#.*$/d' $FILE | while IFS=$'|' read -r -a myArray; do
    if [ -z "$(getPref "${myArray[0]}")" ]; then
       setPref "${myArray[0]}" "${myArray[1]}"
