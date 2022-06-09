@@ -21,7 +21,7 @@ LABEL org.opencontainers.image.source="https://github.com/dockserver/container"
 
 ARG TARGETPLATFORM
 ARG BUILDPLATFORM
-ARG VERSION=3.0.7
+ARG VERSION=null
 
 RUN apk --quiet --no-cache --no-progress update && \
     apk --quiet --no-cache --no-progress upgrade && \
@@ -37,8 +37,6 @@ RUN apk --quiet --no-cache --no-progress update && \
        /app/crunchy.7z \
        /app/multi-downloader-nx-ubuntu64-cli \
        /app/config/cli-defaults.yml
-
-COPY ./apps/docker-crunchydl/config/override-cli-defaults.yml /app/config/cli-defaults.yml
 
 FROM debian:bullseye-slim
 
