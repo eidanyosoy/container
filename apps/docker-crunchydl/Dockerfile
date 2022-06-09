@@ -30,7 +30,7 @@ RUN apk --quiet --no-cache --no-progress update && \
     apk add -U --update --no-cache --no-progress \
       p7zip bash ca-certificates shadow musl \
       findutils linux-headers coreutils apk-tools busybox && \
-    wget https://github.com/anidl/multi-downloader-nx/releases/download/$VERSION/multi-downloader-nx-ubuntu-cli.7z -O /app/crunchy.7z && \
+    wget https://github.com/dockserver/multi-downloader-nx/releases/download/$VERSION/multi-downloader-nx-ubuntu-cli.7z -O /app/crunchy.7z && \
     cd /app && \
     7z e crunchy.7z && \
     rm -rf \
@@ -42,7 +42,7 @@ FROM debian:bullseye-slim
 
 RUN apt-get update -y && apt-get upgrade -y && \
     apt-get install -y --no-install-recommends ffmpeg mkvtoolnix && \
-     apt-get autoremove -yqq && apt-get clean -yqq && \
+     apt-get autoremove -y && apt-get clean -y && \
      rm -rf /var/lib/apt/lists/*
 
 COPY --from=build /app/* ./
