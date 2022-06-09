@@ -97,60 +97,60 @@ ENTRYPOINT ["'"./aniDL"'"]
 
 #####
 
-docker pull ghcr.io/dockserver/docker-crunchydl:latest 
+#docker pull ghcr.io/dockserver/docker-crunchydl:latest 
 
 ### FOR LOGIN ###
-  docker run -it --rm \
-    --name crunchy \
-    -v /opt/appdata/crunchy:/config:rw \
-    ghcr.io/dockserver/docker-crunchydl:latest \
-    --service crunchy --auth
+#  docker run -it --rm \
+#    --name crunchy \
+#    -v /opt/appdata/crunchy:/config:rw \
+#    ghcr.io/dockserver/docker-crunchydl:latest \
+#    --service crunchy --auth
 
-  ## GET NEWS FILES ##
-  CHK=/opt/appdata/crunchy/download.txt
-  docker run -i --rm \
-    -v /opt/appdata/crunchy:/config:rw \
-    ghcr.io/dockserver/docker-crunchydl:latest \
-    --service ${SHOWLINK[0]} --new > /opt/appdata/crunchy/newfiles.txt
+#  ## GET NEWS FILES ##
+#  CHK=/opt/appdata/crunchy/download.txt
+#  docker run -i --rm \
+#    -v /opt/appdata/crunchy:/config:rw \
+#    ghcr.io/dockserver/docker-crunchydl:latest \
+#    --service ${SHOWLINK[0]} --new > /opt/appdata/crunchy/newfiles.txt
 
-  cat /opt/appdata/crunchy/newfiles.txt | grep -e "Season" | grep -E "Z:" | sed 's/[#$%*@]//g' | cut -d: -f2 | awk '{print $1}' | while IFS=$'|' read -ra SHOWLINK ; do
-     echo "tv|${SHOWLINK}" >> "${CHK}"
-  done
+#  cat /opt/appdata/crunchy/newfiles.txt | grep -e "Season" | grep -E "Z:" | sed 's/[#$%*@]//g' | cut -d: -f2 | awk '{print $1}' | while IFS=$'|' read -ra SHOWLINK ; do
+#     echo "tv|${SHOWLINK}" >> "${CHK}"
+#  done
 
 ### FOR DOWNLOADING ###
 #  service|lang|serienid #
-echo "crunchy|deu|G5PHNM4K8" > /opt/appdata/crunchy/download.txt
-  export CHK=/opt/appdata/crunchy/download.txt
-  $(which cat) "${CHK}" | head -n 1 | while IFS=$'|' read -ra SHOWLINK ; do
-    $(which echo) "**** downloading now ${SHOWLINK[2]} ****"
-     echo ${SHOWLINK[0]} ${SHOWLINK[1]} ${SHOWLINK[2]}
-      docker run -i --rm \
-      -v /opt/appdata/crunchy:/config:rw \
-      -v /mnt/downloads/crunchy:/videos:rw \
-      ghcr.io/dockserver/docker-crunchydl:latest \
-      --service ${SHOWLINK[0]} \
-      --series ${SHOWLINK[2]} \
-      --dlsubs all --all \
-      --dubLang ${SHOWLINK[1]} \
-      --filename ${showTitle}.${title}.S${season}E${episode}.WEBHD.${height} \
-      --force Y --mp4 --nocleanup --skipUpdate
-      shopt -s globstar
-      for f in /mnt/downloads/crunchy/**/*.mp4; do
-          $(which mv) "$f" "${f// /.}" &>/dev/null
-      done
-      $(which sed) -i 1d "${CHK}"
-      ## RUN FFMPEG TO COVENT TO MKV ###
-      shopt -s globstar
-      for f in /mnt/downloads/crunchy/**/*.mp4; do
-          ## c:v/s/a >> video _ subtitle _ audio  >> copy from mp4
-          $(which echo) "**** running  convert for ${f} ****" && \
-          $(which ffmpeg) -nostdin -i "$f" -c:v copy -c:a copy -c:s copy "${f%.mp4}.mkv" &>/dev/null
-          $(which chown) -cR 1000:1000 "$f" &>/dev/null && \
-          $(which rm) -rf "{$f}.mp4" &>/dev/null 
-       done
-  done
+#echo "crunchy|deu|G5PHNM4K8" > /opt/appdata/crunchy/download.txt
+#  export CHK=/opt/appdata/crunchy/download.txt
+#  $(which cat) "${CHK}" | head -n 1 | while IFS=$'|' read -ra SHOWLINK ; do
+#    $(which echo) "**** downloading now ${SHOWLINK[2]} ****"
+#     echo ${SHOWLINK[0]} ${SHOWLINK[1]} ${SHOWLINK[2]}
+#      docker run -i --rm \
+#      -v /opt/appdata/crunchy:/config:rw \
+#      -v /mnt/downloads/crunchy:/videos:rw \
+#      ghcr.io/dockserver/docker-crunchydl:latest \
+#      --service ${SHOWLINK[0]} \
+#      --series ${SHOWLINK[2]} \
+#      --dlsubs all --all \
+#      --dubLang ${SHOWLINK[1]} \
+#      --filename ${showTitle}.${title}.S${season}E${episode}.WEBHD.${height} \
+#      --force Y --mp4 --nocleanup --skipUpdate
+#      shopt -s globstar
+#      for f in /mnt/downloads/crunchy/**/*.mp4; do
+#          $(which mv) "$f" "${f// /.}" &>/dev/null
+#      done
+#      $(which sed) -i 1d "${CHK}"
+#      ## RUN FFMPEG TO COVENT TO MKV ###
+#      shopt -s globstar
+#      for f in /mnt/downloads/crunchy/**/*.mp4; do
+#          ## c:v/s/a >> video _ subtitle _ audio  >> copy from mp4
+#          $(which echo) "**** running  convert for ${f} ****" && \
+#          $(which ffmpeg) -nostdin -i "$f" -c:v copy -c:a copy -c:s copy "${f%.mp4}.mkv" &>/dev/null
+#          $(which chown) -cR 1000:1000 "$f" &>/dev/null && \
+#          $(which rm) -rf "{$f}.mp4" &>/dev/null 
+#       done
+#  done
 
-ghcr.io/dockserver/docker-crunchydl:latest
+# ghcr.io/dockserver/docker-crunchydl:latest
 
 #  $(which cat) "${CHK}" | head -n 1 | while IFS=$'|' read -ra SHOWLINK ; do
 #  $(which echo) "**** downloading now ${SHOWLINK[1]} ****"
