@@ -22,8 +22,8 @@ TOKEN=$4
 ### APP SETTINGS ###
 
 APPBRANCH="master"
-APPLINK="https://github.com/dockserver/multi-downloader-nx"
-NEWVERSION=$(curl -u $USERNAME:TOKEN -sX GET https://api.github.com/repos/docker/multi-downloader-nx/releases/latest | jq --raw-output '. | .tag_name')
+APPLINK="https://github.com/dockserver/multi-downloader-nx/releases"
+NEWVERSION=$(curl -u $USERNAME:TOKEN -sX GET https://api.github.com/repos/dockserver/multi-downloader-nx/releases/latest | jq --raw-output '. | .tag_name')
 NEWVERSION="${NEWVERSION#*v}"
 NEWVERSION="${NEWVERSION#*release-}"
 NEWVERSION="${NEWVERSION}"
@@ -38,7 +38,7 @@ BASEIMAGE="alpine:latest"
 INSTCOMMAND="apt-get install"
 UPTCOMMAND="apt-get update -y && apt-get upgrade -y"
 
-CLEANUP="apt-get autoremove -yqq && apt-get clean -yqq && \\
+CLEANUP="apt-get autoremove -y && apt-get clean -y && \\
      rm -rf /var/lib/apt/lists/*"
 
 ### RELEASE SETTINGS ###
@@ -74,7 +74,7 @@ RUN apk --quiet --no-cache --no-progress update && \
     apk add -U --update --no-cache --no-progress \
       p7zip bash ca-certificates shadow musl \
       findutils linux-headers coreutils apk-tools busybox && \
-    wget https://github.com/anidl/multi-downloader-nx/releases/download/$VERSION/multi-downloader-nx-ubuntu-cli.7z -O /app/crunchy.7z && \
+    wget https://github.com/dockserver/multi-downloader-nx/releases/download/$VERSION/multi-downloader-nx-ubuntu-cli.7z -O /app/crunchy.7z && \
     cd /app && \
     7z e crunchy.7z && \
     rm -rf \
