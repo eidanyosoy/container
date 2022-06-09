@@ -22,8 +22,8 @@ TOKEN=$4
 ### APP SETTINGS ###
 
 APPBRANCH="master"
-APPLINK="https://github.com/anidl/multi-downloader-nx"
-NEWVERSION=$(curl -u $USERNAME:TOKEN -sX GET https://api.github.com/repos/anidl/multi-downloader-nx/releases/latest | jq --raw-output '. | .tag_name')
+APPLINK="https://github.com/dockserver/multi-downloader-nx"
+NEWVERSION=$(curl -u $USERNAME:TOKEN -sX GET https://api.github.com/repos/docker/multi-downloader-nx/releases/latest | jq --raw-output '. | .tag_name')
 NEWVERSION="${NEWVERSION#*v}"
 NEWVERSION="${NEWVERSION#*release-}"
 NEWVERSION="${NEWVERSION}"
@@ -82,8 +82,6 @@ RUN apk --quiet --no-cache --no-progress update && \
        /app/multi-downloader-nx-ubuntu64-cli \
        /app/config/cli-defaults.yml
 
-COPY '"${APPFOLDER}"'/config/override-cli-defaults.yml /app/config/cli-defaults.yml
-
 FROM debian:bullseye-slim
 
 RUN '"${UPTCOMMAND}"' && \
@@ -97,10 +95,9 @@ VOLUME /videos
 ENTRYPOINT ["'"./aniDL"'"]
 ##EOF' > ./$FOLDER/$APP/Dockerfile
 
+#####
 
 docker pull ghcr.io/dockserver/docker-crunchydl:latest 
-
-
 
 ### FOR LOGIN ###
   docker run -it --rm \
@@ -108,7 +105,6 @@ docker pull ghcr.io/dockserver/docker-crunchydl:latest
     -v /opt/appdata/crunchy:/config:rw \
     ghcr.io/dockserver/docker-crunchydl:latest \
     --service crunchy --auth
-
 
   ## GET NEWS FILES ##
   CHK=/opt/appdata/crunchy/download.txt
