@@ -74,6 +74,5 @@ RUN \
 
 COPY --chown=abc ./apps/docker-jellyfin/root/ /
 
-EXPOSE 8096 8920
 VOLUME /config
 ##EOF

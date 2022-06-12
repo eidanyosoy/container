@@ -21,7 +21,6 @@ LABEL org.opencontainers.image.source="https://github.com/dockserver/container"
 
 ARG TARGETPLATFORM
 ARG BUILDPLATFORM
-
 ARG VERSION="0.4.0.1816"
 ARG BRANCH="nightly"
 
@@ -38,8 +37,6 @@ RUN \
     rm -rf /app/prowlarr/bin/prowlarr.Update /app/lidarr/bin/fpcalc
 
 COPY --chown=abc ./apps/docker-prowlarr/root/ /
-
-EXPOSE 9696
 
 VOLUME /config
 ##EOF
