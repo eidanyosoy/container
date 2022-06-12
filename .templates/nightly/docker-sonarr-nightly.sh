@@ -46,7 +46,6 @@ CLEANUP="rm -rf /app/sonarr/bin/Sonarr.Update"
 
 PICTURE="./images/$APP.png"
 APPFOLDER="./$FOLDERNIGHTLY/$APPNIGHTLY"
-PORT="EXPOSE 8989"
 VOLUMEN="VOLUME /config"
 
 ### RELEASE SETTINGS ###
@@ -78,16 +77,13 @@ ARG BUILDPLATFORM
 
 ARG VERSION="'"${NEWVERSION}"'"
 ARG BRANCH="'"${APPBRANCH}"'"
-
 ENV XDG_CONFIG_HOME="'"/config/xdg"'"
 
 RUN \
   echo "'"**** install build packages ****"'" && \
-    '"${INSTCOMMAND}"' \
-    '"${PACKAGES}"' && \
+    '"${INSTCOMMAND}"' '"${PACKAGES}"' && \
   echo "'"**** install app packages ****"'" && \
-    '"${INSTCOMMAND}"' \
-    '"${APPSPEC}"' && \
+    '"${INSTCOMMAND}"' '"${APPSPEC}"' && \
   echo "'"**** install '"${APP}"' ****"'" && \
     mkdir -p /app/sonarr/bin && \
     curl -fsSL "'"https://download.sonarr.tv/v3/"'${BRANCH}'"/"'${VERSION}'"/Sonarr."'${BRANCH}'"."'${VERSION}'".linux.tar.gz"'" | tar xzf - -C /app/sonarr/bin --strip-components=1 && \
@@ -97,8 +93,5 @@ RUN \
     '"${CLEANUP}"'
 
 COPY --chown=abc '"${APPFOLDER}"'/root/ /
-
-'"${PORT}"'
-
 '"${VOLUMEN}"'
 ##EOF' > ./$FOLDER/$APP/Dockerfile
