@@ -33,7 +33,8 @@ ENV NVIDIA_DRIVER_CAPABILITIES="compute,video,utility" \
     PLEX_MEDIA_SERVER_MAX_PLUGIN_PROCS="6" \
     PLEX_MEDIA_SERVER_USER="abc" \
     PLEX_MEDIA_SERVER_INFO_VENDOR="Docker" \
-    PLEX_MEDIA_SERVER_INFO_DEVICE="Docker Container"
+    PLEX_MEDIA_SERVER_INFO_DEVICE="Docker Container" \
+    S6_CMD_WAIT_FOR_SERVICES_MAXTIME="0"
 
 RUN \
    apt-get update -yqq && apt-get install gnupg2 wget ca-certificates lsb-release software-properties-common -yqq && \
