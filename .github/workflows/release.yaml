@@ -23,8 +23,8 @@ env:
 jobs:
   changes:
     name: Get changes
-    runs-on: ubuntu-latest
-    #runs-on: self-hosted
+    #runs-on: ubuntu-latest
+    runs-on: self-hosted
     outputs:
       matrix: "{\"container\": ${{ steps.reduce.outputs.containers }} }"
     steps:
@@ -106,8 +106,6 @@ jobs:
         else
            echo ::set-output name=push::true
         fi
-        echo ::set-output name=cache_from::"gha"
-        echo ::set-output name=cache_to::"type=gha,mode=max"
 
     - name: Set up QEMU
       if: ${{ steps.prep.outputs.version != '' }}
@@ -148,14 +146,6 @@ jobs:
           image=${{ env.MOBY }}
           network=host
 
-    - name: Cache Docker layers
-      if: ${{ steps.prep.outputs.version != '' }}
-      uses: actions/cache@v3
-      with:
-        path: /tmp/.buildx-cache-${{ matrix.container }}
-        key: ${{ runner.os }}-buildx-${{ steps.prep.outputs.category }}/${{ matrix.container }}
-        restore-keys: ${{ runner.os }}-buildx-${{ steps.prep.outputs.category }}/${{ matrix.container }}
-
     - name: Extract Docker metadata
       if: ${{ steps.prep.outputs.version != '' }}
       id: meta
@@ -184,8 +174,6 @@ jobs:
           ${{ secrets.OWN_REGISTRY }}/${{ github.repository_owner }}/${{ matrix.container }}:${{ steps.prep.outputs.created }}
           ${{ secrets.OWN_REGISTRY }}/${{ github.repository_owner }}/${{ matrix.container }}:${{ steps.prep.outputs.version }}
           ${{ secrets.OWN_REGISTRY }}/${{ github.repository_owner }}/${{ matrix.container }}:v${{ steps.prep.outputs.version }}
-        cache-from: type=local,src=/tmp/.buildx-cache-${{ matrix.container }}
-        cache-to: type=local,dest=/tmp/.buildx-cache-${{ matrix.container }}-new,mode=max
         labels: |
           maintainer=${{ github.repository_owner }}
           org.opencontainers.image.title=${{ matrix.container }}
@@ -200,12 +188,6 @@ jobs:
           org.opencontainers.image.description=${{ steps.prep.outputs.description }}
           org.opencontainers.image.owner=${{ steps.prep.outputs.owndocker }}
           org.opencontainers.image.shaid=${{ steps.prep.outputs.shashort }}
-
-    - name: Move cache
-      if: ${{ steps.prep.outputs.version != '' }}
-      run: |
-        rm -rf /tmp/.buildx-cache-${{ matrix.container }} && \
-        mv /tmp/.buildx-cache-${{ matrix.container }}-new /tmp/.buildx-cache-${{ matrix.container }}
 
     - name: Image digest
       if: ${{ steps.prep.outputs.version != '' }}
