@@ -38,7 +38,6 @@ CLEANUP="rm -rf /app/prowlarr/bin/prowlarr.Update /app/lidarr/bin/fpcalc"
 
 PICTURE="./images/$APP.png"
 APPFOLDER="./$FOLDER/$APP"
-PORT="EXPOSE 9696"
 VOLUMEN="VOLUME /config"
 
 ### RELEASE SETTINGS ###
@@ -68,7 +67,6 @@ LABEL org.opencontainers.image.source="'"https://github.com/dockserver/container
 
 ARG TARGETPLATFORM
 ARG BUILDPLATFORM
-
 ARG VERSION="'"${NEWVERSION}"'"
 ARG BRANCH="'"${APPBRANCH}"'"
 
@@ -85,8 +83,6 @@ RUN \
     '"${CLEANUP}"'
 
 COPY --chown=abc '"${APPFOLDER}"'/root/ /
-
-'"${PORT}"'
 
 '"${VOLUMEN}"'
 ##EOF' > ./$FOLDER/$APP/Dockerfile
