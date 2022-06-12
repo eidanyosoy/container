@@ -15,31 +15,24 @@
 </p>
 
 ---
+> **Note**:
+> All Dockefiles are automatically generated 
 
-All Dockefiles are automatically generated 
+> **Note**:
+> Do not try to change anything live on the repository
 
-Do not try to change anything live on the repository
-
-All changes are made from our own CI Pipline ( unpublic ) 
+> **Note**:
+> All changes are made from our own CI Pipline ( unpublic ) 
 
 ---
 
-We are out of the dev version.
+> **Info**:
+> All Containers can be used without breaking.
+> You can use all with dockserver
 
-All Containers can be used without breaking.
-
-You can use all with dockserver
-
-Don't use the images / dockers on other projects
-This should not work for you.
-
---- 
-
-## Before open a feature request/ pull_request or issues
-
-1. We don't accept pull_request for other projects.
-1. We don't accept any changes what breaks dockserver.
-1. We don't give any help for other projects to run this dockers.
+> **Warning**:
+> Don't use the images / dockers on other projects
+> This should not work for you.
 
 ---
 
@@ -59,21 +52,11 @@ More and more dockers will use **alpine** as base image
 
 ## What that's all ?!
 
-Nope... we have build our own CI/CD PIPLINE 
+Nope... we have build our own **CI/CD PIPLINE**
 
 It's runs inside of a isolated Container environment 
 
-Specs :
-
-(( SELF HOSTED ))
-
-I9-9900k
-
-64GB RAM
-
-1 DATACENTER NVME 512GB
-
-*( isolated docker based github runner )
+*(isolated **docker-based** github runner)*
 
 ---
 
@@ -92,13 +75,15 @@ We provide as next some hidden scripts to build
 
 the docker images based of a json / shell file 
 
-(( runs since 4 weeks now )) 
-
 Also we have added a new layer for check of any breaches.
+
+
 
 Next what is also added :
 
 one dependencies script to pull the latest versions of every dependencies what is used inside of the docker
+
+----
 
 ## push to public ?!  And show the code ??
 
