@@ -23,10 +23,7 @@ TOKEN=$4
 
 APPBRANCH="master"
 APPLINK="https://api.github.com/repos/jellyfin/jellyfin"
-NEWVERSION=$(
-curl -sX GET https://repo.jellyfin.org/ubuntu/dists/focal/main/binary-amd64/Packages | grep -A 8 -m 1 'Package: jellyfin-server' | awk -F ': ' '/Version/{print $2;exit}'
-
-)
+NEWVERSION=$(curl -sX GET https://repo.jellyfin.org/ubuntu/dists/focal/main/binary-amd64/Packages | grep -A 8 -m 1 'Package: jellyfin-server' | awk -F ': ' '/Version/{print $2;exit}')
 NEWVERSION="${NEWVERSION#*v}"
 NEWVERSION="${NEWVERSION#*release-}"
 NEWVERSION="${NEWVERSION}"
@@ -136,6 +133,5 @@ RUN \
 
 COPY --chown=abc '"${APPFOLDER}"'/root/ /
 
-'"${PORT}"'
 '"${VOLUMEN}"'
 ##EOF' > ./$FOLDER/$APP/Dockerfile
