@@ -24,16 +24,13 @@ ARG BUILDPLATFORM
 
 ARG VERSION="3.0.8.1536"
 ARG BRANCH="develop"
-
 ENV XDG_CONFIG_HOME="/config/xdg"
 
 RUN \
   echo "**** install build packages ****" && \
-    apk add -U --update --no-cache \
-    --repository http://dl-cdn.alpinelinux.org/alpine/edge/main jq ffmpeg openssl curl wget tar mediainfo sqlite-libs tinyxml2 && \
+    apk add -U --update --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/main jq ffmpeg openssl curl wget tar mediainfo sqlite-libs tinyxml2 && \
   echo "**** install app packages ****" && \
-    apk add -U --update --no-cache \
-    --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing mono && \
+    apk add -U --update --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing mono && \
   echo "**** install 'docker-sonarr-nightly' ****" && \
     mkdir -p /app/sonarr/bin && \
     curl -fsSL "https://download.sonarr.tv/v3/${BRANCH}/${VERSION}/Sonarr.${BRANCH}.${VERSION}.linux.tar.gz" | tar xzf - -C /app/sonarr/bin --strip-components=1 && \
@@ -43,8 +40,5 @@ RUN \
     rm -rf /app/sonarr/bin/Sonarr.Update
 
 COPY --chown=abc ./apps/docker-sonarr/root/ /
-
-EXPOSE 8989
-
 VOLUME /config
 ##EOF
