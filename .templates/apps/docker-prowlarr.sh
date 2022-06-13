@@ -83,6 +83,6 @@ RUN \
     '"${CLEANUP}"'
 
 COPY --chown=abc '"${APPFOLDER}"'/root/ /
-
+EXPOSE 9696
 '"${VOLUMEN}"'
 ##EOF' > ./$FOLDER/$APP/Dockerfile
