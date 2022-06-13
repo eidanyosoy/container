@@ -37,6 +37,6 @@ RUN \
     rm -rf /app/prowlarr/bin/prowlarr.Update /app/lidarr/bin/fpcalc
 
 COPY --chown=abc ./apps/docker-prowlarr/root/ /
-
+EXPOSE 9696
 VOLUME /config
 ##EOF
