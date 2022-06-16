@@ -22,7 +22,7 @@ LABEL org.opencontainers.image.source="https://github.com/dockserver/container"
 ARG TARGETPLATFORM
 ARG BUILDPLATFORM
 
-ARG VERSION="4.4.3.1-r1"
+ARG VERSION="4.4.3.1-r2"
 ARG QBT_VERSION="1.7"
 ARG BRANCH="master"
 
@@ -35,7 +35,7 @@ RUN \
     apk --quiet --no-cache --no-progress update && \
     apk --quiet --no-cache --no-progress upgrade && \
   echo "**** install packages ****" && \
-    apk add -U --update --no-cache bash jq tar curl icu-libs libstdc++ openssl p7zip python3 make g++ gcc qbittorrent-nox==4.4.3.1-r1 && \
+    apk add -U --update --no-cache bash jq tar curl icu-libs libstdc++ openssl p7zip python3 make g++ gcc qbittorrent-nox==4.4.3.1-r2 && \
   echo "**** symlink python3 for compatibility ****" && \
     ln -s /usr/bin/python3 /usr/bin/python && \
   echo "**** install 'docker-qbittorrent' ****" && \
