@@ -44,7 +44,7 @@ RUN \
       echo "**** install runtime packages ****" && \
          apt-get update -yqq && \
       echo "**** install Intel packages ****" && \
-         apt-get install --no-install-recommends -yqq intel-opencl-icd intel-gpu-tools i965-va-driver-shaders va-driver-all mesa-vulkan-drivers gpg-agent libmfx1 ocl-icd-libopencl1; \
+         apt-get install -yqq intel-opencl-icd intel-gpu-tools i965-va-driver-shaders va-driver-all mesa-vulkan-drivers gpg-agent libmfx1 ocl-icd-libopencl1; \
     ;; \
     'linux/arm64') export ARCH=arm64 && unset NVIDIA_DRIVER_CAPABILITIES ;; \
    esac \
@@ -52,7 +52,7 @@ RUN \
    echo "**** install runtime packages ****" && \
      apt-get update -yqq && \
    echo "**** install packages ****" && \
-     apt-get install --no-install-recommends -yqq aria2 uuid-runtime udev jq wget curl unzip unrar gpg-agent software-properties-common && \
+     apt-get install -yqq aria2 uuid-runtime udev jq wget curl unzip unrar gpg-agent software-properties-common && \
    echo "**** install plex ****" && \
      aria2c -d /tmp -o plex.deb "https://downloads.plex.tv/plex-media-server-new/${VERSION}/debian/plexmediaserver_${VERSION}_${ARCH}.deb" && \
      dpkg -i --force-confold /tmp/plex.deb && \
