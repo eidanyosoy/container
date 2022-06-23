@@ -35,7 +35,7 @@ BASEIMAGE="ghcr.io/linuxserver/baseimage-ubuntu:jammy"
 
 PLEX_DOWNLOAD="https://downloads.plex.tv/plex-media-server-new"
 
-INSTCOMMAND="apt-get install --no-install-recommends -yqq"
+INSTCOMMAND="apt-get install -yqq"
 UPTCOMMAND="apt-get update -yqq"
 PACKAGES="aria2 uuid-runtime udev jq wget curl unzip unrar gpg-agent software-properties-common"
 PACKAGESINTEL="intel-opencl-icd intel-gpu-tools i965-va-driver-shaders va-driver-all mesa-vulkan-drivers gpg-agent libmfx1 ocl-icd-libopencl1"
