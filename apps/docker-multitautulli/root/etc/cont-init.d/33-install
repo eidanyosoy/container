@@ -1,7 +1,7 @@
 #!/usr/bin/with-contenv bash
  echo "**** install packages ****" && \
    apk add --update --no-cache \
-       g++ gcc make py3-pip python3-dev
+       g++ gcc make py3-pip python3-dev \
        curl jq py3-openssl py3-setuptools \
        python3 py-tz py-dateutil bash \
        gcc musl-dev libxslt-dev libxml2-dev py3-virtualenv \
