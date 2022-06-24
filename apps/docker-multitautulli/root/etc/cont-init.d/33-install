@@ -8,7 +8,7 @@
        coreutils curl git openssl tar tzdata vnstat wget 
 
   echo "**** install pip packages || part 1 ****" && \
-  pip3 install --no-cache-dir -U \
+  pip3 install --no-cache-dir \
   plexapi \
   pycryptodomex \
   pytz \
@@ -76,6 +76,6 @@
   pyopenssl
 
  echo "**** install pip & pip3 packages ****" && \
-    python3 -m pip install virtualenv
+    pip install virtualenv
     python3 -m venv /app/tautulli
     source /app/tautulli/bin/activate
