@@ -30,13 +30,8 @@ RUN \
    echo "**** update packages ****" && \
      apk --quiet --no-cache --no-progress update && \
      apk --quiet --no-cache --no-progress upgrade && \
-   echo "**** install virtual packages ****" && \
-     apk add -U --update --no-cache --virtual=build-dependencies g++ gcc make py3-pip python3-dev && \
    echo "**** install build packages ****" && \
-     apk add -U --update --no-cache curl tar jq py3-openssl py3-setuptools python3 git && \
-   echo "**** install pip packages ****" && \
-     python3 -m pip install --upgrade pip && \
-     pip3 install --no-cache-dir -U mock tzlocal plexapi cherrypy pycryptodomex && \
+     apk add -U --update --no-cache curl tar jq && \
    echo "**** install app ****" && \
      mkdir -p /app/tautulli && \
      curl -fsSL "https://github.com/zSeriesGuy/Tautulli/archive/v${VERSION}.tar.gz" | tar xzf - -C /app/tautulli --strip-components=1 && \
