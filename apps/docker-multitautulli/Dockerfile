@@ -27,11 +27,11 @@ ARG BRANCH="master"
 ENV TAUTULLI_DOCKER=True
 
 RUN \
-   echo "**** update packages ****" && \
-     apk --quiet --no-cache --no-progress update && \
-     apk --quiet --no-cache --no-progress upgrade && \
    echo "**** install build packages ****" && \
-     apk add -U --update --no-cache curl tar jq && \
+     apk add --no-cache --no-cache curl tar jq && \
+     apk add --no-cache python3 py3-lxml py3-openssl py3-setuptools && \
+     apk add --no-cache --virtual=build-dependencies py3-pip make gcc g++ python3-dev && \
+     pip3 install --no-cache-dir --upgrade plexapi pycryptodomex && \
    echo "**** install app ****" && \
      mkdir -p /app/tautulli && \
      curl -fsSL "https://github.com/zSeriesGuy/Tautulli/archive/v${VERSION}.tar.gz" | tar xzf - -C /app/tautulli --strip-components=1 && \
