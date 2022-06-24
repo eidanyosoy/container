@@ -39,8 +39,10 @@ PICTURE="./images/$APP.png"
 UPCOMMAND="apk --quiet --no-cache --no-progress update && \\
      apk --quiet --no-cache --no-progress upgrade"
 
-INSTCOMMAND="apk add -U --update --no-cache"
-PACKAGES="curl tar jq"
+INSTCOMMAND="apk add --no-cache --no-cache curl tar jq && \\
+     apk add --no-cache python3 py3-lxml py3-openssl py3-setuptools && \\
+     apk add --no-cache --virtual=build-dependencies py3-pip make gcc g++ python3-dev && \\
+     pip3 install --no-cache-dir --upgrade plexapi pycryptodomex"
 
 CLEANUP="apk del --purge build-dependencies && \\
      apk del --quiet --clean-protected --no-progress && \\
@@ -83,10 +85,8 @@ ARG BRANCH="'"${APPBRANCH}"'"
 ENV TAUTULLI_DOCKER=True
 
 RUN \
-   echo "'"**** update packages ****"'" && \
-     '"${UPCOMMAND}"' && \
    echo "'"**** install build packages ****"'" && \
-     '"${INSTCOMMAND}"' '"${PACKAGES}"' && \
+     '"${INSTCOMMAND}"' && \
    echo "'"**** install app ****"'" && \
      mkdir -p /app/tautulli && \
      curl -fsSL "'"https://github.com/zSeriesGuy/Tautulli/archive/v"'${VERSION}'".tar.gz"'" | tar xzf - -C /app/tautulli --strip-components=1 && \
