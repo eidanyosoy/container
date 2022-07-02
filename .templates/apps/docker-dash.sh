@@ -32,7 +32,7 @@ BASENEWVERSION="${BASENEWVERSION}"
 APPBRANCH="main"
 
 APPLINK="https://api.github.com/repos/MauriceNino/dashdot"
-NEWVERSION=$(curl -sX GET "https://api.github.com/repos/MauriceNino/dashdot/releases/latest" | jq --raw-output '.tag_name'
+NEWVERSION=$(curl -sX GET "https://api.github.com/repos/MauriceNino/dashdot/releases/latest" | jq --raw-output '.tag_name')
 
 NEWVERSION="${NEWVERSION#*v}"
 NEWVERSION="${NEWVERSION#*release-}"
