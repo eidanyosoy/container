@@ -16,22 +16,8 @@
 #####################################
 # shellcheck disable=SC2086
 # shellcheck disable=SC2046
-FROM alpine:3.16.0 as buildstage
+FROM mauricenino/dashdot
 LABEL org.opencontainers.image.source="https://github.com/dockserver/container"
-
-ARG TARGETPLATFORM
-ARG BUILDPLATFORM
-
-RUN \
-  echo "**** install build packages ****" && \
-    apk add -U --update --no-cache git bash ca-certificates shadow && \
-    mkdir -p /app && \
-    git clone --quiet https://github.com/MauriceNino/dashdot.git /app && \
-    rm -rf /app/*.md /app/_doc /app/Dockerfile /app/docker-compose.yml
-
-FROM node:16-alpine3.15
-
-COPY --from=buildstage /app /app
 
 ENV DASHDOT_OS_WIDGET_ENABLE="true" \
     DASHDOT_CPU_WIDGET_ENABLE="true" \
@@ -40,14 +26,6 @@ ENV DASHDOT_OS_WIDGET_ENABLE="true" \
     DASHDOT_RAM_WIDGET_ENABLE="true" \
     DASHDOT_RAM_POLL_INTERVAL="1000" \
     DASHDOT_STORAGE_WIDGET_ENABLE="true"
-
-WORKDIR /app
-
-RUN \
-  echo "**** install final packages ****" && \
-    apk add -U --update --no-cache ca-certificates dmidecode util-linux lsblk && \
-    mkdir -p /app && \
-    yarn --frozen-lockfile && yarn build
 
 CMD ["yarn", "start"]
 ##EOF
