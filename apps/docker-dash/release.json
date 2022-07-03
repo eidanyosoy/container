@@ -2,10 +2,10 @@
    "appname": "docker-dash",
    "apppic": "",
    "appfolder": "./apps/docker-dash",
-   "newversion": "3.9.7",
+   "newversion": "3.9.8",
    "baseimage": "alpine",
    "baseversion": "3.16.0",
    "description": "A simple, modern server dashboard, primarily used by smaller private servers",
-   "body": "Upgrading docker-dash to 3.9.7",
+   "body": "Upgrading docker-dash to 3.9.8",
    "user": "dockserver-image[bot]"
 }
