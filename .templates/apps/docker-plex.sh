@@ -23,14 +23,25 @@ TOKEN=$4
 
 APPBRANCH="master"
 APPLINK="https://plex.tv"
-NEWVERSION=$(curl -sX GET "https://plex.tv/api/downloads/5.json" | jq -r '.computer.Linux.version')
+##NEWVERSION=$(curl -sX GET "https://plex.tv/api/downloads/5.json" | jq -r '.computer.Linux.version')
+
+## GET PLEX PASS VERSION ##
+rm -rf plex-media-server-plexpass
+git clone --quiet --depth=1 https://aur.archlinux.org/plex-media-server-plexpass.git
+
+NEWVERSION="$(grep -oP "(?<=pkgver=).*" ./plex-media-server-plexpass/PKGBUILD)"
+NEWVERSION="${NEWVERSION}-$(grep -oP "(?<=_pkgsum=).*" ./plex-media-server-plexpass/PKGBUILD)"
 NEWVERSION="${NEWVERSION#*v}"
 NEWVERSION="${NEWVERSION#*release-}"
 NEWVERSION="${NEWVERSION}"
 
+rm -rf plex-media-server-plexpass
+
+## PASS END
+
 HEADLINE="$(cat ./.templates/headline.txt)"
 
-DESCRIPTION="Docker Container for Plex Media Server"
+DESCRIPTION="Docker Container for Plex Media Server || PLEX PASS"
 BASEIMAGE="ghcr.io/linuxserver/baseimage-ubuntu:jammy"
 
 PLEX_DOWNLOAD="https://downloads.plex.tv/plex-media-server-new"
