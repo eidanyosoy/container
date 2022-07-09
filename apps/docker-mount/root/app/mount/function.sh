@@ -189,13 +189,16 @@ function lang() {
    currenttime=$(date +%H:%M)
 
    if [[ ! -d "/app/language" ]]; then
+      $(which git) config --global --add safe.directory /app/language
       $(which git) -C /app clone --quiet https://github.com/dockserver/language.git
    fi
    if [[ "$currenttime" > "23:59" ]] || [[ "$currenttime" < "00:01" ]]; then
       if [[ -d "/app/language" ]]; then
+         $(which git) config --global --add safe.directory /app/language
          $(which git) -C "${LFOLDER}/" stash --quiet
          $(which git) -C "${LFOLDER}/" pull --quiet
-         cd "${LFOLDER}/" && $(which git) stash clear
+         $(which cd) "${LFOLDER}/"
+         $(which git) stash clear
       fi
    fi
 
