@@ -233,11 +233,31 @@ done
 function rcmount() {
 
 if test -f "/tmp/rclone.sh"; then $(which rm) -f /tmp/rclone.sh; fi
+if test -f "/tmp/rclonerc.sh"; then $(which rm) -f /tmp/rclonerc.sh; fi
 
 source /system/mount/mount.env
 
 export MLOG=/system/mount/logs/rclone-union.log \
 CONFIG=/app/rclone/rclone.conf
+
+cat > /tmp/rclonerc.sh << EOF; $(echo)
+#!/command/with-contenv bash
+# shellcheck shell=bash
+# auto generated
+
+## minimal rcd with rclone gui
+$(which rclone) rcd \\
+--rc-user=${RC_USER} \\
+--rc-pass=${RC_PASSWORD}
+--config=${CONFIG} \\
+--rc-web-gui \\
+--rc-realm=dockserver \\
+--rc-web-gui-no-open-browser \\
+--rc-addr :5572 &
+###
+EOF
+
+## SPLIT INTO 2 PARTS FASTER RECREATE ###
 
 cat > /tmp/rclone.sh << EOF; $(echo)
 #!/command/with-contenv bash
@@ -246,15 +266,6 @@ cat > /tmp/rclone.sh << EOF; $(echo)
 
 ## remove test file
 if test -f "/tmp/rclone.running"; then rm -f /tmp/rclone.running ; fi
-
-## minimal rcd with rclone gui
-$(which rclone) rcd \\
---rc-no-auth  \\
---config=${CONFIG} \\
---rc-web-gui \\
---rc-realm=dockserver \\
---rc-web-gui-no-open-browser \\
---rc-addr "0.0.0.0:5572" &
 
 #####
 ## start rclone mount
@@ -301,8 +312,14 @@ EOF
 if test -f "/tmp/rclone.sh"; then
    $(which chmod) 755 /tmp/rclone.sh &>/dev/null
 fi
+if test -f "/tmp/rclonerc.sh"; then
+   $(which chmod) 755 /tmp/rclonerc.sh &>/dev/null
+fi
 ## EXECUTION IN BACKGROUND
 $(which chmod) 700 /tmp/screens/S-root &>/dev/null
+## RC PART
+$(which screen) -S rclonercd -dm bash -c "$(which bash) /tmp/rclonerc.sh";
+## MOUHT PART
 $(which screen) -S rclonerc -dm bash -c "$(which bash) /tmp/rclone.sh";
 
 ## WAIT FOR RUNNING
@@ -367,8 +384,11 @@ source /system/mount/mount.env
 log ">> run fs cache clear <<"
 $(which rclone) rc fscache/clear \
 --fast-list \
---rc-user=${RC_USER} --rc-pass=${RC_PASSWORD} \
---config=${CONFIG} --log-file=${CLOG} --log-level=${LOGLEVEL_RC}
+--rc-user=${RC_USER} \
+--rc-pass=${RC_PASSWORD} \
+--config=${CONFIG} \
+--log-file=${CLOG} \
+--log-level=${LOGLEVEL_RC}
 
 }
 
@@ -386,7 +406,7 @@ $(which rclone) rc core/stats \
 
 function drivecheck() {
 
-   if [ "$(ls -1p /mnt/unionfs)" ] &&  [ "$(ls -1p /mnt/remotes)" ]; then
+   if [ "$(ls -1p /mnt/unionfs)" ] && [ "$(ls -1p /mnt/remotes)" ]; then
       rcclean && refreshVFS
    fi
 
@@ -395,7 +415,8 @@ function drivecheck() {
 function testrun() {
 
 ## force a start sleeping to fetch all options 
-  rlog && sleep 5
+  rlog && \
+  sleep 10
 ## FINAL LOOP
 
 while true; do
