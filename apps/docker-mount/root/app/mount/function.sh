@@ -248,7 +248,7 @@ cat > /tmp/rclonerc.sh << EOF; $(echo)
 ## minimal rcd with rclone gui
 $(which rclone) rcd \\
 --rc-user=${RC_USER} \\
---rc-pass=${RC_PASSWORD}
+--rc-pass=${RC_PASSWORD} \\
 --config=${CONFIG} \\
 --rc-web-gui \\
 --rc-realm=dockserver \\
