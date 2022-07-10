@@ -376,7 +376,10 @@ function rckill() {
 source /system/mount/mount.env
 log ">> kill it with fire <<"
 ## GET NAME TO KILL ##
-$(which screen) -S $($(which screen) -ls | grep Detached | cut -d. -f2 | awk '{print $1}') -X quit
+for killscreen in `screen -ls | grep Detached | cut -d. -f2 | awk '{print $1}'` ; do
+    log "we kill now $killscreen" && \
+    $(which screen) -S $killscreen -X quit
+done
 folderunmount
 
 }
