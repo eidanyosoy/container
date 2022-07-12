@@ -17,39 +17,30 @@
 ######################################################
 #### INSIDE THE DOCKER
 exportorg() {
-set -x
 setorg=$(gcloud organizations list --format="value(ID)")
 export ORGANIZATIONID=$setorg
-set -x
 sleep $CYCLEDELAY
 }
 create_projects() {
-set -x
 while
   : ${start=$i}
   gcloud projects create $PROJECT$i --name=$PROJECT$i --organization=$ORGANIZATIONID && export PROJECT=$PROJECT$i && break
   (( ++i < 50 ))
 do :; done
-set -x
 sleep $CYCLEDELAY
 }
 enable_apis() {
-set -x
     gcloud config set project $PROJECT
     gcloud services enable drive.googleapis.com sheets.googleapis.com \
         admin.googleapis.com cloudresourcemanager.googleapis.com servicemanagement.googleapis.com
-set -x
 sleep $CYCLEDELAY
 }
 create_gdsas() {
-set +x
 gcloud config set project $PROJECT
 let LAST_SA_NUM=$COUNT+$NUMGDSAS-1
    for name in $(seq $COUNT $LAST_SA_NUM); do
         PROGNAME="$SANAME""$name"
-        set -x
             gcloud iam service-accounts create $PROGNAME --display-name=$PROGNAME
-        set +x
         sleep $CYCLEDELAY
     done
 sleep $CYCLEDELAY
@@ -57,16 +48,12 @@ SA_COUNT=`gcloud iam service-accounts list --format="value(EMAIL)" | sort | wc -
 let COUNT=$COUNT+$NUMGDSAS
 }
 create_keys() {
-set -x
     gcloud config set project $PROJECT
-set +x
 TOTAL_JSONS_BEF=`ls $KEYSDONE | grep "GDSA" | wc -l`
 let LAST_SA_NUM=$COUNT+$NUMGDSAS-1
 for name in $(seq $COUNT $LAST_SA_NUM); do
     PROGNAME="$SANAME""$name"
-    set -x
       gcloud iam service-accounts keys create $KEYSDONE/GDSA$name --iam-account=$PROGNAME@$PROJECT.iam.gserviceaccount.com
-    set +x
     echo "$PROGNAME@$PROJECT.iam.gserviceaccount.com" | tee -a /system/servicekeys/members.csv
     sleep $CYCLEDELAY
 done
@@ -115,37 +102,65 @@ for function in exportorg create_projects enable_apis create_gdsas create_keys c
         sleep $SECTION_DELAY
     done
 done
-rm -rf /system/servicekeys/.env
+$(which rm) -rf /system/servicekeys/.env
 }
-usage() {
-echo "####     Please define some parts in the .env file    #### "
-echo "SANAME=                             ## ${SANAME}01-100"
-echo "NUMGDSAS=                           ## how many to generate || maximum is 100"
-echo "PROGNAME=                           ## Projectname"
-echo ""
-echo "#### USER VALUES ####"
-echo ""
-echo "ACCOUNT=                            ## user email"
-echo "PROJECT=                            ## created project on google cloud "
-echo "TEAMDRIVEID=                        ## Team Drive ID"
-echo ""
-echo "If you run a encrypted drive you need to add this values"
-echo "ENCRYPT=                            ## encrypted true or false"
-echo "PASSWORD=                           ## encrypted password from rclone before"
-echo "SALT=                               ## encrypted saltpassword from rclone before"
-echo "" && sleep 30 && exit
-}
-if [[ ! -f "/system/servicekeys/.env" ]];then usage;fi
+
 ######################################################################################
 #FUNCTIONS
-source /system/servicekeys/.env
 KEYSGEN=/system/servicekeys
 KEYSDONE=/system/servicekeys/keys
-if [[ -d ${KEYSDONE} ]];then $(command -v rm) -rf ${KEYSDONE};fi
-if [[ ! -d ${KEYSGEN} ]];then $(command -v mkdir) -p ${KEYSGEN};fi
-if [[ ! -d ${KEYSDONE} ]];then $(command -v mkdir) -p ${KEYSDONE};fi
-if [[ -f "/system/servicekeys/members.csv" ]];then $(command -v rm) -rf /system/servicekeys/members.csv;fi
-if [[ -f "/system/servicekeys/rclonegdsa.conf" ]];then $(command -v rm) -rf /system/servicekeys/rclonegdsa.conf;fi
+if [[ -d ${KEYSDONE} ]];then $(which rm) -rf ${KEYSDONE};fi
+if [[ ! -d ${KEYSGEN} ]];then $(which mkdir) -p ${KEYSGEN};fi
+if [[ ! -d ${KEYSDONE} ]];then $(which mkdir) -p ${KEYSDONE};fi
+if [[ -f "/system/servicekeys/members.csv" ]];then $(which rm) -rf /system/servicekeys/members.csv;fi
+if [[ -f "/system/servicekeys/rclonegdsa.conf" ]];then $(which rm) -rf /system/servicekeys/rclonegdsa.conf;fi
+
+
+if [[ -f "/system/servicekeys/.env" ]]; then 
+   rm -rf "/system/servicekeys/.env" 
+fi
+
+
+### GENERATE  READ LAYOUT IN DOCKER ####
+
+
+
+### ECHO VALUES OR USE EXPORT  
+### EXPORT WILL BE EASIER TO RERUN IT 
+### AND DONT NEED ECHO TO FILE COMMAND 
+
+CYCLEDELAY=0.1s
+SANAME=${SANAME}
+FIRSTGDSA=1
+LASTPROJECTNUM=1
+SECTION_DELAY=2
+
+#### USER VALUES ####
+export NUMGDSAS=${NUMGDSAS}
+export PROGNAME=${PROGNAME}
+export ACCOUNT=${ACCOUNT}
+export PROJECT=${PROJECT}
+export TEAMDRIVEID=${TEAMDRIVEID}
+
+
+export ENCRYPT=${ENCRYPT}
+export PASSWORD=${PASSWORD}
+export SALT=${SALT}
+
+
+## FROM HERE RUN IT TO GENERATE IT
+### REREAD THE SOURCE FILE 
+
+## OR READ ABOVE 
+
+### END COMMAND IS 
+
+### WILL GENERATE ALL THE KEYS
+main
+
+
+
+
 CYCLEDELAY=0.1s
 SANAME=${SANAME}
 FIRSTGDSA=1
@@ -161,5 +176,5 @@ export TEAMDRIVEID=${TEAMDRIVEID}
 export ENCRYPT=${ENCRYPT}
 export PASSWORD=${PASSWORD}
 export SALT=${SALT}
-if [[ -f "/system/servicekeys/.env" ]];then main;fi
-#"
+
+
