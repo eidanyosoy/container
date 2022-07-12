@@ -149,3 +149,6 @@ if [[ -f "$KEYS_DIR/members.csv" ]]; then $(command -v rm) -rf $KEYS_DIR/members
 if [[ -f "$KEYS_DIR/.env" ]]; then main; fi
 
 #E-O-F#
+
+
+## the same way as the keygen
