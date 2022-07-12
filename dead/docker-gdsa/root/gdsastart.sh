@@ -1,7 +1,7 @@
 #!/usr/bin/with-contenv bash
 # shellcheck shell=bash
 ######################################################
-# Copyright (c) 2021, MrDoob                         #
+# Copyright (c) 2022, dockserver.io                  #
 ######################################################
 # All rights reserved.                               #
 # started from Zero                                  #
@@ -176,5 +176,12 @@ export TEAMDRIVEID=${TEAMDRIVEID}
 export ENCRYPT=${ENCRYPT}
 export PASSWORD=${PASSWORD}
 export SALT=${SALT}
+
+
+
+## TO RUN IT 
+## EASIER IS NOT POSSIBLE 
+export alias gdsagen='docker run -it -v /opt/appdata/system/servicekeys/:/system/servicekeys/ ghcr.io/dockserver/docker-gdsa:latest /bin/bash /gdsastart.sh'
+source ~/.bashrc
 
 
