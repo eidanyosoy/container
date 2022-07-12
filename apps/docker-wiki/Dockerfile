@@ -24,7 +24,7 @@ ARG BUILDPLATFORM
 
 ARG BASEVERSION="3.16.0"
 ARG APPVERSION="1.4.27"
-ARG WIKIVERSION="8.3.9"
+ARG WIKIVERSION="8.3.8"
 ARG BRANCH="master"
 
 ## BUILDSTAGE
@@ -43,7 +43,7 @@ RUN \
 
 ## FINALSTAGE
 
-FROM ghcr.io/squidfunk/mkdocs-material:8.3.9
+FROM ghcr.io/squidfunk/mkdocs-material:8.3.8
 
 COPY --from=buildstage /app/wiki /docs
 
