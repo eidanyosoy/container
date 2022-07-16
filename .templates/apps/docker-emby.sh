@@ -27,7 +27,6 @@ NEWVERSION=$(curl -u $USERNAME:TOKEN -sX GET https://api.github.com/repos/MediaB
 NEWVERSION="${NEWVERSION#*v}"
 NEWVERSION="${NEWVERSION#*release-}"
 NEWVERSION="${NEWVERSION}"
-echo $NEWVERSION
 
 HEADLINE="$(cat ./.templates/headline.txt)"
 
