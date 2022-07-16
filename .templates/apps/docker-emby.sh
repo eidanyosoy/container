@@ -23,10 +23,11 @@ TOKEN=$4
 
 APPBRANCH="master"
 APPLINK="https://github.com/MediaBrowser/Emby"
-NEWVERSION=$(curl -u $USERNAME:TOKEN -sX GET https://api.github.com/repos/MediaBrowser/Emby.Releases/releases/latest | jq --raw-output '. | .tag_name')
+NEWVERSION=$(curl -u $USERNAME:TOKEN -sX GET https://github.com/MediaBrowser/Emby.Releases/releases/latest | jq --raw-output '. | .tag_name')
 NEWVERSION="${NEWVERSION#*v}"
 NEWVERSION="${NEWVERSION#*release-}"
 NEWVERSION="${NEWVERSION}"
+echo $NEWVERSION
 
 HEADLINE="$(cat ./.templates/headline.txt)"
 
@@ -97,7 +98,6 @@ LABEL org.opencontainers.image.source="'"https://github.com/dockserver/container
 
 ARG TARGETPLATFORM
 ARG BUILDPLATFORM
-
 ARG VERSION="'"${NEWVERSION}"'"
 ARG BRANCH="'"${APPBRANCH}"'"
 
