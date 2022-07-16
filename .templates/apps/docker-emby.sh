@@ -28,6 +28,14 @@ NEWVERSION="${NEWVERSION#*v}"
 NEWVERSION="${NEWVERSION#*release-}"
 NEWVERSION="${NEWVERSION}"
 
+assets=$(curl -u $USERNAME:TOKEN -sX GET "https://api.github.com/repos/MediaBrowser/Emby.Releases/releases/tags/${NEWVERSION}" | jq -r '.assets[].browser_download_url')
+if echo "$assets"  | grep -q "x86_64.rpm$"; then
+   echo "good we found it "
+else
+   echo "**** Not all artifacts are published yet, skipping trigger ****"
+   exit 0
+fi
+
 HEADLINE="$(cat ./.templates/headline.txt)"
 
 DESCRIPTION="Docker Container for Emby Server"
