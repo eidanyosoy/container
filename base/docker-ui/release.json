@@ -2,10 +2,10 @@
    "appname": "docker-ui",
    "apppic": "",
    "appfolder": "./base/docker-ui",
-   "newversion": "3.16.0",
-   "appversion": "3.16.0",
+   "newversion": "3.16.1",
+   "appversion": "3.16.1",
    "baseimage": "alpine",
    "description": " !!! DEVERLOP STATUS !!! DO NOT TRY TO PULL THE IMAGE YOU NEED ACCESS TO THE REPOSITORY",
-   "body": "Upgrading docker-ui to 3.16.0",
+   "body": "Upgrading docker-ui to 3.16.1",
    "user": "github-actions[bot]"
 }

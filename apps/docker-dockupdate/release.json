@@ -2,9 +2,9 @@
    "appname": "docker-dockupdate",
    "apppic": "./images/docker-dockupdate.png",
    "appfolder": "./apps/docker-dockupdate",
-   "newversion": "3.16.0",
+   "newversion": "3.16.1",
    "baseimage": "alpine",
    "description": "Automatically keep your docker services and your docker containers up-to-date with the latest version",
-   "body": "Upgrading docker-dockupdate to 3.16.0",
+   "body": "Upgrading docker-dockupdate to 3.16.1",
    "user": "github-actions[bot]"
 }
