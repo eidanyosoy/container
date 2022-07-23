@@ -1,0 +1,11 @@
+#!/usr/bin/with-contenv bash
+
+if [ -n "${NVIDIA_VISIBLE_DEVICES}" ]; then
+   echo "Patching nvidia..."
+   curl --url https://raw.githubusercontent.com/keylase/nvidia-patch/master/docker-entrypoint.sh -o /usr/local/bin/docker-entrypoint.sh
+   curl --url https://raw.githubusercontent.com/keylase/nvidia-patch/master/patch.sh -o /usr/local/bin/patch.sh
+   chmod +x /usr/local/bin/docker-entrypoint.sh
+   chmod +x /usr/local/bin/patch.sh
+   /usr/local/bin/docker-entrypoint.sh
+   echo "Patched nvidia"
+fi
