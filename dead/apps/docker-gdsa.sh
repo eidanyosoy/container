@@ -50,7 +50,7 @@ echo '{
    "baseimage": "'${BASEIMAGE}'",
    "description": "'${DESCRIPTION}'",
    "body": "Upgrading '${APP}' to '${NEWVERSION}'",
-   "user": "github-actions[bot]"
+   "user": "dockserver-actions[bot]"
 }' > "./$FOLDER/$APP/release.json"
 
 
@@ -79,5 +79,5 @@ RUN \
 
 COPY '"${APPFOLDER}"'/root/ /
 
-ENTRYPOINT ["'"/bin/bash"'", "'"/movestart.sh"'"]
+ENTRYPOINT ["'"/bin/bash"'", "'"/gdsastart.sh"'"]
 ##EOF' > ./$FOLDER/$APP/Dockerfile
