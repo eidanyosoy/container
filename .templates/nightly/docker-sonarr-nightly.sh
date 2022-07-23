@@ -30,7 +30,7 @@ fi
 
 APPBRANCH="develop"
 APPLINK="https://api.github.com/repos/sonarr/sonarr"
-NEWVERSION=$(curl -sX GET "https://services.sonarr.tv/v1/download/${APPBRANCH}?version=3" | jq --raw-output '.version')
+NEWVERSION=$(curl -sX GET "http://services.sonarr.tv/v1/releases" | jq '.["v3-nightly"]' | jq -r '.version')
 NEWVERSION="${NEWVERSION#*v}"
 NEWVERSION="${NEWVERSION#*release-}"
 NEWVERSION="${NEWVERSION}"
