@@ -16,12 +16,12 @@
 #####################################
 # shellcheck disable=SC2086
 # shellcheck disable=SC2046
-FROM gcr.io/google.com/cloudsdktool/cloud-sdk:388.0.0-alpine
+FROM gcr.io/google.com/cloudsdktool/cloud-sdk:alpine
 LABEL org.opencontainers.image.source="https://github.com/dockserver/container"
 
 ARG TARGETPLATFORM
 ARG BUILDPLATFORM
-ARG VERSION="388.0.0-alpine"
+ARG VERSION="394.0.0-alpine"
 
 RUN \
   echo "**** update packages ****" && \
@@ -35,5 +35,5 @@ RUN \
 
 COPY ./apps/docker-gdsa/root/ /
 
-ENTRYPOINT ["/bin/bash", "/movestart.sh"]
+ENTRYPOINT ["/bin/bash", "/gdsastart.sh"]
 ##EOF
