@@ -23,6 +23,8 @@
    rm -rf /config/scripts/.gi*
 
 chown -R abc:abc "/config/scripts" &>/dev/null
+chown -R abc:abc "/timer/"
+chmod 755 /timer/*
 
 for i in `ls /config/scripts/`; do
     chmod a+x /config/scripts/$i &>/dev/null
