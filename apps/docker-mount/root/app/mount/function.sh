@@ -250,24 +250,23 @@ $(which rclone) mount remote: /mnt/remotes \\
 --vfs-cache-max-size=${VFS_CACHE_MAX_SIZE} \\
 --vfs-read-chunk-size-limit=${VFS_READ_CHUNK_SIZE_LIMIT} \\
 --vfs-read-chunk-size=${VFS_READ_CHUNK_SIZE} \\
---rc --rc-user=${RC_USER} --rc-pass=${RC_PASSWORD}
+--rc --rc-user=${RC_USER} --rc-pass=${RC_PASSWORD} &
 
 touch /tmp/rclone.running
 ###
 EOF
+
 ## SET PERMISSIONS 
 [[ -f "/tmp/rclone.sh" ]] && \
    $(which chmod) 755 /tmp/rclone.sh &>/dev/null
-   $(which chmod) 700 /tmp/screens/S-root &>/dev/null
-   $(which screen) -S rclonerc -dm bash -c "$(which bash) /tmp/rclone.sh";
+   $(which bash) /tmp/rclone.sh
 
-## WAIT FOR RUNNING
-for i in rclone; do
-   if ! $(which pgrep) -x "$i" > /dev/null ; then
-      sleep 5
-   else
-      break
-   fi
+while true; do
+  if [ "$(ls -1p /mnt/remotes)" ]; then
+     break
+  else 
+     sleep 5
+  fi
 done
 }
 
@@ -282,8 +281,6 @@ fi
 MGFS="allow_other,rw,async_read=true,statfs_ignore=nc,use_ino,func.getattr=newest,category.action=all,category.create=mspmfs,cache.writeback=true,cache.symlinks=true,cache.files=auto-full,dropcacheonclose=true,nonempty,minfreespace=0,fsname=mergerfs"
 ## TO RUN JUST ONCE
 if ! $(which pgrep) -x "mergerfs" > /dev/null; then
-   $(which mergerfs) -o ${MGFS} ${UFSPATH} /mnt/unionfs &>/dev/null
-else
    $(which mergerfs) -o ${MGFS} ${UFSPATH} /mnt/unionfs &>/dev/null
 fi
 }
@@ -304,9 +301,8 @@ function rckill() {
 source /system/mount/mount.env
 log ">> kill it with fire <<"
 ## GET NAME TO KILL ##
-for killscreen in `screen -ls | grep Detached | cut -d. -f2 | awk '{print $1}'` ; do
-    log "we kill now $killscreen" && \
-    $(which screen) -S $killscreen -X quit
+for killscreen in `pgrep -x rclone`; do
+    log "we kill now $killscreen" && kill -9 $killscreen
 done
 folderunmount
 }
