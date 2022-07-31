@@ -343,7 +343,7 @@ function rclonedown() {
       $(which chmod) 755 -R "${DONE}" &>/dev/null
    #### SHUTDOWN UPLOAD LOOP WHEN DRIVE SPACE IS LESS THEN SETTINGS ####
    LCT=$($(which df) --output=pcent ${DLFOLDER} | tr -dc '0-9')
-   elif [[ "${DRIVEUSEDSPACE}" =~ ^[0-9][0-9]+([.][0-9]+)?$ ]]; then
+   elif [[ "${DRIVEUSEDSPACE}" =~ '^[0-9][0-9]+([.][0-9]+)?$' ]]; then
       if [[ "${DRIVEUSEDSPACE}" -ge "${LCT}" ]]; then
          $(which rm) -rf "${CHK}" "${LOGFILE}/${FILE}.txt" "${START}/${FILE}.json" && \
          $(which chown) abc:abc -R "${DONE}/${FILE}.json" &>/dev/null && \
