@@ -15,13 +15,11 @@
 # shellcheck disable=SC2046
 while true; do
    for removenzbs in `cat /config/sabnzbd.ini | grep "nzb_backup_dir" | cut -d. -f2 |awk '{print $3}'` ; do
-      find $removenzbs -type f -name "*nzb*" -exec rm -rf \;
+      find $removenzbs -type f -name "*nzb*" -mmin +180 -exec rm -rf {} +
    done
-   sleep 30m
    for removefailed in `cat /config/sabnzbd.ini | grep "complete_dir" | cut -d. -f2 |awk '{print $3}'` ; do
-      find $removefailed -type d -name "*_FAILED*" -exec rm -rf \;
+      find $removefailed -type d -name "*_FAILED*" -mmin +180 -exec rm -rf {} +
    done
-   sleep 30m
    for setperms in `cat /config/sabnzbd.ini | grep "complete_dir" | cut -d. -f2 |awk '{print $3}'` ; do
       chown -cR 1000:1000 $setperms &>/dev/null
    done
