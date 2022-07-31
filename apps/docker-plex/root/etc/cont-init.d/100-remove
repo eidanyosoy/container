@@ -1,9 +1,0 @@
-#!/usr/bin/with-contenv bash
-
-# Directories
-SCRIPTS_DIR="/config/custom-cont-init.d"
-SERVICES_DIR="/config/custom-services.d"
-
-rm -rf "${SCRIPTS_DIR}"
-rm -rf "${SERVICES_DIR}"
-
