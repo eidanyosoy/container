@@ -22,13 +22,13 @@ glib-2.72.3-r0
 gmp-6.2.1-r2
 gnutls-3.7.6-r0
 graphite2-1.3.14-r1
-harfbuzz-4.4.1-r0
+harfbuzz-5.0.1-r0
 jq-1.6-r1
 lame-3.100-r0
 libacl-2.2.53-r0
 libass-0.15.2-r0
 libattr-2.5.1-r1
-libblkid-2.38-r2
+libblkid-2.38-r3
 libbsd-0.11.6-r2
 libbz2-1.0.8-r1
 libc-utils-0.7.2-r3
@@ -44,7 +44,7 @@ libintl-0.21-r0
 libjpeg-turbo-2.1.3-r1
 libmd-1.0.4-r0
 libmediainfo-21.09-r0
-libmount-2.38-r2
+libmount-2.38-r3
 libogg-1.3.5-r1
 libpciaccess-0.16-r0
 libpng-1.6.37-r1
@@ -77,7 +77,7 @@ musl-1.2.2-r7
 musl-utils-1.2.2-r7
 ncurses-libs-6.3_p20211120-r0
 ncurses-terminfo-base-6.3_p20211120-r0
-nettle-3.8-r0
+nettle-3.8.1-r0
 nghttp2-libs-1.46.0-r0
 oniguruma-6.9.7.1-r0
 openssl-1.1.1q-r0
@@ -86,7 +86,7 @@ p11-kit-0.24.1-r0
 patch-2.7.6-r7
 pcre-8.45-r2
 procps-3.3.17-r0
-python3-3.9.7-r4
+python3-3.9.13-r1
 readline-8.1.1-r0
 s6-ipcserver-2.11.0.0-r0
 scanelf-1.3.3-r0
@@ -94,7 +94,7 @@ sdl2-2.0.16-r4
 shadow-4.8.1-r1
 skalibs-2.11.0.0-r0
 soxr-0.1.3-r2
-sqlite-libs-3.39.1-r0
+sqlite-libs-3.39.2-r0
 ssl_client-1.34.1-r5
 tar-1.34-r0
 tinyxml2-9.0.0-r0
