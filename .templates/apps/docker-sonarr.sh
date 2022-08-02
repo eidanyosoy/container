@@ -30,11 +30,8 @@ NEWVERSION="${NEWVERSION}"
 
 DESCRIPTION="$(curl -u $USERNAME:$TOKEN -sX GET "$APPLINK" | jq -r '.description')"
 
-
 PICTURE="./images/$APP.png"
 APPFOLDER="./$FOLDER/$APP"
-PORT="EXPOSE 8989"
-VOLUMEN="VOLUME /config"
 
 ### RELEASE SETTINGS ###
 
