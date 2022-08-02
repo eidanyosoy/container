@@ -31,10 +31,7 @@ fi
 APPBRANCH="nightly"
 APPLINK="https://api.github.com/repos/radarr/radarr"
 NEWVERSION=$(curl -u $USERNAME:TOKEN -sX GET https://api.github.com/repos/linuxserver/docker-radarr/releases | jq -r 'first(.[] | select(.prerelease==true )) | .tag_name')
-NEWVERSION="${NEWVERSION#*v}"
-NEWVERSION="${NEWVERSION#*release-}"
 NEWVERSION="${NEWVERSION}"
-
 DESCRIPTION="$(curl -u $USERNAME:$TOKEN -sX GET "$APPLINK" | jq -r '.description')"
 PICTURE="./images/$APP.png"
 APPFOLDER="./$FOLDERNIGHTLY/$APPNIGHTLY"
