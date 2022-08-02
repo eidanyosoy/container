@@ -31,10 +31,7 @@ fi
 APPBRANCH="develop"
 APPLINK="https://api.github.com/repos/sonarr/sonarr"
 NEWVERSION=$(curl -u $USERNAME:TOKEN -sX GET https://api.github.com/repos/linuxserver/docker-sonarr/releases | jq -r 'first(.[] | select(.prerelease==true )) | .tag_name')
-NEWVERSION="${NEWVERSION#*v}"
-NEWVERSION="${NEWVERSION#*release-}"
 NEWVERSION="${NEWVERSION}"
-
 DESCRIPTION="$(curl -u $USERNAME:$TOKEN -sX GET "$APPLINK" | jq -r '.description')"
 
 PICTURE="./images/$APP.png"
