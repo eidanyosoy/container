@@ -24,12 +24,11 @@ TOKEN=$4
 APPBRANCH="master"
 APPLINK="https://api.github.com/repos/radarr/radarr"
 NEWVERSION=$(curl -u $USERNAME:$TOKEN -sX GET "https://api.github.com/repos/linuxserver/docker-radarr/releases/latest" | jq --raw-output '.tag_name')
-NEWVERSION="${NEWVERSION#*v}"
-NEWVERSION="${NEWVERSION#*release-}"
 NEWVERSION="${NEWVERSION}"
 
 DESCRIPTION="$(curl -u $USERNAME:$TOKEN -sX GET "$APPLINK" | jq -r '.description')"
 
+PICTURE="./images/$APP.png"
 APPFOLDER="./$FOLDER/$APP"
 ### RELEASE SETTINGS ###
 
