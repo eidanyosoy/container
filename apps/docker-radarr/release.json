@@ -1,6 +1,6 @@
 {
    "appname": "docker-radarr",
-   "apppic": "",
+   "apppic": "./images/docker-radarr.png",
    "appfolder": "./apps/docker-radarr",
    "newversion": "4.1.0.6175-ls148",
    "appbranch": "master",
