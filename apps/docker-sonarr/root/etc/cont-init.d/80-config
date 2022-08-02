@@ -1,0 +1,15 @@
+#!/usr/bin/with-contenv bash
+
+MAP=$(ls -1p /app/ | grep '/$' | $(command -v sed) 's/\/$//')
+
+[[ -e /config/$MAP.pid ]] && \
+    rm -rf /config/$MAP.pid
+
+[[ -d /config/custom-cont-init.d ]] && \
+  rm -rf /config/custom-cont-init.d
+
+[[ -d /config/custom-services.d ]] && \
+  rm -rf /config/custom-services.d
+
+# permissions
+chown -R abc:abc /app/sonarr/bin
