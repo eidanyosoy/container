@@ -24,8 +24,6 @@ TOKEN=$4
 APPBRANCH="main"
 APPLINK="https://api.github.com/repos/sonarr/sonarr"
 NEWVERSION=$(curl -u $USERNAME:$TOKEN -sX GET "https://api.github.com/repos/linuxserver/docker-sonarr/releases/latest" | jq --raw-output '.tag_name')
-NEWVERSION="${NEWVERSION#*v}"
-NEWVERSION="${NEWVERSION#*release-}"
 NEWVERSION="${NEWVERSION}"
 
 DESCRIPTION="$(curl -u $USERNAME:$TOKEN -sX GET "$APPLINK" | jq -r '.description')"
