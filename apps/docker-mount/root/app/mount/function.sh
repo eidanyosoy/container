@@ -199,12 +199,10 @@ done
 }
 
 function rcwebui() {
-
+## try as one command
 export ECLOG=/system/mount/logs/rclone-webui.log
-
 [[ -f "${ECLOG}" ]] && $(which rm) -rf "${ECLOG}"
 [[ ! -f "${ECLOG}" ]] && $(which touch) "${ECLOG}"
-
 cat > /tmp/rclonewebui.sh << EOF; $(echo)
 #!/command/with-contenv bash
 # shellcheck shell=bash
@@ -287,8 +285,15 @@ $(which rclone) mount remote: /mnt/remotes \\
 --vfs-cache-max-size=${VFS_CACHE_MAX_SIZE} \\
 --vfs-read-chunk-size=${VFS_READ_CHUNK_SIZE} \\
 --vfs-read-chunk-size-limit=${VFS_READ_CHUNK_SIZE_LIMIT} \\
---rc --rc-addr=0.0.0.0:5573 --rc-no-auth &
-
+--rcd \\
+--rc-no-auth \\
+--rc-files=/mnt \\
+--rc-addr=0.0.0.0:8544 \\
+--rc-allow-origin=* \\
+--rc-web-gui \\
+--rc-web-gui-force-update \\
+--rc-web-gui-no-open-browser \\
+--rc-web-fetch-url=https://api.github.com/repos/controlol/rclone-webui/releases/latest
 touch /tmp/rclone.running
 echo $(date) > /tmp/rclone.running###
 EOF
@@ -330,9 +335,9 @@ for fod in /mnt/remotes/* ;do
     FOLDER="$(basename -- $fod)"
     IFS=- read -r <<< "$ACT"
       log " VFS refreshing : $FOLDER"
-      $(which rclone) rc vfs/forget dir=$FOLDER --fast-list --rc-addr=0.0.0.0:5573 _async=true
+      $(which rclone) rc vfs/forget dir=$FOLDER --fast-list --rc-addr=0.0.0.0:8544 _async=true
       $(which sleep) 1
-      $(which rclone) rc vfs/refresh dir=$FOLDER --fast-list --rc-addr=0.0.0.0:5573 _async=true
+      $(which rclone) rc vfs/refresh dir=$FOLDER --fast-list --rc-addr=0.0.0.0:8544 _async=true
 done  
 }
 
@@ -349,7 +354,7 @@ folderunmount
 function rcclean() {
 source /system/mount/mount.env
 log ">> run fs cache clear <<"
-$(which rclone) rc fscache/clear --fast-list --rc-addr=0.0.0.0:5573 _async=true
+$(which rclone) rc fscache/clear --fast-list --rc-addr=0.0.0.0:8544 _async=true
 }
 
 function rcstats() {
