@@ -194,11 +194,13 @@ done
 }
 
 function rcmount() {
-[[ -f "/tmp/rclone.sh" ]] && $(which rm) -f /tmp/*
+[[ -f "/tmp/rclone.sh" ]] && $(which rm) -rf /tmp/*.sh
 source /system/mount/mount.env
 export MLOG=/system/mount/logs/rclone-union.log
 export ECLOG=/system/mount/logs/rclone-webui.log
 [[ -f "${ECLOG}" ]] && $(which rm) -rf "${ECLOG}"
+
+$(which cp) -r "$ENVA" "$TMPENV"
 
 CONFIG=/app/rclone/rclone.conf
 
