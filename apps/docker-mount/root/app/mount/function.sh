@@ -103,10 +103,7 @@ else
    $(which cp) -r /app/rclone/rclone.conf /root/.config/rclone/ && sleep 5 || exit 1
    log "-->> Next possible ServiceKey is ${KEY} "
    if [[ -f "/tmp/rclone.sh" ]]; then
-      $(which screen) -S rclonerc -X quit
-      $(which fusermount) -uzq /mnt/unionfs
-      $(which chmod) 755 /tmp/rclone.sh &>/dev/null
-      $(which screen) -S rclonerc -dm bash -c "$(which bash) /tmp/rclone.sh";
+      rckill && rcclean && rcmount
    else
       rcmount
    fi
