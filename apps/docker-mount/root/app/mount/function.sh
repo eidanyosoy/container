@@ -233,7 +233,11 @@ EOF
 function rcmount() {
 [[ -f "/tmp/rclone.sh" ]] && $(which rm) -f /tmp/rclone.sh
 source /system/mount/mount.env
-export MLOG=/system/mount/logs/rclone-union.log \
+export MLOG=/system/mount/logs/rclone-union.log
+export ECLOG=/system/mount/logs/rclone-webui.log
+[[ -f "${ECLOG}" ]] && $(which rm) -rf "${ECLOG}"
+[[ ! -f "${ECLOG}" ]] && $(which touch) "${ECLOG}"
+
 CONFIG=/app/rclone/rclone.conf
 
 if [[ "$(ls -1p /mnt/remotes)" ]] ; then
@@ -262,13 +266,31 @@ $(which rclone) rcd \\
   --user-agent=${UAGENT} \\
   --cache-dir=${TMPRCLONE} \\
   --rc-files=/mnt \\
+  --uid=${PUID} \\
+  --gid=${PGID} \\
+  --umask=${UMASK} \\
+  --drive-pacer-min-sleep=10ms \\
+  --drive-pacer-burst=1000 \\
+  --drive-use-trash=${DRIVETRASH} \\
+  --drive-stop-on-upload-limit \\
+  --drive-server-side-across-configs \\
+  --drive-chunk-size=${DRIVE_CHUNK_SIZE} \\
+  --buffer-size=${BUFFER_SIZE} \\
+  --dir-cache-time=${DIR_CACHE_TIME} \\
+  --cache-info-age=${CACHE_INFO_AGE} \\
+  --vfs-fast-fingerprint \\
+  --vfs-cache-poll-interval=${VFS_CACHE_POLL_INTERVAL} \\
+  --vfs-cache-mode=${VFS_CACHE_MODE} \\
+  --vfs-cache-max-age=${VFS_CACHE_MAX_AGE} \\
+  --vfs-cache-max-size=${VFS_CACHE_MAX_SIZE} \\
+  --vfs-read-chunk-size=${VFS_READ_CHUNK_SIZE} \\
+  --vfs-read-chunk-size-limit=${VFS_READ_CHUNK_SIZE_LIMIT} \\
   --rc-no-auth \\
   --rc-addr=0.0.0.0:8544 \\
   --rc-allow-origin=* \\
   --rc-web-gui \\
   --rc-web-gui-force-update \\
   --rc-web-gui-no-open-browser \\
-  --log-file=${ECLOG} \\
   --rc-web-fetch-url=https://api.github.com/repos/controlol/rclone-webui/releases/latest &
 
 $(which rclone) rc \\
