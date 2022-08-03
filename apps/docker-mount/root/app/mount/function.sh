@@ -214,7 +214,7 @@ exec 2>&1
 exec $(which rclone) rcd \\
   --transfers 4 \\
   --rc-no-auth \\
-  --rc-addr :8080 \\
+  --rc-addr=0.0.0.0:8544 \\
   --rc-allow-origin=* \\
   --rc-web-gui \\
   --rc-web-gui-force-update \\
@@ -237,14 +237,6 @@ source /system/mount/mount.env
 export MLOG=/system/mount/logs/rclone-union.log \
 CONFIG=/app/rclone/rclone.conf
 
-cat > /tmp/rclone.sh << EOF; $(echo)
-#!/command/with-contenv bash
-# shellcheck shell=bash
-# auto generated
-
-## remove test file
-[[ -f "/tmp/rclone.running" ]] && $(which rm) -f /tmp/rclone.running
-
 if [[ "$(ls -1p /mnt/remotes)" ]] ; then
    log " cleanup from rclone cache | please wait"
    $(which rm) -rf /mnt/rclone_cache/*
@@ -252,6 +244,14 @@ if [[ "$(ls -1p /mnt/remotes)" ]] ; then
       log " cleanup finished "
    fi
 fi
+
+cat > /tmp/rclone.sh << EOF; $(echo)
+#!/command/with-contenv bash
+# shellcheck shell=bash
+# auto generated
+
+## remove test file
+[[ -f "/tmp/rclone.running" ]] && $(which rm) -f /tmp/rclone.running
 
 $(which fusermount) -uzq /mnt/unionfs
 $(which fusermount) -uzq /mnt/remotes
@@ -287,7 +287,7 @@ $(which rclone) mount remote: /mnt/remotes \\
 --vfs-cache-max-size=${VFS_CACHE_MAX_SIZE} \\
 --vfs-read-chunk-size=${VFS_READ_CHUNK_SIZE} \\
 --vfs-read-chunk-size-limit=${VFS_READ_CHUNK_SIZE_LIMIT} \\
---rc --rc-addr :5572 --rc-no-auth --daemon
+--rc --rc-addr=0.0.0.0:5573 --rc-no-auth &
 
 touch /tmp/rclone.running
 echo $(date) > /tmp/rclone.running###
@@ -329,10 +329,10 @@ for fod in /mnt/remotes/* ;do
     basename "$fod" >/dev/null
     FOLDER="$(basename -- $fod)"
     IFS=- read -r <<< "$ACT"
-      echo $FOLDER
-      $(which rclone) rc vfs/forget dir=$FOLDER --fast-list --rc-addr 127.0.0.1:5572 _async=true
+      log " VFS refreshing : $FOLDER"
+      $(which rclone) rc vfs/forget dir=$FOLDER --fast-list --rc-addr=0.0.0.0:5573 _async=true
       $(which sleep) 1
-      $(which rclone) rc vfs/refresh dir=$FOLDER --fast-list --rc-addr 127.0.0.1:5572 _async=true
+      $(which rclone) rc vfs/refresh dir=$FOLDER --fast-list --rc-addr=0.0.0.0:5573 _async=true
 done  
 }
 
@@ -349,7 +349,7 @@ folderunmount
 function rcclean() {
 source /system/mount/mount.env
 log ">> run fs cache clear <<"
-$(which rclone) rc fscache/clear --fast-list --rc-addr 127.0.0.1:5572 _async=true
+$(which rclone) rc fscache/clear --fast-list --rc-addr=0.0.0.0:5573 _async=true
 }
 
 function rcstats() {
