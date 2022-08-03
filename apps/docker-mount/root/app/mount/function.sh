@@ -182,9 +182,7 @@ function lang() {
 function rlog() {
   SIZE=$(du /system/mount/logs/ | cut -f 1)
   ## 200MB max size of file
-  if [[ $SIZE -gt 200000 ]]; then
-     $(which truncate) -s 0 /system/mount/logs/*.log &>/dev/null
-  fi
+  if [[ $SIZE -gt 200000 ]]; then $(which truncate) -s 0 /system/mount/logs/*.log &>/dev/null ; fi
 }
 
 function folderunmount() {
@@ -198,54 +196,19 @@ for fod in /mnt/* ;do
 done
 }
 
-function rcwebui() {
-## try as one command
-export ECLOG=/system/mount/logs/rclone-webui.log
-[[ -f "${ECLOG}" ]] && $(which rm) -rf "${ECLOG}"
-[[ ! -f "${ECLOG}" ]] && $(which touch) "${ECLOG}"
-cat > /tmp/rclonewebui.sh << EOF; $(echo)
-#!/command/with-contenv bash
-# shellcheck shell=bash
-# auto generated
-## BIND PORT 8080 FOR THE UI
-exec 2>&1
-exec $(which rclone) rcd \\
-  --transfers 4 \\
-  --rc-files=/mnt \\
-  --rc-no-auth \\
-  --rc-addr=0.0.0.0:8544 \\
-  --rc-allow-origin=* \\
-  --rc-web-gui \\
-  --rc-web-gui-force-update \\
-  --rc-web-gui-no-open-browser \\
-  --log-file=${ECLOG} \\
-  --rc-web-fetch-url=https://api.github.com/repos/controlol/rclone-webui/releases/latest
-EOF
-
-## SET PERMISSIONS
-[[ -f ${ECLOG} ]] && \
-   $(which chmod) 755 ${ECLOG}
-[[ -f "/tmp/rclonewebui.sh " ]] && \
-   $(which chmod) 755 /tmp/rclonewebui.sh &>/dev/null && \
-   $(which bash) /tmp/rclonewebui.sh &
-}
-
 function rcmount() {
-[[ -f "/tmp/rclone.sh" ]] && $(which rm) -f /tmp/rclone.sh
+[[ -f "/tmp/rclone.sh" ]] && $(which rm) -f /tmp/*
 source /system/mount/mount.env
 export MLOG=/system/mount/logs/rclone-union.log
 export ECLOG=/system/mount/logs/rclone-webui.log
 [[ -f "${ECLOG}" ]] && $(which rm) -rf "${ECLOG}"
-[[ ! -f "${ECLOG}" ]] && $(which touch) "${ECLOG}"
 
 CONFIG=/app/rclone/rclone.conf
 
 if [[ "$(ls -1p /mnt/remotes)" ]] ; then
    log " cleanup from rclone cache | please wait"
    $(which rm) -rf /mnt/rclone_cache/*
-   if [ $? -gt 0 ]; then
-      log " cleanup finished "
-   fi
+   if [ $? -gt 0 ]; then log " cleanup finished " ; fi
 fi
 
 cat > /tmp/rclone.sh << EOF; $(echo)
@@ -253,16 +216,16 @@ cat > /tmp/rclone.sh << EOF; $(echo)
 # shellcheck shell=bash
 # auto generated
 
-## remove test file
+### remove test file
 [[ -f "/tmp/rclone.running" ]] && $(which rm) -f /tmp/rclone.running
 
 $(which fusermount) -uzq /mnt/unionfs
 $(which fusermount) -uzq /mnt/remotes
 
-## START WEBUI
+### START WEBUI
 $(which rclone) rcd \\
   --config=${CONFIG} \\
-  --log-file=${ECLOG} \\
+  --log-file=${MLOG} \\
   --log-level=${LOGLEVEL} \\
   --user-agent=${UAGENT} \\
   --cache-dir=${TMPRCLONE} \\
@@ -276,13 +239,7 @@ $(which rclone) rcd \\
   --rc-web-fetch-url=https://api.github.com/repos/controlol/rclone-webui/releases/latest &
 
 ## SIMPLE START MOUNT
-$(which rclone) rc \\
-   mount/mount \\
-   fs=remote: \\
-   mountPoint=/mnt/remotes \\
-   mountType=mount \\
-   vfsOpt='{"PollInterval": 15000000000,"Umask": 0,"DirCacheTime": 3600000000000000,"ChunkSize": 33554432}' mountOpt='{"AllowOther": true}'
-
+$(which rclone) rc mount/mountnfs=remote: mountPoint=/mnt/remotes mountType=mount vfsOpt='{"PollInterval": 15000000000,"Umask": 0,"DirCacheTime": 3600000000000000,"ChunkSize": 33554432}' mountOpt='{"AllowOther": true}'
 ## SET OPTIONS_RCLONE over json
 $(which rclone) rc options/set --json {'"main":{"DisableHTTP2": true, "MultiThreadStreams":5,"BufferSize":16777216}'}
 $(which rclone) rc options/set --json {'"vfs": {"CacheMode": 3, "GID": '1000', "UID": '1000', "Umask": 0, "CacheMaxAge":172800000000000, "ReadAhead":67108864, "NoModTime":true, "NoChecksum": true, "WriteBack":10000000000}'}
@@ -330,9 +287,9 @@ for fod in /mnt/remotes/* ;do
     FOLDER="$(basename -- $fod)"
     IFS=- read -r <<< "$ACT"
       log " VFS refreshing : $FOLDER"
-      $(which rclone) rc vfs/forget dir=$FOLDER --fast-list --rc-addr=0.0.0.0:8544 _async=true
+      $(which rclone) rc vfs/forget dir=$FOLDER --fast-list _async=true
       $(which sleep) 1
-      $(which rclone) rc vfs/refresh dir=$FOLDER --fast-list --rc-addr=0.0.0.0:8544 _async=true
+      $(which rclone) rc vfs/refresh dir=$FOLDER --fast-list _async=true
 done  
 }
 
@@ -340,24 +297,22 @@ function rckill() {
 source /system/mount/mount.env
 log ">> kill it with fire <<"
 ## GET NAME TO KILL ##
-for killscreen in `pgrep -x rclone`; do
-    log "we kill now $killscreen" && kill -9 $killscreen
-done
+$(which rclone) rc mount/unmountall
+
 folderunmount
 }
 
 function rcclean() {
 source /system/mount/mount.env
 log ">> run fs cache clear <<"
-$(which rclone) rc fscache/clear --fast-list --rc-addr=0.0.0.0:8544 _async=true
+$(which rclone) rc fscache/clear --fast-list _async=true
 }
 
 function rcstats() {
 # NOTE LATER
 source /system/mount/mount.env
 log ">> get rclone stats <<"
-$(which rclone) rc core/stats --config=${CONFIG}
-
+$(which rclone) rc core/stats
 }
 
 function drivecheck() {
