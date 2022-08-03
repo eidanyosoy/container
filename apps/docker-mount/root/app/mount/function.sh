@@ -284,9 +284,9 @@ $(which rclone) rc \\
    vfsOpt='{"PollInterval": 15000000000,"Umask": 0,"DirCacheTime": 3600000000000000,"ChunkSize": 33554432}' mountOpt='{"AllowOther": true}'
 
 ## SET OPTIONS_RCLONE over json
-$(which rclone) rc options/set --json {'"main": {"DisableHTTP2": true, "MultiThreadStreams":5, "BufferSize":16777216}'}
-$(which rclone) rc options/set --json {'"vfs": {"CacheMode": 3, "GID": '1000', "UID": '1000', "PollInterval": 15000000000, \"Umask\": 0, \"CacheMaxAge\":172800000000000, \"ReadAhead\":67108864, \"NoModTime\":true, \"NoChecksum\": true, \"WriteBack\":10000000000}'}
-$(which rclone) rc options/set --json {'"mount": {"AllowNonEmpty":"true", "AllowOther":"true", "AsyncRead":"true"}'}
+$(which rclone) rc options/set --json {'"main":{"DisableHTTP2": true, "MultiThreadStreams":5,"BufferSize":16777216}'}
+$(which rclone) rc options/set --json {'"vfs": {"CacheMode": 3, "GID": '1000', "UID": '1000', "Umask": 0, "CacheMaxAge":172800000000000, "ReadAhead":67108864, "NoModTime":true, "NoChecksum": true, "WriteBack":10000000000}'}
+$(which rclone) rc options/set --json {'"mount": {"AllowNonEmpty":true, "AllowOther":true, "AsyncRead":true}'}
 
 touch /tmp/rclone.running
 EOF
