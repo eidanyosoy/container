@@ -17,10 +17,13 @@ function log() {
 }
 umask 022
 
+log " -->> fixing permissions"
 chown -cR abc:abc /app /system/* &>/dev/null
 chmod -cR 755 /app /system/* &>/dev/null
+chown -cR abc:abc /mnt/* &>/dev/null
+
 log "-> Starting mounts <-"
 
-exec /app/startup.sh
+exec s6-setuidgid abc /app/startup.sh
 
 #EOF#
