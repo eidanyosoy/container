@@ -238,11 +238,11 @@ $(which rclone) rcd \\
 
 sleep 30
 ## SIMPLE START MOUNT
-$(which rclone) rc mount/mount fs=remote: mountPoint=/mnt/remotes mountType=mount vfsOpt='{"PollInterval": 15000000000,"GID": 1000, "UID": 1000,"Umask": 0,"DirCacheTime": 3600000000000000,"ChunkSize": 33554432}' mountOpt='{"AllowOther": true}'
+$(which rclone) rc mount/mount fs=remote: mountPoint=/mnt/remotes mountType=mount vfsOpt='{"PollInterval": 15000000000,"GID": 1000, "UID": 1000,"Umask": 0,"DirCacheTime": 172800000000000}"}' mountOpt='{"AllowOther": true}'
 ## SET OPTIONS_RCLONE over json
 sleep 30
-$(which rclone) rc options/set --json {'"main":{"DisableHTTP2": true, "MultiThreadStreams":5,"BufferSize":16777216}'}
-$(which rclone) rc options/set --json {'"vfs": {"CacheMode": 3, "GID": '1000', "UID": '1000', "Umask": 0, "CacheMaxAge":172800000000000, "ReadAhead":67108864, "NoModTime":true, "NoChecksum": true, "WriteBack":10000000000}'}
+$(which rclone) rc options/set --json {'"main": {"DisableHTTP2": true, "MultiThreadStreams": 5, "TPSLimitBurst": 20, "TPSLimit": 20, "BufferSize": 3217899 }'}
+$(which rclone) rc options/set --json {'"vfs": {"CacheMode": 3, "GID": '1000', "UID": '1000', "DirCacheTime": 172800000000000, "FastFingerprint": true, "ChunkSizeLimit": 3217899, "CacheMaxSize": 152777216000, "CacheMaxAge": 172800000000000, "ReadAhead": 67108864, "NoModTime": true, "NoChecksum": true, "WriteBack": 10000000000}'}
 $(which rclone) rc options/set --json {'"mount": {"AllowNonEmpty":true, "AllowOther":true, "AsyncRead":true}'}
 
 touch /tmp/rclone.running
