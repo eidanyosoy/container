@@ -19,9 +19,13 @@ function log() {
 SDOWN=/mnt/downloads
 SMOUNT=/app/mount
 SUNION=/mnt/unionfs
+APP=/app
+SYSAPP=/system/
 TMPRCLONE=${TMPRCLONE}
 LOGS=/system/mount/logs
 JSONDIR=/system/mount/keys
+JSONSET=/system/mount/.keys
+JSONUSED=/system/mount/.keys/.usedkeys
 CONFIG=/app/rclone/rclone.conf
 CSV=/system/mount/drive.csv
 ENDCONFIG=/app/rclone/rclone.conf
@@ -79,12 +83,6 @@ if [[ ${UAGENT} == 'null' ]]; then
 else
    UAGENT=${UAGENT}
 fi
-RC_PASSWORD=${RC_PASSWORD:-null}
-if [[ ${RC_PASSWORD} == 'null' ]]; then
-   RC_PASSWORD=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 8 | head -n 1)
-else
-   RC_PASSWORD=${RC_PASSWORD}
-fi
 if [[ ! -f ${rcloneenv} ]]; then
    mv ${rclonesample} ${rclonetmp}
 else
@@ -93,8 +91,7 @@ fi
 
 source ${rclonetmp}
 
-echo -e "#!/command/with-contenv bash
-#-------------------------------------------------------
+echo -e "#-------------------------------------------------------
 #   MOUNT ENVIRONMENT
 #-------------------------------------------------------
 ## USER VALUES
@@ -141,30 +138,27 @@ LANGUAGE=${LANGUAGE:-en}
 if [[ -f ${rclonetmp} ]]; then rm -f ${rclonetmp} ; fi
 
 source ${rcloneenv}
-if [[ ! -d ${TMPRCLONE} ]]; then mkdir -p "${TMPRCLONE}" && chown -hR abc:abc "${TMPRCLONE}" && chmod -R 775 "${TMPRCLONE}" ; fi
-if [[ -d ${TMPRCLONE} ]]; then fusermount -uzq ${TMPRCLONE} ; fi
-if [[ ! -d "/mnt/unionfs" ]]; then mkdir -p "${SUNION}" && chown -hR abc:abc "${SUNION}" && chmod -R 775 "${SUNION}" ; fi
-if [[ ! -d "/mnt/downloads" ]]; then mkdir -p "${SDOWN}" && chown -hR abc:abc "${SDOWN}" && chmod -R 775 "${SDOWN}" ; fi
-if [[ -d "/mnt/remotes" ]]; then fusermount -uzq /mnt/remotes; fi
+
+for folder in ${TMPRCLONE}} ${SUNION} ${SDOWN} ${SMOUNT} ${APP} ${SYSAPP} ${JSONSET}; do
+  if [[ ! -d "$folder" ]]; then
+     $(which mkdir) -p "$folder" && \
+     log "Folder not exist || create now %s" "$folder" && \
+     $(which chown) $PUID:$PUID "$folder"
+  else
+     log "Folder exist || set now permissions on $folder" && \
+     $(which chown) $PUID:$PUID "$folder"
+  fi
+done
 
 source /system/mount/mount.env
 ARRAY=$(ls -A ${JSONDIR} | wc -l)
 
 if [[ ${ARRAY} != 4 ]]; then
-   if [[ ! -d "/system/mount/.keys" ]]; then
-      mkdir -p /system/mount/.keys/ && chown -cR 1000:1000 /system/mount/.keys/
-   else
-      chown -cR 1000:1000 /system/mount/.keys/
-   fi
-   if [[ ! -f /system/mount/.keys/lastkey ]]; then FMINJS=1 ; else FMINJS=$(cat /system/mount/.keys/lastkey) ; fi
-   if `ls -A ${JSONDIR} | grep "GDSA" &>/dev/null`;then
-      export KEY=GDSA
-   elif `ls -A ${JSONDIR} | head -n1 | grep -Po '\[.*?]' | sed 's/.*\[\([^]]*\)].*/\1/' | sed '/GDSA/d'`;then
-      export KEY=""
-   else
-      log "no match found of GDSA[01=~100] or [01=~100]"
-      sleep infinity
-   fi
+   [[ ! -f ${JSONUSED} ]] && FMINJS=1
+   [[ -f ${JSONUSED} ]] && FMINJS=$(cat ${JSONUSED})
+   for f in /system/mount/keys/*; do
+       $(which mv) -f "${f}" "${f//GDSA/}" &>/dev/null
+   done
    ARRAY=$(ls -A ${JSONDIR} | egrep -c '*.json')
    MINJS=${FMINJS}
    MAXJS=${ARRAY}
@@ -173,10 +167,10 @@ if [[ ${ARRAY} != 4 ]]; then
    filter="$1"
    mapfile -t mounts < <(eval rclone listremotes --config=${CONFIG} | grep "$filter" | sed -e 's/://g' | sed '/crypt/d' | sed '/gdrive/d' | sed '/union/d' | sed '/remote/d' | sed '/GDSA/d')
    for i in ${mounts[@]}; do
-       $(which rclone) config update $i service_account_file $JSONDIR/${GDSA}$COUNT.json --config=${CONFIG}
+       $(which rclone) config update $i service_account_file $JSONDIR/$COUNT.json --config=${CONFIG}
        $(which rclone) config update $i service_account_file_path $JSONDIR --config=${CONFIG}
    done
-   echo "${COUNT}" >/system/mount/.keys/lastkey
+   echo "${COUNT}" >${JSONUSED}
 fi
 
 source /system/mount/mount.env
@@ -217,10 +211,10 @@ if [[ ${ARRAY} != 0 ]]; then
 type = drive
 scope = drive
 server_side_across_configs = true
-service_account_file = ${JSONDIR}/${GDSA}${MINJS}.json
+service_account_file = ${JSONDIR}/${MINJS}.json
 service_account_file_path = ${JSONDIR}
 team_drive = ${myArray[1]}" >>$ENDCONFIG
-         rclone lsd ${myArray[0]}: --drive-service-account-file=$JSONDIR/${GDSA}$MINJS.json --fast-list --config=$ENDCONFIG
+         rclone lsd ${myArray[0]}: --drive-service-account-file=$JSONDIR/$MINJS.json --fast-list --config=$ENDCONFIG
          if [ $? != 0 ]; then rclone config delete ${myArray[0]} --config=$ENDCONFIG ; fi
       else
          echo -e "\n
@@ -228,10 +222,10 @@ team_drive = ${myArray[1]}" >>$ENDCONFIG
 type = drive
 scope = drive
 server_side_across_configs = true
-service_account_file = ${JSONDIR}/${GDSA}${MINJS}.json
+service_account_file = ${JSONDIR}/${MINJS}.json
 service_account_file_path = ${JSONDIR}
 team_drive = ${myArray[1]}" >>$ENDCONFIG
-         rclone lsd ${myArray[0]}: --drive-service-account-file=$JSONDIR/${GDSA}$MINJS.json --fast-list --config=$ENDCONFIG
+         rclone lsd ${myArray[0]}: --drive-service-account-file=$JSONDIR/$MINJS.json --fast-list --config=$ENDCONFIG
          if [ $? != 0 ]; then
             $(which rclone) config delete ${myArray[0]} --config=$ENDCONFIG
          else
@@ -248,7 +242,7 @@ filename_encryption = standard
 directory_name_encryption = true
 password = ${ENC_PASSWORD}
 password2 = ${ENC_SALT}" >>$ENDCONFIG
-               $(which rclone) mkdir ${myArray[0]}:/encrypt --drive-service-account-file=$JSONDIR/${GDSA}$MINJS.json --config=$ENDCONFIG
+               $(which rclone) mkdir ${myArray[0]}:/encrypt --drive-service-account-file=$JSONDIR/$MINJS.json --config=$ENDCONFIG
             fi
          fi
       fi
@@ -258,29 +252,26 @@ else
    if [[ ! -f $ENDCONFIG ]]; then ln -sv $SOURCECONFIG $ENDCONFIG ; else rm -rf $ENDCONFIG && ln -sv $SOURCECONFIG $ENDCONFIG ; fi
 fi
 
-value=/tmp/rcunion.union
-if [[ -f ${value} ]]; then rm -rf ${value}; fi
-
 IFS=$'\n'
 filter="$1"
 CONFIG=/app/rclone/rclone.conf
 mapfile -t mounts < <(eval rclone listremotes --config=${CONFIG} | grep "$filter" | sed -e 's/://g' | sed '/union/d' | sed '/download/d' | sed '/remote/d' | sed '/GDSA/d')
 for i in ${mounts[@]}; do
-   echo -n "$i: " >>${value}
+    $(which echo) -n "$i: " >>/tmp/rcunion.union
 done
 
-mapfile -t mapped < <(eval cat ${value})
+IFS=$'\n'
+filter="$1"
+mapfile -t mapped < <(eval cat /tmp/rcunion.union)
 for i in ${mapped[@]}; do
-  $(which rclone) config create remote union upstreams $i action_policy 'all' create_policy 'all' search_policy 'all' cache_time 120 --config=${CONFIG}
+    $(which rclone) config create remote union upstreams $i action_policy 'all' create_policy 'all' search_policy 'all' cache_time 120 --config=${CONFIG}
 done
 
 apk add --quiet --no-progress --update coreutils
 mkdir -p /root/.config/rclone/
 mount --bind /app/rclone/ /root/.config/rclone/
 
-file1=/system/mount/mount.env
-file2=/tmp/mount.env
-rm -rf "$file2" && cp "$file1" "$file2"
+rm -rf /tmp/mount.env && cp -r /system/mount/mount.env /tmp/mount.env
 
 echo "------------------------------
     _____   _   _  __  __
@@ -300,22 +291,8 @@ We have take some code from :
   If we missed you, sorry..
 ------------------------------"
 
-chmod -cR 777 \
-   /system \
-   /app \
-   /root \
-   /etc/logrotate.d \
-   $(which rclone) \
-   $(which mergerfs) &>/dev/null
-
-chown -cR abc:abc \
-   /system \
-   /app \
-   /root \
-   /etc/logrotate.d \
-   $(which rclone) \
-   $(which mergerfs) &>/dev/null
-
+chmod -cR 777 /system /app /root /etc/logrotate.d $(which rclone) $(which mergerfs) &>/dev/null
+chown -cR $PUID:$PUID /system /app /root /etc/logrotate.d $(which rclone) $(which mergerfs) &>/dev/null
 chmod u+s $(which rclone) &>/dev/null
 chmod u+s $(which mergerfs) &>/dev/null
 #E-o-F#
