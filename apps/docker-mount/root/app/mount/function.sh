@@ -85,13 +85,13 @@ if [[ "${ARRAY}" -eq "0" ]]; then
 else
    JSONUSED=/system/mount/.keys/.usedkeys
    if [[ ! -f "${JSONUSED}" ]];then
-      ls | sed -e 's/\.json$//' | sort -u > ${JSONUSED}
+      ls ${JSONDIR} | sed -e 's/\.json$//' | sort -u > ${JSONUSED}
    fi
    $(which cat) "${JSONUSED}" | head -n 1 | while IFS=$'|' read -ra KEY ; do
       IFS=$'\n'
       filter="$1"
       log "-->> We switch the ServiceKey to ${KEY} "
-      mapfile -t mounts < <(eval rclone listremotes --config=${CONFIG} | grep "$filter" | sed -e 's/://g' | sed '/ADDITIONAL/d'  | sed '/downloads/d'  | sed '/crypt/d' | sed '/gdrive/d' | sed '/union/d' | sed '/remote/d' | sed '/GDSA/d')
+      mapfile -t mounts < <(eval rclone listremotes --config=${CONFIG} | grep "$filter" | sed -e 's/://g' | sed '/ADDITIONAL/d'  | sed '/downloads/d'  | sed '/crypt/d' | sed '/gdrive/d' | sed '/union/d' | sed '/remote/d')
       for remote in ${mounts[@]}; do
           $(which rclone) config update $remote service_account_file ${KEY}.json --config=${CONFIG}
           $(which rclone) config update $remote service_account_file_path $JSONDIR --config=${CONFIG}
