@@ -46,6 +46,8 @@ RLOG=/system/mount/logs/vfs-refresh.log
 CLOG=/system/mount/logs/vfs-clean.log
 DLOG=/tmp/discord.dead
 
+RCD="$(which rclone) rc --rc-addr=0.0.0.0:8554"
+
 #########################################
 # From here on out, you probably don't  #
 #   want to change anything unless you  #
@@ -61,7 +63,6 @@ function _echo() {
 }
 
 function checkban() {
-   RCD="$(which rclone) rc --rc-addr=0.0.0.0:8554"
    local line="$@"
    _echo "${line}"
    if echo $line | grep "userRateLimitExceeded" > /dev/null; then
@@ -83,7 +84,6 @@ function rotate() {
 
    ##Upstream=$(grep upstreams /root/.config/rclone/rclone.conf)
    ##Upstream=${UpstreamList#"upstreams = "}
-   RCD="$(which rclone) rc --rc-addr=0.0.0.0:8554"
    RemoteList=$($RCD config/dump | jq -r 'to_entries | (.[] | select(.value.type == "drive")) | .key')
       while IFS= read -r remote; do
         newServiceAccount=$($(which find) ${JSONDIR}/*.json -type f | shuf -n 1)
@@ -199,6 +199,12 @@ $(which rclone) rcd \\
   --log-level=${LOGLEVEL} \\
   --user-agent=${UAGENT} \\
   --cache-dir=${TMPRCLONE} \\
+  --human-readable \\
+  --track-renames \\
+  --track-renames-strategy modtime,leaf \\
+  --buffer-size=64M \\
+  --tpslimit-burst=20 \\
+  --tpslimit-burst-limit=20 \\
   --rc-no-auth \\
   --rc-allow-origin=* \\
   --rc-addr=0.0.0.0:8554 \\
@@ -207,19 +213,16 @@ $(which rclone) rcd \\
   --rc-web-gui-no-open-browser &
   ### \\--rc-web-fetch-url=https://api.github.com/repos/controlol/rclone-webui/releases/latest &
 
+### SET MAJOR OPTIONS FOR MOUNT : ${RCD} options/set options/set --json 
+${RCD} options/set --json {'"main": { "TPSLimitBurst": 20, "TPSLimit": 20 , "Checkers": 6, "Transfers": 6, "BufferSize":16777216, "TrackRenames":true, "TrackRenamesStrategy":"modtime,leaf", "NoUpdateModTime":true, "BufferSize": 67108864, "UserAgent": "rclone_mount", "CutoffMode":"hard", "Progress":true, "UseMmap":true, "HumanReadable":true}'}
+${RCD} options/set --json {'"vfs": { "GID": '1000', "UID": '1000', "CacheMode": 1, "Umask": 0, "DirPerms": 777, "FilePerms": 777 , "CacheMaxSize": 322122547200, "CacheMaxAge": 3600000000000, "CacheMaxSize": 322122547200, "CachePollInterval": 300000000000, "ChunkSize": 67108864, "ChunkSizeLimit": 536870912, "ReadAhead": 67108864, "NoModTime": true,"NoChecksum": true, "WriteBack": 300000000000,"CaseInsensitive": true, "ReadAhead": 2147483648}'} 
+${RCD} options/set --json {'"mount": { "AllowNonEmpty":true, "AllowOther": true, "AsyncRead":true, "WritebackCache":true}'}
+
 sleep 30
 ## SIMPLE START MOUNT
 ${RCD} mount/mount \\
-  fs=remote: mountPoint=/mnt/remotes mountType=mount \\
-    vfsOpt='{ "CacheMode": 3, "DirCacheTime": 172800000000000, "FastFingerprint": true, "ChunkSizeLimit": 3217899, "CacheMaxSize": 214748364800, "CacheMaxAge": 172800000000000, "ReadAhead": 6435798, "NoModTime": true, "NoChecksum": true, "WriteBack": 10000000000, "PollInterval": 15000000000, "GID": 1000, "UID": 1000, "Umask": 0 }' \\
-    mainOpt='{ "DisableHTTP2": true, "MultiThreadStreams": 5, "TPSLimitBurst": 20, "TPSLimit": 20, "BufferSize": 33554432 }' \\
-    mountOpt='{ "AsyncRead": true, "AllowNonEmpty": true, "AllowOther": true }'
-
-## SET OPTIONS_RCLONE over json
-#€sleep 30
-##$(which rclone) rc options/set --rc-addr=0.0.0.0:8554 --json {'"main": {"DisableHTTP2": true, "MultiThreadStreams": 5, "TPSLimitBurst": 20, "TPSLimit": 20, "BufferSize": 3217899 }'}
-##$(which rclone) rc options/set --rc-addr=0.0.0.0:8554 --json {'"vfs": {"CacheMode": 3, "GID": '1000', "UID": '1000', "DirCacheTime": 172800000000000, "FastFingerprint": true, "ChunkSizeLimit": 3217899, "CacheMaxSize": 152777216000, "CacheMaxAge": 172800000000000, "ReadAhead": 67108864, "NoModTime": true, "NoChecksum": true, "WriteBack": 10000000000}'}
-##$(which rclone) rc options/set --rc-addr=0.0.0.0:8554 --json {'"mount": {"AllowNonEmpty":true, "AllowOther":true, "AsyncRead":true}'}
+  fs=remote: mountPoint=/mnt/remotes \\
+  mountType=mount vfsOpt='{"CacheMode": 3,"DirPerms": 777,"FilePerms": 777 , "GID": 1000, "UID": 1000}' mountOpt='{"AllowOther": true}'}
 
 touch /tmp/rclone.running
 EOF
@@ -259,9 +262,9 @@ for fod in /mnt/remotes/* ;do
     FOLDER="$(basename -- $fod)"
     IFS=- read -r <<< "$ACT"
       log " VFS refreshing : $FOLDER"
-      $(which rclone) rc vfs/forget dir=$FOLDER --rc-addr=0.0.0.0:8554 --fast-list _async=true
+      $RCD vfs/forget dir=$FOLDER --fast-list _async=true -drive-pacer-burst 200 --drive-pacer-min-sleep 10ms --timeout 30m
       $(which sleep) 1
-      $(which rclone) rc vfs/refresh dir=$FOLDER --rc-addr=0.0.0.0:8554 --fast-list _async=true
+      $RCD vfs/refresh dir=$FOLDER --fast-list _async=true
 done  
 }
 
@@ -269,21 +272,21 @@ function rckill() {
 source /system/mount/mount.env
 log ">> kill it with fire <<"
 ## GET NAME TO KILL ##
-$(which rclone) rc mount/unmountall --rc-addr=0.0.0.0:8554
+$RCD mount/unmountall
 folderunmount
 }
 
 function rcclean() {
 source /system/mount/mount.env
 log ">> run fs cache clear <<"
-$(which rclone) rc fscache/clear --rc-addr=0.0.0.0:8554 --fast-list _async=true
+$RCD fscache/clear --fast-list _async=true
 }
 
 function rcstats() {
 # NOTE LATER
 source /system/mount/mount.env
 log ">> get rclone stats <<"
-$(which rclone) rc core/stats --rc-addr=0.0.0.0:8554
+$RCD core/stats
 }
 
 function drivecheck() {
