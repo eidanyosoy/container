@@ -238,7 +238,7 @@ $(which rclone) rcd \\
 
 sleep 30
 ## SIMPLE START MOUNT
-$(which rclone) rc mount/mount fs=remote: mountPoint=/mnt/remotes mountType=mount vfsOpt='{"PollInterval": 15000000000,"GID": 1000, "UID": 1000,"Umask": 0,"DirCacheTime": 172800000000000}"}' mountOpt='{"AllowOther": true}'
+$(which rclone) rc mount/mount fs=remote: mountPoint=/mnt/remotes mountType=mount vfsOpt='{"PollInterval": 15000000000,"GID": 1000, "UID": 1000,"Umask": 0,"DirCacheTime": 172800000000000}' mountOpt='{"AllowOther": true}'
 ## SET OPTIONS_RCLONE over json
 sleep 30
 $(which rclone) rc options/set --json {'"main": {"DisableHTTP2": true, "MultiThreadStreams": 5, "TPSLimitBurst": 20, "TPSLimit": 20, "BufferSize": 3217899 }'}
