@@ -228,7 +228,6 @@ $(which rclone) rcd \\
   --log-level=${LOGLEVEL} \\
   --user-agent=${UAGENT} \\
   --cache-dir=${TMPRCLONE} \\
-  --rc-files=/mnt \\
   --rc-no-auth \\
   --rc-allow-origin=* \\
   --rc-addr=0.0.0.0:8554 \\
