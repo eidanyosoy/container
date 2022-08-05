@@ -228,7 +228,8 @@ $(which rclone) rcd \\
   --log-level=${LOGLEVEL} \\
   --user-agent=${UAGENT} \\
   --cache-dir=${TMPRCLONE} \\
-  --rc-no-auth \\
+  --rc-user=rclone \\
+  --rc-pass=rclone \\
   --rc-allow-origin=* \\
   --rc-addr=0.0.0.0:8554 \\
   --rc-web-gui \\
@@ -238,12 +239,12 @@ $(which rclone) rcd \\
 
 sleep 30
 ## SIMPLE START MOUNT
-$(which rclone) rc mount/mount --rc-addr=0.0.0.0:8554 fs=remote: mountPoint=/mnt/remotes mountType=mount vfsOpt='{"PollInterval": 15000000000,"GID": 1000, "UID": 1000,"Umask": 0,"DirCacheTime": 172800000000000}' mountOpt='{"AllowOther": true}'
+$(which rclone) rc mount/mount --rc-addr=0.0.0.0:8554 --rc-user=rclone --rc-pass=rclone fs=remote: mountPoint=/mnt/remotes mountType=mount vfsOpt='{"PollInterval": 15000000000,"GID": 1000, "UID": 1000,"Umask": 0,"DirCacheTime": 172800000000000}' mountOpt='{"AllowOther": true}'
 ## SET OPTIONS_RCLONE over json
 sleep 30
-$(which rclone) rc options/set --rc-addr=0.0.0.0:8554 --json {'"main": {"DisableHTTP2": true, "MultiThreadStreams": 5, "TPSLimitBurst": 20, "TPSLimit": 20, "BufferSize": 3217899 }'}
-$(which rclone) rc options/set --rc-addr=0.0.0.0:8554 --json {'"vfs": {"CacheMode": 3, "GID": '1000', "UID": '1000', "DirCacheTime": 172800000000000, "FastFingerprint": true, "ChunkSizeLimit": 3217899, "CacheMaxSize": 152777216000, "CacheMaxAge": 172800000000000, "ReadAhead": 67108864, "NoModTime": true, "NoChecksum": true, "WriteBack": 10000000000}'}
-$(which rclone) rc options/set --rc-addr=0.0.0.0:8554 --json {'"mount": {"AllowNonEmpty":true, "AllowOther":true, "AsyncRead":true}'}
+$(which rclone) rc options/set --rc-addr=0.0.0.0:8554 --rc-user=rclone --rc-pass=rclone --json {'"main": {"DisableHTTP2": true, "MultiThreadStreams": 5, "TPSLimitBurst": 20, "TPSLimit": 20, "BufferSize": 3217899 }'}
+$(which rclone) rc options/set --rc-addr=0.0.0.0:8554 --rc-user=rclone --rc-pass=rclone --json {'"vfs": {"CacheMode": 3, "GID": '1000', "UID": '1000', "DirCacheTime": 172800000000000, "FastFingerprint": true, "ChunkSizeLimit": 3217899, "CacheMaxSize": 152777216000, "CacheMaxAge": 172800000000000, "ReadAhead": 67108864, "NoModTime": true, "NoChecksum": true, "WriteBack": 10000000000}'}
+$(which rclone) rc options/set --rc-addr=0.0.0.0:8554 --rc-user=rclone --rc-pass=rclone --json {'"mount": {"AllowNonEmpty":true, "AllowOther":true, "AsyncRead":true}'}
 
 touch /tmp/rclone.running
 EOF
@@ -287,9 +288,9 @@ for fod in /mnt/remotes/* ;do
     FOLDER="$(basename -- $fod)"
     IFS=- read -r <<< "$ACT"
       log " VFS refreshing : $FOLDER"
-      $(which rclone) rc vfs/forget dir=$FOLDER --rc-addr=0.0.0.0:8554 --fast-list _async=true
+      $(which rclone) rc vfs/forget dir=$FOLDER --rc-addr=0.0.0.0:8554 --rc-user=rclone --rc-pass=rclone --fast-list _async=true
       $(which sleep) 1
-      $(which rclone) rc vfs/refresh dir=$FOLDER --rc-addr=0.0.0.0:8554 --fast-list _async=true
+      $(which rclone) rc vfs/refresh dir=$FOLDER --rc-addr=0.0.0.0:8554 --rc-user=rclone --rc-pass=rclone --fast-list _async=true
 done  
 }
 
@@ -297,7 +298,7 @@ function rckill() {
 source /system/mount/mount.env
 log ">> kill it with fire <<"
 ## GET NAME TO KILL ##
-$(which rclone) rc mount/unmountall --rc-addr=0.0.0.0:8554
+$(which rclone) rc mount/unmountall --rc-addr=0.0.0.0:8554 --rc-user=rclone --rc-pass=rclone
 
 folderunmount
 }
@@ -305,14 +306,14 @@ folderunmount
 function rcclean() {
 source /system/mount/mount.env
 log ">> run fs cache clear <<"
-$(which rclone) rc fscache/clear --rc-addr=0.0.0.0:8554 --fast-list _async=true
+$(which rclone) rc fscache/clear --rc-addr=0.0.0.0:8554 --rc-user=rclone --rc-pass=rclone --fast-list _async=true
 }
 
 function rcstats() {
 # NOTE LATER
 source /system/mount/mount.env
 log ">> get rclone stats <<"
-$(which rclone) rc core/stats --rc-addr=0.0.0.0:8554
+$(which rclone) rc core/stats --rc-addr=0.0.0.0:8554 --rc-user=rclone --rc-pass=rclone
 }
 
 function drivecheck() {
