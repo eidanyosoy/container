@@ -52,62 +52,46 @@ DLOG=/tmp/discord.dead
 #   know what you're doing.             #
 #########################################
 function log() {
-   echo "[Mount] ${1}"
+   echo -e "[Mount] ${1}"
+}
+
+function _echo() {
+  PREFIX="[rclone-switch-key]-$(s6-basename ${0}):"
+  echo -e "${PREFIX} $@" | tee ${MLOG}
 }
 
 function checkban() {
-if [[ `cat "${MLOG}" | wc -l` -gt 0 ]]; then
-   tail -n 20 "${MLOG}" | grep --line-buffered 'downloadQuotaExceeded' | while read ;do
-       if [ $? = 0 ]; then
-          if [[ ! ${DISCORD_SEND} != "null" ]]; then
-             discord
-          else
-             log "${startuphitlimit}"
-          fi
-          if [[ ${ARRAY} != 0 ]]; then
-             rotate && log "${startuprotate}"
-          fi
-       fi
-   done
-fi
+   RCD="$(which rclone) rc --rc-addr=0.0.0.0:8554"
+   local line="$@"
+   _echo "${line}"
+   if echo $line | grep "userRateLimitExceeded" > /dev/null; then
+      if [ $? = 0 ]; then
+         if [[ ! ${DISCORD_SEND} != "null" ]]; then
+            discord
+         else
+            log "${startuphitlimit}"
+         fi
+         if [[ ${ARRAY} != 0 ]]; then rotate && log "${startuprotate}" ; fi
+      fi
+   fi
 }
 
 function rotate() {
-[[ -f "/system/mount/.keys/lastkey" ]] && \
-   $(which rm) -rf /system/mount/.keys/lastkey
-[[ ! -d "/system/mount/.keys" ]] && \
-   $(which mkdir) -p /system/mount/.keys/ && \
-   $(which chown) -cR 1000:1000 /system/mount/.keys/ &>/dev/null
-[[ -d "/system/mount/.keys" ]] && \
-   $(which chown) -cR 1000:1000 /system/mount/.keys/ &>/dev/null
-if [[ "${ARRAY}" -eq "0" ]]; then
-   log " NO KEYS FOUND "
-else
-   JSONUSED=/system/mount/.keys/.usedkeys
-   if [[ ! -f "${JSONUSED}" ]];then
-      ls ${JSONDIR} | sed -e 's/\.json$//' | sort -u > ${JSONUSED}
-   fi
-   $(which cat) "${JSONUSED}" | head -n 1 | while IFS=$'|' read -ra KEY ; do
-      IFS=$'\n'
-      filter="$1"
-      log "-->> We switch the ServiceKey to ${KEY} "
-      mapfile -t mounts < <(eval rclone listremotes --config=${CONFIG} | grep "$filter" | sed -e 's/://g' | sed '/ADDITIONAL/d'  | sed '/downloads/d'  | sed '/crypt/d' | sed '/gdrive/d' | sed '/union/d' | sed '/remote/d')
-      for remote in ${mounts[@]}; do
-          $(which rclone) config update $remote service_account_file ${KEY}.json --config=${CONFIG}
-          $(which rclone) config update $remote service_account_file_path $JSONDIR --config=${CONFIG}
-      done
-      $(which sed) -i 1d "${JSONUSED}" && break
-   done
-   NEXTKEY=$($(which cat) ${JSONUSED} | head -n 1)
-   log "-->> Rotate to next ServiceKey done || MountKey is now ${NEXTKEY} "
-   $(which cp) -r /app/rclone/rclone.conf /root/.config/rclone/ && sleep 5 || exit 1
-   log "-->> Next possible ServiceKey is ${KEY} "
-   if [[ -f "/tmp/rclone.sh" ]]; then
-      rckill && rcclean && rcmount
-   else
-      rcmount
-   fi
-fi
+[[ -f "/system/mount/.keys/lastkey" ]] && $(which rm) -rf /system/mount/.keys/lastkey
+[[ ! -d "/system/mount/.keys" ]] && $(which mkdir) -p /system/mount/.keys/ && $(which chown) -cR 1000:1000 /system/mount/.keys/ &>/dev/null
+[[ -d "/system/mount/.keys" ]] && $(which chown) -cR 1000:1000 /system/mount/.keys/ &>/dev/null
+
+   ##Upstream=$(grep upstreams /root/.config/rclone/rclone.conf)
+   ##Upstream=${UpstreamList#"upstreams = "}
+   RCD="$(which rclone) rc --rc-addr=0.0.0.0:8554"
+   RemoteList=$($RCD config/dump | jq -r 'to_entries | (.[] | select(.value.type == "drive")) | .key')
+      while IFS= read -r remote; do
+        newServiceAccount=$($(which find) ${JSONDIR}/*.json -type f | shuf -n 1)
+        echo "$newServiceAccount" >> ${JSONUSED}
+        log "Rclone claims userRateLimitExceeded, switching to service account ${newServiceAccount} for remote ${remote}"
+        $RCD backend/command command=set fs=${remote}: -o service_account_file=${newServiceAccount} -o service_account_path=${JSONDIR}
+      done <<< "$RemoteList"
+   $(which cp) -r /app/rclone/rclone.conf /root/.config/rclone/ && sleep 5
 }
 
 function discord() {
@@ -156,19 +140,7 @@ function envrenew() {
 function lang() {
    LANGUAGE=${LANGUAGE}
    currenttime=$(date +%H:%M)
-   if [[ ! -d "/app/language" ]]; then
-      $(which git) config --global --add safe.directory /app/language
-      $(which git) -C /app clone --quiet https://github.com/dockserver/language.git
-   fi
-   if [[ "$currenttime" > "23:59" ]] || [[ "$currenttime" < "00:01" ]]; then
-      if [[ -d "/app/language" ]]; then
-         $(which git) config --global --add safe.directory /app/language
-         $(which git) -C "${LFOLDER}/" stash --quiet
-         $(which git) -C "${LFOLDER}/" pull --quiet
-         $(which cd) "${LFOLDER}/"
-         $(which git) stash clear
-      fi
-   fi
+   [[ ! -d "/app/language" ]] && $(which git) config --global --add safe.directory /app/language && $(which git) -C /app clone --quiet https://github.com/dockserver/language.git
    startupmount=$(grep -Po '"startup.mount": *\K"[^"]*"' "${LFOLDER}/${LANGUAGE}.json" | sed 's/"\|,//g')
    startuphitlimit=$(grep -Po '"startup.hitlimit": *\K"[^"]*"' "${LFOLDER}/${LANGUAGE}.json" | sed 's/"\|,//g')
    startuprotate=$(grep -Po '"startup.rotate": *\K"[^"]*"' "${LFOLDER}/${LANGUAGE}.json" | sed 's/"\|,//g')
@@ -197,13 +169,11 @@ function rcmount() {
 [[ -f "/tmp/rclone.sh" ]] && $(which rm) -rf /tmp/*.sh
 source /system/mount/mount.env
 export MLOG=/system/mount/logs/rclone-union.log
-export ECLOG=/system/mount/logs/rclone-webui.log
 [[ -f "${ECLOG}" ]] && $(which rm) -rf "${ECLOG}"
 
 $(which cp) -r "$ENVA" "$TMPENV"
 
 CONFIG=/app/rclone/rclone.conf
-
 if [[ "$(ls -1p /mnt/remotes)" ]] ; then
    log " cleanup from rclone cache | please wait"
    $(which rm) -rf /mnt/rclone_cache/*
@@ -220,6 +190,7 @@ cat > /tmp/rclone.sh << EOF; $(echo)
 
 $(which fusermount) -uzq /mnt/unionfs
 $(which fusermount) -uzq /mnt/remotes
+RCD="$(which rclone) rc --rc-addr=0.0.0.0:8554"
 
 ### START WEBUI
 $(which rclone) rcd \\
@@ -238,12 +209,17 @@ $(which rclone) rcd \\
 
 sleep 30
 ## SIMPLE START MOUNT
-$(which rclone) rc mount/mount --rc-addr=0.0.0.0:8554 fs=remote: mountPoint=/mnt/remotes mountType=mount vfsOpt='{"PollInterval": 15000000000,"GID": 1000, "UID": 1000,"Umask": 0,"DirCacheTime": 172800000000000}' mountOpt='{"AllowOther": true}'
+${RCD} mount/mount \\
+  fs=remote: mountPoint=/mnt/remotes mountType=mount \\
+    vfsOpt='{ "CacheMode": 3, "DirCacheTime": 172800000000000, "FastFingerprint": true, "ChunkSizeLimit": 3217899, "CacheMaxSize": 214748364800, "CacheMaxAge": 172800000000000, "ReadAhead": 6435798, "NoModTime": true, "NoChecksum": true, "WriteBack": 10000000000, "PollInterval": 15000000000, "GID": 1000, "UID": 1000, "Umask": 0 }' \\
+    mainOpt='{ "DisableHTTP2": true, "MultiThreadStreams": 5, "TPSLimitBurst": 20, "TPSLimit": 20, "BufferSize": 33554432 }' \\
+    mountOpt='{ "AsyncRead": true, "AllowNonEmpty": true, "AllowOther": true }'
+
 ## SET OPTIONS_RCLONE over json
-sleep 30
-$(which rclone) rc options/set --rc-addr=0.0.0.0:8554 --json {'"main": {"DisableHTTP2": true, "MultiThreadStreams": 5, "TPSLimitBurst": 20, "TPSLimit": 20, "BufferSize": 3217899 }'}
-$(which rclone) rc options/set --rc-addr=0.0.0.0:8554 --json {'"vfs": {"CacheMode": 3, "GID": '1000', "UID": '1000', "DirCacheTime": 172800000000000, "FastFingerprint": true, "ChunkSizeLimit": 3217899, "CacheMaxSize": 152777216000, "CacheMaxAge": 172800000000000, "ReadAhead": 67108864, "NoModTime": true, "NoChecksum": true, "WriteBack": 10000000000}'}
-$(which rclone) rc options/set --rc-addr=0.0.0.0:8554 --json {'"mount": {"AllowNonEmpty":true, "AllowOther":true, "AsyncRead":true}'}
+#€sleep 30
+##$(which rclone) rc options/set --rc-addr=0.0.0.0:8554 --json {'"main": {"DisableHTTP2": true, "MultiThreadStreams": 5, "TPSLimitBurst": 20, "TPSLimit": 20, "BufferSize": 3217899 }'}
+##$(which rclone) rc options/set --rc-addr=0.0.0.0:8554 --json {'"vfs": {"CacheMode": 3, "GID": '1000', "UID": '1000', "DirCacheTime": 172800000000000, "FastFingerprint": true, "ChunkSizeLimit": 3217899, "CacheMaxSize": 152777216000, "CacheMaxAge": 172800000000000, "ReadAhead": 67108864, "NoModTime": true, "NoChecksum": true, "WriteBack": 10000000000}'}
+##$(which rclone) rc options/set --rc-addr=0.0.0.0:8554 --json {'"mount": {"AllowNonEmpty":true, "AllowOther":true, "AsyncRead":true}'}
 
 touch /tmp/rclone.running
 EOF
@@ -256,11 +232,7 @@ echo $(date) > /tmp/rclone.running
    $(which bash) /tmp/rclone.sh
 
 while true; do
-  if [ "$(ls -1p /mnt/remotes)" ]; then
-     break
-  else 
-     sleep 5
-  fi
+  if [ "$(ls -1p /mnt/remotes)" ]; then break; else sleep 5 ; fi
 done
 }
 
@@ -298,7 +270,6 @@ source /system/mount/mount.env
 log ">> kill it with fire <<"
 ## GET NAME TO KILL ##
 $(which rclone) rc mount/unmountall --rc-addr=0.0.0.0:8554
-
 folderunmount
 }
 
@@ -316,9 +287,7 @@ $(which rclone) rc core/stats --rc-addr=0.0.0.0:8554
 }
 
 function drivecheck() {
-   if [ "$(ls -1p /mnt/unionfs)" ] && [ "$(ls -1p /mnt/remotes)" ]; then
-      rcclean && refreshVFS
-   fi
+   if [ "$(ls -1p /mnt/unionfs)" ] && [ "$(ls -1p /mnt/remotes)" ]; then rcclean && refreshVFS ; fi
 }
 
 function testrun() {
