@@ -231,6 +231,7 @@ $(which rclone) rcd \\
   --rc-files=/mnt \\
   --rc-no-auth \\
   --rc-allow-origin=* \\
+  --rc-addr=0.0.0.0:8544 \\
   --rc-web-gui \\
   --rc-web-gui-force-update \\
   --rc-web-gui-no-open-browser \\
