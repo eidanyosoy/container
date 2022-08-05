@@ -234,8 +234,8 @@ $(which rclone) rcd \\
   --rc-addr=0.0.0.0:8554 \\
   --rc-web-gui \\
   --rc-web-gui-force-update \\
-  --rc-web-gui-no-open-browser \\
-  --rc-web-fetch-url=https://api.github.com/repos/controlol/rclone-webui/releases/latest &
+  --rc-web-gui-no-open-browser &
+  ### \\--rc-web-fetch-url=https://api.github.com/repos/controlol/rclone-webui/releases/latest &
 
 sleep 30
 ## SIMPLE START MOUNT
