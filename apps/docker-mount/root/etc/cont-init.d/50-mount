@@ -139,10 +139,10 @@ if [[ -f ${rclonetmp} ]]; then rm -f ${rclonetmp} ; fi
 
 source ${rcloneenv}
 
-for folder in ${TMPRCLONE}} ${SUNION} ${SDOWN} ${SMOUNT} ${APP} ${SYSAPP} ${JSONSET}; do
+for folder in ${TMPRCLONE} ${SUNION} ${SDOWN} ${SMOUNT} ${APP} ${SYSAPP} ${JSONSET}; do
   if [[ ! -d "$folder" ]]; then
-     $(which mkdir) -p "$folder" && \
      log "Folder not exist || create now %s" "$folder" && \
+     $(which mkdir) -p "$folder" && \
      $(which chown) $PUID:$PUID "$folder"
   else
      log "Folder exist || set now permissions on $folder" && \
@@ -271,8 +271,6 @@ apk add --quiet --no-progress --update coreutils
 mkdir -p /root/.config/rclone/
 mount --bind /app/rclone/ /root/.config/rclone/
 
-rm -rf /tmp/mount.env && cp -r /system/mount/mount.env /tmp/mount.env
-
 echo "------------------------------
     _____   _   _  __  __
    |_   _| | | | | \ \/ /
@@ -290,6 +288,7 @@ We have take some code from :
        and all other
   If we missed you, sorry..
 ------------------------------"
+rm -rf /tmp/mount.env && cp -r /system/mount/mount.env /tmp/mount.env
 
 chmod -cR 777 /system /app /root /etc/logrotate.d $(which rclone) $(which mergerfs) &>/dev/null
 chown -cR $PUID:$PUID /system /app /root /etc/logrotate.d $(which rclone) $(which mergerfs) &>/dev/null
