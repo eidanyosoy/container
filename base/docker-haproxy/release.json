@@ -4,7 +4,7 @@
    "appfolder": "./base/docker-haproxy",
    "newversion": "2.5.7-alpine3.15",
    "baseimage": "haproxy",
-   "description": "null",
+   "description": "HAProxy Load Balancer's development branch (mirror of git.haproxy.org)",
    "body": "Upgrading docker-haproxy to 2.5.7-alpine3.15",
    "user": "github-actions[bot]"
 }

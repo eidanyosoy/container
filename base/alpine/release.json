@@ -4,7 +4,7 @@
    "appfolder": "./base/alpine",
    "newversion": "3.16.1",
    "baseimage": "alpine",
-   "description": "null",
+   "description": "Official Alpine Linux Docker image. Win at minimalism!",
    "body": "Upgrading alpine to 3.16.1",
    "user": "github-actions[bot]"
 }

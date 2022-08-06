@@ -5,7 +5,7 @@
    "newversion": "3.16.1",
    "appversion": "3.16.1",
    "baseimage": "alpine",
-   "description": "null",
+   "description": "Docker + Traefik with Authelia and Cloudflare Protection",
    "body": "Upgrading docker-dockserver to 3.16.1",
    "user": "github-actions[bot]"
 }
