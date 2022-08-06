@@ -57,41 +57,33 @@ function log() {
    echo -e "[Mount] ${1}"
 }
 
-function _echo() {
-  PREFIX="[rclone-switch-key]-$(s6-basename ${0}):"
-  echo -e "${PREFIX} $@" | tee ${MLOG}
-}
-
 function checkban() {
-   local line="$@"
-   _echo "${line}"
-   if echo $line | grep "userRateLimitExceeded" > /dev/null; then
-      if [ $? = 0 ]; then
-         if [[ ! ${DISCORD_SEND} != "null" ]]; then
-            discord
-         else
-            log "${startuphitlimit}"
-         fi
-         if [[ ${ARRAY} != 0 ]]; then rotate && log "${startuprotate}" ; fi
-      fi
+   ### RELOAD ENF FILE ###
+   source /system/mount/mount.env
+
+   RCCHECK=$($RCD core/stats | jq -r '. | .lastError' | grep -E '403')
+   if [ $? = 0 ]; then
+      if [[ ! ${DISCORD_SEND} != "null" ]]; then discord ; fi
+      if [[ ! ${DISCORD_SEND} == "null" ]]; then log "${startuphitlimit}" ; fi
+      if [[ `ls -A ${JSONDIR} | wc -l` -gt 4 ]]; then
+         [[ -f "/system/mount/.keys/lastkey" ]] && $(which rm) -rf /system/mount/.keys/lastkey
+         [[ ! -d "/system/mount/.keys" ]] && $(which mkdir) -p /system/mount/.keys/
+         [[ -d "/system/mount/.keys" ]] && $(which chown) -cR 1000:1000 /system/mount/.keys/ &>/dev/null
+         RCERROR=$($RCD core/stats | jq -r '. | .lastError')
+         RemoteList=$($RCD config/dump | jq -r 'to_entries | (.[] | select(.value.type == "drive")) | .key' | sed '/gdrive/d')
+            while IFS= read -r remote; do
+               newServiceAccount=$($(which find) ${JSONDIR}/*.json -type f | shuf -n 1)
+               echo "$newServiceAccount" > ${JSONUSED}
+               log "Rclone claims ${RCERROR}, switching to service account ${newServiceAccount} for remote ${remote}"
+               $RCD backend/command command=set fs=${remote}: -o service_account_file=${newServiceAccount} -o service_account_path=${JSONDIR}
+            done <<< "$RemoteList"
+         $(which cp) -r /app/rclone/rclone.conf /root/.config/rclone/ && sleep 5
+         ### RESET STATS AFTER SWITCH THE KEY ###
+         $RCD core/stats-reset &>/dev/null
+         ### RESET ALL LOGS AFTER SWITCH ###
+         $(which truncate) -s 0 /system/mount/logs/*.log &>/dev/null
+     fi
    fi
-}
-
-function rotate() {
-[[ -f "/system/mount/.keys/lastkey" ]] && $(which rm) -rf /system/mount/.keys/lastkey
-[[ ! -d "/system/mount/.keys" ]] && $(which mkdir) -p /system/mount/.keys/ && $(which chown) -cR 1000:1000 /system/mount/.keys/ &>/dev/null
-[[ -d "/system/mount/.keys" ]] && $(which chown) -cR 1000:1000 /system/mount/.keys/ &>/dev/null
-
-   ##Upstream=$(grep upstreams /root/.config/rclone/rclone.conf)
-   ##Upstream=${UpstreamList#"upstreams = "}
-   RemoteList=$($RCD config/dump | jq -r 'to_entries | (.[] | select(.value.type == "drive")) | .key')
-      while IFS= read -r remote; do
-        newServiceAccount=$($(which find) ${JSONDIR}/*.json -type f | shuf -n 1)
-        echo "$newServiceAccount" >> ${JSONUSED}
-        log "Rclone claims userRateLimitExceeded, switching to service account ${newServiceAccount} for remote ${remote}"
-        $RCD backend/command command=set fs=${remote}: -o service_account_file=${newServiceAccount} -o service_account_path=${JSONDIR}
-      done <<< "$RemoteList"
-   $(which cp) -r /app/rclone/rclone.conf /root/.config/rclone/ && sleep 5
 }
 
 function discord() {
@@ -128,18 +120,8 @@ function discord() {
       --timestamp > "${DLOG}"
 }
 
-function envrenew() {
-   diff -q "$ENVA" "$TMPENV"
-   if [ $? -gt 0 ]; then
-      rckill && rcmount && $(which cp) -r "$ENVA" "$TMPENV"
-    else
-      echo "no changes" &>/dev/null
-   fi
-}
-
 function lang() {
    LANGUAGE=${LANGUAGE}
-   currenttime=$(date +%H:%M)
    [[ ! -d "/app/language" ]] && $(which git) config --global --add safe.directory /app/language && $(which git) -C /app clone --quiet https://github.com/dockserver/language.git
    startupmount=$(grep -Po '"startup.mount": *\K"[^"]*"' "${LFOLDER}/${LANGUAGE}.json" | sed 's/"\|,//g')
    startuphitlimit=$(grep -Po '"startup.hitlimit": *\K"[^"]*"' "${LFOLDER}/${LANGUAGE}.json" | sed 's/"\|,//g')
@@ -219,9 +201,9 @@ ${RCD} mount/mount \\
 
 sleep 5
 ### SET MAJOR OPTIONS FOR MOUNT : ${RCD} options/set options/set --json 
-${RCD} options/set --json {'"main": { "TPSLimitBurst": 20, "TPSLimit": 20 , "Checkers": 6, "Transfers": 6, "BufferSize": 16777216, "TrackRenames": true, "TrackRenamesStrategy":"modtime,leaf", "NoUpdateModTime": true, "BufferSize": 67108864, "UserAgent": "rclone_mount", "CutoffMode":"hard", "Progress":true, "UseMmap":true, "HumanReadable":true}'}
-${RCD} options/set --json {'"vfs": { "GID": '1000', "UID": '1000', "CacheMode": 1, "Umask": 0, "DirPerms": 777, "FilePerms": 777 , "CacheMaxSize": 322122547200, "CacheMaxAge": 3600000000000, "CacheMaxSize": 322122547200, "CachePollInterval": 300000000000, "ChunkSize": 67108864, "ChunkSizeLimit": 536870912, "ReadAhead": 67108864, "NoModTime": true,"NoChecksum": true, "WriteBack": 300000000000,"CaseInsensitive": true, "ReadAhead": 2147483648}'} 
-${RCD} options/set --json {'"mount": { "AllowNonEmpty": true, "AllowOther": true, "AsyncRead": true, "WritebackCache": true}'}
+${RCD} options/set --json {'"main": { "TPSLimitBurst": 20, "TPSLimit": 20 , "Checkers": 6, "Transfers": 6, "BufferSize": 16777216, "TrackRenames": true, "TrackRenamesStrategy":"modtime,leaf", "NoUpdateModTime": true, "BufferSize": 67108864, "UserAgent": "rclone_mount", "CutoffMode":"hard", "Progress":true, "UseMmap":true, "HumanReadable":true}'} > /dev/null
+${RCD} options/set --json {'"vfs": { "GID": '1000', "UID": '1000', "CacheMode": 1, "Umask": 0, "DirPerms": 777, "FilePerms": 777 , "CacheMaxSize": 322122547200, "CacheMaxAge": 3600000000000, "CacheMaxSize": 322122547200, "CachePollInterval": 300000000000, "ChunkSize": 67108864, "ChunkSizeLimit": 536870912, "ReadAhead": 67108864, "NoModTime": true,"NoChecksum": true, "WriteBack": 300000000000,"CaseInsensitive": true, "ReadAhead": 2147483648}'} > /dev/null 
+${RCD} options/set --json {'"mount": { "AllowNonEmpty": true, "AllowOther": true, "AsyncRead": true, "WritebackCache": true}'} > /dev/null
 
 touch /tmp/rclone.running
 EOF
@@ -261,24 +243,23 @@ for fod in /mnt/remotes/* ;do
     FOLDER="$(basename -- $fod)"
     IFS=- read -r <<< "$ACT"
       log " VFS refreshing : $FOLDER"
-      $RCD vfs/forget dir=$FOLDER --fast-list _async=true -drive-pacer-burst 200 --drive-pacer-min-sleep 10ms --timeout 30m
+      $RCD vfs/forget dir=$FOLDER --fast-list _async=true -drive-pacer-burst 200 --drive-pacer-min-sleep 10ms --timeout 30m > /dev/null
       $(which sleep) 1
-      $RCD vfs/refresh dir=$FOLDER --fast-list _async=true
+      $RCD vfs/refresh dir=$FOLDER --fast-list _async=true > /dev/null
 done  
 }
 
 function rckill() {
 source /system/mount/mount.env
 log ">> kill it with fire <<"
-## GET NAME TO KILL ##
-$RCD mount/unmountall
+$RCD mount/unmountall > /dev/null
 folderunmount
 }
 
 function rcclean() {
 source /system/mount/mount.env
 log ">> run fs cache clear <<"
-$RCD fscache/clear --fast-list _async=true
+$RCD fscache/clear --fast-list _async=true > /dev/null
 }
 
 function rcstats() {
@@ -303,7 +284,7 @@ while true; do
    else
       rckill && rcmount && rcmergerfs && rcclean
    fi
-   rlog && envrenew && lang && checkban && sleep 360
+   rlog && lang && checkban && sleep 360
 done
 }
 
