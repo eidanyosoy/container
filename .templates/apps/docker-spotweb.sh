@@ -29,18 +29,18 @@ NEWVERSION="${NEWVERSION}"
 
 HEADLINE="$(cat ./.templates/headline.txt)"
 DESCRIPTION="$(curl -u $USERNAME:$TOKEN -sX GET "$APPLINK" | jq -r '.description')"
-BASEIMAGE="ubuntu:21.10"
+BASEIMAGE="ubuntu:latest"
 
 ### APP SETTINGS
 APTOINSTALL="apache2 php8.0 php8.0-curl php8.0-gd php8.0-gmp php8.0-mysql php8.0-pgsql php8.0-xml php8.0-xmlrpc php8.0-mbstring php8.0-zip tar curl git-core cron wget jq locales"
 
 INSTALL="apt-get -q update && \\
-    apt -qy install software-properties-common && add-apt-repository ppa:ondrej/php && \\
+    apt -qy install software-properties-common && \\
+    add-apt-repository ppa:ondrej/php && \\
     apt-get -qy dist-upgrade"
 
 SETMOD="a2enmod headers && \\
     locale-gen --no-purge en_US.UTF-8"
-
 
 CLEANUP="apt-get -yqq autoremove && \\
     apt-get -yqq clean && \\
