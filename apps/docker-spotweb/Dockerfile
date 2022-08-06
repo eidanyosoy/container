@@ -2,7 +2,7 @@
 ##
 ## Do not changes any lines here
 ##
-FROM ubuntu:21.10
+FROM ubuntu:latest
 LABEL org.opencontainers.image.source="https://github.com/dockserver/container"
 
 ARG TARGETPLATFORM
@@ -17,7 +17,8 @@ ENV DEBIAN_FRONTEND="noninteractive" \
 RUN echo "force-unsafe-io" > /etc/dpkg/dpkg.cfg.d/02apt-speedup &&\
     echo "Acquire::http {No-Cache=True;};" > /etc/apt/apt.conf.d/no-cache && \
     apt-get -q update && \
-    apt -qy install software-properties-common && add-apt-repository ppa:ondrej/php && \
+    apt -qy install software-properties-common && \
+    add-apt-repository ppa:ondrej/php && \
     apt-get -qy dist-upgrade && \
     apt-get install -qy apache2 php8.0 php8.0-curl php8.0-gd php8.0-gmp php8.0-mysql php8.0-pgsql php8.0-xml php8.0-xmlrpc php8.0-mbstring php8.0-zip tar curl git-core cron wget jq locales && \
     a2enmod headers && \
