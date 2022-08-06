@@ -24,7 +24,7 @@ LABEL org.opencontainers.image.source="https://github.com/dockserver/container"
 ARG TARGETPLATFORM
 ARG BUILDPLATFORM
 
-ARG MERGERFS_VERSION=null
+ARG MERGERFS_VERSION=2.33.5
 
 RUN \
   echo "**** update packages ****" && \
@@ -59,9 +59,9 @@ ARG BUILDPLATFORM
 
 ARG BASE_VERSION=3.16.1
 ARG ALPINE_VERSION=3.16.1
-ARG MERGERFS_VERSION=null
-ARG RCLONE_VERSION=null
-ARG LANG_VERSION=null
+ARG MERGERFS_VERSION=2.33.5
+ARG RCLONE_VERSION=v1.59.0
+ARG LANG_VERSION=v0.0.19
 
 RUN \
   echo "**** update packages ****" && \

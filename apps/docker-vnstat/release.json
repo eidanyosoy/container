@@ -4,7 +4,7 @@
    "appfolder": "./apps/docker-vnstat",
    "newversion": "22.5.28",
    "finalimage": "node:alpine3.15",
-   "description": "null",
+   "description": "GUI Client for vnStat Network Monitor for Linux or GNU/Linux",
    "body": "Upgrading docker-vnstat to 22.5.28",
    "user": "dockserver-image[bot]"
 }

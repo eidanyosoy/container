@@ -5,7 +5,7 @@
    "newversion": "b33956e6b85b2c2fc12e23951c06f36e009fb627",
    "appbranch": "develop",
    "baseimage": "ghcr.io/dockserver/docker-alpine:latest",
-   "description": "null",
+   "description": "Request management and media discovery tool for the Plex ecosystem",
    "body": "Upgrading docker-overseerr-nightly to b33956e6b85b2c2fc12e23951c06f36e009fb627",
    "user": "github-actions[bot]"
 }

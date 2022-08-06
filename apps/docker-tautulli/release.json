@@ -2,9 +2,9 @@
    "appname": "docker-tautulli",
    "apppic": "./images/docker-tautulli.png",
    "appfolder": "./apps/docker-tautulli",
-   "newversion": "null",
+   "newversion": "2.10.2",
    "baseimage": "ghcr.io/dockserver/docker-alpine:latest",
-   "description": "null",
-   "body": "Upgrading docker-tautulli to null",
+   "description": "A Python based monitoring and tracking tool for Plex Media Server.",
+   "body": "Upgrading docker-tautulli to 2.10.2",
    "user": "github-actions[bot]"
 }
