@@ -212,15 +212,15 @@ $(which rclone) rcd \\
   ### \\--rc-web-fetch-url=https://api.github.com/repos/controlol/rclone-webui/releases/latest &
 
 ### SET MAJOR OPTIONS FOR MOUNT : ${RCD} options/set options/set --json 
-${RCD} options/set --json {'"main": { "TPSLimitBurst": 20, "TPSLimit": 20 , "Checkers": 6, "Transfers": 6, "BufferSize":16777216, "TrackRenames":true, "TrackRenamesStrategy":"modtime,leaf", "NoUpdateModTime":true, "BufferSize": 67108864, "UserAgent": "rclone_mount", "CutoffMode":"hard", "Progress":true, "UseMmap":true, "HumanReadable":true}'}
+${RCD} options/set --json {'"main": { "TPSLimitBurst": 20, "TPSLimit": 20 , "Checkers": 6, "Transfers": 6, "BufferSize": 16777216, "TrackRenames": true, "TrackRenamesStrategy":"modtime,leaf", "NoUpdateModTime": true, "BufferSize": 67108864, "UserAgent": "rclone_mount", "CutoffMode":"hard", "Progress":true, "UseMmap":true, "HumanReadable":true}'}
 ${RCD} options/set --json {'"vfs": { "GID": '1000', "UID": '1000', "CacheMode": 1, "Umask": 0, "DirPerms": 777, "FilePerms": 777 , "CacheMaxSize": 322122547200, "CacheMaxAge": 3600000000000, "CacheMaxSize": 322122547200, "CachePollInterval": 300000000000, "ChunkSize": 67108864, "ChunkSizeLimit": 536870912, "ReadAhead": 67108864, "NoModTime": true,"NoChecksum": true, "WriteBack": 300000000000,"CaseInsensitive": true, "ReadAhead": 2147483648}'} 
-${RCD} options/set --json {'"mount": { "AllowNonEmpty":true, "AllowOther": true, "AsyncRead":true, "WritebackCache":true}'}
+${RCD} options/set --json {'"mount": { "AllowNonEmpty": true, "AllowOther": true, "AsyncRead": true, "WritebackCache": true}'}
 
 sleep 30
 ## SIMPLE START MOUNT
 ${RCD} mount/mount \\
   fs=remote: mountPoint=/mnt/remotes \\
-  mountType=mount vfsOpt='{"CacheMode": 3,"DirPerms": 777,"FilePerms": 777 , "GID": 1000, "UID": 1000}' mountOpt='{"AllowOther": true}'}
+  mountType=mount vfsOpt='{"CacheMode": 2, "DirPerms": 777, "FilePerms": 777 , "GID": 1000, "UID": 1000}' mountOpt='{"AllowOther": true}'
 
 touch /tmp/rclone.running
 EOF
