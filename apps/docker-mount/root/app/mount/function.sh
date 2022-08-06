@@ -197,12 +197,12 @@ sleep 5
 ## SIMPLE START MOUNT
 ${RCD} mount/mount \\
   fs=remote: mountPoint=/mnt/remotes \\
-  mountType=mount vfsOpt='{"CacheMode": 2, "DirPerms": 777, "FilePerms": 777 , "GID": 1000, "UID": 1000}' mountOpt='{"AllowOther": true}'
+  mountType=mount vfsOpt='{"CacheMode": 2, "GID": 1000, "UID": 1000, "Umask": 0}' mountOpt='{"AllowOther": true}'
 
 sleep 5
 ### SET MAJOR OPTIONS FOR MOUNT : ${RCD} options/set options/set --json 
 ${RCD} options/set --json {'"main": { "TPSLimitBurst": 20, "TPSLimit": 20 , "Checkers": 6, "Transfers": 6, "BufferSize": 16777216, "TrackRenames": true, "TrackRenamesStrategy":"modtime,leaf", "NoUpdateModTime": true, "BufferSize": 67108864, "UserAgent": "rclone_mount", "CutoffMode":"hard", "Progress":true, "UseMmap":true, "HumanReadable":true}'} > /dev/null
-${RCD} options/set --json {'"vfs": { "GID": '1000', "UID": '1000', "CacheMode": 1, "Umask": 0, "DirPerms": 777, "FilePerms": 777 , "CacheMaxSize": 322122547200, "CacheMaxAge": 3600000000000, "CacheMaxSize": 322122547200, "CachePollInterval": 300000000000, "ChunkSize": 67108864, "ChunkSizeLimit": 536870912, "ReadAhead": 67108864, "NoModTime": true,"NoChecksum": true, "WriteBack": 300000000000,"CaseInsensitive": true, "ReadAhead": 2147483648}'} > /dev/null 
+${RCD} options/set --json {'"vfs": { "GID": '1000', "UID": '1000', "CacheMode": 1, "Umask": 0, "CacheMaxSize": 322122547200, "CacheMaxAge": 3600000000000, "CacheMaxSize": 322122547200, "CachePollInterval": 300000000000, "ChunkSize": 67108864, "ChunkSizeLimit": 536870912, "ReadAhead": 67108864, "NoModTime": true,"NoChecksum": true, "WriteBack": 300000000000,"CaseInsensitive": true, "ReadAhead": 2147483648}'} > /dev/null 
 ${RCD} options/set --json {'"mount": { "AllowNonEmpty": true, "AllowOther": true, "AsyncRead": true, "WritebackCache": true}'} > /dev/null
 
 touch /tmp/rclone.running
