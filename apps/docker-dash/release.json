@@ -5,7 +5,7 @@
    "newversion": "4.3.7",
    "baseimage": "alpine",
    "baseversion": "3.16.1",
-   "description": "A simple, modern server dashboard, primarily used by smaller private servers",
+   "description": "null",
    "body": "Upgrading docker-dash to 4.3.7",
    "user": "dockserver-image[bot]"
 }
