@@ -203,8 +203,6 @@ $(which rclone) rcd \\
   --track-renames \\
   --track-renames-strategy modtime,leaf \\
   --buffer-size=64M \\
-  --tpslimit-burst=20 \\
-  --tpslimit-burst-limit=20 \\
   --rc-no-auth \\
   --rc-allow-origin=* \\
   --rc-addr=0.0.0.0:8554 \\
