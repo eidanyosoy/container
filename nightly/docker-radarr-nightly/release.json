@@ -5,7 +5,7 @@
    "newversion": "nightly-4.2.1.6450-ls346",
    "appbranch": "nightly",
    "baseimage": "",
-   "description": "A fork of Sonarr to work with movies à la Couchpotato.",
+   "description": "null",
    "body": "Upgrading docker-radarr-nightly to nightly-4.2.1.6450-ls346",
    "user": "github-actions[bot]"
 }
