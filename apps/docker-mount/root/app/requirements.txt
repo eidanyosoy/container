@@ -39,7 +39,6 @@ openssl
 procps
 pigz
 readline
-screen
 s6-ipcserver
 scanelf
 shadow
