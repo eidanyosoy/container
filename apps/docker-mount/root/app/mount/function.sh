@@ -70,7 +70,7 @@ function checkban() {
          [[ ! -d "/system/mount/.keys" ]] && $(which mkdir) -p /system/mount/.keys/
          [[ -d "/system/mount/.keys" ]] && $(which chown) -cR 1000:1000 /system/mount/.keys/ &>/dev/null
          RCERROR=$($RCD core/stats | jq -r '. | .lastError')
-         RemoteList=$($RCD config/dump | jq -r 'to_entries | (.[] | select(.value.type == "drive")) | .key' | sed '/gdrive/d')
+         RemoteList=$($RCD config/dump | jq -r 'to_entries | (.[] | select(.value.team_drive)) | .key')
             while IFS= read -r remote; do
                newServiceAccount=$($(which find) ${JSONDIR}/*.json -type f | shuf -n 1)
                echo "$newServiceAccount" > ${JSONUSED}
