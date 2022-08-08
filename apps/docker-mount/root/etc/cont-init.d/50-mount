@@ -157,13 +157,15 @@ if [[ ${ARRAY} != 4 ]]; then
    for f in /system/mount/keys/*; do
        $(which mv) -f "${f}" "${f//GDSA/}" &>/dev/null
    done
-   ## besser ist es und einfacher einen rc min zu starten und dann den backend command zu nehmen 
    newServiceAccount=$($(which find) ${JSONDIR}/*.json -type f | shuf -n 1)
-   mapfile -t mounts < <(eval rclone listremotes --config=${CONFIG} | grep "$filter" | sed -e 's/://g' | sed '/crypt/d' | sed '/gdrive/d' | sed '/union/d' | sed '/remote/d' | sed '/GDSA/d')
-   for i in ${mounts[@]}; do
-       $(which rclone) config update $i service_account_file $JSONDIR/${newServiceAccount$ --config=${CONFIG}
-       $(which rclone) config update $i service_account_file_path $JSONDIR --config=${CONFIG}
-   done
+   RemoteList=$($(which rclone) config dump --config=${SOURCECONFIG} | jq -r 'to_entries | (.[] | select(.value.team_drive)) | .key'
+   while IFS= read -r remote; do
+       newServiceAccount=$($(which find) ${JSONDIR}/*.json -type f | shuf -n 1)
+       echo "$newServiceAccount" > ${JSONUSED}
+       log "Rclone : using service account ${newServiceAccount} for remote ${remote}"
+       $(which rclone) config update $remote service_account_file $JSONDIR/${newServiceAccount$ --config=${CONFIG}
+       $(which rclone) config update $remote service_account_file_path $JSONDIR --config=${CONFIG}
+   done <<< "$RemoteList"
 fi
 
 source /system/mount/mount.env
@@ -189,6 +191,19 @@ filename_encryption = standard
 directory_name_encryption = true
 password = ${ENC_PASSWORD}
 password2 = ${ENC_SALT}
+
+
+## Von a nach b ohne viel Mühe und kein CP oder bind mount
+## Wenn keine team drive id's gefunden worden sind  für alle anderen dann möglich 
+(envsubst < /system/rclone/rclone.conf) >> /app/rclone/rclone.conf
+
+
+
+
+
+
+#### Das hier muss neu  und einfacher werden 
+
 
 
 ARRAY=$(ls -A ${JSONDIR} | wc -l)
@@ -272,6 +287,8 @@ else
    if [[ ! -f $ENDCONFIG ]]; then ln -sv $SOURCECONFIG $ENDCONFIG ; else rm -rf $ENDCONFIG && ln -sv $SOURCECONFIG $ENDCONFIG ; fi
 fi
 
+#### DER HIER MUSS BLEIBEN ####
+#### rclone union hier     ####
 CONFIG=/app/rclone/rclone.conf
 mapfile -t mapped < <(eval rclone listremotes --config=${CONFIG} | sort -u)
 for i in ${mapped[@]}; do
