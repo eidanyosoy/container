@@ -4,7 +4,7 @@ alpine-keys-2.4-r1
 apk-tools-2.12.9-r3
 bash-5.1.16-r2
 busybox-1.35.0-r15
-ca-certificates-20211220-r0
+ca-certificates-20220614-r0
 ca-certificates-bundle-20211220-r0
 libc-utils-0.7.2-r3
 libcrypto1.1-1.1.1q-r0

@@ -6,7 +6,7 @@ bash-5.1.16-r2
 brotli-libs-1.0.9-r6
 busybox-1.35.0-r15
 c-ares-1.18.1-r0
-ca-certificates-20211220-r0
+ca-certificates-20220614-r0
 ca-certificates-bundle-20211220-r0
 cabextract-1.9.1-r0
 cairo-1.17.4-r2
@@ -58,4 +58,4 @@ readline-8.1.2-r0
 scanelf-1.3.4-r0
 ssl_client-1.35.0-r15
 wget-1.21.3-r0
-zlib-1.2.12-r1
+zlib-1.2.12-r2
