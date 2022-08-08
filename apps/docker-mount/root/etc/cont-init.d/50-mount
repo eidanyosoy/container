@@ -154,26 +154,42 @@ source /system/mount/mount.env
 ARRAY=$(ls -A ${JSONDIR} | wc -l)
 
 if [[ ${ARRAY} != 4 ]]; then
-   [[ ! -f ${JSONUSED} ]] && FMINJS=1
-   [[ -f ${JSONUSED} ]] && FMINJS=$(cat ${JSONUSED})
    for f in /system/mount/keys/*; do
        $(which mv) -f "${f}" "${f//GDSA/}" &>/dev/null
    done
-   ARRAY=$(ls -A ${JSONDIR} | egrep -c '*.json')
-   MINJS=${FMINJS}
-   MAXJS=${ARRAY}
-   COUNT=$MINJS
-   IFS=$'\n'
-   filter="$1"
+   ## besser ist es und einfacher einen rc min zu starten und dann den backend command zu nehmen 
+   newServiceAccount=$($(which find) ${JSONDIR}/*.json -type f | shuf -n 1)
    mapfile -t mounts < <(eval rclone listremotes --config=${CONFIG} | grep "$filter" | sed -e 's/://g' | sed '/crypt/d' | sed '/gdrive/d' | sed '/union/d' | sed '/remote/d' | sed '/GDSA/d')
    for i in ${mounts[@]}; do
-       $(which rclone) config update $i service_account_file $JSONDIR/$COUNT.json --config=${CONFIG}
+       $(which rclone) config update $i service_account_file $JSONDIR/${newServiceAccount$ --config=${CONFIG}
        $(which rclone) config update $i service_account_file_path $JSONDIR --config=${CONFIG}
    done
-   echo "${COUNT}" >${JSONUSED}
 fi
 
 source /system/mount/mount.env
+
+## Wird als source file genommen 
+[${myArray[0]}]
+type = drive
+scope = drive
+use_trash = false
+chunk_size = 128M
+acknowledge_abuse = true
+pacer_min_sleep = 1ms
+pacer_burst = 5000
+team_drive = ${myArray[1]}
+server_side_across_configs = true
+service_account_file = ${JSONDIR}/${newServiceAccount}
+service_account_file_path = ${JSONDIR}
+
+[${myArray[0]}crypt]
+type = crypt
+remote = ${myArray[0]}:/encrypt
+filename_encryption = standard
+directory_name_encryption = true
+password = ${ENC_PASSWORD}
+password2 = ${ENC_SALT}
+
 
 ARRAY=$(ls -A ${JSONDIR} | wc -l)
 if [[ ${ARRAY} != 0 ]]; then
@@ -201,31 +217,33 @@ if [[ ${ARRAY} != 0 ]]; then
    fi
    if [[ -f $ENDCONFIG ]]; then sed -i '/^$/d' $ENDCONFIG; fi
    if [[ -f $ENDCONFIG ]]; then rm -rf $ENDCONFIG; fi
-   if [[ ! -f /system/mount/.keys/lastkey ]]; then FMINJS=1 ; else FMINJS=$(cat /system/mount/.keys/lastkey) ; fi
-
-   COUNT=$MINJS
+   newServiceAccount=$($(which find) ${JSONDIR}/*.json -type f | shuf -n 1)
    sed '/^\s*#.*$/d' $ENDFILE | while IFS=$'|' read -r -a myArray; do
       if [[ ${myArray[2]} == "" && ${myArray[3]} == "" ]]; then
-         echo -e "\n
+
+echo -e "\n
 [${myArray[0]}]
 type = drive
 scope = drive
 server_side_across_configs = true
-service_account_file = ${JSONDIR}/${MINJS}.json
+service_account_file = ${JSONDIR}/${newServiceAccount}
 service_account_file_path = ${JSONDIR}
 team_drive = ${myArray[1]}" >>$ENDCONFIG
-         rclone lsd ${myArray[0]}: --drive-service-account-file=$JSONDIR/$MINJS.json --fast-list --config=$ENDCONFIG
+
+         rclone lsd ${myArray[0]}: --drive-service-account-file=$JSONDIR/${newServiceAccount} --fast-list --config=$ENDCONFIG
          if [ $? != 0 ]; then rclone config delete ${myArray[0]} --config=$ENDCONFIG ; fi
       else
-         echo -e "\n
+
+echo -e "\n
 [${myArray[0]}]
 type = drive
 scope = drive
 server_side_across_configs = true
-service_account_file = ${JSONDIR}/${MINJS}.json
+service_account_file = ${JSONDIR}/${newServiceAccount}
 service_account_file_path = ${JSONDIR}
 team_drive = ${myArray[1]}" >>$ENDCONFIG
-         rclone lsd ${myArray[0]}: --drive-service-account-file=$JSONDIR/$MINJS.json --fast-list --config=$ENDCONFIG
+
+         rclone lsd ${myArray[0]}: --drive-service-account-file=$JSONDIR/${newServiceAccount} --fast-list --config=$ENDCONFIG
          if [ $? != 0 ]; then
             $(which rclone) config delete ${myArray[0]} --config=$ENDCONFIG
          else
@@ -235,14 +253,16 @@ team_drive = ${myArray[1]}" >>$ENDCONFIG
             else
                ENC_PASSWORD=${myArray[2]}
                ENC_SALT=${myArray[3]}
-               echo -e "\n[tcrypt-${myArray[0]}]
+
+echo -e "\n[tcrypt-${myArray[0]}]
 type = crypt
 remote = ${myArray[0]}:/encrypt
 filename_encryption = standard
 directory_name_encryption = true
 password = ${ENC_PASSWORD}
 password2 = ${ENC_SALT}" >>$ENDCONFIG
-               $(which rclone) mkdir ${myArray[0]}:/encrypt --drive-service-account-file=$JSONDIR/$MINJS.json --config=$ENDCONFIG
+
+               $(which rclone) mkdir ${myArray[0]}:/encrypt --drive-service-account-file=$JSONDIR/${newServiceAccount} --config=$ENDCONFIG
             fi
          fi
       fi
@@ -252,17 +272,8 @@ else
    if [[ ! -f $ENDCONFIG ]]; then ln -sv $SOURCECONFIG $ENDCONFIG ; else rm -rf $ENDCONFIG && ln -sv $SOURCECONFIG $ENDCONFIG ; fi
 fi
 
-IFS=$'\n'
-filter="$1"
 CONFIG=/app/rclone/rclone.conf
-mapfile -t mounts < <(eval rclone listremotes --config=${CONFIG} | grep "$filter" | sed -e 's/://g' | sed '/union/d' | sed '/download/d' | sed '/remote/d' | sed '/GDSA/d')
-for i in ${mounts[@]}; do
-    $(which echo) -n "$i: " >>/tmp/rcunion.union
-done
-
-IFS=$'\n'
-filter="$1"
-mapfile -t mapped < <(eval cat /tmp/rcunion.union)
+mapfile -t mapped < <(eval rclone listremotes --config=${CONFIG} | sort -u)
 for i in ${mapped[@]}; do
     $(which rclone) config create remote union upstreams $i action_policy 'all' create_policy 'all' search_policy 'all' cache_time 120 --config=${CONFIG}
 done
