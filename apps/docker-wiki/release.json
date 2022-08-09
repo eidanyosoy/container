@@ -3,11 +3,11 @@
    "apppic": "./images/docker-wiki.png",
    "appfolder": "./apps/docker-wiki",
    "appbranch": "master",
-   "newversion": "3.16.1",
+   "newversion": "3.16.2",
    "appversion": "1.4.27",
    "wikiversion": "8.4.0rc1",
    "baseimage": "alpine",
    "description": "Docker + Traefik with Authelia and Cloudflare Protection",
-   "body": "Upgrading docker-wiki to 3.16.1",
+   "body": "Upgrading docker-wiki to 3.16.2",
    "user": "github-actions[bot]"
 }
