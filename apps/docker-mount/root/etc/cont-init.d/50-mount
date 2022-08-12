@@ -181,7 +181,7 @@ pacer_min_sleep = 1ms
 pacer_burst = 5000
 team_drive = ${myArray[1]}
 server_side_across_configs = true
-service_account_file = ${JSONDIR}/${newServiceAccount}
+service_account_file = ${newServiceAccount}
 service_account_file_path = ${JSONDIR}
 
 [${myArray[0]}crypt]
