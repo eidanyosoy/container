@@ -2,11 +2,11 @@
    "appname": "docker-fenrus",
    "apppic": "./images/docker-fenrus.png",
    "appfolder": "./apps/docker-fenrus",
-   "newversion": "3.16.1",
+   "newversion": "3.16.2",
    "appbranch": "master",
    "baseimage": "alpine",
-   "appversion": "12f4837fb6338774bae439aeecb68fab1f7fdc45",
+   "appversion": "361f1429d827c6f20c070089abc5abdd706576cd",
    "description": "A personal home page for quick access to all your personal apps/sites.",
-   "body": "Upgrading docker-fenrus to 12f4837fb6338774bae439aeecb68fab1f7fdc45",
+   "body": "Upgrading docker-fenrus to 361f1429d827c6f20c070089abc5abdd706576cd",
    "user": "github-actions[bot]"
 }
