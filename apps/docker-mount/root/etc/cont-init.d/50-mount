@@ -163,7 +163,7 @@ if [[ ${ARRAY} != 4 ]]; then
        newServiceAccount=$($(which find) ${JSONDIR}/*.json -type f | shuf -n 1)
        echo "$newServiceAccount" > ${JSONUSED}
        log "Rclone : using service account ${newServiceAccount} for remote ${remote}"
-       $(which rclone) config update $remote service_account_file $JSONDIR/${newServiceAccount$ --config=${CONFIG}
+       $(which rclone) config update $remote service_account_file ${newServiceAccount} --config=${CONFIG}
        $(which rclone) config update $remote service_account_file_path $JSONDIR --config=${CONFIG}
    done <<< "$RemoteList"
 fi
