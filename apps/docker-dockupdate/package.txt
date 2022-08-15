@@ -25,4 +25,4 @@ shadow-4.10-r3
 skalibs-2.11.2.0-r0
 ssl_client-1.35.0-r17
 utmps-libs-0.1.2.0-r0
-zlib-1.2.12-r2
+zlib-1.2.12-r3
