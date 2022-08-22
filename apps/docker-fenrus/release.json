@@ -5,8 +5,8 @@
    "newversion": "3.16.2",
    "appbranch": "master",
    "baseimage": "alpine",
-   "appversion": "763357695ef9ba3897bbfa7efdea7e464f007fb9",
+   "appversion": "590f8211f52d176d3e1fcce33b976e0c61f59ea9",
    "description": "A personal home page for quick access to all your personal apps/sites.",
-   "body": "Upgrading docker-fenrus to 763357695ef9ba3897bbfa7efdea7e464f007fb9",
+   "body": "Upgrading docker-fenrus to 590f8211f52d176d3e1fcce33b976e0c61f59ea9",
    "user": "github-actions[bot]"
 }
