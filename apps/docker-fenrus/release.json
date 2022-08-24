@@ -2,7 +2,7 @@
    "appname": "docker-fenrus",
    "apppic": "./images/docker-fenrus.png",
    "appfolder": "./apps/docker-fenrus",
-   "newversion": "",
+   "newversion": "3.16.2",
    "appbranch": "master",
    "baseimage": "alpine",
    "appversion": "384dd1156b93a4002861a85c9638d26374ee0d97",
