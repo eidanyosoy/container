@@ -5,7 +5,7 @@ apps docker-auto-replyarr
    "appfolder": "./apps/docker-auto-replyarr",
    "newversion": "3.16.2",
    "baseimage": "alpine",
-   "description": "Official Alpine Linux Docker image. Win at minimalism!",
+   "description": "",
    "body": "Upgrading docker-auto-replyarr to 3.16.2",
    "user": "github-actions[bot]"
 }
