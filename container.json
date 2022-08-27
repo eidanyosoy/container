@@ -5,7 +5,7 @@ apps docker-auto-replyarr
    "appfolder": "./apps/docker-auto-replyarr",
    "newversion": "3.16.2",
    "baseimage": "alpine",
-   "description": "",
+   "description": "Official Alpine Linux Docker image. Win at minimalism!",
    "body": "Upgrading docker-auto-replyarr to 3.16.2",
    "user": "github-actions[bot]"
 }
@@ -545,7 +545,7 @@ apps docker-wiki
    "appbranch": "master",
    "newversion": "3.16.2",
    "appversion": "1.4.27",
-   "wikiversion": "8.4.1",
+   "wikiversion": "8.4.2",
    "baseimage": "alpine",
    "description": "Docker + Traefik with Authelia and Cloudflare Protection",
    "body": "Upgrading docker-wiki to 3.16.2",

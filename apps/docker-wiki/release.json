@@ -5,7 +5,7 @@
    "appbranch": "master",
    "newversion": "3.16.2",
    "appversion": "1.4.27",
-   "wikiversion": "8.4.1",
+   "wikiversion": "8.4.2",
    "baseimage": "alpine",
    "description": "Docker + Traefik with Authelia and Cloudflare Protection",
    "body": "Upgrading docker-wiki to 3.16.2",
