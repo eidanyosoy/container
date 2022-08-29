@@ -45,6 +45,6 @@ readline-8.1.0-r0
 scanelf-1.2.8-r0
 sqlite-libs-3.34.1-r0
 ssl_client-1.32.1-r9
-tzdata-2022a-r0
+tzdata-2022c-r0
 xz-libs-5.2.5-r1
 zlib-1.2.12-r3
