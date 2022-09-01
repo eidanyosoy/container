@@ -22,11 +22,11 @@
    "appname": "docker-bazarr",
    "apppic": "./images/docker-bazarr.png",
    "appfolder": "./apps/docker-bazarr",
-   "newversion": "1.1.0",
+   "newversion": "1.1.1",
    "appbranch": "master",
    "baseimage": "ghcr.io/dockserver/docker-alpine:latest",
    "description": "Bazarr is a companion application to Sonarr and Radarr. It manages and downloads subtitles based on your requirements. You define your preferences by TV show or movie and Bazarr takes care of everything for you.",
-   "body": "Upgrading docker-bazarr to 1.1.0",
+   "body": "Upgrading docker-bazarr to 1.1.1",
    "user": "github-actions[bot]"
 }
 {
@@ -44,10 +44,10 @@
    "appname": "docker-cloudflared",
    "apppic": "./images/docker-cloudflared.png",
    "appfolder": "./apps/docker-cloudflared",
-   "newversion": "2022.8.2",
+   "newversion": "2022.8.4",
    "baseimage": "alpine",
    "description": "Cloudflare Tunnel client (formerly Argo Tunnel)",
-   "body": "Upgrading docker-cloudflared to 2022.8.2",
+   "body": "Upgrading docker-cloudflared to 2022.8.4",
    "user": "github-actions[bot]"
 }
 {
@@ -154,30 +154,30 @@
    "newversion": "3.16.2",
    "appbranch": "master",
    "baseimage": "alpine",
-   "appversion": "72bbaf12be569e5444f31e45b8bf530df6286b46",
+   "appversion": "458ce62133ae025b454667d7ff22cefb733d5d2a",
    "description": "A personal home page for quick access to all your personal apps/sites.",
-   "body": "Upgrading docker-fenrus to 72bbaf12be569e5444f31e45b8bf530df6286b46",
+   "body": "Upgrading docker-fenrus to 458ce62133ae025b454667d7ff22cefb733d5d2a",
    "user": "github-actions[bot]"
 }
 {
    "appname": "docker-gdsa",
    "apppic": "./images/docker-gdsa.png",
    "appfolder": "./apps/docker-gdsa",
-   "newversion": "399.0.0-alpine",
+   "newversion": "400.0.0-alpine",
    "baseimage": "gcr.io/google.com/cloudsdktool/cloud-sdk",
    "description": "Docker for Creating GDSA keys",
-   "body": "Upgrading docker-gdsa to 399.0.0-alpine",
+   "body": "Upgrading docker-gdsa to 400.0.0-alpine",
    "user": "dockserver-actions[bot]"
 }
 {
    "appname": "docker-jackett",
    "apppic": "./images/docker-jackett.png",
    "appfolder": "./apps/docker-jackett",
-   "newversion": "0.20.1810",
+   "newversion": "0.20.1821",
    "appbranch": "master",
    "baseimage": "ghcr.io/linuxserver/baseimage-ubuntu:bionic",
    "description": "API Support for your favorite torrent trackers",
-   "body": "Upgrading docker-jackett to 0.20.1810",
+   "body": "Upgrading docker-jackett to 0.20.1821",
    "user": "github-actions[bot]"
 }
 {
@@ -308,11 +308,11 @@
    "appname": "docker-plex",
    "apppic": "./images/docker-plex.png",
    "appfolder": "./apps/docker-plex",
-   "newversion": "1.28.2.6106-44a5bbd28",
+   "newversion": "1.28.2.6151-914ddd2b3",
    "appbranch": "master",
    "baseimage": "ghcr.io/linuxserver/baseimage-ubuntu:jammy",
    "description": "Docker Container for Plex Media Server || PLEX PASS",
-   "body": "Upgrading docker-plex to 1.28.2.6106-44a5bbd28",
+   "body": "Upgrading docker-plex to 1.28.2.6151-914ddd2b3",
    "user": "github-actions[bot]"
 }
 {
@@ -330,12 +330,12 @@
    "appname": "docker-qbittorrent",
    "apppic": "./images/docker-qbittorrent.png",
    "appfolder": "./apps/docker-qbittorrent",
-   "newversion": "4.4.4-r0",
+   "newversion": "4.4.5-r0",
    "appversion": "1.7",
    "appbranch": "master",
    "baseimage": "ghcr.io/linuxserver/baseimage-alpine:edge",
    "description": "Cli to manage qBittorrent",
-   "body": "Upgrading docker-qbittorrent to 4.4.4-r0 with 1.7",
+   "body": "Upgrading docker-qbittorrent to 4.4.5-r0 with 1.7",
    "user": "github-actions[bot]"
 }
 {
@@ -608,11 +608,11 @@
    "appname": "docker-overseerr-nightly",
    "apppic": "./images/docker-overseerr-nightly.png",
    "appfolder": "./nightly/docker-overseerr-nightly",
-   "newversion": "2950cf4438e2d10a9c0543a848519a113527fe91",
+   "newversion": "03d5e56678c3a372114a0256ee3431deee42cb57",
    "appbranch": "develop",
    "baseimage": "ghcr.io/dockserver/docker-alpine:latest",
    "description": "Request management and media discovery tool for the Plex ecosystem",
-   "body": "Upgrading docker-overseerr-nightly to 2950cf4438e2d10a9c0543a848519a113527fe91",
+   "body": "Upgrading docker-overseerr-nightly to 03d5e56678c3a372114a0256ee3431deee42cb57",
    "user": "github-actions[bot]"
 }
 {
