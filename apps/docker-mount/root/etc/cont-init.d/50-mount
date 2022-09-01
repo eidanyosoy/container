@@ -171,39 +171,31 @@ fi
 source /system/mount/mount.env
 
 ## Wird als source file genommen 
-[${myArray[0]}]
-type = drive
-scope = drive
-use_trash = false
-chunk_size = 128M
-acknowledge_abuse = true
-pacer_min_sleep = 1ms
-pacer_burst = 5000
-team_drive = ${myArray[1]}
-server_side_across_configs = true
-service_account_file = ${newServiceAccount}
-service_account_file_path = ${JSONDIR}
+##[${myArray[0]}]
+##type = drive
+##scope = drive
+##use_trash = false
+##chunk_size = 128M
+##acknowledge_abuse = true
+##pacer_min_sleep = 1ms
+##pacer_burst = 5000
+##team_drive = ${myArray[1]}
+##server_side_across_configs = true
+##service_account_file = ${newServiceAccount}
+##service_account_file_path = ${JSONDIR}
 
-[${myArray[0]}crypt]
-type = crypt
-remote = ${myArray[0]}:/encrypt
-filename_encryption = standard
-directory_name_encryption = true
-password = ${ENC_PASSWORD}
-password2 = ${ENC_SALT}
+##[${myArray[0]}crypt]
+##type = crypt
+##remote = ${myArray[0]}:/encrypt
+##filename_encryption = standard
+##directory_name_encryption = true
+##password = ${ENC_PASSWORD}
+##password2 = ${ENC_SALT}
 
 
 ## Von a nach b ohne viel Mühe und kein CP oder bind mount
 ## Wenn keine team drive id's gefunden worden sind  für alle anderen dann möglich 
-(envsubst < /system/rclone/rclone.conf) >> /app/rclone/rclone.conf
-
-
-
-
-
-
-#### Das hier muss neu  und einfacher werden 
-
+## (envsubst < /system/rclone/rclone.conf) >> /app/rclone/rclone.conf
 
 
 ARRAY=$(ls -A ${JSONDIR} | wc -l)
@@ -219,7 +211,7 @@ if [[ ${ARRAY} != 0 ]]; then
          TDID=$($(which rclone) config show $i --config=${SOURCECONFIG} | egrep team_drive | awk $'{print $3}')
          GETP=$(grep -C7 "$TDID" $SOURCECONFIG | tail -1 | sed "s/\[//g" | sed "s/\]//g" | awk $'{print $3}')
          GETS=$(grep -C8 "$TDID" $SOURCECONFIG | tail -1 | sed "s/\[//g" | sed "s/\]//g" | awk $'{print $3}')
-         LREMO=$($(which rclone) listremotes --config=$SOURCECONFIG | grep "$1" | sed -e 's/://g' | sed '/union/d' | sed '/remote/d' | sed '/GDSA/d' | sed '/gdrive/d' | sed '/crypt/d' | wc -l)
+         LREMO=$($(which rclone) listremotes --config=${SOURCECONFIG} | grep "$1" | sed -e 's/://g' | sed '/union/d' | sed '/remote/d' | sed '/GDSA/d' | sed '/gdrive/d' | sed '/crypt/d' | wc -l)
          RCRYPT=$(grep $i:/encrypt $SOURCECONFIG | sed "s/\[//g" | sed "s/\]//g" | awk $'{print $3}')
          if [[ $RCRYPT != "" ]]; then
             echo -e "tdrive$NRTD|${TDID}|${GETP}|${GETS}" >>$ENDFILE
@@ -236,29 +228,37 @@ if [[ ${ARRAY} != 0 ]]; then
    sed '/^\s*#.*$/d' $ENDFILE | while IFS=$'|' read -r -a myArray; do
       if [[ ${myArray[2]} == "" && ${myArray[3]} == "" ]]; then
 
-echo -e "\n
-[${myArray[0]}]
+echo -e "\n[${myArray[0]}]
 type = drive
 scope = drive
+use_trash = false
+chunk_size = 128M
+acknowledge_abuse = true
+pacer_min_sleep = 1ms
+pacer_burst = 5000
+team_drive = ${myArray[1]}
 server_side_across_configs = true
-service_account_file = ${JSONDIR}/${newServiceAccount}
-service_account_file_path = ${JSONDIR}
-team_drive = ${myArray[1]}" >>$ENDCONFIG
+service_account_file = ${newServiceAccount}
+service_account_file_path = ${JSONDIR}" >>$ENDCONFIG
 
-         rclone lsd ${myArray[0]}: --drive-service-account-file=$JSONDIR/${newServiceAccount} --fast-list --config=$ENDCONFIG
+         rclone lsd ${myArray[0]}: --drive-service-account-file=${newServiceAccount} --fast-list --config=$ENDCONFIG
          if [ $? != 0 ]; then rclone config delete ${myArray[0]} --config=$ENDCONFIG ; fi
       else
 
-echo -e "\n
-[${myArray[0]}]
+echo -e "\n[${myArray[0]}]
 type = drive
 scope = drive
+use_trash = false
+chunk_size = 128M
+acknowledge_abuse = true
+pacer_min_sleep = 1ms
+pacer_burst = 5000
+team_drive = ${myArray[1]}
 server_side_across_configs = true
-service_account_file = ${JSONDIR}/${newServiceAccount}
-service_account_file_path = ${JSONDIR}
-team_drive = ${myArray[1]}" >>$ENDCONFIG
+service_account_file = ${newServiceAccount}
+service_account_file_path = ${JSONDIR}"" >>$ENDCONFIG
 
-         rclone lsd ${myArray[0]}: --drive-service-account-file=$JSONDIR/${newServiceAccount} --fast-list --config=$ENDCONFIG
+         rclone lsd ${myArray[0]}: --drive-service-account-file=${newServiceAccount} --fast-list --config=$ENDCONFIG
          if [ $? != 0 ]; then
             $(which rclone) config delete ${myArray[0]} --config=$ENDCONFIG
          else
@@ -269,7 +269,7 @@ team_drive = ${myArray[1]}" >>$ENDCONFIG
                ENC_PASSWORD=${myArray[2]}
                ENC_SALT=${myArray[3]}
 
-echo -e "\n[tcrypt-${myArray[0]}]
+echo -e "\n[${myArray[0]}crypt]
 type = crypt
 remote = ${myArray[0]}:/encrypt
 filename_encryption = standard
