@@ -5,7 +5,7 @@
    "newversion": "0.4.5.1955",
    "appbranch": "nightly",
    "baseimage": "ghcr.io/dockserver/docker-alpine:latest",
-   "description": "null",
+   "description": "",
    "body": "Upgrading docker-prowlarr to 0.4.5.1955",
    "user": "github-actions[bot]"
 }
