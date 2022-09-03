@@ -2,9 +2,9 @@
    "appname": "docker-vnstat",
    "apppic": "",
    "appfolder": "./apps/docker-vnstat",
-   "newversion": "",
+   "newversion": "5.0.0-beta",
    "finalimage": "node:alpine3.15",
    "description": "GUI Client for vnStat Network Monitor for Linux or GNU/Linux",
-   "body": "Upgrading docker-vnstat to ",
+   "body": "Upgrading docker-vnstat to 5.0.0-beta",
    "user": "dockserver-image[bot]"
 }
