@@ -183,9 +183,9 @@ apps docker-fenrus
    "newversion": "3.16.2",
    "appbranch": "master",
    "baseimage": "alpine",
-   "appversion": "7e01379cacd9c1c9336f879d77a288427e3d9812",
+   "appversion": "46dcb32470f148c1fc40656f163c6b568b178893",
    "description": "A personal home page for quick access to all your personal apps/sites.",
-   "body": "Upgrading docker-fenrus to 7e01379cacd9c1c9336f879d77a288427e3d9812",
+   "body": "Upgrading docker-fenrus to 46dcb32470f148c1fc40656f163c6b568b178893",
    "user": "github-actions[bot]"
 }
 
@@ -206,11 +206,11 @@ apps docker-jackett
    "appname": "docker-jackett",
    "apppic": "./images/docker-jackett.png",
    "appfolder": "./apps/docker-jackett",
-   "newversion": "0.20.1825",
+   "newversion": "0.20.1830",
    "appbranch": "master",
    "baseimage": "ghcr.io/linuxserver/baseimage-ubuntu:bionic",
    "description": "API Support for your favorite torrent trackers",
-   "body": "Upgrading docker-jackett to 0.20.1825",
+   "body": "Upgrading docker-jackett to 0.20.1830",
    "user": "github-actions[bot]"
 }
 
@@ -721,11 +721,11 @@ nightly docker-overseerr-nightly
    "appname": "docker-overseerr-nightly",
    "apppic": "./images/docker-overseerr-nightly.png",
    "appfolder": "./nightly/docker-overseerr-nightly",
-   "newversion": "03d5e56678c3a372114a0256ee3431deee42cb57",
+   "newversion": "867286996b805fefd3c16f2a1a05d5f2c10daced",
    "appbranch": "develop",
    "baseimage": "ghcr.io/dockserver/docker-alpine:latest",
    "description": "Request management and media discovery tool for the Plex ecosystem",
-   "body": "Upgrading docker-overseerr-nightly to 03d5e56678c3a372114a0256ee3431deee42cb57",
+   "body": "Upgrading docker-overseerr-nightly to 867286996b805fefd3c16f2a1a05d5f2c10daced",
    "user": "github-actions[bot]"
 }
 
@@ -747,10 +747,10 @@ nightly docker-sabnzbd-nightly
    "appname": "docker-sabnzbd-nightly",
    "apppic": "./images/docker-sabnzbd-nightly.png",
    "appfolder": "./nightly/docker-sabnzbd-nightly",
-   "newversion": "c43e74eabd17f0deff4eaa089c9cf71ff6888f13",
+   "newversion": "2685f9adab97ceae7bfcddfd1fc2402d63181de0",
    "appbranch": "develop",
    "description": "SABnzbd - The automated Usenet download tool",
-   "body": "Upgrading docker-sabnzbd-nightly to c43e74eabd17f0deff4eaa089c9cf71ff6888f13",
+   "body": "Upgrading docker-sabnzbd-nightly to 2685f9adab97ceae7bfcddfd1fc2402d63181de0",
    "user": "github-actions[bot]"
 }
 
