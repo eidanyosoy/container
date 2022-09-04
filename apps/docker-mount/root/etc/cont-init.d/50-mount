@@ -151,6 +151,9 @@ for folder in ${TMPRCLONE} ${SUNION} ${SDOWN} ${SMOUNT} ${APP} ${SYSAPP} ${JSONS
 done
 
 source /system/mount/mount.env
+
+(envsubst < /system/rclone/rclone.conf) >> /app/rclone/rclone.conf
+
 ARRAY=$(ls -A ${JSONDIR} | wc -l)
 
 if [[ ${ARRAY} != 4 ]]; then
@@ -158,7 +161,7 @@ if [[ ${ARRAY} != 4 ]]; then
        $(which mv) -f "${f}" "${f//GDSA/}" &>/dev/null
    done
    newServiceAccount=$($(which find) ${JSONDIR}/*.json -type f | shuf -n 1)
-   RemoteList=$($(which rclone) config dump --config=${SOURCECONFIG} | jq -r 'to_entries | (.[] | select(.value.team_drive)) | .key')
+   RemoteList=$($(which rclone) config dump --config=${CONFIG} | jq -r 'to_entries | (.[] | select(.value.team_drive)) | .key')
    while IFS= read -r remote; do
        newServiceAccount=$($(which find) ${JSONDIR}/*.json -type f | shuf -n 1)
        echo "$newServiceAccount" > ${JSONUSED}
@@ -168,134 +171,25 @@ if [[ ${ARRAY} != 4 ]]; then
    done <<< "$RemoteList"
 fi
 
-source /system/mount/mount.env
-
-## Wird als source file genommen 
-##[${myArray[0]}]
-##type = drive
-##scope = drive
-##use_trash = false
-##chunk_size = 128M
-##acknowledge_abuse = true
-##pacer_min_sleep = 1ms
-##pacer_burst = 5000
-##team_drive = ${myArray[1]}
-##server_side_across_configs = true
-##service_account_file = ${newServiceAccount}
-##service_account_file_path = ${JSONDIR}
-
-##[${myArray[0]}crypt]
-##type = crypt
-##remote = ${myArray[0]}:/encrypt
-##filename_encryption = standard
-##directory_name_encryption = true
-##password = ${ENC_PASSWORD}
-##password2 = ${ENC_SALT}
-
-
-## Von a nach b ohne viel Mühe und kein CP oder bind mount
-## Wenn keine team drive id's gefunden worden sind  für alle anderen dann möglich 
-## (envsubst < /system/rclone/rclone.conf) >> /app/rclone/rclone.conf
-
-
-ARRAY=$(ls -A ${JSONDIR} | wc -l)
-if [[ ${ARRAY} != 0 ]]; then
-   if [[ -f $TMPCONFIG ]]; then rm -rf $TMPCONFIG ; fi
-   if [[ ! -f $TMPCONFIG ]]; then awk '$1~search {p=1} NF==0 {p=0}; p' search="gdrive|gcrypt" $SOURCECONFIG >$TMPCONFIG ; fi
-   if [[ ! -f $ENDFILE ]]; then
-      IFS=$'\n'
-      filter="$1"
-      mapfile -t mounts < <(eval rclone listremotes --config=$SOURCECONFIG | grep "$1" |  grep 't' |  sed '/gd/d' | sed '/remo/d' | sed '/crypt/d')
-      for i in ${mounts[@]}; do
-         NRTD=$((NRTD + 1))
-         TDID=$($(which rclone) config show $i --config=${SOURCECONFIG} | egrep team_drive | awk $'{print $3}')
-         GETP=$(grep -C7 "$TDID" $SOURCECONFIG | tail -1 | sed "s/\[//g" | sed "s/\]//g" | awk $'{print $3}')
-         GETS=$(grep -C8 "$TDID" $SOURCECONFIG | tail -1 | sed "s/\[//g" | sed "s/\]//g" | awk $'{print $3}')
-         LREMO=$($(which rclone) listremotes --config=${SOURCECONFIG} | grep "$1" | sed -e 's/://g' | sed '/union/d' | sed '/remote/d' | sed '/GDSA/d' | sed '/gdrive/d' | sed '/crypt/d' | wc -l)
-         RCRYPT=$(grep $i:/encrypt $SOURCECONFIG | sed "s/\[//g" | sed "s/\]//g" | awk $'{print $3}')
-         if [[ $RCRYPT != "" ]]; then
-            echo -e "tdrive$NRTD|${TDID}|${GETP}|${GETS}" >>$ENDFILE
-         else
-            echo -e "tdrive$NRTD|${TDID}" >>$ENDFILE
-         fi
-      done
-   else
-      echo "${ENDFILE} exist"
-   fi
-   if [[ -f $ENDCONFIG ]]; then sed -i '/^$/d' $ENDCONFIG; fi
-   if [[ -f $ENDCONFIG ]]; then rm -rf $ENDCONFIG; fi
-   newServiceAccount=$($(which find) ${JSONDIR}/*.json -type f | shuf -n 1)
-   sed '/^\s*#.*$/d' $ENDFILE | while IFS=$'|' read -r -a myArray; do
-      if [[ ${myArray[2]} == "" && ${myArray[3]} == "" ]]; then
-
-echo -e "\n[${myArray[0]}]
-type = drive
-scope = drive
-use_trash = false
-chunk_size = 128M
-acknowledge_abuse = true
-pacer_min_sleep = 1ms
-pacer_burst = 5000
-team_drive = ${myArray[1]}
-server_side_across_configs = true
-service_account_file = ${newServiceAccount}
-service_account_file_path = ${JSONDIR}" >>$ENDCONFIG
-
-         rclone lsd ${myArray[0]}: --drive-service-account-file=${newServiceAccount} --fast-list --config=$ENDCONFIG
-         if [ $? != 0 ]; then rclone config delete ${myArray[0]} --config=$ENDCONFIG ; fi
-      else
-
-echo -e "\n[${myArray[0]}]
-type = drive
-scope = drive
-use_trash = false
-chunk_size = 128M
-acknowledge_abuse = true
-pacer_min_sleep = 1ms
-pacer_burst = 5000
-team_drive = ${myArray[1]}
-server_side_across_configs = true
-service_account_file = ${newServiceAccount}
-service_account_file_path = ${JSONDIR}"" >>$ENDCONFIG
-
-         rclone lsd ${myArray[0]}: --drive-service-account-file=${newServiceAccount} --fast-list --config=$ENDCONFIG
-         if [ $? != 0 ]; then
-            $(which rclone) config delete ${myArray[0]} --config=$ENDCONFIG
-         else
-            if [[ ${HASHPASSWORD} == "plain" && ${HASHPASSWORD} != "hashed" ]] ; then
-               ENC_PASSWORD=$(rclone obscure ${myArray[2]} | tail -n1)
-               ENC_SALT=$(rclone obscure ${myArray[3]} | tail -n1)
-            else
-               ENC_PASSWORD=${myArray[2]}
-               ENC_SALT=${myArray[3]}
-
-echo -e "\n[${myArray[0]}crypt]
-type = crypt
-remote = ${myArray[0]}:/encrypt
-filename_encryption = standard
-directory_name_encryption = true
-password = ${ENC_PASSWORD}
-password2 = ${ENC_SALT}" >>$ENDCONFIG
-
-               $(which rclone) mkdir ${myArray[0]}:/encrypt --drive-service-account-file=$JSONDIR/${newServiceAccount} --config=$ENDCONFIG
-            fi
-         fi
-      fi
-   done
-   if [[ -f $TMPCONFIG ]]; then awk '$1~search {p=1} NF==0 {p=0}; p' search="gdrive|gcrypt" $TMPCONFIG >>$ENDCONFIG ; fi
-else
-   if [[ ! -f $ENDCONFIG ]]; then ln -sv $SOURCECONFIG $ENDCONFIG ; else rm -rf $ENDCONFIG && ln -sv $SOURCECONFIG $ENDCONFIG ; fi
-fi
-
-#### DER HIER MUSS BLEIBEN ####
-#### rclone union hier     ####
+#### rclone union ####
 CONFIG=/app/rclone/rclone.conf
-mapfile -t mapped < <(eval rclone listremotes --config=${CONFIG} | sort -u)
+
+$(which rclone) config delete remote
+
+value=/tmp/rcunion.union
+if [[ -f ${value} ]]; then rm -rf ${value}; fi
+IFS=$'\n'
+filter="$1"
+CONFIG=/app/rclone/rclone.conf
+mapfile -t mounts < <(eval rclone listremotes --config=${CONFIG} | grep "$filter" | sed -e 's/://g' | sed '/remote/d' | sed '/union/d' | sed '/download/d' | sed '/remote/d' | sed '/GDSA/d')
+for i in ${mounts[@]}; do
+   echo -n "$i: " >>${value}
+done
+mapfile -t mapped < <(eval cat ${value})
 for i in ${mapped[@]}; do
-    $(which rclone) config create remote union upstreams $i action_policy 'all' create_policy 'all' search_policy 'all' cache_time 120 --config=${CONFIG}
+  $(which rclone) config create remote union upstreams $i action_policy 'all' create_policy 'all' search_policy 'all' cache_time 120 --config=${CONFIG}
 done
 
-apk add --quiet --no-progress --update coreutils
 mkdir -p /root/.config/rclone/
 mount --bind /app/rclone/ /root/.config/rclone/
 
