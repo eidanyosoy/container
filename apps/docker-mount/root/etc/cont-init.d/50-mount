@@ -152,11 +152,9 @@ done
 
 source /system/mount/mount.env
 
-(envsubst < /system/rclone/rclone.conf) >> /app/rclone/rclone.conf
-
 ARRAY=$(ls -A ${JSONDIR} | wc -l)
-
-if [[ ${ARRAY} != 4 ]]; then
+if [[ ! -f $ENDFILE && ${ARRAY} != 4 ]] ; then
+   (envsubst < /system/rclone/rclone.conf) >> /app/rclone/rclone.conf
    for f in /system/mount/keys/*; do
        $(which mv) -f "${f}" "${f//GDSA/}" &>/dev/null
    done
@@ -174,7 +172,30 @@ fi
 #### rclone union ####
 CONFIG=/app/rclone/rclone.conf
 
-$(which rclone) config delete remote
+$(which rclone) config delete remote --config=${CONFIG}
+ARRAY=$(ls -A ${JSONDIR} | wc -l)
+if [[ -f $ENDFILE && ${ARRAY} != 4 ]] ; then
+   for f in /system/mount/keys/*; do
+       $(which mv) -f "${f}" "${f//GDSA/}" &>/dev/null
+   done
+   newServiceAccount=$($(which find) ${JSONDIR}/*.json -type f | shuf -n 1)
+   source /system/mount/mount.env
+   sed '/^\s*#.*$/d' $ENDFILE | while IFS=$'|' read -r -a myArray; do
+      if [[ ${myArray[2]} == "" && ${myArray[3]} == "" ]]; then
+         $(which rclone) config create ${myArray[0]} drive scope 'drive' server_side_across_configs 'true' team_drive '${myArray[2]}' service_account_file ${newServiceAccount} service_account_file_path $JSONDIR --config=${CONFIG}
+      fi
+      if [[ ${myArray[2]} != "" && ${myArray[3]} != "" ]]; then
+         if [[ ${HASHPASSWORD} == "plain" && ${HASHPASSWORD} != "hashed" ]] ; then
+            ENC_PASSWORD=$($(which rclone) obscure ${myArray[2]} | tail -n1)
+            ENC_SALT=$($(which rclone) obscure ${myArray[3]} | tail -n1)
+         else
+            ENC_PASSWORD=${myArray[2]}
+            ENC_SALT=${myArray[3]}
+         fi
+         $(which rclone) config create ${myArray[0]}-crypt crypt remote '${myArray[0]}:/encrypt' filename_encryption 'standard' directory_name_encryption 'true' password '$ENC_PASSWORD' password2 '$ENC_SALT' --config=${CONFIG}
+      fi
+   done
+fi
 
 value=/tmp/rcunion.union
 if [[ -f ${value} ]]; then rm -rf ${value}; fi
