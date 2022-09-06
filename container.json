@@ -15,10 +15,10 @@ apps docker-backup
    "appname": "docker-backup",
    "apppic": "./images/docker-backup.png",
    "appfolder": "./apps/docker-backup",
-   "newversion": "3.16.2",
+   "newversion": "",
    "baseimage": "alpine",
    "description": "Official Alpine Linux Docker image. Win at minimalism!",
-   "body": "Upgrading docker-backup to 3.16.2",
+   "body": "Upgrading docker-backup to ",
    "user": "github-actions[bot]"
 }
 
@@ -543,12 +543,12 @@ apps docker-wiki
    "apppic": "./images/docker-wiki.png",
    "appfolder": "./apps/docker-wiki",
    "appbranch": "master",
-   "newversion": "3.16.2",
+   "newversion": "",
    "appversion": "1.4.27",
    "wikiversion": "8.4.2",
    "baseimage": "alpine",
    "description": "Docker + Traefik with Authelia and Cloudflare Protection",
-   "body": "Upgrading docker-wiki to 3.16.2",
+   "body": "Upgrading docker-wiki to ",
    "user": "github-actions[bot]"
 }
 
@@ -570,10 +570,10 @@ base alpine
    "appname": "alpine",
    "apppic": "",
    "appfolder": "./base/alpine",
-   "newversion": "3.16.2",
+   "newversion": "",
    "baseimage": "alpine",
    "description": "Official Alpine Linux Docker image. Win at minimalism!",
-   "body": "Upgrading alpine to 3.16.2",
+   "body": "Upgrading alpine to ",
    "user": "github-actions[bot]"
 }
 
@@ -633,11 +633,11 @@ base docker-dockserver
    "appname": "docker-dockserver",
    "apppic": "",
    "appfolder": "./base/docker-dockserver",
-   "newversion": "3.16.2",
-   "appversion": "3.16.2",
+   "newversion": "",
+   "appversion": "",
    "baseimage": "alpine",
    "description": "Docker + Traefik with Authelia and Cloudflare Protection",
-   "body": "Upgrading docker-dockserver to 3.16.2",
+   "body": "Upgrading docker-dockserver to ",
    "user": "github-actions[bot]"
 }
 
