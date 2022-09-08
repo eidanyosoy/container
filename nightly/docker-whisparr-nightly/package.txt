@@ -30,13 +30,13 @@ libass-0.15.2-r0
 libattr-2.5.1-r1
 libblkid-2.38.1-r0
 libbsd-0.11.6-r2
-libbz2-1.0.8-r2
+libbz2-1.0.8-r3
 libc-utils-0.7.2-r3
 libcrypto1.1-1.1.1n-r0
 libcrypto3-3.0.5-r2
 libcurl-7.80.0-r0
 libdav1d-0.9.2-r0
-libdrm-2.4.112-r1
+libdrm-2.4.113-r0
 libexpat-2.4.8-r1
 libffi-3.4.2-r1
 libgcc-12.1.1_git20220630-r1
