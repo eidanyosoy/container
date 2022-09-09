@@ -77,6 +77,12 @@ rcloneenv=/system/mount/mount.env
 rclonetmp=/tmp/mount.env
 rclonesample=/app/env/sample.env
 
+if [[ ${VFS_CACHE_MAX_SIZE} == 'null' ]]; then
+   VFS_CACHE_MAX_SIZE=${checkspace}G
+else
+   VFS_CACHE_MAX_SIZE=${VFS_CACHE_MAX_SIZE}
+   sed -i "s#VFS_CACHE_MAX_SIZE=G#VFS_CACHE_MAX_SIZE=50G#g" ${rcloneenv}
+fi
 UAGENT=${UAGENT:-null}
 if [[ ${UAGENT} == 'null' ]]; then
    UAGENT=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
