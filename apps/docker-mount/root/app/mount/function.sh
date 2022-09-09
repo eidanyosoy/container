@@ -179,12 +179,20 @@ $(which rclone) rcd \\
   --config=${CONFIG} \\
   --log-file=${MLOG} \\
   --log-level=${LOGLEVEL} \\
+  --timeout=1h \\
+  --use-mmap \\
+  --ignore-errors \\
   --user-agent=${UAGENT} \\
   --cache-dir=${TMPRCLONE} \\
   --human-readable \\
   --track-renames \\
   --track-renames-strategy modtime,leaf \\
-  --buffer-size=64M \\
+  --drive-use-trash=${DRIVETRASH} \\
+  --drive-stop-on-upload-limit \\
+  --drive-server-side-across-configs \\
+  --drive-acknowledge-abuse \\
+  --drive-chunk-size=${DRIVE_CHUNK_SIZE} \\
+  --buffer-size=${BUFFER_SIZE} \\
   --rc-no-auth \\
   --rc-allow-origin=* \\
   --rc-addr=0.0.0.0:8554 \\
@@ -193,17 +201,17 @@ $(which rclone) rcd \\
   --rc-web-gui-no-open-browser &
   ### \\--rc-web-fetch-url=https://api.github.com/repos/controlol/rclone-webui/releases/latest &
 
+sleep 10
+
+### SET MAJOR OPTIONS FOR MOUNT : ${RCD} options/set options/set --json 
+${RCD} options/set --json {'"main": { "TPSLimitBurst": ${TPSBURST}, "TPSLimit": ${TPSLIMIT} , "Checkers": 6, "Transfers": 6, "BufferSize": "${BUFFER_SIZE}", "TrackRenames": true, "TrackRenamesStrategy":"modtime,leaf", "NoUpdateModTime": true, "UserAgent": "${UAGENT}", "CutoffMode":"hard", "Progress":true, "UseMmap":true, "HumanReadable":true}'} &>/dev/null
+${RCD} options/set --json {'"vfs": { "GID": '${PGID}', "UID": '${PUID}', "Umask": '${UMASK}', "CacheMode": 3, "CacheMaxSize": "${VFS_CACHE_MAX_SIZE}", "CacheMaxAge": 21600000000000, "CachePollInterval": 120000000000, "PollInterval": 60000000000, "ChunkSize": "${VFS_READ_CHUNK_SIZE}", "ChunkSizeLimit": "${VFS_READ_CHUNK_SIZE_LIMIT}", "DirCacheTime": 43200000000000, "NoModTime": true,"NoChecksum": true}'} &>/dev/null
+${RCD} options/set --json {'"mount": { "AllowNonEmpty": true, "AllowOther": true, "AsyncRead": true, "WritebackCache": true}'} &>/dev/null
 sleep 5
+
 ## SIMPLE START MOUNT
 ${RCD} mount/mount \\
-  fs=remote: mountPoint=/mnt/remotes \\
-  mountType=mount vfsOpt='{"CacheMode": 2, "GID": 1000, "UID": 1000, "Umask": 0}' mountOpt='{"AllowOther": true}'
-
-sleep 5
-### SET MAJOR OPTIONS FOR MOUNT : ${RCD} options/set options/set --json 
-${RCD} options/set --json {'"main": { "TPSLimitBurst": 20, "TPSLimit": 20 , "Checkers": 6, "Transfers": 6, "BufferSize": 16777216, "TrackRenames": true, "TrackRenamesStrategy":"modtime,leaf", "NoUpdateModTime": true, "BufferSize": 67108864, "UserAgent": "rclone_mount", "CutoffMode":"hard", "Progress":true, "UseMmap":true, "HumanReadable":true}'} > /dev/null
-${RCD} options/set --json {'"vfs": { "GID": '1000', "UID": '1000', "CacheMode": 1, "Umask": 0, "CacheMaxSize": 322122547200, "CacheMaxAge": 3600000000000, "CacheMaxSize": 322122547200, "CachePollInterval": 300000000000, "ChunkSize": 67108864, "ChunkSizeLimit": 536870912, "ReadAhead": 67108864, "NoModTime": true,"NoChecksum": true, "WriteBack": 300000000000,"CaseInsensitive": true, "ReadAhead": 2147483648}'} > /dev/null 
-${RCD} options/set --json {'"mount": { "AllowNonEmpty": true, "AllowOther": true, "AsyncRead": true, "WritebackCache": true}'} > /dev/null
+  fs=remote: mountPoint=/mnt/remotes mountType=mount &>/dev/null
 
 touch /tmp/rclone.running
 EOF
@@ -243,7 +251,7 @@ for fod in /mnt/remotes/* ;do
     FOLDER="$(basename -- $fod)"
     IFS=- read -r <<< "$ACT"
       log " VFS refreshing : $FOLDER"
-      $RCD vfs/forget dir=$FOLDER --fast-list _async=true -drive-pacer-burst 200 --drive-pacer-min-sleep 10ms --timeout 30m > /dev/null
+      $RCD vfs/forget dir=$FOLDER --fast-list _async=true --drive-pacer-burst 200 --drive-pacer-min-sleep 10ms --timeout 30m > /dev/null
       $(which sleep) 1
       $RCD vfs/refresh dir=$FOLDER --fast-list _async=true > /dev/null
 done  
