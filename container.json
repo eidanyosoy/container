@@ -90,11 +90,11 @@ apps docker-dash
    "appname": "docker-dash",
    "apppic": "",
    "appfolder": "./apps/docker-dash",
-   "newversion": "4.5.0",
+   "newversion": "4.5.1",
    "baseimage": "alpine",
    "baseversion": "",
    "description": "A simple, modern server dashboard, primarily used by smaller private servers",
-   "body": "Upgrading docker-dash to 4.5.0",
+   "body": "Upgrading docker-dash to 4.5.1",
    "user": "dockserver-image[bot]"
 }
 
@@ -545,7 +545,7 @@ apps docker-wiki
    "appbranch": "master",
    "newversion": "",
    "appversion": "1.4.27",
-   "wikiversion": "8.5.1",
+   "wikiversion": "8.5.2",
    "baseimage": "alpine",
    "description": "Docker + Traefik with Authelia and Cloudflare Protection",
    "body": "Upgrading docker-wiki to ",
