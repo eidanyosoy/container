@@ -8,7 +8,7 @@ LABEL org.opencontainers.image.source="https://github.com/dockserver/container"
 ARG TARGETPLATFORM
 ARG BUILDPLATFORM
 
-ARG VERSION="1.5.1"
+ARG VERSION="null"
 ARG BRANCH=""
 
 ENV DEBIAN_FRONTEND="noninteractive" \
