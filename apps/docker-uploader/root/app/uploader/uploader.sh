@@ -20,7 +20,7 @@ log "dockserver.io Multi-Thread Uploader started"
 BASE=/system/uploader
 CSV=/system/servicekeys/uploader.csv
 UPPED=/system/servicekeys/uploaded.json
-KEYLOCAL=/system/servicekeys/keys/
+KEYLOCAL=/system/servicekeys/keys
 LOGFILE=/system/uploader/logs
 START=/system/uploader/json/upload
 DONE=/system/uploader/json/done
@@ -113,7 +113,7 @@ cat > ${ENDCONFIG} << EOF; $(echo)
 type = drive
 scope = drive
 server_side_across_configs = true
-service_account_file = ${JSONDIR}/${KEY}$[USED]
+service_account_file = ${KEYLOCAL}/${KEY}$[USED]
 team_drive = ${uppdir[1]}
 EOF
      else
@@ -124,7 +124,7 @@ cat > ${ENDCONFIG} << EOF; $(echo)
 type = drive
 scope = drive
 server_side_across_configs = true
-service_account_file = ${JSONDIR}/${KEY}$[USED]
+service_account_file = ${KEYLOCAL}/${KEY}$[USED]
 team_drive = ${uppdir[1]}
 ##
 [${KEY}$[USED]C]
@@ -148,7 +148,7 @@ function replace-used() {
    #### CHECK IS CUSTOM RCLONE.CONF IS AVAILABLE ####
    if test -f "${CUSTOM}/${FILE}.conf" ; then
       CONFIG=${CUSTOM}/${FILE}.conf && \
-        USED=`$(which rclone) listremotes --config=${CONFIG} | grep "$1" | sed -e 's/://g' | sed -e 's/GDSA//g' | sort`
+        USED=`$(which rclone) listremotes --config="${CONFIG}" | grep "$1" | sed -e 's/://g' | sed -e 's/GDSA//g' | sort`
    else
       CONFIG=/system/servicekeys/rclonegdsa.conf && \
         ARRAY=$($(which ls) ${KEYLOCAL} | wc -l) && \
@@ -217,7 +217,7 @@ function rcloneupload() {
    #### CHECK IS CUSTOM RCLONE.CONF IS AVAILABLE ####
    if test -f "${CUSTOM}/${FILE}.conf" ; then
       CONFIG=${CUSTOM}/${FILE}.conf && \
-        USED=`$(which rclone) listremotes --config=${CONFIG} | grep "$1" | sed -e 's/://g' | sed -e 's/GDSA//g' | sort`
+        USED=`$(which rclone) listremotes --config="${CONFIG}" | grep "$1" | sed -e 's/://g' | sed -e 's/GDSA//g' | sort`
    else
       CONFIG=/system/servicekeys/rclonegdsa.conf && \
         ARRAY=$($(which ls) ${KEYLOCAL} | wc -l) && \
@@ -226,7 +226,7 @@ function rcloneupload() {
    #### REPLACED UPLOADED FILESIZE ####
    #### replace-used
    #### CRYPTED HACK ####
-   if `$(which rclone) config show --config=${CONFIG} | grep ":/encrypt" &>/dev/null`;then
+   if `$(which rclone) config show --config="${CONFIG}" | grep ":/encrypt" &>/dev/null`;then
        export CRYPTED=C
    else
        export CRYPTED=""
