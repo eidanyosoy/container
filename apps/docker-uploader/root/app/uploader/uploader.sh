@@ -20,7 +20,7 @@ log "dockserver.io Multi-Thread Uploader started"
 BASE=/system/uploader
 CSV=/system/servicekeys/uploader.csv
 UPPED=/system/servicekeys/uploaded.json
-KEYLOCAL=/system/servicekeys/keys/
+KEYLOCAL=/system/servicekeys/keys
 LOGFILE=/system/uploader/logs
 START=/system/uploader/json/upload
 DONE=/system/uploader/json/done
@@ -113,7 +113,7 @@ cat > ${ENDCONFIG} << EOF; $(echo)
 type = drive
 scope = drive
 server_side_across_configs = true
-service_account_file = ${KEYLOCAL}${KEY}$[USED]
+service_account_file = ${KEYLOCAL}/${KEY}$[USED]
 team_drive = ${uppdir[1]}
 EOF
      else
@@ -124,7 +124,7 @@ cat > ${ENDCONFIG} << EOF; $(echo)
 type = drive
 scope = drive
 server_side_across_configs = true
-service_account_file = ${KEYLOCAL}${KEY}$[USED]
+service_account_file = ${KEYLOCAL}/${KEY}$[USED]
 team_drive = ${uppdir[1]}
 ##
 [${KEY}$[USED]C]
