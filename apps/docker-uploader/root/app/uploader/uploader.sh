@@ -113,7 +113,7 @@ cat > ${ENDCONFIG} << EOF; $(echo)
 type = drive
 scope = drive
 server_side_across_configs = true
-service_account_file = ${JSONDIR}/${KEY}$[USED]
+service_account_file = ${KEYLOCAL}${KEY}$[USED]
 team_drive = ${uppdir[1]}
 EOF
      else
@@ -124,7 +124,7 @@ cat > ${ENDCONFIG} << EOF; $(echo)
 type = drive
 scope = drive
 server_side_across_configs = true
-service_account_file = ${JSONDIR}/${KEY}$[USED]
+service_account_file = ${KEYLOCAL}${KEY}$[USED]
 team_drive = ${uppdir[1]}
 ##
 [${KEY}$[USED]C]
