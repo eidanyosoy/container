@@ -102,9 +102,9 @@ if test -f ${CSV} ; then
    USED=$(( $RANDOM % ${ARRAY} + 1 ))
 
    ### TEST IS FOLDER AND CSV CORRECT ####
-   $(which cat) ${CSV} | grep -E ${DIR} | sed '/^\s*#.*$/d'| while IFS=$'|' read -ra CHECKDIR; do
+   $(which cat) ${CSV} | grep -Ew ${DIR} | sed '/^\s*#.*$/d'| while IFS=$'|' read -ra CHECKDIR; do
      if [[ ${CHECKDIR[0]} == ${DIR} ]]; then
-        $(which cat) ${CSV} | grep -E ${DIR} | sed '/^\s*#.*$/d'| while IFS=$'|' read -ra uppdir; do
+        $(which cat) ${CSV} | grep -Ew ${DIR} | sed '/^\s*#.*$/d'| while IFS=$'|' read -ra uppdir; do
         if [[ ${uppdir[2]} == "" && ${uppdir[3]} == "" ]]; then
 ### UNENCRYPTED RCLONE.CONF ####
 cat > ${ENDCONFIG} << EOF; $(echo)
