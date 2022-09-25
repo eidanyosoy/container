@@ -107,7 +107,7 @@ if test -f ${CSV} ; then
         $(which cat) ${CSV} | grep -Ew ${DIR} | sed '/^\s*#.*$/d'| while IFS=$'|' read -ra uppdir; do
         if [[ ${uppdir[2]} == "" && ${uppdir[3]} == "" ]]; then
 ### UNENCRYPTED RCLONE.CONF ####
-cat > ${ENDCONFIG} << EOF; $(echo)
+cat > "${ENDCONFIG}" << EOF; $(echo)
 ## CUSTOM RCLONE.CONF for ${FILE}
 [${KEY}$[USED]]
 type = drive
@@ -118,7 +118,7 @@ team_drive = ${uppdir[1]}
 EOF
      else
 #### CRYPTED CUSTOM RCLONE.CONF ####
-cat > ${ENDCONFIG} << EOF; $(echo)
+cat > "${ENDCONFIG}" << EOF; $(echo)
 ## CUSTOM RCLONE.CONF
 [${KEY}$[USED]]
 type = drive
