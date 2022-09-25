@@ -277,7 +277,7 @@ function rcloneupload() {
    fi
    #### REMOVE CUSTOM RCLONE.CONF ####
    if test -f "${CUSTOM}/${FILE}.conf";then
-      $(which rm) -rf ${CUSTOM}/${FILE}.conf
+      $(which rm) -rf "${CUSTOM}/${FILE}.conf"
    fi
 }
 
