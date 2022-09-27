@@ -385,7 +385,7 @@ while true ; do
             if [ "${CHECKFILES}" -eq "${TRANSFERS}" ] || [ "${CHECKFILES}" -lt "${TRANSFERS}" ]; then
                #### FALLBACK TO SINGLE UPLOAD ####
                rcloneupload
-            elif [ "${ACTIVETRANSFERS}" -lt "${TRANSFERS}" ] || [ "${CHECKFILES}" -gt "${TRANSFERS}"]; then
+            elif [ "${ACTIVETRANSFERS}" -lt "${TRANSFERS}" ] || [ "${CHECKFILES}" -gt "${TRANSFERS}" ]; then
                #### DEMONISED UPLOAD ####
                rcloneupload &
             else
