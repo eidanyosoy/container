@@ -4,7 +4,7 @@
    "appfolder": "./apps/docker-plex",
    "newversion": "1.29.1.6260-420892357",
    "appbranch": "master",
-   "baseimage": "ghcr.io/linuxserver/baseimage-ubuntu:jammy",
+   "baseimage": "ghcr.io/linuxserver/baseimage-ubuntu:jammy-ebee6755-ls41",
    "description": "Docker Container for Plex Media Server || PLEX PASS",
    "body": "Upgrading docker-plex to 1.29.1.6260-420892357",
    "user": "github-actions[bot]"
