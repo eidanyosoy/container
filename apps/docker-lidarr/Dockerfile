@@ -22,7 +22,7 @@ LABEL org.opencontainers.image.source="https://github.com/dockserver/container"
 ARG TARGETPLATFORM
 ARG BUILDPLATFORM
 
-ARG VERSION=""
+ARG VERSION="1.0.2.2592"
 ARG BRANCH="master"
 
 ENV XDG_CONFIG_HOME="/config/xdg"
