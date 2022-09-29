@@ -39,8 +39,8 @@ libdav1d-0.9.2-r0
 libdrm-2.4.113-r0
 libexpat-2.4.8-r1
 libffi-3.4.2-r1
-libgcc-12.1.1_git20220630-r1
-libgomp-12.1.1_git20220630-r1
+libgcc-12.1.1_git20220630-r5
+libgomp-12.1.1_git20220630-r5
 libidn2-2.3.2-r0
 libintl-0.21-r0
 libjpeg-turbo-2.1.4-r0
@@ -56,7 +56,7 @@ libsrt-1.4.2-r1
 libssh-0.9.6-r1
 libssl1.1-1.1.1n-r0
 libssl3-3.0.5-r2
-libstdc++-12.1.1_git20220630-r1
+libstdc++-12.1.1_git20220630-r5
 libtasn1-4.19.0-r0
 libtheora-1.1.1-r16
 libunistring-0.9.10-r1
@@ -103,7 +103,7 @@ utmps-0.1.0.3-r0
 v4l-utils-libs-1.22.1-r1
 vidstab-1.1.0-r1
 vulkan-loader-1.2.196-r0
-wayland-libs-client-1.21.0-r0
+wayland-libs-client-1.21.0-r1
 wget-1.21.2-r2
 x264-libs-20210613-r0
 x265-libs-3.5-r0
