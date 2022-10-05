@@ -58,10 +58,9 @@ RUN \
      dpkg -i --force-confold /tmp/plex.deb && \
    echo "**** set permissions ****" && \
      usermod -d /app abc && \
-  echo "**** cleanup ****" && \
-     apt-get remove -yqq aria2 jq software-properties-common gpg-agent && \
-   apt-get autoremove -yqq && apt-get clean -yqq && \
-   rm -rf /etc/default/plexmediaserver /tmp/* /var/lib/apt/lists/* /var/tmp/
+   echo "**** cleanup ****" && \
+     apt-get clean -yqq && \
+     rm -rf /etc/default/plexmediaserver /tmp/* /var/lib/apt/lists/* /var/tmp/
 
 COPY --chown=abc ./apps/docker-plex/root/ /
 
