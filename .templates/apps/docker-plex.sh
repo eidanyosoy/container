@@ -42,7 +42,7 @@ rm -rf plex-media-server-plexpass
 HEADLINE="$(cat ./.templates/headline.txt)"
 
 DESCRIPTION="Docker Container for Plex Media Server || PLEX PASS"
-BASEIMAGE="ghcr.io/linuxserver/baseimage-ubuntu:jammy"
+BASEIMAGE="ghcr.io/linuxserver/baseimage-ubuntu:jammy-cd65f39a-ls38"
 
 PLEX_DOWNLOAD="https://downloads.plex.tv/plex-media-server-new"
 
