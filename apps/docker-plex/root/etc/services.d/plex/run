@@ -1,6 +1,6 @@
 #!/usr/bin/with-contenv bash
 
-#echo "checking mount"
+echo "checking mount"
 
 APP="$HOSTNAME"
 if [[ -d "/mnt/unionfs" ]]; then
