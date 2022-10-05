@@ -30,8 +30,6 @@ fi
 
 if [[ "$REMOTE_VERSION" == $INSTALLED_VERSION ]]; then
    exit 0
-elif [[ "$INSTALLED_VERSION" -gt "$REMOTE_VERSION" ]]; then
-   exit 0
 else
    echo "Atempting to upgrade to: $REMOTE_VERSION"
    rm -rf /tmp/plex*.deb && aria2c -d /tmp -o plex.deb "${PLEX_DOWNLOAD}/${REMOTE_VERSION}/debian/plexmediaserver_${REMOTE_VERSION}_${PLEX_URL_ARCH}.deb" &>/dev/null
