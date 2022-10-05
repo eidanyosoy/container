@@ -60,7 +60,7 @@ RUN \
      usermod -d /app abc && \
    echo "**** cleanup ****" && \
      apt-get clean -yqq && \
-     rm -rf /etc/default/plexmediaserver /tmp/* /var/lib/apt/lists/* /var/tmp/
+   rm -rf /etc/default/plexmediaserver /tmp/* /var/lib/apt/lists/* /var/tmp/*
 
 COPY --chown=abc ./apps/docker-plex/root/ /
 
