@@ -51,9 +51,8 @@ UPTCOMMAND="apt-get update -yqq"
 PACKAGES="aria2 uuid-runtime udev jq wget curl unzip unrar gpg-agent software-properties-common"
 PACKAGESINTEL="intel-opencl-icd intel-gpu-tools i965-va-driver-shaders va-driver-all mesa-vulkan-drivers gpg-agent libmfx1 ocl-icd-libopencl1"
 PLEXINST="dpkg -i --force-confold /tmp/plex.deb"
-CLEANUP="apt-get remove -yqq aria2 jq software-properties-common gpg-agent && \\
-   apt-get autoremove -yqq && apt-get clean -yqq && \\
-   rm -rf /etc/default/plexmediaserver /tmp/* /var/lib/apt/lists/* /var/tmp/"
+CLEANUP="apt-get clean -yqq && \\
+   rm -rf /etc/default/plexmediaserver /tmp/* /var/lib/apt/lists/* /var/tmp/*"
 
 PICTURE="./images/$APP.png"
 APPFOLDER="./$FOLDER/$APP"
