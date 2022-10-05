@@ -121,7 +121,7 @@ RUN \
      '"${PLEXINST}"' && \
    echo "'"**** set permissions ****"'" && \
      usermod -d /app abc && \
-  echo "'"**** cleanup ****"'" && \
+   echo "'"**** cleanup ****"'" && \
      '"${CLEANUP}"'
 
 COPY --chown=abc '"${APPFOLDER}"'/root/ /
