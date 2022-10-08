@@ -22,7 +22,7 @@ LABEL org.opencontainers.image.source="https://github.com/dockserver/container"
 ARG TARGETPLATFORM
 ARG BUILDPLATFORM
 
-ARG VERSION="1.1.1"
+ARG VERSION="1.1.0"
 ARG BRANCH=""
 ENV HOME="/config"
 
@@ -33,7 +33,7 @@ RUN \
     ln -s /usr/bin/python3 /usr/bin/python && \
   echo "**** install runtime packages ****" && \
     apk add -U --update --no-cache yarn && \
-    export COMMIT_TAG="v1.1.1" && \
+    export COMMIT_TAG="v1.1.0" && \
   echo "**** install 'docker-jellyseerr' ****" && \
     mkdir -p /app/jellyseerr && \
     curl -fsSL "https://github.com/Fallenbagel/jellyseerr/archive/refs/tags/v${VERSION}.tar.gz" | tar xzf - -C /app/jellyseerr --strip-components=1 && \

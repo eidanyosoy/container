@@ -2,10 +2,10 @@
    "appname": "docker-dim",
    "apppic": "./images/docker-dim.png",
    "appfolder": "./apps/docker-dim",
-   "newversion": "0.3.0-rc6",
+   "newversion": "0.3.0-rc4",
    "appbranch": "",
    "baseimage": "multi-stages",
    "description": "Dim, a media manager fueled by dark forces.",
-   "body": "Upgrading docker-dim to 0.3.0-rc6",
+   "body": "Upgrading docker-dim to 0.3.0-rc4",
    "user": "github-actions[bot]"
 }
