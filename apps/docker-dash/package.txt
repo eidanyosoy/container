@@ -9,7 +9,7 @@ busybox-1.35.0-r17
 ca-certificates-bundle-20220614-r0
 cfdisk-2.38-r1
 dmidecode-3.3-r1
-expat-2.4.8-r0
+expat-2.4.9-r0
 findmnt-2.38-r1
 flock-2.38-r1
 fstrim-2.38-r1
