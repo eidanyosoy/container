@@ -143,6 +143,6 @@ sysvinit-utils=2.96-2.1ubuntu1
 tar=1.30+dfsg-7ubuntu0.20.04.2
 tzdata=2022c-0ubuntu0.20.04.0
 ubuntu-keyring=2020.02.11.4
-unzip=6.0-25ubuntu1
+unzip=6.0-25ubuntu1.1
 util-linux=2.34-0.1ubuntu9.3
 zlib1g=1:1.2.11.dfsg-2ubuntu1.2
