@@ -23,7 +23,9 @@ TOKEN=$4
 
 APPBRANCH="master"
 APPLINK="https://api.github.com/repos/dockserver/dockserver"
-NEWVERSION=$(curl -sX GET "https://registry.hub.docker.com/v1/repositories/library/alpine/tags" | jq --raw-output '.[] | select(.name | contains(".")) | .name' | sort -t "." -k1,1n -k2,2n -k3,3n | tail -n1)
+NEWVERSION=$(curl -sX GET "https://registry.hub.docker.com/v2/repositories/library/alpine/tags" \
+   | jq -r 'select(.results != null) | .results[]["name"]' \
+   | sort -t "." -k1,1n -k2,2n -k3,3n | tail -n1)
 NEWVERSION="${NEWVERSION#*v}"
 NEWVERSION="${NEWVERSION#*release-}"
 NEWVERSION="${NEWVERSION}"
