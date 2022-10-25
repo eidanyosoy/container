@@ -45,6 +45,10 @@ PUID=${PUID:-1000} &>/dev/null
 groupmod -o -g "$PGID" abc &>/dev/null
 usermod -o -u "$PUID" abc &>/dev/null
 
+if [[ -f /donate.txt ]]; then
+   $(which cat) /donate.txt
+fi
+
 echo "----------------------------------------------------
      GID/UID
 ----------------------------------------------------
