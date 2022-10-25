@@ -21,9 +21,9 @@ TOKEN=$4
 
 ### APP SETTINGS ###
 
-NEWVERSION=$(curl -s "https://registry.hub.docker.com/v1/repositories/google/cloud-sdk/tags" \
- | jq --raw-output '.[] | select(.name | contains("-alpine")) | .name' \
- | tail -n1)
+NEWVERSION=$(curl -sX GET "https://registry.hub.docker.com/v2/repositories/google/cloud-sdk/tags" \
+   | jq -r 'select(.results != null) | .results[]["name"]' \
+   | grep -e "-alpine" | tail -n1)
 NEWVERSION="${NEWVERSION#*v}"
 NEWVERSION="${NEWVERSION#*release-}"
 NEWVERSION="${NEWVERSION}"
