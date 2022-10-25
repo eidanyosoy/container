@@ -30,7 +30,6 @@ libxml2-utils
 linux-headers
 linux-pam
 logrotate
-mergerfs
 musl
 musl-dev
 musl-utils
