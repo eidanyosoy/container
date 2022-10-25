@@ -134,7 +134,7 @@ RUN \
   echo "'"*** cleanup build system ****"'" && \
     '"${CLEANUP}"'
 
-FROM '"${FINALIMAGE}"':v'"${BUILDVERSION}"'
+FROM '"${FINALIMAGE}"':latest
 
 ARG TARGETPLATFORM
 ARG BUILDPLATFORM
