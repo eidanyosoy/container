@@ -40,9 +40,6 @@ RUN \
     cd /tmp/mergerfs && make STATIC=1 LTO=1 && make install && \
   echo "**** install rclone ****" && \
     wget -qO- https://rclone.org/install.sh | bash && \
-  echo "**** install language pack ****" && \
-    mkdir -p /app && \
-    cd /app && git clone --quiet https://github.com/dockserver/language.git && \
   echo "*** cleanup build dependencies ****" && \
     apk del --purge --quiet \
     bash wget unzip git fuse libattr libstdc++ autoconf \
@@ -61,7 +58,6 @@ ARG BASE_VERSION=
 ARG ALPINE_VERSION=
 ARG MERGERFS_VERSION=2.33.5
 ARG RCLONE_VERSION=v1.60.0
-ARG LANG_VERSION=v0.0.19
 
 RUN \
   echo "**** update packages ****" && \
@@ -81,7 +77,6 @@ COPY --from=builder --chown=abc --chmod=755 /usr/local/bin/mergerfs /usr/local/b
 COPY --from=builder --chown=abc --chmod=755 /usr/local/bin/mergerfs-fusermount /usr/local/bin/mergerfs-fusermount
 COPY --from=builder --chown=abc --chmod=755 /sbin/mount.mergerfs /sbin/mount.mergerfs
 COPY --from=builder --chown=abc --chmod=755 /usr/bin/rclone /usr/local/bin/rclone
-COPY --from=builder --chown=abc --chmod=755 /app/language /app/language
 
 VOLUME /system
 
