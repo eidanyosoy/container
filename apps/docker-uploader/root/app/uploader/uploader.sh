@@ -20,7 +20,7 @@ log "dockserver.io Multi-Thread Uploader started"
 BASE=/system/uploader
 CSV=/system/servicekeys/uploader.csv
 UPPED=/system/servicekeys/uploaded.json
-KEYLOCAL=/system/servicekeys/keys/
+KEYLOCAL=/system/servicekeys/keys
 LOGFILE=/system/uploader/logs
 START=/system/uploader/json/upload
 DONE=/system/uploader/json/done
@@ -102,29 +102,29 @@ if test -f ${CSV} ; then
    USED=$(( $RANDOM % ${ARRAY} + 1 ))
 
    ### TEST IS FOLDER AND CSV CORRECT ####
-   $(which cat) ${CSV} | grep -E ${DIR} | sed '/^\s*#.*$/d'| while IFS=$'|' read -ra CHECKDIR; do
+   $(which cat) ${CSV} | grep -Ew ${DIR} | sed '/^\s*#.*$/d'| while IFS=$'|' read -ra CHECKDIR; do
      if [[ ${CHECKDIR[0]} == ${DIR} ]]; then
-        $(which cat) ${CSV} | grep -E ${DIR} | sed '/^\s*#.*$/d'| while IFS=$'|' read -ra uppdir; do
+        $(which cat) ${CSV} | grep -Ew ${DIR} | sed '/^\s*#.*$/d'| while IFS=$'|' read -ra uppdir; do
         if [[ ${uppdir[2]} == "" && ${uppdir[3]} == "" ]]; then
 ### UNENCRYPTED RCLONE.CONF ####
-cat > ${ENDCONFIG} << EOF; $(echo)
+cat > "${ENDCONFIG}" << EOF; $(echo)
 ## CUSTOM RCLONE.CONF for ${FILE}
 [${KEY}$[USED]]
 type = drive
 scope = drive
 server_side_across_configs = true
-service_account_file = ${JSONDIR}/${KEY}$[USED]
+service_account_file = ${KEYLOCAL}/${KEY}$[USED]
 team_drive = ${uppdir[1]}
 EOF
      else
 #### CRYPTED CUSTOM RCLONE.CONF ####
-cat > ${ENDCONFIG} << EOF; $(echo)
+cat > "${ENDCONFIG}" << EOF; $(echo)
 ## CUSTOM RCLONE.CONF
 [${KEY}$[USED]]
 type = drive
 scope = drive
 server_side_across_configs = true
-service_account_file = ${JSONDIR}/${KEY}$[USED]
+service_account_file = ${KEYLOCAL}/${KEY}$[USED]
 team_drive = ${uppdir[1]}
 ##
 [${KEY}$[USED]C]
@@ -148,7 +148,7 @@ function replace-used() {
    #### CHECK IS CUSTOM RCLONE.CONF IS AVAILABLE ####
    if test -f "${CUSTOM}/${FILE}.conf" ; then
       CONFIG=${CUSTOM}/${FILE}.conf && \
-        USED=`$(which rclone) listremotes --config=${CONFIG} | grep "$1" | sed -e 's/://g' | sed -e 's/GDSA//g' | sort`
+        USED=`$(which rclone) listremotes --config="${CONFIG}" | grep "$1" | sed -e 's/://g' | sed -e 's/GDSA//g' | sort`
    else
       CONFIG=/system/servicekeys/rclonegdsa.conf && \
         ARRAY=$($(which ls) ${KEYLOCAL} | wc -l) && \
@@ -217,7 +217,7 @@ function rcloneupload() {
    #### CHECK IS CUSTOM RCLONE.CONF IS AVAILABLE ####
    if test -f "${CUSTOM}/${FILE}.conf" ; then
       CONFIG=${CUSTOM}/${FILE}.conf && \
-        USED=`$(which rclone) listremotes --config=${CONFIG} | grep "$1" | sed -e 's/://g' | sed -e 's/GDSA//g' | sort`
+        USED=`$(which rclone) listremotes --config="${CONFIG}" | grep "$1" | sed -e 's/://g' | sed -e 's/GDSA//g' | sort`
    else
       CONFIG=/system/servicekeys/rclonegdsa.conf && \
         ARRAY=$($(which ls) ${KEYLOCAL} | wc -l) && \
@@ -226,7 +226,7 @@ function rcloneupload() {
    #### REPLACED UPLOADED FILESIZE ####
    #### replace-used
    #### CRYPTED HACK ####
-   if `$(which rclone) config show --config=${CONFIG} | grep ":/encrypt" &>/dev/null`;then
+   if `$(which rclone) config show --config="${CONFIG}" | grep ":/encrypt" &>/dev/null`;then
        export CRYPTED=C
    else
        export CRYPTED=""
@@ -277,7 +277,7 @@ function rcloneupload() {
    fi
    #### REMOVE CUSTOM RCLONE.CONF ####
    if test -f "${CUSTOM}/${FILE}.conf";then
-      $(which rm) -rf ${CUSTOM}/${FILE}.conf
+      $(which rm) -rf "${CUSTOM}/${FILE}.conf"
    fi
 }
 
@@ -385,7 +385,7 @@ while true ; do
             if [ "${CHECKFILES}" -eq "${TRANSFERS}" ] || [ "${CHECKFILES}" -lt "${TRANSFERS}" ]; then
                #### FALLBACK TO SINGLE UPLOAD ####
                rcloneupload
-            elif [ "${ACTIVETRANSFERS}" -lt "${TRANSFERS}" ] || [ "${CHECKFILES}" -gt "${TRANSFERS}"]; then
+            elif [ "${ACTIVETRANSFERS}" -lt "${TRANSFERS}" ] || [ "${CHECKFILES}" -gt "${TRANSFERS}" ]; then
                #### DEMONISED UPLOAD ####
                rcloneupload &
             else
