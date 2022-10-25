@@ -22,7 +22,7 @@ TOKEN=$4
 ### APP SETTINGS ###
 APPLINK="https://api.github.com/repos/dockserver/dockserver"
 BUILDVERSION=$(curl -sX GET "https://registry.hub.docker.com/v2/repositories/library/ubuntu/tags" \
-   | jq --raw-output '.[] | select(.name | contains(".")) | .name' \
+   | jq -r 'select(.results != null) | .results[]["name"]'' \
    | sort -t "." -k1,1n -k2,2n -k3,3n | tail -n1)
 BUILDVERSION="${BUILDVERSION#*v}"
 BUILDVERSION="${BUILDVERSION#*release-}"
