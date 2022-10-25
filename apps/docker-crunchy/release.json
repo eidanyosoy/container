@@ -2,9 +2,9 @@
    "appname": "docker-crunchy",
    "apppic": "./images/docker-crunchy.png",
    "appfolder": "./apps/docker-crunchy",
-   "newversion": "",
+   "newversion": "xenial-20210804",
    "baseimage": "ubuntu",
    "description": "Docker image  for docker-crunchy",
-   "body": "Upgrading docker-crunchy to baseimage: ubuntu:",
+   "body": "Upgrading docker-crunchy to baseimage: ubuntu:xenial-20210804",
    "user": "dockserver image update[bot]"
 }
