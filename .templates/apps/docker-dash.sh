@@ -22,7 +22,7 @@ TOKEN=$4
 ### APP SETTINGS ###
 
 BASENEWVERSION=$(curl -sX GET "https://registry.hub.docker.com/v2/repositories/library/alpine/tags" \
-   | jq --raw-output '.[] | select(.name | contains(".")) | .name' \
+   | jq -r 'select(.results != null) | .results[]["name"]' \
    | sort -t "." -k1,1n -k2,2n -k3,3n | tail -n1)
 BASENEWVERSION="${BASENEWVERSION#*v}"
 BASENEWVERSION="${BASENEWVERSION#*release-}"
