@@ -49,7 +49,7 @@ RUN \
     apk del --quiet --clean-protected --no-progress && \
     rm -rf /var/cache/apk/* /tmp/*
 
-FROM ghcr.io/dockserver/docker-alpine-v3:v
+FROM ghcr.io/dockserver/docker-alpine-v3:latest
 
 ARG TARGETPLATFORM
 ARG BUILDPLATFORM
