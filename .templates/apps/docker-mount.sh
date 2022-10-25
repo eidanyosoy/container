@@ -71,7 +71,6 @@ BUILDSTAGE="COPY --from=builder --chown=abc --chmod=755 /usr/local/bin/mergerfs 
 COPY --from=builder --chown=abc --chmod=755 /usr/local/bin/mergerfs-fusermount /usr/local/bin/mergerfs-fusermount
 COPY --from=builder --chown=abc --chmod=755 /sbin/mount.mergerfs /sbin/mount.mergerfs
 COPY --from=builder --chown=abc --chmod=755 /usr/bin/rclone /usr/local/bin/rclone
-COPY --from=builder --chown=abc --chmod=755 /app/language /app/language"
 
 CLEANUP="apk del --quiet --clean-protected --no-progress && \\
     rm -rf /var/cache/apk/* /tmp/*"
@@ -144,7 +143,6 @@ ARG BASE_VERSION='"${BUILDVERSION}"'
 ARG ALPINE_VERSION='"${ALPINEVERSION}"'
 ARG MERGERFS_VERSION='"${MGVERSION}"'
 ARG RCLONE_VERSION='"${RCVERSION}"'
-ARG LANG_VERSION='"${LANGVERSION}"'
 
 RUN \
   echo "'"**** update packages ****"'" && \
