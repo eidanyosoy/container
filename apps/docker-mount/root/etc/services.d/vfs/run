@@ -6,21 +6,21 @@
 # Docker owned dockserver           #
 # Docker Maintainer dockserver      #
 #####################################
-#####################################
 # THIS DOCKER IS UNDER LICENSE      #
 # NO CUSTOMIZING IS ALLOWED         #
 # NO REBRANDING IS ALLOWED          #
 # NO CODE MIRRORING IS ALLOWED      #
 #####################################
 function log() {
-    echo "[Mount] ${1}"
+   GRAY="\033[0;37m"
+   BLUE="\033[0;34m"
+   NC="\033[0m"
+   $(which echo) -e "${GRAY}[$(date +'%Y/%m/%d %H:%M:%S')]${BLUE} [Mount]${NC} ${1}"
 }
 umask 022
 
-chown -cR abc:abc /app /system/* &>/dev/null
-chmod -cR 755 /app /system/* &>/dev/null
-log "-> Starting vfs <-"
+source /app/mount/function.sh && lang
 
-exec s6-setuidgid abc /app/mount/vfsrefresh.sh
+log "${startupvfs}"
 
-#EOF#
+drivecheck
