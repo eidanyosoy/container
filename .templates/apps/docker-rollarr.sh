@@ -23,8 +23,8 @@ TOKEN=$4
 
 APPLINK="https://github.com/TheHumanRobot/Rollarr"
 
-NEWVERSION=$(curl -sX GET "https://registry.hub.docker.com/v1/repositories/library/ubuntu/tags" \
-   | jq --raw-output '.[] | select(.name | contains(".")) | .name' \
+NEWVERSION=$(curl -sX GET "https://registry.hub.docker.com/v2/repositories/library/ubuntu/tags" \
+   | jq -r 'select(.results != null) | .results[]["name"]'' \
    | sort -t "." -k1,1n -k2,2n -k3,3n | tail -n1)
 NEWVERSION="${NEWVERSION#*v}"
 NEWVERSION="${NEWVERSION#*release-}"
