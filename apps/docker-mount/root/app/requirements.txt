@@ -8,6 +8,7 @@ ca-certificates
 ca-certificates-bundle
 coreutils
 curl
+envsubst
 findutils
 fuse
 fuse-common
