@@ -16,7 +16,7 @@
 #####################################
 # shellcheck disable=SC2086
 # shellcheck disable=SC2046
-FROM alpine: as builder
+FROM alpine:3.16.2 as builder
 
 LABEL org.opencontainers.image.source="https://github.com/dockserver/container"
 
@@ -54,8 +54,8 @@ FROM ghcr.io/dockserver/docker-alpine-v3:v
 ARG TARGETPLATFORM
 ARG BUILDPLATFORM
 
-ARG BASE_VERSION=
-ARG ALPINE_VERSION=
+ARG BASE_VERSION=3.16.2
+ARG ALPINE_VERSION=3.16.2
 ARG MERGERFS_VERSION=2.33.5
 ARG RCLONE_VERSION=v1.60.0
 
@@ -66,7 +66,7 @@ RUN \
   echo "**** install build packages ****" && \
     apk add -U --update --no-cache --quiet bash jq musl findutils linux-headers apk-tools busybox coreutils procps shadow && \
   echo "**** set alpine version ****" && \
-    echo -e "" > /etc/alpine-release && \
+    echo -e "3.16.2" > /etc/alpine-release && \
   echo "*** cleanup system ****" && \
     apk del --quiet --clean-protected --no-progress && \
     rm -rf /var/cache/apk/* /tmp/*
