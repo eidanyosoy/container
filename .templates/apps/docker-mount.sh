@@ -60,11 +60,6 @@ MAKEMG="cd /tmp/mergerfs && make STATIC=1 LTO=1 && make install"
 RCINSTALL="wget -qO- https://rclone.org/install.sh | bash"
 RCVERSION="$(curl -u $USERNAME:$TOKEN -sX GET "https://api.github.com/repos/rclone/rclone/releases/latest" | jq --raw-output '.tag_name')"
 
-## LANGUAGE VERSION
-LANGVERSION="$(curl -u $USERNAME:$TOKEN -sX GET "https://api.github.com/repos/dockserver/language/releases/latest" | jq --raw-output '.tag_name')"
-LGSTAGE="mkdir -p /app && \\
-    cd /app && git clone --quiet https://github.com/dockserver/language.git"
-
 ## S6-OVERLAY
 S6_STAGE_VERSION="$(curl -u $USERNAME:$TOKEN -sX GET "https://api.github.com/repos/just-containers/s6-overlay/releases/latest" | jq --raw-output '.tag_name')"
 
@@ -134,8 +129,6 @@ RUN \
     '"${MAKEMG}"' && \
   echo "'"**** install rclone ****"'" && \
     '"${RCINSTALL}"' && \
-  echo "'"**** install language pack ****"'" && \
-    '"${LGSTAGE}"' && \
   echo "'"*** cleanup build dependencies ****"'" && \
     '"${CLEAN}"' \
     '"${BUILDPACK}"' && \
