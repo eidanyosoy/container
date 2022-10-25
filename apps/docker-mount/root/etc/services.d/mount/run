@@ -6,23 +6,27 @@
 # Docker owned dockserver           #
 # Docker Maintainer dockserver      #
 #####################################
-#####################################
 # THIS DOCKER IS UNDER LICENSE      #
 # NO CUSTOMIZING IS ALLOWED         #
 # NO REBRANDING IS ALLOWED          #
 # NO CODE MIRRORING IS ALLOWED      #
 #####################################
 function log() {
-    echo "[Mount] ${1}"
+   GRAY="\033[0;37m"
+   BLUE="\033[0;34m"
+   NC="\033[0m"
+   $(which echo) -e "${GRAY}[$(date +'%Y/%m/%d %H:%M:%S')]${BLUE} [Mount]${NC} ${1}"
 }
 umask 022
 
-log " -->> fixing permissions"
-chown -cR abc:abc /app /system/* &>/dev/null
-chmod -cR 755 /app /system/* &>/dev/null
+source /app/mount/function.sh && lang
 
-log "-> Starting mounts <-"
+MSG="${startupmount}" && notification
+$(which sleep) 1
+rlog && log "${startuplogrotate}" || { log "${failedlog}"; exit 1; }
+rcmount && log "${startuprclone}" || { log "${failedrclone}"; exit 1; }
+$(which sleep) 10
+rcmergerfs && log "${startupmergerfs}" || { log "${failedmergerfs}"; exit 1; }
+testsuccessfull && $(which sleep) 360
 
-exec /app/startup.sh
-
-#EOF#
+testrun
