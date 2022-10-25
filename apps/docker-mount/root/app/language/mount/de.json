@@ -1,0 +1,42 @@
+{
+  "update": {
+    "rclonestart": "-> Starte Rclone aktualisierung <-",
+    "rcloneend": "-> Rclone aktualisierung war erfolgreich <-",
+    "packagesstart": "-> Starte Paket aktualisierung <-",
+    "packagesend": "-> Paket aktualisierung war erfolgreich <-"
+  },
+  "startup": {
+    "mount": "-> Starte Mount <-",
+    "logrotate": "-> Starte Logrotate <-",
+    "rclone": "-> Starte Rclone <-",
+    "mergerfs": "-> Starte MergerFS <-",
+    "vfs": "-> Starte VFS Refresh <-",
+    "nzb": "-> Starte NZB Cleanup <-",
+    "hitlimit": "-> Beachten Sie, dass Sie die Google API-Limits erreicht haben <-",
+    "newchanges": "-> Änderungen in mount.env gefunden || Starte Rclone neu <-",
+    "mountend": "-> Starten von Mount war erfolgreich <-",
+    "mountworks": "-> Mount läuft und funktioniert <-"
+  },
+  "kill": {
+    "rclone": "-> Stoppe Rclone <-",
+    "mergerfs": "-> Stoppe MergerFS <-",
+    "mount": "-> Stoppe Mount <-",
+    "unmountremote": "-> Unmounting /mnt/unionfs <-",
+    "unmountremotes": "-> Unmounting /mnt/remotes} <-"
+  },
+  "rclone": {
+    "vfs": "-> Starte VFS aktualisierung <-",
+    "clean": "-> Starte FS Cache bereinigung <-",
+    "stats": "-> Rufe Rclone Statistiken ab <-",
+    "cache": "-> Starte Rclone Cache reinigung <-",
+    "cacheend": "-> Rclone Cache reinigung erfolgreich <-"
+  },
+  "failed": {
+    "log": "-> Starten von Logrotate ist fehlgeschlagen <-",
+    "rclone": "-> Starten von Rclone ist fehlgeschlagen <-",
+    "mergerfs": "-> Starten von MergerFS ist fehlgeschlagen <-",
+    "newchanges": "-> Mount.env fehlt <-",
+    "unmountremote": "-> Unmounting von /mnt/unionfs ist fehlgeschlagen <-",
+    "unmountremotes": "-> Unmounting von /mnt/remotes ist fehlgeschlagen <-"
+  }
+}

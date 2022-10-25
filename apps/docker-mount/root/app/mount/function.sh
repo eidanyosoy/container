@@ -6,47 +6,33 @@
 # Docker owned dockserver           #
 # Docker Maintainer dockserver      #
 #####################################
-#####################################
 # THIS DOCKER IS UNDER LICENSE      #
 # NO CUSTOMIZING IS ALLOWED         #
 # NO REBRANDING IS ALLOWED          #
 # NO CODE MIRRORING IS ALLOWED      #
 #####################################
-# shellcheck disable=SC2086
-# shellcheck disable=SC2002
-# shellcheck disable=SC2006
-## FUNCTIONS SOURCECONFIG ##
-#########################################
-# From here on out, you probably don't  #
-#   want to change anything unless you  #
-#   know what you're doing.             #
-#########################################
 source /system/mount/mount.env
 #SETTINGS
-CONFIG=/app/rclone/rclone.conf
+ENDCONFIG=/app/rclone/rclone.conf
 ENVA=/system/mount/mount.env
 TMPENV=/tmp/mount.env
-GDSAMIN=4
-ARRAY=$(ls -A ${JSONDIR} | wc -l )
-
-#SCRIPTS
-SDISCORD=/app/discord/discord.sh
 
 #FOLDER
-REMOTE=/mnt/unionfs
-JSONDIR=/system/mount/keys
-JSONUSED=/system/mount/.keys/.usedkeys
+SUNION=/mnt/unionfs
 SMOUNT=/app/mount
-FDISCORD=/app/discord
+SREMOTES=/mnt/remotes
+SDOWN=/mnt/downloads
+JSONDIR=/system/mount/keys
+USEDDIR=/system/mount/.keys
+JSONUSED=/system/mount/.keys/usedkeys
 LFOLDER=/app/language/mount
+ARRAY=$($(which ls) -A "${JSONDIR}" | $(which wc) -l)
 
 #LOG
+LOGS=/system/mount/logs
 MLOG=/system/mount/logs/rclone-union.log
 RLOG=/system/mount/logs/vfs-refresh.log
 CLOG=/system/mount/logs/vfs-clean.log
-DLOG=/tmp/discord.dead
-
-RCD="$(which rclone) rc --rc-addr=0.0.0.0:8554"
 
 #########################################
 # From here on out, you probably don't  #
@@ -54,145 +40,180 @@ RCD="$(which rclone) rc --rc-addr=0.0.0.0:8554"
 #   know what you're doing.             #
 #########################################
 function log() {
-   echo -e "[Mount] ${1}"
+   GRAY="\033[0;37m"
+   BLUE="\033[0;34m"
+   NC="\033[0m"
+   $(which echo) -e "${GRAY}[$(date +'%Y/%m/%d %H:%M:%S')]${BLUE} [Mount]${NC} ${1}"
+}
+
+function notification() {
+   source /system/mount/mount.env
+   if [[ "${NOTIFYTYPE}" == "" ]]; then
+     NOTIFYTYPE="info"
+   fi
+   if [[ "${NOTIFICATION_SERVERNAME}" == "null" ]]; then
+     NOTIFICATION_NAME="Docker"
+   else
+     NOTIFICATION_NAME="${NOTIFICATION_SERVERNAME}"
+   fi
+   if [[ "${NOTIFICATION_URL}" != "null" ]]; then
+      log "${MSG}" && apprise --notification-type="${NOTIFYTYPE}" --title="Mount - ${NOTIFICATION_NAME}" --body="${MSG}" "${NOTIFICATION_URL}/?format=markdown"
+   else
+      log "${MSG}"
+   fi
 }
 
 function checkban() {
-   ### RELOAD ENF FILE ###
-   source /system/mount/mount.env
-
-   RCCHECK=$($RCD core/stats | jq -r '. | .lastError' | grep -E '403')
-   if [ $? = 0 ]; then
-      if [[ ! ${DISCORD_SEND} != "null" ]]; then discord ; fi
-      if [[ ! ${DISCORD_SEND} == "null" ]]; then log "${startuphitlimit}" ; fi
-      if [[ `ls -A ${JSONDIR} | wc -l` -gt 4 ]]; then
-         [[ -f "/system/mount/.keys/lastkey" ]] && $(which rm) -rf /system/mount/.keys/lastkey
-         [[ ! -d "/system/mount/.keys" ]] && $(which mkdir) -p /system/mount/.keys/
-         [[ -d "/system/mount/.keys" ]] && $(which chown) -cR 1000:1000 /system/mount/.keys/ &>/dev/null
-         RCERROR=$($RCD core/stats | jq -r '. | .lastError')
-         RemoteList=$($RCD config/dump | jq -r 'to_entries | (.[] | select(.value.team_drive)) | .key')
-            while IFS= read -r remote; do
-               newServiceAccount=$($(which find) ${JSONDIR}/*.json -type f | shuf -n 1)
-               echo "$newServiceAccount" > ${JSONUSED}
-               log "Rclone claims ${RCERROR}, switching to service account ${newServiceAccount} for remote ${remote}"
-               $RCD backend/command command=set fs=${remote}: -o service_account_file=${newServiceAccount} -o service_account_path=${JSONDIR}
-            done <<< "$RemoteList"
-         $(which cp) -r /app/rclone/rclone.conf /root/.config/rclone/ && sleep 5
-         ### RESET STATS AFTER SWITCH THE KEY ###
-         $RCD core/stats-reset &>/dev/null
-         ### RESET ALL LOGS AFTER SWITCH ###
-         $(which truncate) -s 0 /system/mount/logs/*.log &>/dev/null
-     fi
+   MLOGARRAY=$($(which cat) "${MLOG}" | $(which wc) -l)
+   if [[ "${MLOGARRAY}" -gt "0" ]]; then
+      $(which tail) -n 25 "${MLOG}" | $(which grep) -e "downloadQuotaExceeded"
+      if [[ "$?" = "0" ]]; then
+         MSG="${startuphitlimit}" && notification
+         if [[ "${ARRAY}" -gt "0" ]]; then
+            rotate
+         fi
+      fi
    fi
 }
 
-function discord() {
-   source /system/mount/mount.env
-   DATE=$(date "+%Y-%m-%d")
-   YEAR=$(date "+%Y")
-   SOURCE='https://raw.githubusercontent.com/ChaoticWeg/discord.sh/master/discord.sh'
-   if [[ ${ARRAY} -gt 0 ]]; then
-       MSG1=${startuphitlimit}
-       MSG2=${startuprotate}
-       MSGSEND="${MSG1} and ${MSG2}"
-       $(which rm) -rf ${DLOG}
+function rotate() {
+   if [[ ! -d "${USEDDIR}" ]]; then $(which mkdir) -p "${USEDDIR}" && $(which chown) -hR abc:abc "${USEDDIR}"; fi
+   if [[ -d "${USEDDIR}" ]]; then $(which chown) -hR abc:abc "${USEDDIR}"; fi
+   if [[ "${ARRAY}" -lt "1" ]]; then
+      log "-> No Keys found <-"
    else
-       MSG1=${startuphitlimit}
-       MSGSEND="${MSG1}"
+      ARRAY=$($(which ls) -A "${JSONDIR}" | $(which wc) -l)
+      if [[ ! -f "${JSONUSED}" ]]; then
+         $(which ls) -A "${JSONDIR}" | $(which sort) -V > "${JSONUSED}"
+      else
+         ARRAYJSON=$($(which cat) "${JSONUSED}" | $(which wc) -l)
+         $(which sed) -i '1h;1d;$G' "${JSONUSED}"
+         if [[ "${ARRAY}" != "${ARRAYJSON}" ]]; then
+            $(which rm) -rf "${JSONUSED}" && $(which ls) -A "${JSONDIR}" | $(which sort) -V > "${JSONUSED}"
+         fi
+      fi
+      KEY=$($(which sed) -n 1p "${JSONUSED}")
+      KEYNOTI=$($(which sed) -n 1p "${JSONUSED}" | $(which awk) -F '.' '{print $1}')
+      log "-> We switch the Service 🔑 to "${KEYNOTI}" <-"
+      mapfile -t MOUNTS < <($(which rclone) config dump --config="${ENDCONFIG}" | $(which jq) -r 'to_entries | (.[] | select(.value.team_drive)) | .key')
+      for REMOTE in "${MOUNTS[@]}"; do
+         $(which rclone) rc --rc-addr=0.0.0.0:8554 backend/command command=set fs="${REMOTE}": -o service_account_file="${JSONDIR}/${KEY}" -o service_account_path="${JSONDIR}" &>/dev/null
+      done
+      $(which sleep) 5
+      $(which rclone) rc --rc-addr=0.0.0.0:8554 core/stats-reset &>/dev/null
+      $(which truncate) -s 0 "${LOGS}"/*.log &>/dev/null
+      if [[ "$($(which ls) -1p ${SREMOTES})" ]] && [[ "$($(which ls) -1p ${SUNION})" ]]; then
+         KEYNOTI=$($(which sed) -n 1p "${JSONUSED}" | $(which awk) -F '.' '{print $1}')
+         MSG="-> Rotate to next Service 🔑 "${KEYNOTI}" done <-" && notification
+      fi
+      NEXTKEY=$($(which sed) -n 2p "${JSONUSED}" | $(which awk) -F '.' '{print $1}')
+      log "-> Next Service 🔑 is "${NEXTKEY}" <-"
    fi
-   [[ ! -d "${FDISCORD}" ]] && \
-      $(which mkdir) -p "${FDISCORD}"
-   [[ ! -f "${SDISCORD}" ]] && \
-      $(which curl) --silent -fsSL "${SOURCE}" -o "${SDISCORD}" && chmod 755 "${SDISCORD}"
-   [[ ! -f "${DLOG}" ]] && \
-      $(which bash) "${SDISCORD}" \
-      --webhook-url=${DISCORD_WEBHOOK_URL} \
-      --title "${DISCORD_EMBED_TITEL}" \
-      --avatar "${DISCORD_ICON_OVERRIDE}" \
-      --author "Dockerserver.io Bot" \
-      --author-url "https://dockserver.io/" \
-      --author-icon "https://dockserver.io/img/favicon.png" \
-      --username "${DISCORD_NAME_OVERRIDE}" \
-      --description "${MSGSEND}" \
-      --thumbnail "https://www.freeiconspng.com/uploads/error-icon-4.png" \
-      --footer "(c) ${YEAR} DockServer.io" \
-      --footer-icon "https://www.freeiconspng.com/uploads/error-icon-4.png" \
-      --timestamp > "${DLOG}"
+}
+
+function envrenew() {
+   $(which diff) -q "${ENVA}" "${TMPENV}" &>/dev/null
+   if [[ "$?" -gt "0" ]]; then
+      if [[ ! -f "${ENVA}" ]]; then
+         MSG="${failednewchanges}" && notification
+      else
+         MSG="${startupnewchanges}" && notification
+         rckill && rcmergerfskill && folderunmount && rcmount && rcmergerfs && $(which cp) -r "$ENVA" "$TMPENV"
+         $(which sleep) 5 && testsuccessfull
+      fi
+   fi
 }
 
 function lang() {
-   LANGUAGE=${LANGUAGE}
-   [[ ! -d "/app/language" ]] && $(which git) config --global --add safe.directory /app/language && $(which git) -C /app clone --quiet https://github.com/dockserver/language.git
-   startupmount=$(grep -Po '"startup.mount": *\K"[^"]*"' "${LFOLDER}/${LANGUAGE}.json" | sed 's/"\|,//g')
-   startuphitlimit=$(grep -Po '"startup.hitlimit": *\K"[^"]*"' "${LFOLDER}/${LANGUAGE}.json" | sed 's/"\|,//g')
-   startuprotate=$(grep -Po '"startup.rotate": *\K"[^"]*"' "${LFOLDER}/${LANGUAGE}.json" | sed 's/"\|,//g')
-   startupnewchanges=$(grep -Po '"startup.newchanges": *\K"[^"]*"' "${LFOLDER}/${LANGUAGE}.json" | sed 's/"\|,//g')
-   startuprcloneworks=$(grep -Po '"startup.rcloneworks": *\K"[^"]*"' "${LFOLDER}/${LANGUAGE}.json" | sed 's/"\|,//g')
+   source /system/mount/mount.env
+   startupmount=$($(which jq) ".startup.mount" "${LFOLDER}/${LANGUAGE}.json" | $(which sed) 's/"\|,//g')
+   startuplogrotate=$($(which jq) ".startup.logrotate" "${LFOLDER}/${LANGUAGE}.json" | $(which sed) 's/"\|,//g')
+   startuprclone=$($(which jq) ".startup.rclone" "${LFOLDER}/${LANGUAGE}.json" | $(which sed) 's/"\|,//g')
+   startupmergerfs=$($(which jq) ".startup.mergerfs" "${LFOLDER}/${LANGUAGE}.json" | $(which sed) 's/"\|,//g')
+   startupvfs=$($(which jq) ".startup.vfs" "${LFOLDER}/${LANGUAGE}.json" | $(which sed) 's/"\|,//g')
+   startupnzb=$($(which jq) ".startup.nzb" "${LFOLDER}/${LANGUAGE}.json" | $(which sed) 's/"\|,//g')
+   startuphitlimit=$($(which jq) ".startup.hitlimit" "${LFOLDER}/${LANGUAGE}.json" | $(which sed) 's/"\|,//g')
+   startupnewchanges=$($(which jq) ".startup.newchanges" "${LFOLDER}/${LANGUAGE}.json" | $(which sed) 's/"\|,//g')
+   startupmountend=$($(which jq) ".startup.mountend" "${LFOLDER}/${LANGUAGE}.json" | $(which sed) 's/"\|,//g')
+   startupmountworks=$($(which jq) ".startup.mountworks" "${LFOLDER}/${LANGUAGE}.json" | $(which sed) 's/"\|,//g')
+   startuprotate=$($(which jq) ".startup.rotate" "${LFOLDER}/${LANGUAGE}.json" | $(which sed) 's/"\|,//g')
+   killrclone=$($(which jq) ".kill.rclone" "${LFOLDER}/${LANGUAGE}.json" | $(which sed) 's/"\|,//g')
+   killmergerfs=$($(which jq) ".kill.mergerfs" "${LFOLDER}/${LANGUAGE}.json" | $(which sed) 's/"\|,//g')
+   killmount=$($(which jq) ".kill.mount" "${LFOLDER}/${LANGUAGE}.json" | $(which sed) 's/"\|,//g')
+   killunmountremote=$($(which jq) ".kill.unmountremote" "${LFOLDER}/${LANGUAGE}.json" | $(which sed) 's/"\|,//g')
+   killunmountremotes=$($(which jq) ".kill.unmountremotes" "${LFOLDER}/${LANGUAGE}.json" | $(which sed) 's/"\|,//g')
+   rclonevfs=$($(which jq) ".rclone.vfs" "${LFOLDER}/${LANGUAGE}.json" | $(which sed) 's/"\|,//g')
+   rcloneclean=$($(which jq) ".rclone.clean" "${LFOLDER}/${LANGUAGE}.json" | $(which sed) 's/"\|,//g')
+   rclonestats=$($(which jq) ".rclone.stats" "${LFOLDER}/${LANGUAGE}.json" | $(which sed) 's/"\|,//g')
+   rclonecache=$($(which jq) ".rclone.cache" "${LFOLDER}/${LANGUAGE}.json" | $(which sed) 's/"\|,//g')
+   rclonecacheend=$($(which jq) ".rclone.cacheend" "${LFOLDER}/${LANGUAGE}.json" | $(which sed) 's/"\|,//g')
+   failedlog=$($(which jq) ".failed.log" "${LFOLDER}/${LANGUAGE}.json" | $(which sed) 's/"\|,//g')
+   failedrclone=$($(which jq) ".failed.rclone" "${LFOLDER}/${LANGUAGE}.json" | $(which sed) 's/"\|,//g')
+   failedmergerfs=$($(which jq) ".failed.mergerfs" "${LFOLDER}/${LANGUAGE}.json" | $(which sed) 's/"\|,//g')
+   failednewchanges=$($(which jq) ".failed.newchanges" "${LFOLDER}/${LANGUAGE}.json" | $(which sed) 's/"\|,//g')
+   failedunmountremote=$($(which jq) ".failed.unmountremote" "${LFOLDER}/${LANGUAGE}.json" | $(which sed) 's/"\|,//g')
+   failedunmountremotes=$($(which jq) ".failed.unmountremotes" "${LFOLDER}/${LANGUAGE}.json" | $(which sed) 's/"\|,//g')
 }
 
 function rlog() {
-  SIZE=$(du /system/mount/logs/ | cut -f 1)
-  ## 200MB max size of file
-  if [[ $SIZE -gt 200000 ]]; then $(which truncate) -s 0 /system/mount/logs/*.log &>/dev/null ; fi
+   SIZE=$($(which du) "${LOGS}" | $(which cut) -f 1)
+   ## 50MB max size of file
+   if [[ "${SIZE}" -gt "50000" ]]; then
+      $(which truncate) -s 0 "${LOGS}"/*.log &>/dev/null
+   fi
 }
 
 function folderunmount() {
-for fod in /mnt/* ;do
-    basename "$fod" >/dev/null
-    FOLDER="$(basename -- $fod)"
-    IFS=- read -r <<< "$ACT"
-    if ! ls -1p "$fod/" >/dev/null ; then
-       $(which fusermount) -uzq /mnt/$FOLDER && log "unmounting $FOLDER" || log "failed to unmounting $FOLDER"
-    fi
-done
+   source /system/mount/mount.env
+   $(which mountpoint) -q "${SUNION}" || $(which fusermount) -uzq "${SUNION}" && log "${killunmountremote}" || log "${failedunmountremote}"
+   $(which mountpoint) -q "${SREMOTES}" || $(which fusermount) -uzq "${SREMOTES}" && log "${killunmountremotes}" || log "${failedunmountremotes}"
 }
 
 function rcmount() {
-[[ -f "/tmp/rclone.sh" ]] && $(which rm) -rf /tmp/*.sh
-source /system/mount/mount.env
-export MLOG=/system/mount/logs/rclone-union.log
-[[ -f "${ECLOG}" ]] && $(which rm) -rf "${ECLOG}"
+   source /system/mount/mount.env
+   if [[ -f "/tmp/rclone.sh" ]]; then
+      $(which rm) -f "/tmp/rclone.sh"
+   fi
+   if [[ "$($(which ls) -1p ${SREMOTES})" ]]; then
+      log "${rclonecache}"
+      $(which rm) -rf "${TMPRCLONE}/*"
+      if [[ "$?" -gt "0" ]]; then 
+         log "${rclonecachesuccessful}"
+      fi
+   fi
 
-$(which cp) -r "$ENVA" "$TMPENV"
-
-CONFIG=/app/rclone/rclone.conf
-if [[ "$(ls -1p /mnt/remotes)" ]] ; then
-   log " cleanup from rclone cache | please wait"
-   $(which rm) -rf /mnt/rclone_cache/*
-   if [ $? -gt 0 ]; then log " cleanup finished " ; fi
-fi
-
-cat > /tmp/rclone.sh << EOF; $(echo)
+$(which cat) > "/tmp/rclone.sh" << EOF; $(echo)
 #!/command/with-contenv bash
 # shellcheck shell=bash
 # auto generated
 
-### remove test file
-[[ -f "/tmp/rclone.running" ]] && $(which rm) -f /tmp/rclone.running
+## remove test file
+if [[ -f "/tmp/rclone.running" ]]; then
+   $(which rm) -f "/tmp/rclone.running"
+fi
 
-$(which fusermount) -uzq /mnt/unionfs
-$(which fusermount) -uzq /mnt/remotes
-RCD="$(which rclone) rc --rc-addr=0.0.0.0:8554"
+$(which fusermount) -uzq "${SUNION}"
+$(which fusermount) -uzq "${SREMOTES}"
 
 ### START WEBUI
 $(which rclone) rcd \\
-  --config=${CONFIG} \\
-  --log-file=${MLOG} \\
-  --log-level=${LOGLEVEL} \\
+  --config="${ENDCONFIG}" \\
+  --log-file="${MLOG}" \\
+  --log-level="${LOG_LEVEL}" \\
   --timeout=1h \\
   --use-mmap \\
   --ignore-errors \\
-  --user-agent=${UAGENT} \\
-  --cache-dir=${TMPRCLONE} \\
+  --user-agent="${UAGENT}" \\
+  --cache-dir="${TMPRCLONE}" \\
   --human-readable \\
   --track-renames \\
   --track-renames-strategy modtime,leaf \\
-  --drive-use-trash=${DRIVETRASH} \\
+  --drive-use-trash="${DRIVETRASH}" \\
   --drive-stop-on-upload-limit \\
   --drive-server-side-across-configs \\
   --drive-acknowledge-abuse \\
-  --drive-chunk-size=${DRIVE_CHUNK_SIZE} \\
-  --buffer-size=${BUFFER_SIZE} \\
+  --drive-chunk-size="${DRIVE_CHUNK_SIZE}" \\
+  --buffer-size="${BUFFER_SIZE}" \\
   --rc-no-auth \\
   --rc-allow-origin=* \\
   --rc-addr=0.0.0.0:8554 \\
@@ -201,106 +222,157 @@ $(which rclone) rcd \\
   --rc-web-gui-no-open-browser &
   ### \\--rc-web-fetch-url=https://api.github.com/repos/controlol/rclone-webui/releases/latest &
 
-sleep 10
+$(which sleep) 10
 
-### SET MAJOR OPTIONS FOR MOUNT : ${RCD} options/set options/set --json 
-${RCD} options/set --json {'"main": { "TPSLimitBurst": ${TPSBURST}, "TPSLimit": ${TPSLIMIT} , "Checkers": 6, "Transfers": 6, "BufferSize": "${BUFFER_SIZE}", "TrackRenames": true, "TrackRenamesStrategy":"modtime,leaf", "NoUpdateModTime": true, "UserAgent": "${UAGENT}", "CutoffMode":"hard", "Progress":true, "UseMmap":true, "HumanReadable":true}'} &>/dev/null
-${RCD} options/set --json {'"vfs": { "GID": '${PGID}', "UID": '${PUID}', "Umask": '${UMASK}', "CacheMode": 3, "CacheMaxSize": "${VFS_CACHE_MAX_SIZE}", "CacheMaxAge": 21600000000000, "CachePollInterval": 120000000000, "PollInterval": 60000000000, "ChunkSize": "${VFS_READ_CHUNK_SIZE}", "ChunkSizeLimit": "${VFS_READ_CHUNK_SIZE_LIMIT}", "DirCacheTime": 43200000000000, "NoModTime": true,"NoChecksum": true}'} &>/dev/null
-${RCD} options/set --json {'"mount": { "AllowNonEmpty": true, "AllowOther": true, "AsyncRead": true, "WritebackCache": true}'} &>/dev/null
-sleep 5
+### SET MAJOR OPTIONS FOR MOUNT : $(which rclone) rc --rc-addr=0.0.0.0:8554 options/set options/set --json 
+$(which rclone) rc --rc-addr=0.0.0.0:8554 options/set --json {'"main": { "TPSLimitBurst": ${TPSBURST}, "TPSLimit": ${TPSLIMIT} , "Checkers": 6, "Transfers": 6, "BufferSize": "${BUFFER_SIZE}", "TrackRenames": true, "TrackRenamesStrategy":"modtime,leaf", "NoUpdateModTime": true, "UserAgent": "${UAGENT}", "CutoffMode":"hard", "Progress":true, "UseMmap":true, "HumanReadable":true}'} &>/dev/null
+$(which rclone) rc --rc-addr=0.0.0.0:8554 options/set --json {'"vfs": { "GID": '${PGID}', "UID": '${PUID}', "Umask": '${UMASK}', "CacheMode": 3, "CacheMaxSize": "${VFS_CACHE_MAX_SIZE}", "CacheMaxAge": 21600000000000, "CachePollInterval": 120000000000, "PollInterval": 60000000000, "ChunkSize": "${VFS_READ_CHUNK_SIZE}", "ChunkSizeLimit": "${VFS_READ_CHUNK_SIZE_LIMIT}", "DirCacheTime": 43200000000000, "NoModTime": true,"NoChecksum": true}'} &>/dev/null
+$(which rclone) rc --rc-addr=0.0.0.0:8554 options/set --json {'"mount": { "AllowNonEmpty": true, "AllowOther": true, "AsyncRead": true, "WritebackCache": true}'} &>/dev/null
+$(which sleep) 5
 
 ## SIMPLE START MOUNT
-${RCD} mount/mount \\
-  fs=remote: mountPoint=/mnt/remotes mountType=mount &>/dev/null
+$(which rclone) rc --rc-addr=0.0.0.0:8554 mount/mount \\
+  fs=remote: mountPoint="${SREMOTES}" mountType=mount &>/dev/null
 
-touch /tmp/rclone.running
+$(which touch) "/tmp/rclone.running"
 EOF
-echo $(date) > /tmp/rclone.running
-###
 
-## SET PERMISSIONS 
-[[ -f "/tmp/rclone.sh" ]] && \
-   $(which chmod) 755 /tmp/rclone.sh && \
-   $(which bash) /tmp/rclone.sh
+   $(which echo) $(date) > "/tmp/rclone.running"
+   #### SET PERMISSIONS ####
+   if [[ -f "/tmp/rclone.sh" ]]; then
+      $(which chmod) 755 "/tmp/rclone.sh" &>/dev/null
+      $(which bash) "/tmp/rclone.sh"
+   fi
 
-while true; do
-  if [ "$(ls -1p /mnt/remotes)" ]; then break; else sleep 5 ; fi
-done
+   while true; do
+     if [[ "$($(which ls) -1p ${SREMOTES})" ]]; then
+        break
+     else 
+        $(which sleep) 5
+     fi
+   done
 }
 
 function rcmergerfs() {
-source /system/mount/mount.env
-if [[ -d "${ADDITIONAL_MOUNT}" ]];then
-   UFSPATH="/mnt/downloads=RW:${ADDITIONAL_MOUNT}=${ADDITIONAL_MOUNT_PERMISSION}:/mnt/remotes=NC"
-else
-   UFSPATH="/mnt/downloads=RW:/mnt/remotes=NC"
-fi
-###
-MGFS="allow_other,rw,async_read=true,statfs_ignore=nc,use_ino,func.getattr=newest,category.action=all,category.create=mspmfs,cache.writeback=true,cache.symlinks=true,cache.files=auto-full,dropcacheonclose=true,nonempty,minfreespace=0,fsname=mergerfs"
-## TO RUN JUST ONCE
-if ! $(which pgrep) -x "mergerfs" > /dev/null; then
-   $(which mergerfs) -o ${MGFS} ${UFSPATH} /mnt/unionfs &>/dev/null
-fi
+   source /system/mount/mount.env
+   if [[ -d "${ADDITIONAL_MOUNT}" ]]; then
+      UFSPATH="${SDOWN}=RW:${ADDITIONAL_MOUNT}=${ADDITIONAL_MOUNT_PERMISSION}:${SREMOTES}=NC"
+   else
+      UFSPATH="${SDOWN}=RW:${SREMOTES}=NC"
+   fi
+
+   MGFS="allow_other,rw,async_read=true,statfs_ignore=nc,use_ino,func.getattr=newest,category.action=all,category.create=mspmfs,cache.writeback=true,cache.symlinks=true,cache.files=auto-full,dropcacheonclose=true,nonempty,minfreespace=0,fsname=mergerfs"
+   #### TO RUN JUST ONCE ####
+   if ! $(which pgrep) -x "mergerfs" > /dev/null; then
+      $(which mergerfs) -o "${MGFS}" "${UFSPATH}" "${SUNION}" &>/dev/null
+   fi
 }
 
 function refreshVFS() {
-source /system/mount/mount.env
-log ">> run vfs refresh <<"
-for fod in /mnt/remotes/* ;do
-    basename "$fod" >/dev/null
-    FOLDER="$(basename -- $fod)"
-    IFS=- read -r <<< "$ACT"
-      log " VFS refreshing : $FOLDER"
-      $RCD vfs/forget dir=$FOLDER --fast-list _async=true --drive-pacer-burst 200 --drive-pacer-min-sleep 10ms --timeout 30m > /dev/null
-      $(which sleep) 1
-      $RCD vfs/refresh dir=$FOLDER --fast-list _async=true > /dev/null
-done  
+   source /system/mount/mount.env
+   log "${rclonevfs}"
+   for FOLD in ${SREMOTES}/*; do
+       basename "${FOLD}" >/dev/null
+       FOLDER="$($(which basename) -- ${FOLD})"
+       IFS=- read -r <<< "${ACT}"
+         $(which rclone) rc --rc-addr=0.0.0.0:8554 vfs/forget dir="${FOLDER}" --fast-list _async=true --drive-pacer-burst 200 --drive-pacer-min-sleep 10ms --timeout 30m &>/dev/null
+         $(which sleep) 1
+         $(which rclone) rc --rc-addr=0.0.0.0:8554 vfs/refresh dir="${FOLDER}" --fast-list _async=true &>/dev/null
+   done
 }
 
 function rckill() {
-source /system/mount/mount.env
-log ">> kill it with fire <<"
-$RCD mount/unmountall > /dev/null
-folderunmount
+   source /system/mount/mount.env
+   log "${killrclone}"
+   #### GET NAME TO KILL ####
+   for KILL in `$(which pgrep) -x rclone`; do
+       $(which kill) -9 "${KILL}"
+   done
+}
+
+function rcmergerfskill() {
+   source /system/mount/mount.env
+   log "${killmergerfs}"
+   #### GET NAME TO KILL ####
+   for KILL in `$(which pgrep) -x mergerfs`; do
+       $(which kill) -9 "${KILL}"
+   done
+}
+
+function rcmountkill() {
+   source /system/mount/mount.env
+   log "${killmount}"
+   $(which rclone) rc --rc-addr=0.0.0.0:8554 mount/unmountall &>/dev/null
 }
 
 function rcclean() {
-source /system/mount/mount.env
-log ">> run fs cache clear <<"
-$RCD fscache/clear --fast-list _async=true > /dev/null
+   source /system/mount/mount.env
+   log "${rcloneclean}"
+   $(which rclone) rc --rc-addr=0.0.0.0:8554 fscache/clear --fast-list _async=true &>/dev/null
 }
 
 function rcstats() {
-# NOTE LATER
-source /system/mount/mount.env
-log ">> get rclone stats <<"
-$RCD core/stats
+   source /system/mount/mount.env
+   log "${rclonestats}"
+   $(which rclone) rc --rc-addr=0.0.0.0:8554 core/stats
 }
 
 function drivecheck() {
-   if [ "$(ls -1p /mnt/unionfs)" ] && [ "$(ls -1p /mnt/remotes)" ]; then rcclean && refreshVFS ; fi
+   while true; do
+      source /system/mount/mount.env
+      if [[ "$($(which ls) -1p ${SUNION})" ]] && [[ "$($(which ls) -1p ${SREMOTES})" ]]; then
+         if [[ "${VFS_REFRESH_ENABLE}" == "true" ]]; then
+            rcclean && refreshVFS
+            $(which truncate) -s 0 "${RLOG}" &>/dev/null
+         else
+            rcclean
+         fi
+      fi
+      $(which sleep) "${VFS_REFRESH}"
+   done
+}
+
+function nzbcleanup() {
+   while true; do
+      source /system/mount/mount.env
+      DRIVEPERCENT=$($(which df) --output=pcent /mnt | $(which tr) -dc '0-9')
+      if [[ "${NZBCLEANUP}" != "false" ]]; then
+         if [[ ! "${DRIVEPERCENT}" -ge "${DRIVEUSEDPERCENT}" ]]; then
+            $(which sleep) 120
+         else
+            $(which find) "${NZBBACKUPFOLDER}"/* -type d -mmin +"${NZBBACKUPTIME}" -exec rm -rf {} \; &>/dev/null
+            $(which find) "${NZBDOWNLOADFOLDER}"/* -type f -mmin +"${NZBDOWNLOADTIME}" -exec rm -rf {} \; &>/dev/null
+            $(which sleep) 120
+         fi
+      else
+         $(which sleep) 120
+      fi
+   done
+}
+
+function testsuccessfull() {
+   source /system/mount/mount.env
+   rlog && $(which sleep) 10
+   if [[ "$($(which ls) -1p ${SREMOTES})" ]] && [[ "$($(which ls) -1p ${SUNION})" ]]; then
+      MSG="${startupmountend}" && notification
+   else
+      rckill && rcmergerfskill && folderunmount && rcmount && rcmergerfs && rcclean
+   fi
 }
 
 function testrun() {
-## force a start sleeping to fetch all options 
-  rlog && sleep 5
-## FINAL LOOP
-while true; do
-   source /system/mount/mount.env
-   if [ "$(ls -1p /mnt/remotes)" ] && [ "$(ls -1p /mnt/unionfs)" ]; then
-      log "${startuprcloneworks}" && sleep 360
-   else
-      rckill && rcmount && rcmergerfs && rcclean
-   fi
-   rlog && lang && checkban && sleep 360
-done
+   #### FORCE START SLEEPING TO FETCH OPTIONS ####
+   rlog && $(which sleep) 5
+   #### FINAL LOOP ####
+   while true; do
+      source /system/mount/mount.env
+      if [[ "$($(which ls) -1p ${SREMOTES})" ]] && [[ "$($(which ls) -1p ${SUNION})" ]]; then
+         log "${startupmountworks}" && $(which sleep) 360
+      else
+         rckill && rcmergerfskill && folderunmount && rcmount && rcmergerfs && rcclean
+      fi
+      rlog && envrenew && lang && checkban && $(which sleep) 360
+   done
 }
 
-#########################################
-# Till here on out, you probably don't  #
-#   want to change anything unless you  #
-#   know what you're doing.             #
-#########################################
-     ### DO NOT MAKE ANY CHANGES ###
-##  IF YOU DON'T KNOW WHAT YOU'RE DOING ##
-##########################################
+#### END OF FILE ####
