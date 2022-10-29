@@ -10,7 +10,7 @@ ca-certificates-20220614-r0
 ca-certificates-bundle-20220614-r0
 cabextract-1.9.1-r0
 cairo-1.17.4-r2
-expat-2.4.8-r0
+expat-2.4.9-r0
 fontconfig-2.14.0-r0
 freetype-2.12.1-r0
 fribidi-1.0.12-r0
@@ -50,7 +50,7 @@ musl-utils-1.2.3-r0
 ncurses-libs-6.3_p20220521-r0
 ncurses-terminfo-base-6.3_p20220521-r0
 nghttp2-libs-1.47.0-r0
-nodejs-16.16.0-r0
+nodejs-16.17.1-r0
 pango-1.50.7-r0
 pcre-8.45-r2
 pixman-0.40.0-r3
