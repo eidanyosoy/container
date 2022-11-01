@@ -197,6 +197,14 @@ fi
 if [[ -f "${SOURCECONFIG}" && "${ARRAY}" -lt "1" ]]; then
    cp "${SOURCECONFIG}" "${ENDCONFIG}"
    $(which rclone) config delete remote --config="${ENDCONFIG}" &>/dev/null
+   #### REMOVE GDSA ENTRY IN ENDCONFIG ####
+   GDSACHECK=$($(which rclone) config dump --config="${ENDCONFIG}" | $(which jq) -r 'to_entries | (.[] | select(.key | contains("GDSA"))) | .key')
+   if [[ "${GDSACHECK}" != "" ]]; then
+      mapfile -t GDSA < <($(which rclone) config dump --config="${ENDCONFIG}" | $(which jq) -r 'to_entries | (.[] | select(.key | contains("GDSA"))) | .key')
+      for NAME in ${GDSA[@]}; do
+         $(which rclone) config delete "${NAME}" --config="${ENDCONFIG}" &>/dev/null
+      done
+   fi
 fi
 
 # CREATE CSV
