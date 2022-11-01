@@ -22,7 +22,7 @@ LABEL org.opencontainers.image.source="https://github.com/dockserver/container"
 
 ARG TARGETPLATFORM
 ARG BUILDPLATFORM
-ARG VERSION="10.8.6-1"
+ARG VERSION="10.8.7-1"
 ARG BRANCH="master"
 
 ENV NVIDIA_DRIVER_CAPABILITIES="compute,video,utility" \
@@ -59,7 +59,7 @@ RUN \
    echo "**** install packages ****" && \
      apt-get install --no-install-recommends -yqq at jellyfin-ffmpeg jellyfin-web libfontconfig1 libfreetype6 libssl1.1 && \
    echo "**** install jellyfin ****" && \
-     apt-get install --no-install-recommends -yqq jellyfin-server=10.8.6-1 && \
+     apt-get install --no-install-recommends -yqq jellyfin-server=10.8.7-1 && \
    case $TARGETPLATFORM in \
     'linux/amd64') apt-get update -yqq && apt-get install --no-install-recommends -yqq mesa-va-drivers intel-media-va-driver-non-free beignet-opencl-icd intel-media-va-driver-non-free i965-va-driver libva2=2.13.0+i643~u20.04 libigdgmm11=21.3.3+i643~u20.04 intel-media-va-driver-non-free=21.4.1+i643~u20.04;; \
     'linux/arm64') apt-get update -yqq && apt-get install --no-install-recommends -yqq libomxil-bellagio0 libomxil-bellagio-bin libraspberrypi0;; \
