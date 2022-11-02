@@ -170,14 +170,15 @@ LANGUAGE=${LANGUAGE:-en}
 if [[ -f "${TMPENV}" ]]; then $(which rm) -f "${TMPENV}"; fi
 
 source "${ENVA}"
-if [[ -d "${TMPRCLONE}" ]]; then $(which fusermount) -uzq "${TMPRCLONE}"; fi
-if [[ -d "${SUNION}" ]]; then $(which fusermount) -uzq "${SUNION}"; fi
-if [[ -d "${SREMOTES}" ]]; then $(which fusermount) -uzq "${SREMOTES}"; fi
-if [[ ! -d "${USEDDIR}" ]]; then $(which mkdir) -p "${USEDDIR}" && $(which chown) -hR abc:abc "${USEDDIR}"; fi
-if [[ ! -d "${TMPRCLONE}" ]]; then $(which mkdir) -p "${TMPRCLONE}" && $(which chown) -hR abc:abc "${TMPRCLONE}" && $(which chmod) -R 775 "${TMPRCLONE}"; fi
-if [[ ! -d "${SUNION}" ]]; then $(which mkdir) -p "${SUNION}" && $(which chown) -hR abc:abc "${SUNION}" && $(which chmod) -R 775 "${SUNION}"; fi
-if [[ ! -d "${SDOWN}" ]]; then $(which mkdir) -p "${SDOWN}" && $(which chown) -hR abc:abc "${SDOWN}" && $(which chmod) -R 775 "${SDOWN}"; fi
-if [[ -f "${ENDCONFIG}" ]]; then $(which rm) -f "${ENDCONFIG}"; fi
+if [[ ! -d "${USEDDIR}" ]]; then $(which mkdir) -p "${USEDDIR}" && $(which chown) -hR abc:abc "${USEDDIR}" &>/dev/null; fi
+if [[ ! -d "${TMPRCLONE}" ]]; then $(which mkdir) -p "${TMPRCLONE}" && $(which chown) -hR abc:abc "${TMPRCLONE}" && $(which chmod) -R 775 "${TMPRCLONE}" &>/dev/null; fi
+if [[ ! -d "${SUNION}" ]]; then $(which mkdir) -p "${SUNION}" && $(which chown) -hR abc:abc "${SUNION}" && $(which chmod) -R 775 "${SUNION}" &>/dev/null; fi
+if [[ ! -d "${SREMOTES}" ]]; then $(which mkdir) -p "${SREMOTES}" && $(which chown) -hR abc:abc "${SREMOTES}" && $(which chmod) -R 775 "${SREMOTES}" &>/dev/null; fi
+if [[ ! -d "${SDOWN}" ]]; then $(which mkdir) -p "${SDOWN}" && $(which chown) -hR abc:abc "${SDOWN}" && $(which chmod) -R 775 "${SDOWN}" &>/dev/null; fi
+if [[ -d "${TMPRCLONE}" ]]; then $(which fusermount) -uzq "${TMPRCLONE}" &>/dev/null; fi
+if [[ -d "${SUNION}" ]]; then $(which fusermount) -uzq "${SUNION}" &>/dev/null; fi
+if [[ -d "${SREMOTES}" ]]; then $(which fusermount) -uzq "${SREMOTES}" &>/dev/null; fi
+if [[ -f "${ENDCONFIG}" ]]; then $(which rm) -f "${ENDCONFIG}" &>/dev/null; fi
 $(which sed) -i 's/UMASK=022/UMASK=18/' "${ENVA}" &>/dev/null
 $(which truncate) -s 0 "${LOGS}"/*.log &>/dev/null
 
