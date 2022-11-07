@@ -16,59 +16,29 @@
 #####################################
 # shellcheck disable=SC2086
 # shellcheck disable=SC2046
-FROM alpine:latest AS base
+FROM php:8-apache
+
 LABEL org.opencontainers.image.source="https://github.com/dockserver/container"
 
-ENV HTTP_PORT=8685
-ENV HTTP_BIND=*
-ENV HTTP_LOG=/dev/stdout
-ENV LARGE_FONTS=0
-ENV CACHE_TIME=1
-ENV RATE_UNIT=1
-ENV PAGE_REFRESH=0
-ENV RUN_VNSTATD=1
+ARG TARGETPLATFORM
+ARG BUILDPLATFORM
 
-RUN true \
-    && set -ex \
-    && apk add --no-cache \
-        gd \
-        perl \
-        lighttpd \
-        sqlite-libs \
-        curl
+RUN \
+  echo "**** install build packages ****" && \
+  rm -rf /etc/apt/sources.list && \
+  echo "deb http://ftp.debian.org/debian experimental main" >>/etc/apt/sources.list && \
+  echo "deb http://ftp.debian.org/debian sid main" >>/etc/apt/sources.list && \
+  apt-get update -yqq && \
+  apt-get install -yqq git unzip apt-utils && \
+  apt-get purge libgcc-8-dev -yqq && \
+  apt-get autoremove -yqq && \
+  apt-get autoclean -yqq && \
+  apt-get -t experimental install libc6-dev -yqq && \
+  apt-get autoremove -yqq && \
+  apt-get autoclean -yqq
 
-FROM alpine:latest AS builder
+RUN curl -sS https://getcomposer.org/installer | php && mv composer.phar /usr/local/bin/composer
 
-RUN true \
-    && set -ex \
-    && apk add --no-cache gcc make musl-dev linux-headers gd-dev sqlite-dev git \
-    && git clone --depth 1 https://github.com/vergoh/vnstat \
-    && cd vnstat \
-    && ./configure --prefix=/usr --sysconfdir=/etc \
-    && make \
-    && make install
+COPY ./apps/docker-vnstat/app/ /var/www/html/
 
-FROM base AS runtime
-
-COPY --from=builder /usr/bin/vnstat /usr/bin/vnstat
-COPY --from=builder /usr/bin/vnstati /usr/bin/vnstati
-COPY --from=builder /usr/sbin/vnstatd /usr/sbin/vnstatd
-COPY --from=builder /etc/vnstat.conf /etc/vnstat.conf
-COPY --from=builder vnstat/examples/vnstat.cgi /var/www/localhost/htdocs/index.cgi
-COPY --from=builder vnstat/examples/vnstat-json.cgi /var/www/localhost/htdocs/json.cgi
-
-RUN true \
-    && set -ex \
-    && addgroup -S vnstat  \
-    && adduser -S -h /var/lib/vnstat -s /sbin/nologin -g vnStat -D -H -G vnstat vnstat
-
-VOLUME /var/lib/vnstat
-EXPOSE ${HTTP_PORT}
-
-COPY ./apps/docker-vnstat/root/favicon.ico /var/www/localhost/htdocs/favicon.ico
-COPY ./apps/docker-vnstat/root/start.sh /start.sh
-
-RUN chmod 777 /start.sh
-
-CMD [ "/start.sh" ]
 ##EOF
