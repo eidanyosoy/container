@@ -182,6 +182,17 @@ if [[ -f "${ENDCONFIG}" ]]; then $(which rm) -f "${ENDCONFIG}" &>/dev/null; fi
 $(which sed) -i 's/UMASK=022/UMASK=18/' "${ENVA}" &>/dev/null
 $(which truncate) -s 0 "${LOGS}"/*.log &>/dev/null
 
+# CHECK MOUNT KEYS ARE NOT UPLOADER KEYS
+if [[ "${ARRAY}" -ge "1" ]]; then
+   KEYMOUNT=$($(which ls) -A "${JSONDIR}" | $(which sort) -V | $(which head) -n 1 2>/dev/null)
+   KEYUPLOADER=$($(which ls) -A "${JSONDIRUPLOADER}" | $(which sort) -V | $(which head) -n 1 2>/dev/null)
+   $(which cmp) -s "${JSONDIR}/${KEYMOUNT}" "${JSONDIRUPLOADER}/${KEYUPLOADER}"
+   if [[ "$?" -eq "0" ]]; then 
+      log "-> You are using your Uploader Keys! Generate Keys only for Mount! <-"
+      $(which sleep) infinity
+   fi
+fi
+
 # MOUNT KEYS
 if [[ "${ARRAY}" -ge "1" ]]; then
    if [[ ! -f "${JSONUSED}" ]]; then
