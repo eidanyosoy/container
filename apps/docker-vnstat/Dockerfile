@@ -41,4 +41,6 @@ RUN curl -sS https://getcomposer.org/installer | php && mv composer.phar /usr/lo
 
 COPY ./apps/docker-vnstat/app/ /var/www/html/
 
+RUN composer install --quiet && mkdir -p /var/lib/vnstat
+
 ##EOF
