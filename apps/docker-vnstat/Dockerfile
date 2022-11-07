@@ -16,7 +16,7 @@
 #####################################
 # shellcheck disable=SC2086
 # shellcheck disable=SC2046
-FROM php:
+FROM php:8-apache
 
 LABEL org.opencontainers.image.source="https://github.com/dockserver/container"
 
