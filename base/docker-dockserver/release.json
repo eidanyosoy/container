@@ -2,10 +2,10 @@
    "appname": "docker-dockserver",
    "apppic": "",
    "appfolder": "./base/docker-dockserver",
-   "newversion": "20221110",
-   "appversion": "20221110",
+   "newversion": "3.16.2",
+   "appversion": "3.16.2",
    "baseimage": "alpine",
    "description": "Docker + Traefik with Authelia and Cloudflare Protection",
-   "body": "Upgrading docker-dockserver to 20221110",
+   "body": "Upgrading docker-dockserver to 3.16.2",
    "user": "github-actions[bot]"
 }
