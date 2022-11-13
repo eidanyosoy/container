@@ -2,10 +2,10 @@
    "appname": "docker-jackett",
    "apppic": "./images/docker-jackett.png",
    "appfolder": "./apps/docker-jackett",
-   "newversion": "null",
+   "newversion": "0.20.2238",
    "appbranch": "master",
    "baseimage": "ghcr.io/linuxserver/baseimage-ubuntu:bionic",
-   "description": "null",
-   "body": "Upgrading docker-jackett to null",
+   "description": "API Support for your favorite torrent trackers",
+   "body": "Upgrading docker-jackett to 0.20.2238",
    "user": "github-actions[bot]"
 }

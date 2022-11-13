@@ -6,7 +6,7 @@
    "appbranch": "master",
    "baseimage": "alpine",
    "appversion": "fea6f6c5790dd71270b3c708ffa54965131035fa",
-   "description": "null",
+   "description": "A personal home page for quick access to all your personal apps/sites.",
    "body": "Upgrading docker-fenrus to fea6f6c5790dd71270b3c708ffa54965131035fa",
    "user": "github-actions[bot]"
 }

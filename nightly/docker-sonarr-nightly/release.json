@@ -4,7 +4,7 @@
    "appfolder": "./nightly/docker-sonarr-nightly",
    "newversion": "develop-3.0.9.1555-ls311",
    "appbranch": "develop",
-   "description": "null",
+   "description": "Smart PVR for newsgroup and bittorrent users.",
    "body": "Upgrading docker-sonarr-nightly to develop-3.0.9.1555-ls311",
    "user": "github-actions[bot]"
 }

@@ -2,9 +2,9 @@
    "appname": "docker-sonarr",
    "apppic": "./images/docker-sonarr.png",
    "appfolder": "./apps/docker-sonarr",
-   "newversion": "null",
+   "newversion": "3.0.9.1549-ls163",
    "appbranch": "main",
-   "description": "null",
-   "body": "Upgrading docker-sonarr to null",
+   "description": "Smart PVR for newsgroup and bittorrent users.",
+   "body": "Upgrading docker-sonarr to 3.0.9.1549-ls163",
    "user": "github-actions[bot]"
 }

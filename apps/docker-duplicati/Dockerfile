@@ -23,7 +23,7 @@ LABEL org.opencontainers.image.source="https://github.com/dockserver/container"
 ARG TARGETPLATFORM
 ARG BUILDPLATFORM
 
-ARG VERSION=""
+ARG VERSION="2.0.6.3-2.0.6.3_beta_2021-06-17"
 ARG BRANCH="master"
 
 ENV XDG_CONFIG_HOME="/config"
@@ -35,7 +35,7 @@ RUN \
     apk add -U --update --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/v3.14/main unrar && \
   echo "**** install 'docker-duplicati' ****" && \
     mkdir -p /app/duplicati && \
-    curl -o /tmp/duplicati.zip -L "$(curl -s https://api.github.com/repos/duplicati/duplicati/releases/tags/v | jq -r .assets[].browser_download_url | grep zip | grep -v signatures)" && \
+    curl -o /tmp/duplicati.zip -L "$(curl -s https://api.github.com/repos/duplicati/duplicati/releases/tags/v2.0.6.3-2.0.6.3_beta_2021-06-17 | jq -r .assets[].browser_download_url | grep zip | grep -v signatures)" && \
     unzip /tmp/duplicati.zip -d /app/duplicati && \
   echo "**** cleanup ****" && \
     rm -rf /tmp/* /var/tmp/*
