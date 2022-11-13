@@ -4,7 +4,7 @@
    "appfolder": "./base/docker-haproxy",
    "newversion": "",
    "baseimage": "haproxy",
-   "description": "HAProxy Load Balancer's development branch (mirror of git.haproxy.org)",
+   "description": "null",
    "body": "Upgrading docker-haproxy to ",
    "user": "github-actions[bot]"
 }

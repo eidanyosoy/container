@@ -5,7 +5,7 @@
    "newversion": "nightly-4.3.1.6741-ls397",
    "appbranch": "nightly",
    "baseimage": "",
-   "description": "A fork of Sonarr to work with movies à la Couchpotato.",
+   "description": "null",
    "body": "Upgrading docker-radarr-nightly to nightly-4.3.1.6741-ls397",
    "user": "github-actions[bot]"
 }

@@ -21,7 +21,7 @@ LABEL org.opencontainers.image.source="https://github.com/dockserver/container"
 
 ARG TARGETPLATFORM
 ARG BUILDPLATFORM
-ARG VERSION="4.1.07"
+ARG VERSION="null"
 ARG BRANCH="master"
 
 ENV TAUTULLI_DOCKER=True
@@ -35,7 +35,7 @@ RUN \
    echo "**** install app ****" && \
      mkdir -p /app/tautulli && \
      curl -fsSL "https://github.com/zSeriesGuy/Tautulli/archive/v${VERSION}.tar.gz" | tar xzf - -C /app/tautulli --strip-components=1 && \
-   echo -e "v4.1.07" > /app/tautulli/version.txt && \
+   echo -e "vnull" > /app/tautulli/version.txt && \
    echo -e "master" > /app/tautulli/branch.txt && \
    echo "*** cleanup system ****" && \
      apk del --purge build-dependencies && \
