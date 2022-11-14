@@ -6,26 +6,25 @@ include_once('../../utility.php');
 
 function processJsonFiles()
 {
-    $jsonDirectoryIterator = new FilesystemIterator(JSON_DIRECTORY_INPROGRESS);
     $response = new ApiResponse();
-    foreach ($jsonDirectoryIterator as $jsonFile) {
-        if (!$jsonFile->isFile() || str_starts_with(basename($jsonFile), '.')) {
-            continue;
-        }
-        $jsonObject = json_decode(file_get_contents($jsonFile));
+    $response->jobs = [];
+    $db = new SQLite3(DATABASE, SQLITE3_OPEN_READONLY);
+    $results = $db->query("SELECT drive, filedir, filebase, filesize, gdsa, logfile FROM uploads");
+    while ($row = $results->fetchArray()) {
         try {
             $jobStatus = new UploadJobStatus();
-            $jobStatus->job_last_update_timestamp = $jsonFile->getMTime();
-            $jobStatus->job_name = basename($jsonFile);
-            $jobStatus->gdsa = $jsonObject->gdsa;
-            $jobStatus->file_directory = $jsonObject->filedir;
-            $jobStatus->file_name = $jsonObject->filebase;
-            $jobStatus->file_size = $jsonObject->filesize;
+            $jobStatus->job_name = $row['filebase'];
+            $jobStatus->drive = $row['drive'];
+            $jobStatus->gdsa = $row['gdsa'];
+            $jobStatus->file_directory = $row['filedir'];
+            $jobStatus->file_name = $row['filebase'];
+            $jobStatus->file_size = $row['filesize'];
 
             //Parse rclone logfile
-            mapLogFileInformation($jsonObject->logfile, $jobStatus);
-
-            $response->jobs[] = $jobStatus;
+            if ($row['logfile'] != null) {
+                mapLogFileInformation($row['logfile'], $jobStatus);
+                $response->jobs[] = $jobStatus;
+            }
         } catch (Exception $e) {
             //TODO: Error handling
         }
@@ -33,6 +32,8 @@ function processJsonFiles()
 
     $response->total_count = isset($response->jobs) ? count($response->jobs) : 0;
 
+    $db?->close();
+    unset($db);
     return json_encode($response);
 }
 
