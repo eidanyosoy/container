@@ -256,7 +256,7 @@ $(which rm) -rf /var/cache/apk/* \
 $(which find) "${BASE}" -type f -name '*.log' -delete
 $(which find) "${BASE}" -type f -name '*.txt' -delete
 
-echo "------------------------------
+$(which echo) "------------------------------
     _____   _   _  __  __
    |_   _| | | | | \ \/ /
      | |   | |_| |  \  / 
