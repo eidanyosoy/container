@@ -6,14 +6,14 @@
 # Docker owned dockserver           #
 # Docker Maintainer dockserver      #
 #####################################
-#####################################
 # THIS DOCKER IS UNDER LICENSE      #
 # NO CUSTOMIZING IS ALLOWED         #
 # NO REBRANDING IS ALLOWED          #
 # NO CODE MIRRORING IS ALLOWED      #
 #####################################
+
 function log() {
-     echo "${1}"
+   $(which echo) "[Uploader] ${1}"
 }
 
 addgroup -S abc &>/dev/null
@@ -35,87 +35,225 @@ User uid:    $(id -u abc)
 User gid:    $(id -g abc)
 -------------------------------------
 "
+
+#SETTINGS
+ENDCONFIG=/app/rclone/rclone.conf
+SOURCECONFIG=/system/servicekeys/rclonegdsa.conf
+ENDFILE=/system/uploader/drive.csv
+ENVA=/system/uploader/uploader.env
+SAMPLE=/app/sample/.sample.uploader.env
+EXCLUDE=/system/uploader/rclone.exclude
+DATABASE=/system/uploader/db/uploader.db
+PAUSE=/app/rclone/pause
+
+#FOLDER
+BASE=/system/uploader
+JSONDIR=/system/servicekeys/keys
+USEDDIR=/system/uploader/.keys
+JSONUSED=/system/uploader/.keys/keys
+JSONOLD=/system/uploader/json
+ARRAY=$($(which ls) -A "${JSONDIR}" | $(which wc) -l)
+
    $(which cat) > /etc/apk/repositories << EOF; $(echo)
 http://dl-cdn.alpinelinux.org/alpine/v$(cat /etc/alpine-release | cut -d'.' -f1,2)/main
 http://dl-cdn.alpinelinux.org/alpine/v$(cat /etc/alpine-release | cut -d'.' -f1,2)/community
 http://dl-cdn.alpinelinux.org/alpine/edge/testing
 EOF
 
-   log "**** update packages ****"
-   $(which apk) --quiet --no-progress update && \
-   $(which apk) --quiet --no-progress upgrade
+log "**** update system packages ****" && \
+   apk --quiet --no-progress update && \
+   apk --quiet --no-progress upgrade
 
-   log "**** install build packages ****"
+log "**** install build packages from requirements ****" && \
    $(which cat) /app/requirements.txt | while IFS=$'\n' read -ra myArray; do
-      $(which apk) add --quiet --no-progress --update ${myArray[@]}
+      apk add --quiet --no-progress --update "${myArray[@]}"
    done
 
-   log "**** install rclone ****" && \
-   $(which wget) -qO- https://rclone.org/install.sh | bash &>/dev/null
+log "**** install pip packages ****"
+   pip3 install --no-cache-dir -U apprise &>/dev/null
 
-   KEYLOCAL=/system/servicekeys/keys/
-   ARRAY=$(ls ${KEYLOCAL} | wc -l )
-   if [[ "${ARRAY}" -eq "0" ]]; then
-      log "-->> [ WARNING ] ----------------- [ WARNING ] <<--"
-      log "-->> [ WARNING ]  no match found   [ WARNING ] <<--"
-      log "-->> [ WARNING ]  of GDSA[01=~100] [ WARNING ] <<--"
-      log "-->> [ WARNING ]    or [01=~100]   [ WARNING ] <<--"
-      log "-->> [ WARNING ] ----------------- [ WARNING ] <<--"
-      sleep infinity
-   fi
+log "**** install rclone ****"
+   apk add --quiet --no-cache --no-progress rclone --repository=http://dl-cdn.alpinelinux.org/alpine/edge/community
 
-   log "**** copy dependencies ****"
+if [[ "${ARRAY}" -lt "1" ]]; then
+   log "-> No match found of GDSA[01=~100] or [01=~100] <-"
+   $(which sleep) infinity
+fi
+
+log "**** copy dependencies ****"
    $(which cp) -r /conf/nginx.conf /etc/nginx/nginx.conf
    $(which cp) -r /conf/fpm-pool.conf /etc/php8/php-fpm.d/www.conf
    $(which cp) -r /conf/php.j2 /etc/php8/conf.d/custom.ini
 
-   $(which rm) -rf /system/uploader/.keys/{usedupload,lastday} \
-          /app/uploader/{pid,discord} \
-          /system/uploader/vfsforget \
+   $(which rm) -rf /app/uploader/pid \
           /var/cache/apk/* &>/dev/null
 
-   log "**** creating folders ****"
+log "**** creating folders ****"
    $(which mkdir) -p /system/uploader/.keys \
-           /system/uploader/{logs,json,sample} \
-           /system/uploader/json/{done,upload} \
+           /system/uploader/{logs,db,sample} \
+           /app/custom \
+           /app/rclone \
            /root/.config/rclone/ &>/dev/null
 
-   ## COPY SAMPLE FILES ###
-   $(which cp) -r /conf/crypt_multi_tdrive-example.csv /system/uploader/sample/crypt_multi_tdrive-example.csv
-   $(which cp) -r /conf/uncrypt_multi_tdrive-example.csv /system/uploader/sample/uncrypt_multi_tdrive-example.csv
+#### COPY SAMPLE FILES #####
+$(which cp) -r /app/sample/crypt_multi_tdrive-example.csv /system/uploader/sample/crypt_multi_tdrive-example.csv
+$(which cp) -r /app/sample/uncrypt_multi_tdrive-example.csv /system/uploader/sample/uncrypt_multi_tdrive-example.csv
 
-   ## SET PERMS ##
-   $(which chown) -cR abc:abc /root/.config /app /system/* &>/dev/null
-   $(which chmod) -cR 755 /root/.config/rclone/ /app /system/* &>/dev/null
+if [[ -f "${ENVA}" ]]; then
+   source "${ENVA}"
+else
+   source "${SAMPLE}"
+fi
 
-   sample=/app/uploader/.sample.uploader.env
-   uploaderenv=/system/uploader/uploader.env
+#### FIX EXCLUDE ####
+if [[ -f "${EXCLUDE}" ]]; then
+   $(which sed) -i 's/*//g' "${EXCLUDE}"
+fi
 
-   if test -f ${uploaderenv} ; then
-     source $uploaderenv
-   else
-     source $sample
-   fi
+#### EXCLUDE PART ####
+if [[ ! -f "${EXCLUDE}" ]]; then
+   $(which cat) > "${EXCLUDE}" << EOF; $(echo)
+-vpn/
+.anchors/
+.inProgress/
+amd/
+aria/
+deluge/
+jdownloader2/
+nzb/
+nzbget/
+qbittorrent/
+rutorrent/
+sabnzbd/
+temp/
+torrent/
+tubesync/
+EOF
+fi
 
-echo -e "#-------------------------------------------------------
+$(which echo) -e "#-------------------------------------------------------
 #   UPLOADER ENVIROMENTS
 #-------------------------------------------------------
 ## USER VALUES
 PUID=${PUID:-1000}
 PGID=${PGID:-1000}
+TIMEZONE=${TZ:-UTC}
+
+## CRITICAL SETUP FOR CRYPT USER
+HASHPASSWORD=${HASHPASSWORD:-hashed}
 
 ## RCLONE - SETTINGS
-BANDWITHLIMIT=${BANDWITHLIMIT:-40}
+BANDWIDTH_LIMIT=\"${BANDWIDTH_LIMIT:-null}\"
 LOG_LEVEL=${LOG_LEVEL:-INFO}
 DLFOLDER=${DLFOLDER:-/mnt/downloads}
 TRANSFERS=${TRANSFERS:-2}
 
 ## USER - SETTINGS
-DRIVEUSEDSPACE=${DRIVEUSEDSPACE:-10}
+DRIVEUSEDSPACE=${DRIVEUSEDSPACE:-null}
+FOLDER_DEPTH=${FOLDER_DEPTH:-1}
+FOLDER_PRIORITY=${FOLDER_PRIORITY:-null}
+MIN_AGE_UPLOAD=${MIN_AGE_UPLOAD:-1}
+
+## VFS - SETTINGS
+VFS_REFRESH_ENABLE=${VFS_REFRESH_ENABLE:-true}
+MOUNT=${MOUNT:-mount:8554}
+
+## LOG - SETTINGS
+LOG_ENTRY=${LOG_ENTRY:-1000}
+LOG_RETENTION_DAYS=${LOG_RETENTION_DAYS:-null}
+
+## AUTOSCAN - SETTINGS
+AUTOSCAN_URL=${AUTOSCAN_URL:-null}
+AUTOSCAN_USER=${AUTOSCAN_USER:-null}
+AUTOSCAN_PASS=${AUTOSCAN_PASS:-null}
+
+## NOTIFICATION - SETTINGS
+NOTIFICATION_URL=${NOTIFICATION_URL:-null}
+NOTIFICATION_LEVEL=${NOTIFICATION_LEVEL:-ALL}
+NOTIFICATION_SERVERNAME=${NOTIFICATION_SERVERNAME:-null}
+
+## LANGUAGE MESSAGES
+LANGUAGE=${LANGUAGE:-en}
 
 #-------------------------------------------------------
 #   UPLOADER ENVIROMENTS
-#-------------------------------------------------------" >$uploaderenv
+#-------------------------------------------------------" > "${ENVA}"
+
+if [[ -f "${ENDCONFIG}" ]]; then $(which rm) -f "${ENDCONFIG}"; fi
+if [[ -f "${PAUSE}" ]]; then $(which rm) -f "${PAUSE}"; fi
+if [[ -d "${JSONOLD}" ]]; then $(which rm) -rf "${JSONOLD}"; fi
+if [[ ! -d "${USEDDIR}" ]]; then $(which mkdir) -p "${USEDDIR}" && $(which chown) -hR abc:abc "${USEDDIR}"; fi
+
+# UPLOADER KEYS
+if [[ ! -f "${JSONUSED}" ]]; then
+   $(which ls) -A "${JSONDIR}" | $(which sort) -V > "${JSONUSED}"
+else
+   ARRAYJSON=$($(which cat) "${JSONUSED}" | $(which wc) -l)
+   if [[ "${ARRAY}" != "${ARRAYJSON}" ]]; then
+      $(which rm) -f "${JSONUSED}" && $(which ls) -A "${JSONDIR}" | $(which sort) -V > "${JSONUSED}"
+   fi
+fi
+
+# CREATE RCLONE.CONF FROM RCLONEGDSA.CONF
+if [[ ! -f "${ENDFILE}" && -f "${SOURCECONFIG}" ]]; then
+   KEY=$($(which sed) -n 1p "${JSONUSED}")
+   TDID=$($(which rclone) config dump --config="${SOURCECONFIG}" | $(which jq) -r 'to_entries | (.[] | select(.value.team_drive)) | .value.team_drive' | $(which head) -n 1)
+   GETP=$($(which rclone) config dump --config="${SOURCECONFIG}" | $(which jq) -r 'to_entries | (.[] | select(.value.type=="crypt")) | .value.password' | $(which head) -n 1)
+   GETS=$($(which rclone) config dump --config="${SOURCECONFIG}" | $(which jq) -r 'to_entries | (.[] | select(.value.type=="crypt")) | .value.password2' | $(which head) -n 1)
+   if [[ "${GETP}" == "" && "${GETS}" == "" ]]; then
+      $(which rclone) config create GDSA drive scope=drive server_side_across_configs=true team_drive="${TDID}" service_account_file="${JSONDIR}/${KEY}" --config="${ENDCONFIG}"
+   else
+      $(which rclone) config create GDSA drive scope=drive server_side_across_configs=true team_drive="${TDID}" service_account_file="${JSONDIR}/${KEY}" --config="${ENDCONFIG}"
+      $(which rclone) config create GDSAC crypt remote=GDSA:/encrypt filename_encryption=standard directory_name_encryption=true password="${GETP}" password2="${GETS}" --config="${ENDCONFIG}"
+   fi
+fi
+
+# CREATE RCLONE.CONF FROM DRIVE.CSV
+if [[ -f "${ENDFILE}" ]]; then
+   KEY=$($(which sed) -n 1p "${JSONUSED}")
+   $(which cat) "${ENDFILE}" | $(which sed) '/^\s*#.*$/d' | $(which head) -n 1 | while IFS=$'|' read -r -a DRIVE; do
+      if [[ "${DRIVE[2]}" == "" && "${DRIVE[3]}" == "" ]]; then
+         $(which rclone) config create GDSA drive scope=drive server_side_across_configs=true team_drive="${DRIVE[1]}" service_account_file="${JSONDIR}/${KEY}" --config="${ENDCONFIG}"
+      else
+         if [[ "${HASHPASSWORD}" == "plain" && "${HASHPASSWORD}" != "hashed" ]]; then
+            ENC_PASSWORD=$($(which rclone) obscure "${DRIVE[2]}" | $(which tail) -n1)
+            ENC_SALT=$($(which rclone) obscure "${DRIVE[3]}" | $(which tail) -n1)
+         else
+            ENC_PASSWORD="${DRIVE[2]}"
+            ENC_SALT="${DRIVE[3]}"
+         fi
+         $(which rclone) config create GDSA drive scope=drive server_side_across_configs=true team_drive="${DRIVE[1]}" service_account_file="${JSONDIR}/${KEY}" --config="${ENDCONFIG}"
+         $(which rclone) config create GDSAC crypt remote=GDSA:/encrypt filename_encryption=standard directory_name_encryption=true password="${ENC_PASSWORD}" password2="${ENC_SALT}" --config="${ENDCONFIG}"
+      fi
+   done
+fi
+
+# CREATE UPLOADER DATABASE
+if [[ ! -f "${DATABASE}" ]]; then
+   $(which echo) "CREATE TABLE upload_queue(time DATETIME DEFAULT (datetime('now','localtime')), drive TEXT, filedir TEXT, filebase TEXT PRIMARY KEY, filesize TEXT);" | $(which sqlite3) "${DATABASE}" &>/dev/null
+   $(which echo) "CREATE TABLE uploads(drive TEXT, filedir TEXT, filebase TEXT PRIMARY KEY, filesize TEXT, logfile TEXT, gdsa TEXT);" | $(which sqlite3) "${DATABASE}" &>/dev/null
+   $(which echo) "CREATE TABLE completed_uploads(drive TEXT, filedir TEXT, filebase TEXT, filesize TEXT, gdsa TEXT, starttime NUMERIC, endtime NUMERIC, status NUMERIC, error TEXT);" | $(which sqlite3) "${DATABASE}" &>/dev/null
+   $(which echo) "CREATE INDEX idx_completed_endtime ON completed_uploads (endtime);" | $(which sqlite3) "${DATABASE}" &>/dev/null
+   $(which echo) "CREATE INDEX idx_queue_time ON upload_queue (time);" | $(which sqlite3) "${DATABASE}" &>/dev/null
+fi
+
+# CLEAR DATABASE OLD ENTRYS
+$(which echo) "PRAGMA busy_timeout = 10000; PRAGMA synchronous = NORMAL; DELETE FROM upload_queue;" | $(which sqlite3) "${DATABASE}" &>/dev/null
+$(which echo) "PRAGMA busy_timeout = 10000; PRAGMA synchronous = NORMAL; DELETE FROM uploads;" | $(which sqlite3) "${DATABASE}" &>/dev/null
+
+log "**** set permissions ****"
+$(which chown) -cR abc:abc /root/.config /app /system/* &>/dev/null
+$(which chmod) -cR 755 /root/.config/rclone/ /app /system/* &>/dev/null
+
+log "**** cleannup ****"
+$(which rm) -rf /var/cache/apk/* \
+       /var/run/s6/etc/cont-init.d/90-custom-folders \
+       /var/run/s6/etc/cont-init.d/99-custom-files \
+       /etc/cont-init.d/90-custom-folders \
+       /etc/cont-init.d/99-custom-files
+
+$(which find) "${BASE}" -type f -name '*.log' -delete
+$(which find) "${BASE}" -type f -name '*.txt' -delete
 
 echo "------------------------------
     _____   _   _  __  __
@@ -136,3 +274,5 @@ We have take some code from :
   If we missed you, sorry..
 
 ------------------------------"
+
+#### END OF FILE ####
