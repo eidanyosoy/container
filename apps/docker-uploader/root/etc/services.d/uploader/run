@@ -5,34 +5,21 @@
 # Docker owned dockserver           #
 # Docker Maintainer dockserver      #
 #####################################
-#####################################
 # THIS DOCKER IS UNDER LICENSE      #
 # NO CUSTOMIZING IS ALLOWED         #
 # NO REBRANDING IS ALLOWED          #
 # NO CODE MIRRORING IS ALLOWED      #
 #####################################
+function log() {
+   GRAY="\033[0;37m"
+   BLUE="\033[0;34m"
+   NC="\033[0m"
+   $(which echo) -e "${GRAY}[$($(which date) +'%Y/%m/%d %H:%M:%S')]${BLUE} [Uploader]${NC} ${1}"
+}
 umask 022
 
-chown -cR abc:abc \
-     /root \
-     /app \
-     /system &>/dev/null
+source /app/uploader/function.sh && lang
 
-chmod -cR 755 \
-     /root \
-     /app \
-     /system &>/dev/null
+log "${startupuploader}"
 
-command="/app/uploader/uploader.sh"
-
-APP="$(basename -- $(for i in $(ls -d /app/*/); do echo ${i%%/}; done))"
-if [[ -d "/mnt/unionfs" ]]; then
-   while [ -z "`ls /mnt/unionfs`" ]
-   do
-      echo "wait mount /mnt/unionfs" && sleep 10
-   done
-   echo "mount working! $APP starting..."
-fi
-
-echo "-> Starting Multi Thread Uploader <-"
-exec $command >/dev/null 2>&1
+startuploader

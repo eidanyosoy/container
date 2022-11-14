@@ -4,8 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Uploader Dashboard</title>
-
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootswatch@5.1.3/dist/slate/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootswatch@5.2.0/dist/slate/bootstrap.min.css"/>
     <link rel="stylesheet" href="css/style.css"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
@@ -17,9 +16,12 @@
             <a href="/" class="d-flex align-items-center text-light text-decoration-none">
                 <span class="fs-4">Uploader Dashboard</span>
             </a>
-            <div class="d-inline-flex mt-2 mt-md-0 ms-md-auto">
+            <div id="info_badges" class="d-inline-flex mt-2 mt-md-0 ms-md-auto">
                 <div id="download_rate">
                     <span class="badge bg-light text-dark">0</span>
+                </div>
+                <div id="control">
+                    <span class="badge bg-success text-dark"><i class="fa-solid fa-play"></i></span>
                 </div>
             </div>
         </div>
@@ -36,7 +38,8 @@
                         <thead class="table-primary">
                         <tr>
                             <td>Filename</td>
-                            <td class="d-none d-lg-table-cell">GDSA</td>
+                            <td class="d-none d-lg-table-cell">Folder</td>
+                            <td class="d-none d-lg-table-cell">Key</td>
                             <td>Progress bar</td>
                             <td class="d-none d-lg-table-cell">Filesize</td>
                             <td class="tl-w-20 text-end">Time Left</td>
@@ -44,7 +47,7 @@
                         </thead>
                         <tbody>
                         <tr>
-                            <td class="text-muted" colspan="5">No entries found.</td>
+                            <td class="text-muted" colspan="6">No entries found.</td>
                         </tr>
                         </tbody>
                     </table>
@@ -52,29 +55,32 @@
             </div>
         </div>
         <div class="row">
-            <div class="pricing-header p-3 pb-md-4 mx-auto text-start">
-                <p class="h5 fw-normal">Completed</p>
+            <div class="p-3 pb-md-4 mx-auto text-start d-inline-flex justify-content-between">
+                <span class="h5 fw-normal">Completed</span>
             </div>
             <div class="col col-12">
                 <div class="table-responsive">
+                    <input type="checkbox" style="display:none" id="prettyEndTime" name="prettyEndTime" />
                     <table id="completedTable" class="table table-sm">
-                        <thead class="table-primary">
+                        <thead class="table-primary table-sm">
                         <tr>
                             <td>Filename</td>
-                            <td>GDSA</td>
+                            <td>Folder</td>
+                            <td>Key</td>
                             <td>Filesize</td>
                             <td>Time spent</td>
+                            <td>Uploaded <i class="fa-solid fa-hourglass-end" style="cursor: pointer" onclick="$('#prettyEndTime').click();"></i></td>
                         </tr>
                         </thead>
                         <tbody>
-                        <tr><td class="text-muted" colspan="4">No entries found.</td></tr>
+                        <tr><td class="text-muted" colspan="6">No entries found.</td></tr>
                         </tbody>
                         <tfoot>
                         <tr>
-                            <td colspan="3">
+                            <td colspan="6">
+                                <div class="w-100 d-inline-flex justify-content-between">
                                 <div id="page"></div>
-                            </td>
-                            <td>
+                                <span id="clnHist">Clear History</span>
                                 <nav aria-label="Page navigation">
                                     <ul id="pageSize" class="pagination pagination-sm" style="float:right">
                                         <li class="page-item"><a class="page-link" href="#">5</a></li>
@@ -83,7 +89,9 @@
                                         <li class="page-item"><a class="page-link" href="#">50</a></li>
                                     </ul>
                                 </nav>
+                                </div>
                             </td>
+                        </tr>
                         </tr>
                         </tfoot>
                     </table>

@@ -1,4 +1,3 @@
 <?php
-
-define('JSON_DIRECTORY_COMPLETED', '/system/uploader/json/done');
-define('JSON_DIRECTORY_INPROGRESS', '/system/uploader/json/upload');
+define('PAUSE_FILE', '/app/rclone/pause');
+define('DATABASE', '/system/uploader/db/uploader.db');

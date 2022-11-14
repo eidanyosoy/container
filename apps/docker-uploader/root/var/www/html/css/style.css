@@ -6,6 +6,31 @@ table {
     width:20%;
 }
 
+#info_badges > div {
+    padding: 3px;
+}
+
+#info_badges > div > span.badge {
+    height: 20px;
+    min-width: 24px;
+}
+
+#control > span:hover {
+    opacity:0.8;
+    background-color: Black;
+    cursor: pointer;
+}
+
+span#clnHist {
+    font-size: 10px;
+    padding: 5px;
+}
+span#clnHist:hover {
+    font-size: 10px;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
 @media only screen and (max-width: 800px) {
     .truncate {
         width:100%;
