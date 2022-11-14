@@ -72,8 +72,8 @@ log "**** install build packages from requirements ****" && \
 log "**** install pip packages ****"
    pip3 install --no-cache-dir -U apprise &>/dev/null
 
-log "**** install rclone ****"
-   apk add --quiet --no-cache --no-progress rclone --repository=http://dl-cdn.alpinelinux.org/alpine/edge/community
+log "**** install rclone ****" && \
+   $(which wget) -qO- https://rclone.org/install.sh | bash &>/dev/null
 
 if [[ "${ARRAY}" -lt "1" ]]; then
    log "-> No match found of GDSA[01=~100] or [01=~100] <-"
