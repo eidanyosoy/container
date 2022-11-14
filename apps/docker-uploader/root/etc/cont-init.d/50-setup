@@ -26,7 +26,8 @@ usermod -o -u "$PUID" abc &>/dev/null
 if [[ -f /donate.txt ]]; then
    $(which cat) /donate.txt
 fi
-echo '
+
+$(which echo) '
 -------------------------------------
 GID/UID
 -------------------------------------'
