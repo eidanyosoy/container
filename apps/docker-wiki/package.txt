@@ -58,13 +58,13 @@ openssh-server-8.4_p1-r4
 openssh-server-common-8.4_p1-r4
 openssh-sftp-server-8.4_p1-r4
 pcre2-10.36-r1
-pixman-0.40.0-r2
+pixman-0.40.0-r3
 pkgconf-1.7.3-r0
 readline-8.1.0-r0
 scanelf-1.2.8-r0
 sqlite-libs-3.34.1-r0
 ssl_client-1.32.1-r9
-tzdata-2022f-r0
+tzdata-2022f-r1
 xz-libs-5.2.5-r1
 zlib-1.2.12-r3
 zlib-dev-1.2.12-r3
