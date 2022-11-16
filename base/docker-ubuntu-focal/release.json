@@ -2,9 +2,9 @@
    "appname": "docker-ubuntu-focal",
    "apppic": "./images/docker-ubuntu-focal.png",
    "appfolder": "./base/docker-ubuntu-focal",
-   "newversion": "3.16.3",
+   "newversion": "3.17.0_rc1",
    "baseimage": "alpine",
    "description": "Docker image  for docker-ubuntu-focal",
-   "body": "Upgrading docker-ubuntu-focal to baseimage: alpine:3.16.3",
+   "body": "Upgrading docker-ubuntu-focal to baseimage: alpine:3.17.0_rc1",
    "user": "dockserver image update[bot]"
 }
