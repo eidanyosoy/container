@@ -272,12 +272,10 @@ function refreshVFS() {
    source /system/mount/mount.env
    log "${rclonevfs}"
    for FOLD in ${SREMOTES}/*; do
-       basename "${FOLD}" >/dev/null
-       FOLDER="$($(which basename) -- ${FOLD})"
-       IFS=- read -r <<< "${ACT}"
-         $(which rclone) rc --rc-addr=0.0.0.0:8554 vfs/forget dir="${FOLDER}" --fast-list _async=true --drive-pacer-burst 200 --drive-pacer-min-sleep 10ms --timeout 30m &>/dev/null
-         $(which sleep) 1
-         $(which rclone) rc --rc-addr=0.0.0.0:8554 vfs/refresh dir="${FOLDER}" --fast-list _async=true &>/dev/null
+      FOLDER=$($(which basename) "${FOLD}")
+      $(which rclone) rc --rc-addr=0.0.0.0:8554 vfs/forget dir="${FOLDER}" --fast-list _async=true --drive-pacer-burst 200 --drive-pacer-min-sleep 10ms --timeout 30m &>/dev/null
+      $(which sleep) 1
+      $(which rclone) rc --rc-addr=0.0.0.0:8554 vfs/refresh dir="${FOLDER}" --fast-list _async=true &>/dev/null
    done
 }
 
