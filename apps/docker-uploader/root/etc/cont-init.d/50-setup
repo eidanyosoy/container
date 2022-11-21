@@ -116,11 +116,6 @@ else
    source "${SAMPLE}"
 fi
 
-#### FIX EXCLUDE ####
-if [[ -f "${EXCLUDE}" ]]; then
-   $(which sed) -i 's/*//g' "${EXCLUDE}"
-fi
-
 #### EXCLUDE PART ####
 if [[ ! -f "${EXCLUDE}" ]]; then
    $(which cat) > "${EXCLUDE}" << EOF; $(echo)
