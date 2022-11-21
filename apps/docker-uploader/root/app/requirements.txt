@@ -5,6 +5,7 @@ busybox
 ca-certificates
 coreutils
 curl
+cronie
 dos2unix
 findutils
 git
