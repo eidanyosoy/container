@@ -101,7 +101,7 @@ log "**** install cronjob ****"
       $(which mkdir) -p /etc/periodic/midnight &>/dev/null
       $(which echo) 'CRON_TZ=America/Los_Angeles' >> /etc/crontabs/root
       $(which echo) '0       0       *       *       *       run-parts /etc/periodic/midnight' >> /etc/crontabs/root
-      $(which echo) -e '#!/usr/bin/with-contenv bash
+      $(which echo) -e '#!/command/with-contenv bash
 source /app/uploader/function.sh && reset-used' > "${CRON}"
       $(which chmod) +x "${CRON}" &>/dev/null
    fi
