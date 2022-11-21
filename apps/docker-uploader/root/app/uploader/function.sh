@@ -246,6 +246,19 @@ function replace-used() {
    $(which echo) "${NEWVALUE}" > "${UPPED}"
 }
 
+function reset-used() {
+   #### SORT KEYS TO DEFAULT ####
+   if [[ ! -f "${JSONUSED}" ]]; then
+      $(which ls) -A "${JSONDIR}" | $(which sort) -V > "${JSONUSED}"
+   else
+      $(which rm) -f "${JSONUSED}" && $(which ls) -A "${JSONDIR}" | $(which sort) -V > "${JSONUSED}"
+   fi
+   #### UPDATE KEY IN ${ENDCONFIG} AND SET USED TO ZERO ####
+   KEY=$($(which sed) -n 1p "${JSONUSED}")
+   $(which rclone) config update GDSA service_account_file="${JSONDIR}/${KEY}" --config="${ENDCONFIG}" &>/dev/null
+   $(which echo) "0" > "${UPPED}"
+}
+
 function rcloneupload() {
    source /system/uploader/uploader.env
    FILE="${UPP[3]}"

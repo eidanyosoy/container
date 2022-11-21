@@ -96,6 +96,16 @@ log "**** creating folders ****"
            /app/rclone \
            /root/.config/rclone/ &>/dev/null
 
+log "**** install cronjob ****"
+   if [[ ! -f "${CRON}" ]]; then
+      $(which mkdir) -p /etc/periodic/midnight &>/dev/null
+      $(which echo) 'CRON_TZ=America/Los_Angeles' >> /etc/crontabs/root
+      $(which echo) '0       0       *       *       *       run-parts /etc/periodic/midnight' >> /etc/crontabs/root
+      $(which echo) -e '#!/command/with-contenv bash
+source /app/uploader/function.sh && reset-used' > "${CRON}"
+      $(which chmod) +x "${CRON}" &>/dev/null
+   fi
+
 #### COPY SAMPLE FILES #####
 $(which cp) -r /app/sample/crypt_multi_tdrive-example.csv /system/uploader/sample/crypt_multi_tdrive-example.csv
 $(which cp) -r /app/sample/uncrypt_multi_tdrive-example.csv /system/uploader/sample/uncrypt_multi_tdrive-example.csv
