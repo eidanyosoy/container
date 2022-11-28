@@ -34,6 +34,7 @@ LOGS=/system/mount/logs
 JSONDIR=/system/mount/keys
 USEDDIR=/system/mount/.keys
 JSONUSED=/system/mount/.keys/usedkeys
+JSONDIRUPLOADER=/system/servicekeys/keys
 ARRAY=$($(which ls) -A "${JSONDIR}" | $(which wc) -l)
 
 ## ADD USER
