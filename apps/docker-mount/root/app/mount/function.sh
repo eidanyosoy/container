@@ -97,10 +97,10 @@ function rotate() {
       log "-> We switch the Service 🔑 to "${KEYNOTI}" <-"
       mapfile -t MOUNTS < <($(which rclone) config dump --config="${ENDCONFIG}" | $(which jq) -r 'to_entries | (.[] | select(.value.team_drive)) | .key')
       for REMOTE in "${MOUNTS[@]}"; do
-         $(which rclone) rc --rc-addr=0.0.0.0:8554 backend/command command=set fs="${REMOTE}": -o service_account_file="${JSONDIR}/${KEY}" -o service_account_path="${JSONDIR}" &>/dev/null
+         $(which rclone) rc backend/command command=set fs="${REMOTE}": -o service_account_file="${JSONDIR}/${KEY}" -o service_account_path="${JSONDIR}" &>/dev/null
       done
       $(which sleep) 5
-      $(which rclone) rc --rc-addr=0.0.0.0:8554 core/stats-reset &>/dev/null
+      $(which rclone) rc core/stats-reset &>/dev/null
       $(which truncate) -s 0 "${LOGS}"/*.log &>/dev/null
       if [[ "$($(which ls) -1p ${SREMOTES})" ]] && [[ "$($(which ls) -1p ${SUNION})" ]]; then
          KEYNOTI=$($(which sed) -n 1p "${JSONUSED}" | $(which awk) -F '.' '{print $1}')
@@ -216,7 +216,7 @@ $(which rclone) rcd \\
   --buffer-size="${BUFFER_SIZE}" \\
   --rc-no-auth \\
   --rc-allow-origin=* \\
-  --rc-addr=0.0.0.0:8554 \\
+  --rc-addr=:5572 \\
   --rc-web-gui \\
   --rc-web-gui-force-update \\
   --rc-web-gui-no-open-browser &
@@ -224,14 +224,14 @@ $(which rclone) rcd \\
 
 $(which sleep) 10
 
-### SET MAJOR OPTIONS FOR MOUNT : $(which rclone) rc --rc-addr=0.0.0.0:8554 options/set options/set --json 
-$(which rclone) rc --rc-addr=0.0.0.0:8554 options/set --json {'"main": { "TPSLimitBurst": ${TPSBURST}, "TPSLimit": ${TPSLIMIT} , "Checkers": 6, "Transfers": 6, "BufferSize": "${BUFFER_SIZE}", "TrackRenames": true, "TrackRenamesStrategy":"modtime,leaf", "NoUpdateModTime": true, "UserAgent": "${UAGENT}", "CutoffMode":"hard", "Progress":true, "UseMmap":true, "HumanReadable":true}'} &>/dev/null
-$(which rclone) rc --rc-addr=0.0.0.0:8554 options/set --json {'"vfs": { "GID": '${PGID}', "UID": '${PUID}', "Umask": '${UMASK}', "CacheMode": 3, "CacheMaxSize": "${VFS_CACHE_MAX_SIZE}", "CacheMaxAge": 21600000000000, "CachePollInterval": 120000000000, "PollInterval": 60000000000, "ChunkSize": "${VFS_READ_CHUNK_SIZE}", "ChunkSizeLimit": "${VFS_READ_CHUNK_SIZE_LIMIT}", "DirCacheTime": 43200000000000, "NoModTime": true,"NoChecksum": true}'} &>/dev/null
-$(which rclone) rc --rc-addr=0.0.0.0:8554 options/set --json {'"mount": { "AllowNonEmpty": true, "AllowOther": true, "AsyncRead": true, "WritebackCache": true}'} &>/dev/null
+### SET MAJOR OPTIONS FOR MOUNT : $(which rclone) rc options/set options/set --json 
+$(which rclone) rc options/set --json {'"main": { "TPSLimitBurst": ${TPSBURST}, "TPSLimit": ${TPSLIMIT} , "Checkers": 6, "Transfers": 6, "BufferSize": "${BUFFER_SIZE}", "TrackRenames": true, "TrackRenamesStrategy":"modtime,leaf", "NoUpdateModTime": true, "UserAgent": "${UAGENT}", "CutoffMode":"hard", "Progress":true, "UseMmap":true, "HumanReadable":true}'} &>/dev/null
+$(which rclone) rc options/set --json {'"vfs": { "GID": '${PGID}', "UID": '${PUID}', "Umask": '${UMASK}', "CacheMode": 3, "CacheMaxSize": "${VFS_CACHE_MAX_SIZE}", "CacheMaxAge": 21600000000000, "CachePollInterval": 120000000000, "PollInterval": 60000000000, "ChunkSize": "${VFS_READ_CHUNK_SIZE}", "ChunkSizeLimit": "${VFS_READ_CHUNK_SIZE_LIMIT}", "DirCacheTime": 43200000000000, "NoModTime": true,"NoChecksum": true}'} &>/dev/null
+$(which rclone) rc options/set --json {'"mount": { "AllowNonEmpty": true, "AllowOther": true, "AsyncRead": true, "WritebackCache": true}'} &>/dev/null
 $(which sleep) 5
 
 ## SIMPLE START MOUNT
-$(which rclone) rc --rc-addr=0.0.0.0:8554 mount/mount \\
+$(which rclone) rc mount/mount \\
   fs=remote: mountPoint="${SREMOTES}" mountType=mount &>/dev/null
 
 $(which touch) "/tmp/rclone.running"
@@ -273,9 +273,9 @@ function refreshVFS() {
    log "${rclonevfs}"
    for FOLD in ${SREMOTES}/*; do
       FOLDER=$($(which basename) "${FOLD}")
-      $(which rclone) rc --rc-addr=0.0.0.0:8554 vfs/forget dir="${FOLDER}" --fast-list _async=true --drive-pacer-burst 200 --drive-pacer-min-sleep 10ms --timeout 30m &>/dev/null
+      $(which rclone) rc vfs/forget dir="${FOLDER}" --fast-list _async=true --drive-pacer-burst 200 --drive-pacer-min-sleep 10ms --timeout 30m &>/dev/null
       $(which sleep) 1
-      $(which rclone) rc --rc-addr=0.0.0.0:8554 vfs/refresh dir="${FOLDER}" --fast-list _async=true &>/dev/null
+      $(which rclone) rc vfs/refresh dir="${FOLDER}" --fast-list _async=true &>/dev/null
    done
 }
 
@@ -300,19 +300,19 @@ function rcmergerfskill() {
 function rcmountkill() {
    source /system/mount/mount.env
    log "${killmount}"
-   $(which rclone) rc --rc-addr=0.0.0.0:8554 mount/unmountall &>/dev/null
+   $(which rclone) rc mount/unmountall &>/dev/null
 }
 
 function rcclean() {
    source /system/mount/mount.env
    log "${rcloneclean}"
-   $(which rclone) rc --rc-addr=0.0.0.0:8554 fscache/clear --fast-list _async=true &>/dev/null
+   $(which rclone) rc fscache/clear --fast-list _async=true &>/dev/null
 }
 
 function rcstats() {
    source /system/mount/mount.env
    log "${rclonestats}"
-   $(which rclone) rc --rc-addr=0.0.0.0:8554 core/stats
+   $(which rclone) rc core/stats
 }
 
 function drivecheck() {
