@@ -70,7 +70,7 @@ FINALPACKAGES="bash jq musl findutils linux-headers apk-tools busybox coreutils 
 BUILDSTAGE="COPY --from=builder --chown=abc --chmod=755 /usr/local/bin/mergerfs /usr/local/bin/mergerfs
 COPY --from=builder --chown=abc --chmod=755 /usr/local/bin/mergerfs-fusermount /usr/local/bin/mergerfs-fusermount
 COPY --from=builder --chown=abc --chmod=755 /sbin/mount.mergerfs /sbin/mount.mergerfs
-COPY --from=builder --chown=abc --chmod=755 /usr/bin/rclone /usr/local/bin/rclone
+COPY --from=builder --chown=abc --chmod=755 /usr/bin/rclone /usr/local/bin/rclone"
 
 CLEANUP="apk del --quiet --clean-protected --no-progress && \\
     rm -rf /var/cache/apk/* /tmp/*"

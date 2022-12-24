@@ -16,7 +16,7 @@
 #####################################
 # shellcheck disable=SC2086
 # shellcheck disable=SC2046
-FROM alpine:3.16.2 as builder
+FROM alpine:3.17.0_rc1 as builder
 
 LABEL org.opencontainers.image.source="https://github.com/dockserver/container"
 
@@ -24,7 +24,7 @@ LABEL org.opencontainers.image.source="https://github.com/dockserver/container"
 ARG TARGETPLATFORM
 ARG BUILDPLATFORM
 
-ARG MERGERFS_VERSION=2.33.5
+ARG MERGERFS_VERSION=2.34.1
 
 RUN \
   echo "**** update packages ****" && \
@@ -54,10 +54,10 @@ FROM ghcr.io/dockserver/docker-alpine-v3:latest
 ARG TARGETPLATFORM
 ARG BUILDPLATFORM
 
-ARG BASE_VERSION=3.16.2
-ARG ALPINE_VERSION=3.16.2
-ARG MERGERFS_VERSION=2.33.5
-ARG RCLONE_VERSION=v1.60.0
+ARG BASE_VERSION=3.17.0_rc1
+ARG ALPINE_VERSION=3.17.0_rc1
+ARG MERGERFS_VERSION=2.34.1
+ARG RCLONE_VERSION=v1.61.1
 
 RUN \
   echo "**** update packages ****" && \
@@ -66,7 +66,7 @@ RUN \
   echo "**** install build packages ****" && \
     apk add -U --update --no-cache --quiet bash jq musl findutils linux-headers apk-tools busybox coreutils procps shadow && \
   echo "**** set alpine version ****" && \
-    echo -e "3.16.2" > /etc/alpine-release && \
+    echo -e "3.17.0_rc1" > /etc/alpine-release && \
   echo "*** cleanup system ****" && \
     apk del --quiet --clean-protected --no-progress && \
     rm -rf /var/cache/apk/* /tmp/*
