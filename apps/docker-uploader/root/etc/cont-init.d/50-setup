@@ -76,7 +76,8 @@ log "**** install pip packages ****"
 log "**** install rclone ****"
    $(which wget) -qO- https://rclone.org/install.sh | bash &>/dev/null
 
-if [[ "${ARRAY}" -lt "1" ]]; then
+DROPBOX=$($(which rclone) config dump --config="${SOURCECONFIG}" | $(which jq) -r 'to_entries | (.[] | select(.value.type=="dropbox")) | .value.type')
+if [[ "${ARRAY}" -lt "1" && "${DROPBOX}" == "" ]]; then
    log "-> No match found of GDSA[01=~100] or [01=~100] <-"
    $(which sleep) infinity
 fi
@@ -186,26 +187,40 @@ if [[ -d "${JSONOLD}" ]]; then $(which rm) -rf "${JSONOLD}"; fi
 if [[ ! -d "${USEDDIR}" ]]; then $(which mkdir) -p "${USEDDIR}" && $(which chown) -hR abc:abc "${USEDDIR}"; fi
 
 # UPLOADER KEYS
-if [[ ! -f "${JSONUSED}" ]]; then
+if [[ ! -f "${JSONUSED}" && "${DROPBOX}" == "" ]]; then
    $(which ls) -A "${JSONDIR}" | $(which sort) -V > "${JSONUSED}"
-else
+elif [[ "${DROPBOX}" == "" ]]; then
    ARRAYJSON=$($(which cat) "${JSONUSED}" | $(which wc) -l)
    if [[ "${ARRAY}" != "${ARRAYJSON}" ]]; then
       $(which rm) -f "${JSONUSED}" && $(which ls) -A "${JSONDIR}" | $(which sort) -V > "${JSONUSED}"
    fi
 fi
 
-# CREATE RCLONE.CONF FROM RCLONEGDSA.CONF
+# CREATE RCLONE.CONF FROM RCLONEGDSA.CONF | DROPBOX AND GOOGLE
 if [[ ! -f "${ENDFILE}" && -f "${SOURCECONFIG}" ]]; then
-   KEY=$($(which sed) -n 1p "${JSONUSED}")
-   TDID=$($(which rclone) config dump --config="${SOURCECONFIG}" | $(which jq) -r 'to_entries | (.[] | select(.value.team_drive)) | .value.team_drive' | $(which head) -n 1)
-   GETP=$($(which rclone) config dump --config="${SOURCECONFIG}" | $(which jq) -r 'to_entries | (.[] | select(.value.type=="crypt")) | .value.password' | $(which head) -n 1)
-   GETS=$($(which rclone) config dump --config="${SOURCECONFIG}" | $(which jq) -r 'to_entries | (.[] | select(.value.type=="crypt")) | .value.password2' | $(which head) -n 1)
-   if [[ "${GETP}" == "" && "${GETS}" == "" ]]; then
-      $(which rclone) config create GDSA drive scope=drive server_side_across_configs=true team_drive="${TDID}" service_account_file="${JSONDIR}/${KEY}" --config="${ENDCONFIG}"
+   if [[ "${DROPBOX}" == "dropbox" ]]; then
+      TOKEN=$($(which rclone) config dump --config="${SOURCECONFIG}" | $(which jq) -r 'to_entries | (.[] | select(.value.type=="dropbox")) | .value.token' | $(which head) -n 1)
+      GETP=$($(which rclone) config dump --config="${SOURCECONFIG}" | $(which jq) -r 'to_entries | (.[] | select(.value.type=="crypt")) | .value.password' | $(which head) -n 1)
+      GETS=$($(which rclone) config dump --config="${SOURCECONFIG}" | $(which jq) -r 'to_entries | (.[] | select(.value.type=="crypt")) | .value.password2' | $(which head) -n 1)
+      if [[ "${GETP}" == "" && "${GETS}" == "" ]]; then
+         $(which rclone) config create DB dropbox scope=drive server_side_across_configs=true token="${TOKEN}" --config="${ENDCONFIG}" --non-interactive &>/dev/null
+         $(which cat) "${ENDCONFIG}"
+      else
+         $(which rclone) config create DB dropbox scope=drive server_side_across_configs=true token="${TOKEN}" --config="${ENDCONFIG}" --non-interactive &>/dev/null
+         $(which cat) "${ENDCONFIG}"
+         $(which rclone) config create DBC crypt remote=DB:/encrypt filename_encryption=standard directory_name_encryption=true password="${GETP}" password2="${GETS}" --config="${ENDCONFIG}"
+      fi
    else
-      $(which rclone) config create GDSA drive scope=drive server_side_across_configs=true team_drive="${TDID}" service_account_file="${JSONDIR}/${KEY}" --config="${ENDCONFIG}"
-      $(which rclone) config create GDSAC crypt remote=GDSA:/encrypt filename_encryption=standard directory_name_encryption=true password="${GETP}" password2="${GETS}" --config="${ENDCONFIG}"
+      KEY=$($(which sed) -n 1p "${JSONUSED}")
+      TDID=$($(which rclone) config dump --config="${SOURCECONFIG}" | $(which jq) -r 'to_entries | (.[] | select(.value.team_drive)) | .value.team_drive' | $(which head) -n 1)
+      GETP=$($(which rclone) config dump --config="${SOURCECONFIG}" | $(which jq) -r 'to_entries | (.[] | select(.value.type=="crypt")) | .value.password' | $(which head) -n 1)
+      GETS=$($(which rclone) config dump --config="${SOURCECONFIG}" | $(which jq) -r 'to_entries | (.[] | select(.value.type=="crypt")) | .value.password2' | $(which head) -n 1)
+      if [[ "${GETP}" == "" && "${GETS}" == "" ]]; then
+         $(which rclone) config create GDSA drive scope=drive server_side_across_configs=true team_drive="${TDID}" service_account_file="${JSONDIR}/${KEY}" --config="${ENDCONFIG}"
+      else
+         $(which rclone) config create GDSA drive scope=drive server_side_across_configs=true team_drive="${TDID}" service_account_file="${JSONDIR}/${KEY}" --config="${ENDCONFIG}"
+         $(which rclone) config create GDSAC crypt remote=GDSA:/encrypt filename_encryption=standard directory_name_encryption=true password="${GETP}" password2="${GETS}" --config="${ENDCONFIG}"
+      fi
    fi
 fi
 
