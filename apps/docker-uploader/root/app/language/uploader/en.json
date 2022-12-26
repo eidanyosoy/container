@@ -6,7 +6,8 @@
     "packagesend": "-> Packages update was successful <-"
   },
   "startup": {
-    "uploader": "-> Starting Uploader <-",
+    "uploadergdsa": "-> Starting Uploader - GDSA <-",
+    "uploaderdb": "-> Starting Uploader - DB <-",
     "nginx": "-> Starting Nginx <-",
     "php": "-> Starting PHP-FPM <-"
   },

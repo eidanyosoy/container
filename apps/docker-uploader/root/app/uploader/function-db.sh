@@ -158,7 +158,7 @@ ${TIMESPENT}" && notification
 
 function lang() {
    source /system/uploader/uploader.env
-   startupuploader=$($(which jq) ".startup.uploadergdsa" "${LFOLDER}/${LANGUAGE}.json" | $(which sed) 's/"\|,//g')
+   startupuploader=$($(which jq) ".startup.uploaderdb" "${LFOLDER}/${LANGUAGE}.json" | $(which sed) 's/"\|,//g')
    startupnginx=$($(which jq) ".startup.nginx" "${LFOLDER}/${LANGUAGE}.json" | $(which sed) 's/"\|,//g')
    startupphp=$($(which jq) ".startup.php" "${LFOLDER}/${LANGUAGE}.json" | $(which sed) 's/"\|,//g')
    limitused=$($(which jq) ".limit.used" "${LFOLDER}/${LANGUAGE}.json" | $(which sed) 's/"\|,//g')
@@ -196,13 +196,13 @@ function loopcsv() {
       DRIVE=$($(which echo) "${UPP[1]}" | $(which sed) 's/-//g')
       #### USE FILE NAME AS RCLONE CONF ####
       CUSTOMCONFIG="${CUSTOM}/${FILE}.conf"
-      KEY=$($(which sed) -n 1p "${JSONUSED}")
+      TOKEN=$($(which rclone) config dump --config="${SOURCECONFIG}" | $(which jq) -r 'to_entries | (.[] | select(.value.type=="dropbox")) | .value.token' | $(which head) -n 1)
       #### TEST IS FOLDER AND CSV CORRECT ####
       $(which cat) "${CSV}" | $(which sed) '/^\s*#.*$/d' | $(which grep) -Ew "${DRIVE}" | while IFS=$'|' read -ra CHECKDIR; do
          if [[ ${CHECKDIR[0]} == ${DRIVE} ]]; then
            $(which cat) "${CSV}" | $(which sed) '/^\s*#.*$/d' | $(which grep) -Ew "${DRIVE}" | while IFS=$'|' read -ra UPPDIR; do
            if [[ "${UPPDIR[2]}" == "" && "${UPPDIR[3]}" == "" ]]; then
-              $(which rclone) config create GDSA drive scope=drive server_side_across_configs=true team_drive="${UPPDIR[1]}" service_account_file="${JSONDIR}/${KEY}" --config="${CUSTOMCONFIG}" &>/dev/null
+              $(which rclone) config create DB dropbox token="${TOKEN}" --config="${CUSTOMCONFIG}" --non-interactive &>/dev/null
            else
               if [[ "${HASHPASSWORD}" == "plain" && "${HASHPASSWORD}" != "hashed" ]]; then
                  ENC_PASSWORD=$($(which rclone) obscure "${UPPDIR[2]}" | $(which tail) -n1)
@@ -211,8 +211,8 @@ function loopcsv() {
                  ENC_PASSWORD="${UPPDIR[2]}"
                  ENC_SALT="${UPPDIR[3]}"
               fi
-              $(which rclone) config create GDSA drive scope=drive server_side_across_configs=true team_drive="${UPPDIR[1]}" service_account_file="${JSONDIR}/${KEY}" --config="${CUSTOMCONFIG}" &>/dev/null
-              $(which rclone) config create GDSAC crypt remote=GDSA:/encrypt filename_encryption=standard directory_name_encryption=true password="${ENC_PASSWORD}" password2="${ENC_SALT}" --config="${CUSTOMCONFIG}" &>/dev/null
+              $(which rclone) config create DB dropbox token="${TOKEN}" --config="${CUSTOMCONFIG}" --non-interactive &>/dev/null
+              $(which rclone) config create DBC crypt remote=DB:/encrypt filename_encryption=standard directory_name_encryption=true password="${ENC_PASSWORD}" password2="${ENC_SALT}" --config="${CUSTOMCONFIG}" &>/dev/null
            fi
            done
          fi
@@ -226,21 +226,6 @@ function replace-used() {
       $(which echo) "0" > "${UPPED}"
    fi
    USEDUPLOAD=$($(which cat) "${UPPED}")
-   if [[ "${USEDUPLOAD}" -gt "700000000000" ]]; then
-      if [[ ! -f "${JSONUSED}" ]]; then
-         $(which ls) -A "${JSONDIR}" | $(which sort) -V > "${JSONUSED}"
-      fi
-      #### SWITCH KEY TO NEXT ####
-      ARRAYJSON=$($(which cat) "${JSONUSED}" | $(which wc) -l)
-      $(which sed) -i '1h;1d;$G' "${JSONUSED}"
-      if [[ "${ARRAY}" != "${ARRAYJSON}" ]]; then
-         $(which rm) -f "${JSONUSED}" && $(which ls) -A "${JSONDIR}" | $(which sort) -V > "${JSONUSED}"
-      fi
-      #### UPDATE KEY IN ${ENDCONFIG} AND SET USED TO ZERO ####
-      KEY=$($(which sed) -n 1p "${JSONUSED}")
-      $(which rclone) config update GDSA service_account_file="${JSONDIR}/${KEY}" --config="${ENDCONFIG}" &>/dev/null
-      USEDUPLOAD="0"
-   fi
    #### UPDATE USED FILE ####
    NEWVALUE="$(( ${USEDUPLOAD} + ${SIZEBYTES} ))"
    $(which echo) "${NEWVALUE}" > "${UPPED}"
@@ -255,7 +240,7 @@ function reset-used() {
    fi
    #### UPDATE KEY IN ${ENDCONFIG} AND SET USED TO ZERO ####
    KEY=$($(which sed) -n 1p "${JSONUSED}")
-   $(which rclone) config update GDSA service_account_file="${JSONDIR}/${KEY}" --config="${ENDCONFIG}" &>/dev/null
+   $(which rclone) config update DB service_account_file="${JSONDIR}/${KEY}" --config="${ENDCONFIG}" &>/dev/null
    $(which echo) "0" > "${UPPED}"
 }
 
@@ -317,7 +302,7 @@ function rcloneupload() {
       CRYPTED="C"
    fi
    #### CHECK USED KEY ####
-   KEYNOTI=$($(which sed) -n 1p "${JSONUSED}" | $(which awk) -F '.' '{print $1}')
+   KEYNOTI="DB"
    #### TOUCH LOG FILE FOR UI READING ####
    touch "${LOGFILE}/${FILE}.txt" &>/dev/null
    #### UPDATE DATABASE ENTRY ####
@@ -332,14 +317,14 @@ function rcloneupload() {
    #### CHECK IS TRANSFERS GREAT AS 1 TO PREVENT DOUBLE FOLDER ON GOOGLE ####
    if [[ "${TRANSFERS}" -gt "1" ]]; then
       #### MAKE FOLDER ON CORRECT DRIVE #### 
-      $(which rclone) mkdir "GDSA${CRYPTED}:/${DIR}/" --config="${CONFIG}" &>/dev/null
+      $(which rclone) mkdir "DB${CRYPTED}:/${DIR}/" --config="${CONFIG}" &>/dev/null
    fi
    #### GENERATE FOR EACH UPLOAD A NRW AGENT ####
    USERAGENT=$($(which cat) /dev/urandom | $(which tr) -dc 'a-zA-Z0-9' | $(which fold) -w 32 | $(which head) -n 1)
    #### START TIME UPLOAD ####
    STARTZ=$($(which date) +%s)
    #### RUN RCLONE UPLOAD COMMAND ####
-   $(which rclone) moveto "${DLFOLDER}/${DIR}/${FILE}" "GDSA${CRYPTED}:/${DIR}/${FILE}" \
+   $(which rclone) moveto "${DLFOLDER}/${DIR}/${FILE}" "DB${CRYPTED}:/${DIR}/${FILE}" \
       --config="${CONFIG}" \
       --stats=1s --checkers=4 \
       --drive-chunk-size=32M \
@@ -463,9 +448,9 @@ function startuploader() {
                #### RUN TRANSFERS CHECK ####
                transfercheck
                #### CHECK IS CSV AVAILABLE AND LOOP TO CORRECT DRIVE ####
-               if [[ -f "${CSV}" ]]; then 
-                  loopcsv
-               fi
+               #if [[ -f "${CSV}" ]]; then 
+               #   loopcsv
+               #fi
                #### UPLOAD FUNCTIONS STARTUP ####
                if [[ "${TRANSFERS}" -eq "1" ]]; then 
                   #### SINGLE UPLOAD ####
