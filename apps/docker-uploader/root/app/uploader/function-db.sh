@@ -202,7 +202,7 @@ function loopcsv() {
          if [[ ${CHECKDIR[0]} == ${DRIVE} ]]; then
            $(which cat) "${CSV}" | $(which sed) '/^\s*#.*$/d' | $(which grep) -Ew "${DRIVE}" | while IFS=$'|' read -ra UPPDIR; do
            if [[ "${UPPDIR[2]}" == "" && "${UPPDIR[3]}" == "" ]]; then
-              $(which rclone) config create DB dropbox token="${TOKEN}" --config="${CUSTOMCONFIG}" --non-interactive &>/dev/null
+              $(which rclone) config create DB dropbox scope=drive server_side_across_configs=true token="${TOKEN}" --config="${CUSTOMCONFIG}" --non-interactive &>/dev/null
            else
               if [[ "${HASHPASSWORD}" == "plain" && "${HASHPASSWORD}" != "hashed" ]]; then
                  ENC_PASSWORD=$($(which rclone) obscure "${UPPDIR[2]}" | $(which tail) -n1)
@@ -211,7 +211,7 @@ function loopcsv() {
                  ENC_PASSWORD="${UPPDIR[2]}"
                  ENC_SALT="${UPPDIR[3]}"
               fi
-              $(which rclone) config create DB dropbox token="${TOKEN}" --config="${CUSTOMCONFIG}" --non-interactive &>/dev/null
+              $(which rclone) config create DB dropbox scope=drive server_side_across_configs=true token="${TOKEN}" --config="${CUSTOMCONFIG}" --non-interactive &>/dev/null
               $(which rclone) config create DBC crypt remote=DB:/encrypt filename_encryption=standard directory_name_encryption=true password="${ENC_PASSWORD}" password2="${ENC_SALT}" --config="${CUSTOMCONFIG}" &>/dev/null
            fi
            done
