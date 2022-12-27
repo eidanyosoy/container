@@ -32,7 +32,6 @@ php8-gd
 php8-intl
 php8-json
 php8-mbstring
-php8-mbstring
 php8-opcache
 php8-openssl
 php8-session
