@@ -12,6 +12,17 @@ if [[ -d "/mnt/unionfs" ]]; then
    echo "Starting $APP."
 fi
 
+### Show plex Server name
+GRAY="\033[0;37m"
+BLUE="\033[0;34m"
+NC="\033[0m"
+
+PREFNAME="/config/Library/Application Support/Plex Media Server/Preferences.xml"
+PlexName=$(sed -n "s/^.*FriendlyName=\"\([^\"]*\)\".*$/\1/p" "${PREFNAME}")
+$(which echo) -e "${GRAY}[$($(which date) +'%Y/%m/%d %H:%M:%S')] Plex Media Server ${BLUE} ${PlexName} ${NC} (you can ignore the libusb_init error)"
+
+###
+
 export PLEX_MEDIA_SERVER_INFO_MODEL=$(uname -m)
 export PLEX_MEDIA_SERVER_INFO_PLATFORM_VERSION=$(uname -r)
 
