@@ -2,9 +2,9 @@
    "appname": "docker-rutorrent",
    "apppic": "",
    "appfolder": "./apps/docker-rutorrent",
-   "newversion": "3.10",
+   "newversion": "null",
    "baseimage": "alpine",
    "description": "Yet another web front-end for rTorrent",
-   "body": "Upgrading docker-rutorrent to 3.10",
+   "body": "Upgrading docker-rutorrent to null",
    "user": "dockserver[bot]"
 }
