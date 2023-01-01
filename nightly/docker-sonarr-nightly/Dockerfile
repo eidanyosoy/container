@@ -2,6 +2,6 @@
 ##
 ## Do not changes any lines here
 ##
-FROM lscr.io/linuxserver/sonarr:develop-4.0.0.323-ls372
+FROM lscr.io/linuxserver/sonarr:develop-4.0.0.326-ls374
 COPY --chown=abc ./apps/docker-sonarr/root/ /
 ##EOF
