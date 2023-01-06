@@ -16,7 +16,7 @@
 #####################################
 # shellcheck disable=SC2086
 # shellcheck disable=SC2046
-FROM ubuntu:23.04
+FROM ubuntu:
 
 LABEL org.opencontainers.image.source="https://github.com/dockserver/container"
 
