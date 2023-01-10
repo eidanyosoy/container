@@ -7,5 +7,5 @@
    "baseimage": "ghcr.io/dockserver/docker-alpine:latest",
    "description": "Request management and media discovery tool for the Plex ecosystem",
    "body": "Upgrading docker-overseerr-nightly to 7b6db50ae55b1fc60d19a5cff62dd46bb989fa51",
-   "user": "github-actions[bot]"
+   "user": "dockserver image update[bot]"
 }

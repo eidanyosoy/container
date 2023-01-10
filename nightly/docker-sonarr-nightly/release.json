@@ -6,5 +6,5 @@
    "appbranch": "develop",
    "description": "Smart PVR for newsgroup and bittorrent users.",
    "body": "Upgrading docker-sonarr-nightly to develop-4.0.0.344-ls384",
-   "user": "github-actions[bot]"
+   "user": "dockserver image update[bot]"
 }

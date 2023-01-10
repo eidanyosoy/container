@@ -7,6 +7,5 @@
    "baseimage": "ghcr.io/linuxserver/baseimage-ubuntu:jammy",
    "description": "Docker Container for Plex Media Server || PLEX PASS",
    "body": "Upgrading docker-plex to 1.30.2.6563-3d4dc0cce",
-   "user": "github-actions[bot]"
+   "user": "dockserver image update[bot]"
 }
-
