@@ -50,6 +50,14 @@ jobs:
       run: |
         CONTAINERS=$(jq --raw-output '.changed_files | fromjson | .[] |= sub("(?<filepath>(?<first_directory>(?<root1>[/]?)[^/]+/)(?<second_directory>(?<root2>[/]?)[^/]+)(?<extra_paths>.+))"; "\(.second_directory)") | unique' changes.json)
         echo "containers=${CONTAINERS}" >> $GITHUB_OUTPUT
+        echo "containers=${CONTAINERS}"
+        sleep 3
+        unset $GITHUB_OUTPUT
+        echo "containers=$(jq --raw-output '.changed_files | fromjson | .[] |= sub("(?<filepath>(?<first_directory>(?<root1>[/]?)[^/]+/)(?<second_directory>(?<root2>[/]?)[^/]+)(?<extra_paths>.+))"; "\(.second_directory)") | unique' changes.json)" >> $GITHUB_OUTPUT
+        echo $GITHUB_OUTPUT
+        sleep 3
+
+
   build:
     name: Build Docker
     #runs-on: ubuntu-latest
