@@ -79,7 +79,7 @@ VOLUMEN="VOLUME /config"
 
 [[ ! -d "$APPFOLDER" ]] && \
   mkdir -p "$APPFOLDER" && \
-  touch "$APPFOLDER/Dockerfile
+  touch "$APPFOLDER/Dockerfile"
 
 ### RELEASE SETTINGS ###
 
@@ -92,7 +92,7 @@ echo '{
    "baseimage": "'${BASEIMAGE}'",
    "description": "'${DESCRIPTION}'",
    "body": "Upgrading '${APP}' to '${NEWVERSION}'",
-   "user": "github-actions[bot]"
+   "user": "dockserver image update[bot]"
 }' > "./$FOLDER/$APP/release.json"
 
 ## HAXK for Intel
