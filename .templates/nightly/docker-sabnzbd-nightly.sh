@@ -69,7 +69,7 @@ echo '{
    "appbranch": "'${APPBRANCH}'",
    "description": "'${DESCRIPTION}'",
    "body": "Upgrading '${APP}' to '${NEWVERSION}'",
-   "user": "github-actions[bot]"
+   "user": "dockserver image update[bot]"
 }' > "./$FOLDER/$APP/release.json"
 
 ### DOCKER BUILD ###
