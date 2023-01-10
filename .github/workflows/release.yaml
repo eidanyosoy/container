@@ -49,7 +49,7 @@ jobs:
     - id: reduce
       run: |
         CONTAINERS=$(jq --raw-output '.changed_files | fromjson | .[] |= sub("(?<filepath>(?<first_directory>(?<root1>[/]?)[^/]+/)(?<second_directory>(?<root2>[/]?)[^/]+)(?<extra_paths>.+))"; "\(.second_directory)") | unique' changes.json)
-        echo ::set-output name=containers::${CONTAINERS}
+        echo "containers=${CONTAINERS}" >> $GITHUB_OUTPUT
   build:
     name: Build Docker
     runs-on: ubuntu-latest
@@ -89,22 +89,22 @@ jobs:
         else
            CATEGORY="base"
         fi
-        echo ::set-output name=category::${CATEGORY}
+        echo "category=${CATEGORY}" >> $GITHUB_OUTPUT
            VERSION=$(jq -r '.newversion' < ./${CATEGORY}/${{ matrix.container }}/release.json)
-        echo ::set-output name=version::${VERSION}
+        echo "version=${VERSION}" >> $GITHUB_OUTPUT
            DESCRIPTION=$(jq -r '.description' < ./${CATEGORY}/${{ matrix.container }}/release.json)
-        echo ::set-output name=description::${DESCRIPTION}
-        echo ::set-output name=platform::${PLATFORM}
+        echo "description=${DESCRIPTION}" >> $GITHUB_OUTPUT
+        echo "platform=${PLATFORM}" >> $GITHUB_OUTPUT
            CREATED="$(date +%Y-%m-%d)"
-        echo ::set-output name=shashort::$(echo ${GITHUB_SHA} | cut -c1-8)
-        echo ::set-output name=created::${CREATED}
-        echo ::set-output name=platformout::${{ env.PLATFORM }}
-        echo ::set-output name=linc::${{ env.LICENSE }}
-        echo ::set-output name=owndocker::${{ env.CODE_OWNED }}
+        echo "shashort=$(echo ${GITHUB_SHA} | cut -c1-8)" >> $GITHUB_OUTPUT
+        echo "created=${CREATED}" >> $GITHUB_OUTPUT
+        echo "platformout=${{ env.PLATFORM }}" >> $GITHUB_OUTPUT
+        echo "linc=${{ env.LICENSE }}" >> $GITHUB_OUTPUT
+        echo "owndocker=${{ env.CODE_OWNED }}" >> $GITHUB_OUTPUT
         if [ "${{ github.event_name }}" == "pull_request" ]; then
-           echo ::set-output name=push::false
+           echo "push=false" >> $GITHUB_OUTPUT
         else
-           echo ::set-output name=push::true
+           echo "push=true" >> $GITHUB_OUTPUT
         fi
 
     - name: Set up QEMU
