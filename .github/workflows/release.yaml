@@ -52,8 +52,8 @@ jobs:
         echo "containers=${CONTAINERS}" >> $GITHUB_OUTPUT
   build:
     name: Build Docker
-    runs-on: ubuntu-latest
-    #runs-on: self-hosted
+    #runs-on: ubuntu-latest
+    runs-on: self-hosted
     continue-on-error: true
 
     permissions:
