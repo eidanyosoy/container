@@ -49,15 +49,7 @@ jobs:
     - id: reduce
       run: |
         CONTAINERS=$(jq --raw-output '.changed_files | fromjson | .[] |= sub("(?<filepath>(?<first_directory>(?<root1>[/]?)[^/]+/)(?<second_directory>(?<root2>[/]?)[^/]+)(?<extra_paths>.+))"; "\(.second_directory)") | unique' changes.json)
-        echo "containers=${CONTAINERS}" >> $GITHUB_OUTPUT
-        echo "containers=${CONTAINERS}"
-        sleep 3
-        unset $GITHUB_OUTPUT
-        echo "containers=$(jq --raw-output '.changed_files | fromjson | .[] |= sub("(?<filepath>(?<first_directory>(?<root1>[/]?)[^/]+/)(?<second_directory>(?<root2>[/]?)[^/]+)(?<extra_paths>.+))"; "\(.second_directory)") | unique' changes.json)" >> $GITHUB_OUTPUT
-        echo $GITHUB_OUTPUT
-        sleep 3
-
-
+        echo ::set-output name=containers::${CONTAINERS}
   build:
     name: Build Docker
     #runs-on: ubuntu-latest
@@ -97,22 +89,22 @@ jobs:
         else
            CATEGORY="base"
         fi
-        echo "category=${CATEGORY}" >> $GITHUB_OUTPUT
+        echo ::set-output name=category::${CATEGORY}
            VERSION=$(jq -r '.newversion' < ./${CATEGORY}/${{ matrix.container }}/release.json)
-        echo "version=${VERSION}" >> $GITHUB_OUTPUT
+        echo ::set-output name=version::${VERSION}
            DESCRIPTION=$(jq -r '.description' < ./${CATEGORY}/${{ matrix.container }}/release.json)
-        echo "description=${DESCRIPTION}" >> $GITHUB_OUTPUT
-        echo "platform=${PLATFORM}" >> $GITHUB_OUTPUT
+        echo ::set-output name=description::${DESCRIPTION}
+        echo ::set-output name=platform::${PLATFORM}
            CREATED="$(date +%Y-%m-%d)"
-        echo "shashort=$(echo ${GITHUB_SHA} | cut -c1-8)" >> $GITHUB_OUTPUT
-        echo "created=${CREATED}" >> $GITHUB_OUTPUT
-        echo "platformout=${{ env.PLATFORM }}" >> $GITHUB_OUTPUT
-        echo "linc=${{ env.LICENSE }}" >> $GITHUB_OUTPUT
-        echo "owndocker=${{ env.CODE_OWNED }}" >> $GITHUB_OUTPUT
+        echo ::set-output name=shashort::$(echo ${GITHUB_SHA} | cut -c1-8)
+        echo ::set-output name=created::${CREATED}
+        echo ::set-output name=platformout::${{ env.PLATFORM }}
+        echo ::set-output name=linc::${{ env.LICENSE }}
+        echo ::set-output name=owndocker::${{ env.CODE_OWNED }}
         if [ "${{ github.event_name }}" == "pull_request" ]; then
-           echo "push=false" >> $GITHUB_OUTPUT
+           echo ::set-output name=push::false
         else
-           echo "push=true" >> $GITHUB_OUTPUT
+           echo ::set-output name=push::true
         fi
 
     - name: Set up QEMU
@@ -144,7 +136,7 @@ jobs:
     - name: Set up Docker Buildx
       if: ${{ steps.prep.outputs.version != '' }}
       id: buildx
-      uses: docker/setup-buildx-action@v2.2.1
+      uses: docker/setup-buildx-action@v2.2.0
       with:
         install: true
         buildkitd-flags: --debug
