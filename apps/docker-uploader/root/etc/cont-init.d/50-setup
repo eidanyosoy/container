@@ -93,6 +93,7 @@ log "**** copy dependencies ****"
 log "**** creating folders ****"
    $(which mkdir) -p /system/uploader/.keys \
            /system/uploader/{logs,db,sample} \
+           /system/servicekeys/keys \
            /app/custom \
            /app/rclone \
            /root/.config/rclone/ &>/dev/null
@@ -203,10 +204,10 @@ if [[ ! -f "${ENDFILE}" && -f "${SOURCECONFIG}" ]]; then
       GETP=$($(which rclone) config dump --config="${SOURCECONFIG}" 2>/dev/null | $(which jq) -r 'to_entries | (.[] | select(.value.type=="crypt")) | .value.password' | $(which head) -n 1)
       GETS=$($(which rclone) config dump --config="${SOURCECONFIG}" 2>/dev/null | $(which jq) -r 'to_entries | (.[] | select(.value.type=="crypt")) | .value.password2' | $(which head) -n 1)
       if [[ "${GETP}" == "" && "${GETS}" == "" ]]; then
-         $(which rclone) config create DB dropbox scope=drive server_side_across_configs=true token="${TOKEN}" --config="${ENDCONFIG}" --non-interactive &>/dev/null
+         $(which rclone) config create DB dropbox server_side_across_configs=true token="${TOKEN}" --config="${ENDCONFIG}" --non-interactive &>/dev/null
          $(which cat) "${ENDCONFIG}"
       else
-         $(which rclone) config create DB dropbox scope=drive server_side_across_configs=true token="${TOKEN}" --config="${ENDCONFIG}" --non-interactive &>/dev/null
+         $(which rclone) config create DB dropbox server_side_across_configs=true token="${TOKEN}" --config="${ENDCONFIG}" --non-interactive &>/dev/null
          $(which cat) "${ENDCONFIG}"
          $(which rclone) config create DBC crypt remote=DB:/encrypt filename_encryption=standard directory_name_encryption=true password="${GETP}" password2="${GETS}" --config="${ENDCONFIG}" 2>/dev/null
       fi
