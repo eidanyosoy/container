@@ -52,8 +52,8 @@ jobs:
         echo ::set-output name=containers::${CONTAINERS}
   build:
     name: Build Docker
-    runs-on: ubuntu-latest
-    #runs-on: self-hosted
+    #runs-on: ubuntu-latest
+    runs-on: self-hosted
     continue-on-error: true
 
     permissions:
@@ -136,7 +136,7 @@ jobs:
     - name: Set up Docker Buildx
       if: ${{ steps.prep.outputs.version != '' }}
       id: buildx
-      uses: docker/setup-buildx-action@v2.2.1
+      uses: docker/setup-buildx-action@v2.2.0
       with:
         install: true
         buildkitd-flags: --debug
