@@ -15,16 +15,15 @@ source /system/uploader/uploader.env
 #SETTINGS
 ENVA=/system/uploader/uploader.env
 CSV=/system/servicekeys/uploader.csv
-UPPED=/system/uploader/.keys/used
 EXCLUDE=/system/uploader/rclone.exclude
 ENDCONFIG=/app/rclone/rclone.conf
 DATABASE=/system/uploader/db/uploader.db
 PAUSE=/app/rclone/pause
+TEMPFILES=/app/rclone/files.txt
 
 #FOLDER
 BASE=/system/uploader
 JSONDIR=/system/servicekeys/keys
-JSONUSED=/system/uploader/.keys/keys
 LOGFILE=/system/uploader/logs
 SUNION=/mnt/unionfs
 CUSTOM=/app/custom
@@ -176,7 +175,7 @@ function cleanuplog() {
          LOG_RETENTION_DAYS="${LOG_RETENTION_DAYS}"
       fi
       ENDTIME=$($(which date) --date "-${LOG_RETENTION_DAYS} days" +%s)
-      $(which echo) "PRAGMA busy_timeout = 10000; PRAGMA synchronous = NORMAL; DELETE FROM completed_uploads WHERE endtime < ${ENDTIME};" | $(which sqlite3) "${DATABASE}" &>/dev/null
+      sqlite3write "DELETE FROM completed_uploads WHERE endtime < ${ENDTIME};" &>/dev/null
    #### REMOVE LAST ${LOG_ENTRY} ENTRIES IN DATABASE ####
    else
       if [[ "${LOG_ENTRY}" != +([0-9.]) ]]; then
@@ -184,7 +183,7 @@ function cleanuplog() {
       else
          LOG_ENTRY="${LOG_ENTRY}"
       fi
-      $(which echo) "PRAGMA busy_timeout = 10000; PRAGMA synchronous = NORMAL; DELETE FROM completed_uploads WHERE endtime NOT IN (SELECT endtime from completed_uploads ORDER BY endtime DESC LIMIT ${LOG_ENTRY});" | $(which sqlite3) "${DATABASE}" &>/dev/null
+      sqlite3write "DELETE FROM completed_uploads WHERE endtime NOT IN (SELECT endtime from completed_uploads ORDER BY endtime DESC LIMIT ${LOG_ENTRY});" &>/dev/null
    fi
 }
 
@@ -196,7 +195,7 @@ function loopcsv() {
       DRIVE=$($(which echo) "${UPP[1]}" | $(which sed) 's/-//g')
       #### USE FILE NAME AS RCLONE CONF ####
       CUSTOMCONFIG="${CUSTOM}/${FILE}.conf"
-      KEY=$($(which sed) -n 1p "${JSONUSED}")
+      KEY=$(sqlite3read "SELECT key FROM upload_keys WHERE active = 1;" 2>/dev/null)
       #### TEST IS FOLDER AND CSV CORRECT ####
       $(which cat) "${CSV}" | $(which sed) '/^\s*#.*$/d' | $(which grep) -Ew "${DRIVE}" | while IFS=$'|' read -ra CHECKDIR; do
          if [[ ${CHECKDIR[0]} == ${DRIVE} ]]; then
@@ -221,47 +220,38 @@ function loopcsv() {
 }
 
 function replace-used() {
-   #### CREATE USED FILE ####
-   if [[ ! -f "${UPPED}" ]]; then
-      $(which echo) "0" > "${UPPED}"
-   fi
-   USEDUPLOAD=$($(which cat) "${UPPED}")
+   #### WAIT BEFORE READ ####
+   $(which sleep) 1
+   #### READ USED VALUE ####
+   USEDUPLOAD=$(sqlite3read "SELECT used FROM upload_keys WHERE active = 1;")
    if [[ "${USEDUPLOAD}" -gt "700000000000" ]]; then
-      if [[ ! -f "${JSONUSED}" ]]; then
-         $(which ls) -A "${JSONDIR}" | $(which sort) -V > "${JSONUSED}"
-      fi
       #### SWITCH KEY TO NEXT ####
-      ARRAYJSON=$($(which cat) "${JSONUSED}" | $(which wc) -l)
-      $(which sed) -i '1h;1d;$G' "${JSONUSED}"
-      if [[ "${ARRAY}" != "${ARRAYJSON}" ]]; then
-         $(which rm) -f "${JSONUSED}" && $(which ls) -A "${JSONDIR}" | $(which sort) -V > "${JSONUSED}"
-      fi
+      sqlite3write "UPDATE upload_keys SET active = 0;" &>/dev/null
+      sqlite3write "UPDATE upload_keys SET active = 1 WHERE rowid = (SELECT rowid FROM upload_keys AS ActiveKey ORDER BY time, rowid LIMIT 1);" &>/dev/null
+      sqlite3write "UPDATE upload_keys SET used = 0 WHERE active = 1;" &>/dev/null
       #### UPDATE KEY IN ${ENDCONFIG} AND SET USED TO ZERO ####
-      KEY=$($(which sed) -n 1p "${JSONUSED}")
+      KEY=$(sqlite3read "SELECT key FROM upload_keys WHERE active = 1;")
       $(which rclone) config update GDSA service_account_file="${JSONDIR}/${KEY}" --config="${ENDCONFIG}" &>/dev/null
       USEDUPLOAD="0"
    fi
    #### UPDATE USED FILE ####
-   NEWVALUE="$(( ${USEDUPLOAD} + ${SIZEBYTES} ))"
-   $(which echo) "${NEWVALUE}" > "${UPPED}"
+   sqlite3write "UPDATE upload_keys SET used = used + \"${SIZEBYTES}\", time = datetime('now', 'localtime') WHERE active = 1;" &>/dev/null
 }
 
 function reset-used() {
    #### SORT KEYS TO DEFAULT ####
-   if [[ ! -f "${JSONUSED}" ]]; then
-      $(which ls) -A "${JSONDIR}" | $(which sort) -V > "${JSONUSED}"
-   else
-      $(which rm) -f "${JSONUSED}" && $(which ls) -A "${JSONDIR}" | $(which sort) -V > "${JSONUSED}"
-   fi
+   sqlite3write "UPDATE upload_keys SET active = 0;" &>/dev/null
+   sqlite3write "UPDATE upload_keys SET active = 1 WHERE rowid = 1;" &>/dev/null
    #### UPDATE KEY IN ${ENDCONFIG} AND SET USED TO ZERO ####
-   KEY=$($(which sed) -n 1p "${JSONUSED}")
+   KEY=$(sqlite3read "SELECT key FROM upload_keys WHERE active = 1;" 2>/dev/null)
    $(which rclone) config update GDSA service_account_file="${JSONDIR}/${KEY}" --config="${ENDCONFIG}" &>/dev/null
-   $(which echo) "0" > "${UPPED}"
+   sqlite3write "UPDATE upload_keys SET used = 0, time = datetime('now', 'localtime') WHERE active = 1;" &>/dev/null
 }
 
 function rcloneupload() {
    source /system/uploader/uploader.env
    FILE="${UPP[3]}"
+   FILETYPE="${FILE##*.}"
    DIR="${UPP[2]}"
    SETDIR=$($(which echo) "${UPP[2]}" | $(which cut) -d/ -f-"${FOLDER_DEPTH}")
    DRIVE="${UPP[1]}"
@@ -270,7 +260,7 @@ function rcloneupload() {
 
    #### CHECK IS FILE AVAILABLE ####
    if [[ ! -f "${DLFOLDER}/${DIR}/${FILE}" ]]; then
-      $(which echo) "PRAGMA busy_timeout = 10000; PRAGMA synchronous = NORMAL; DELETE FROM uploads WHERE filebase = \"${FILE}\";" | $(which sqlite3) "${DATABASE}" &>/dev/null
+      sqlite3write "DELETE FROM uploads WHERE filebase = \"${FILE}\";" &>/dev/null
       $(which sleep) 2 && return
    fi
    #### CHECK IS FILE SIZE NOT CHANGED ####
@@ -317,11 +307,11 @@ function rcloneupload() {
       CRYPTED="C"
    fi
    #### CHECK USED KEY ####
-   KEYNOTI=$($(which sed) -n 1p "${JSONUSED}" | $(which awk) -F '.' '{print $1}')
+   KEYNOTI=$(sqlite3read "SELECT key FROM upload_keys WHERE active = 1;" 2>/dev/null | $(which awk) -F '.' '{print $1}')
    #### TOUCH LOG FILE FOR UI READING ####
    touch "${LOGFILE}/${FILE}.txt" &>/dev/null
    #### UPDATE DATABASE ENTRY ####
-   $(which echo) "PRAGMA busy_timeout = 10000; PRAGMA synchronous = NORMAL; INSERT OR REPLACE INTO uploads (drive,filedir,filebase,filesize,logfile,gdsa) VALUES (\"${DRIVE}\",\"${DIR}\",\"${FILE}\",\"${SIZE}\",\"${LOGFILE}/${FILE}.txt\",\"${KEYNOTI}${CRYPTED}\");" | $(which sqlite3) "${DATABASE}" &>/dev/null
+   sqlite3write "INSERT OR REPLACE INTO uploads (drive,filedir,filebase,filesize,logfile,gdsa) VALUES (\"${DRIVE}\",\"${DIR}\",\"${FILE}\",\"${SIZE}\",\"${LOGFILE}/${FILE}.txt\",\"${KEYNOTI}${CRYPTED}\");" &>/dev/null
    #### READ BWLIMIT ####
    if [[ "${BANDWIDTH_LIMIT}" == "" ]]; then
       BANDWIDTH_LIMIT="null"
@@ -357,7 +347,7 @@ function rcloneupload() {
    checkerror
    #### ECHO END-PARTS FOR UI READING ####
    $(which find) "${DLFOLDER}/${SETDIR}" -mindepth 1 -type d -empty -delete &>/dev/null
-   $(which echo) "PRAGMA busy_timeout = 10000; PRAGMA synchronous = NORMAL; INSERT INTO completed_uploads (drive,filedir,filebase,filesize,gdsa,starttime,endtime,status,error) VALUES (\"${DRIVE}\",\"${DIR}\",\"${FILE}\",\"${SIZE}\",\"${KEYNOTI}${CRYPTED}\",\"${STARTZ}\",\"${ENDZ}\",\"${STATUS}\",\"${ERROR}\"); DELETE FROM uploads WHERE filebase = \"${FILE}\";" | $(which sqlite3) "${DATABASE}" &>/dev/null
+   sqlite3write "INSERT INTO completed_uploads (drive,filedir,filebase,filesize,gdsa,starttime,endtime,status,error) VALUES (\"${DRIVE}\",\"${DIR}\",\"${FILE}\",\"${SIZE}\",\"${KEYNOTI}${CRYPTED}\",\"${STARTZ}\",\"${ENDZ}\",\"${STATUS}\",\"${ERROR}\"); DELETE FROM uploads WHERE filebase = \"${FILE}\";" &>/dev/null
    #### END OF MOVE ####
    $(which rm) -rf "${LOGFILE}/${FILE}.txt" &>/dev/null
    #### REMOVE CUSTOM RCLONE.CONF ####
@@ -368,16 +358,21 @@ function rcloneupload() {
 
 function listfiles() {
    source /system/uploader/uploader.env
+   #### CREATE TEMP_FILE ####
+   sqlite3read "SELECT filebase FROM upload_queue UNION ALL SELECT filebase FROM uploads;" > "${TEMPFILES}"
    #### FIND NEW FILES ####
    IFS=$'\n'
-   mapfile -t "FILEBASE" < <($(which find) "${DLFOLDER}" -type f -size +0b -cmin +"${MIN_AGE_UPLOAD}" -printf "%P\n" | $(which grep) -Evf "${EXCLUDE}")
+   mapfile -t "FILEBASE" < <($(which find) "${DLFOLDER}" -type f -size +0b -cmin +"${MIN_AGE_UPLOAD}" -printf "%P\n" | $(which grep) -Evf "${EXCLUDE}" | $(which grep) -Fvf "${TEMPFILES}")
+   sqlite3write "BEGIN TRANSACTION;" &>/dev/null
    for NAME in ${FILEBASE[@]}; do
       LISTFILE=$($(which basename) "${NAME}")
       LISTDIR=$($(which dirname) "${NAME}")
       LISTDRIVE=$($(which echo) "${LISTDIR}" | $(which cut) -d/ -f-"${FOLDER_DEPTH}" | $(which xargs) -I {} $(which basename) {})
       LISTSIZE=$($(which stat) -c %s "${DLFOLDER}/${NAME}" 2>/dev/null)
-      $(which echo) "PRAGMA busy_timeout = 10000; PRAGMA synchronous = NORMAL; INSERT OR IGNORE INTO upload_queue (drive,filedir,filebase,filesize) SELECT \"${LISTDRIVE}\",\"${LISTDIR}\",\"${LISTFILE}\",\"${LISTSIZE}\" WHERE NOT EXISTS (SELECT 1 FROM uploads WHERE filebase = \"${LISTFILE}\");" | $(which sqlite3) "${DATABASE}" &>/dev/null
+      sqlite3write "INSERT OR IGNORE INTO upload_queue (drive,filedir,filebase,filesize) SELECT \"${LISTDRIVE}\",\"${LISTDIR}\",\"${LISTFILE}\",\"${LISTSIZE}\" WHERE NOT EXISTS (SELECT 1 FROM uploads WHERE filebase = \"${LISTFILE}\");" &>/dev/null
    done
+   sqlite3write "COMMIT;" &>/dev/null
+   $(which rm) "${TEMPFILES}"
 }
 
 function checkspace() {
@@ -403,7 +398,7 @@ function transfercheck() {
       #### RUN PAUSE CHECK ####
       pausecheck
       #### START TRANSFER CHECK ####
-      ACTIVETRANSFERS=$($(which echo) "SELECT COUNT(*) FROM uploads;" | $(which sqlite3) -readonly "${DATABASE}" 2>/dev/null)
+      ACTIVETRANSFERS=$(sqlite3read "SELECT COUNT(*) FROM uploads;" 2>/dev/null)
       if [[ "${TRANSFERS}" != +([0-9.]) ]] || [ "${TRANSFERS}" -gt "99" ] || [ "${TRANSFERS}" -eq "0" ]; then
          TRANSFERS="1"
       else
@@ -411,7 +406,7 @@ function transfercheck() {
       fi
       if [[ "${ACTIVETRANSFERS}" -lt "${TRANSFERS}" ]]; then
          #### CREATE DATABASE ENTRY ####
-         $(which echo) "PRAGMA busy_timeout = 10000; PRAGMA synchronous = NORMAL; DELETE FROM upload_queue WHERE filebase = \"${UPP[3]}\"; INSERT INTO uploads (filebase) VALUES (\"${UPP[3]}\");" | $(which sqlite3) "${DATABASE}" &>/dev/null
+         sqlite3write "DELETE FROM upload_queue WHERE filebase = \"${UPP[3]}\"; INSERT INTO uploads (filebase) VALUES (\"${UPP[3]}\");" &>/dev/null
          $(which sleep) 2 && break
       else
          $(which sleep) 10
@@ -429,6 +424,14 @@ function pausecheck() {
    done
 }
 
+function sqlite3write() {
+   $(which sqlite3) -cmd "PRAGMA busy_timeout = 10000; PRAGMA synchronous = NORMAL; PRAGMA TEMP_STORE = MEMORY; PRAGMA JOURNAL_MODE = WAL;" "${DATABASE}" "$@"
+}
+
+function sqlite3read() {
+   $(which sqlite3) "file:${DATABASE}?immutable=1" "$@"
+}
+
 #### START HERE UPLOADER ####
 function startuploader() {
    while true; do
@@ -438,10 +441,13 @@ function startuploader() {
       listfiles
       #### START UPLOAD ####
       source /system/uploader/uploader.env
-      CHECKFILES=$($(which echo) "SELECT COUNT(*) FROM upload_queue;" | $(which sqlite3) -readonly "${DATABASE}" 2>/dev/null)
+      CHECKFILES=$(sqlite3read "SELECT COUNT(*) FROM upload_queue;")
       if [[ "${CHECKFILES}" -ge "1" ]]; then
          # shellcheck disable=SC2086
          #### CHECK FOLDER PRIORITY ####
+         if [[ "${FOLDER_PRIORITY}" == "" ]]; then
+            FOLDER_PRIORITY="null"
+         fi
          if [[ "${FOLDER_PRIORITY}" != "null" ]]; then
             i=0
             ORDER_BY="ORDER BY CASE drive "
@@ -455,7 +461,7 @@ function startuploader() {
          else
             SEARCHSTRING="ORDER BY time"
          fi
-         $(which echo) "SELECT * FROM upload_queue ${SEARCHSTRING} LIMIT 1;" | $(which sqlite3) -readonly "${DATABASE}" 2>/dev/null | while IFS='|' read -ra UPP; do
+         sqlite3read "SELECT * FROM upload_queue ${SEARCHSTRING} LIMIT 1;" 2>/dev/null | while IFS='|' read -ra UPP; do
             #### TO CHECK IS IT A FILE OR NOT ####
             if [[ -f "${DLFOLDER}/${UPP[2]}/${UPP[3]}" ]]; then
                #### REPULL SOURCE FILE FOR LIVE EDITS ####
@@ -476,7 +482,7 @@ function startuploader() {
                fi
             else
                #### WHEN NOT THEN DELETE ENTRY ####
-               $(which echo) "PRAGMA busy_timeout = 10000; PRAGMA synchronous = NORMAL; DELETE FROM upload_queue WHERE filebase = \"${UPP[3]}\";" | $(which sqlite3) "${DATABASE}" &>/dev/null
+               sqlite3write "DELETE FROM upload_queue WHERE filebase = \"${UPP[3]}\";" &>/dev/null
                $(which sleep) 2
             fi
          done
