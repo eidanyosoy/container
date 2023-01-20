@@ -17,7 +17,7 @@ jobs:
     #runs-on: self-hosted
     steps:
       - name: GitHub metrics as SVG image
-        uses: lowlighter/metrics@v3.31
+        uses: lowlighter/metrics@v3.32
         with:
           committer_token: ${{ secrets.CR_PAT }}
           config_timezone: 'Europe/Berlin'
