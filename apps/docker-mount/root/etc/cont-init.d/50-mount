@@ -183,7 +183,7 @@ if [[ -d "${SUNION}" ]]; then $(which fusermount) -uzq "${SUNION}" &>/dev/null; 
 if [[ -d "${SREMOTES}" ]]; then $(which fusermount) -uzq "${SREMOTES}" &>/dev/null; fi
 if [[ -f "${ENDCONFIG}" ]]; then $(which rm) -f "${ENDCONFIG}" &>/dev/null; fi
 $(which sed) -i 's/UMASK=022/UMASK=18/' "${ENVA}" &>/dev/null
-$(which truncate) -s 0 "${LOGS}"/*.log &>/dev/null
+$(which truncate) -s 0 ${LOGS}/*.log &>/dev/null
 
 # CHECK MOUNT KEYS ARE NOT UPLOADER KEYS
 if [[ "${ARRAY}" -ge "1" ]]; then
