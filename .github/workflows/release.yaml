@@ -24,6 +24,7 @@ jobs:
   changes:
     name: Get changes
     runs-on: ubuntu-latest
+    #runs-on: self-hosted
     outputs:
       matrix: "{\"container\": ${{ steps.reduce.outputs.containers }} }"
     steps:
@@ -52,6 +53,7 @@ jobs:
   build:
     name: Build Docker
     runs-on: ubuntu-latest
+    ##runs-on: self-hosted
     continue-on-error: true
 
     permissions:
