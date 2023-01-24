@@ -197,6 +197,15 @@ function rcmount() {
    elif [[ "${VFS_CACHE_MAX_AGE_CHECK}" == "d" ]]; then
       VFS_CACHE_MAX_AGE_CHANGE=$($(which echo) "${VFS_CACHE_MAX_AGE::-1}")
       VFS_CACHE_MAX_AGE_NS=$(( ${VFS_CACHE_MAX_AGE_CHANGE} * 86400000000000 ))
+   elif [[ "${VFS_CACHE_MAX_AGE_CHECK}" == "w" ]]; then
+      VFS_CACHE_MAX_AGE_CHANGE=$($(which echo) "${VFS_CACHE_MAX_AGE::-1}")
+      VFS_CACHE_MAX_AGE_NS=$(( ${VFS_CACHE_MAX_AGE_CHANGE} * 604800016558522 ))
+   elif [[ "${VFS_CACHE_MAX_AGE_CHECK}" == "M" ]]; then
+      VFS_CACHE_MAX_AGE_CHANGE=$($(which echo) "${VFS_CACHE_MAX_AGE::-1}")
+      VFS_CACHE_MAX_AGE_NS=$(( ${VFS_CACHE_MAX_AGE_CHANGE} * 2629800000000000 ))
+   elif [[ "${VFS_CACHE_MAX_AGE_CHECK}" == "y" ]]; then
+      VFS_CACHE_MAX_AGE_CHANGE=$($(which echo) "${VFS_CACHE_MAX_AGE::-1}")
+      VFS_CACHE_MAX_AGE_NS=$(( ${VFS_CACHE_MAX_AGE_CHANGE} * 31557600000000000 ))
    else
       VFS_CACHE_MAX_AGE_NS="${VFS_CACHE_MAX_AGE}"
    fi
@@ -216,6 +225,15 @@ function rcmount() {
    elif [[ "${VFS_DIR_CACHE_TIME_CHECK}" == "d" ]]; then
       VFS_DIR_CACHE_TIME_CHANGE=$($(which echo) "${VFS_DIR_CACHE_TIME::-1}")
       VFS_DIR_CACHE_TIME_NS=$(( ${VFS_DIR_CACHE_TIME_CHANGE} * 86400000000000 ))
+   elif [[ "${VFS_DIR_CACHE_TIME_CHECK}" == "w" ]]; then
+      VFS_DIR_CACHE_TIME_CHANGE=$($(which echo) "${VFS_DIR_CACHE_TIME::-1}")
+      VFS_DIR_CACHE_TIME_NS=$(( ${VFS_DIR_CACHE_TIME_CHANGE} * 604800016558522 ))
+   elif [[ "${VFS_DIR_CACHE_TIME_CHECK}" == "M" ]]; then
+      VFS_DIR_CACHE_TIME_CHANGE=$($(which echo) "${VFS_DIR_CACHE_TIME::-1}")
+      VFS_DIR_CACHE_TIME_NS=$(( ${VFS_DIR_CACHE_TIME_CHANGE} * 2629800000000000 ))
+   elif [[ "${VFS_DIR_CACHE_TIME_CHECK}" == "y" ]]; then
+      VFS_DIR_CACHE_TIME_CHANGE=$($(which echo) "${VFS_DIR_CACHE_TIME::-1}")
+      VFS_DIR_CACHE_TIME_NS=$(( ${VFS_DIR_CACHE_TIME_CHANGE} * 31557600000000000 ))
    else
       VFS_DIR_CACHE_TIME_NS="${VFS_DIR_CACHE_TIME}"
    fi
