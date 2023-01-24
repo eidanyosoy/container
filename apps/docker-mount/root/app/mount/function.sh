@@ -101,7 +101,7 @@ function rotate() {
       done
       $(which sleep) 5
       $(which rclone) rc core/stats-reset &>/dev/null
-      $(which truncate) -s 0 "${LOGS}"/*.log &>/dev/null
+      $(which truncate) -s 0 ${LOGS}/*.log &>/dev/null
       if [[ "$($(which ls) -1p ${SREMOTES})" ]] && [[ "$($(which ls) -1p ${SUNION})" ]]; then
          KEYNOTI=$($(which sed) -n 1p "${JSONUSED}" | $(which awk) -F '.' '{print $1}')
          MSG="-> Rotate to next Service 🔑 "${KEYNOTI}" done <-" && notification
@@ -159,7 +159,7 @@ function rlog() {
    SIZE=$($(which du) "${LOGS}" | $(which cut) -f 1)
    ## 50MB max size of file
    if [[ "${SIZE}" -gt "50000" ]]; then
-      $(which truncate) -s 0 "${LOGS}"/*.log &>/dev/null
+      $(which truncate) -s 0 ${LOGS}/*.log &>/dev/null
    fi
 }
 
