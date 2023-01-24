@@ -182,6 +182,44 @@ function rcmount() {
       fi
    fi
 
+   #### VFS_CACHE_MAX_AGE to nanoseconds ####
+   VFS_CACHE_MAX_AGE_CHECK=$($(which echo) "${VFS_CACHE_MAX_AGE:0-1}")
+
+   if [[ "${VFS_CACHE_MAX_AGE_CHECK}" == "s" ]]; then
+      VFS_CACHE_MAX_AGE_CHANGE=$($(which echo) "${VFS_CACHE_MAX_AGE::-1}")
+      VFS_CACHE_MAX_AGE_NS=$(( ${VFS_CACHE_MAX_AGE_CHANGE} * 1000000000 ))
+   elif [[ "${VFS_CACHE_MAX_AGE_CHECK}" == "m" ]]; then
+      VFS_CACHE_MAX_AGE_CHANGE=$($(which echo) "${VFS_CACHE_MAX_AGE::-1}")
+      VFS_CACHE_MAX_AGE_NS=$(( ${VFS_CACHE_MAX_AGE_CHANGE} * 60000000000 ))
+   elif [[ "${VFS_CACHE_MAX_AGE_CHECK}" == "h" ]]; then
+      VFS_CACHE_MAX_AGE_CHANGE=$($(which echo) "${VFS_CACHE_MAX_AGE::-1}")
+      VFS_CACHE_MAX_AGE_NS=$(( ${VFS_CACHE_MAX_AGE_CHANGE} * 3600000000000 ))
+   elif [[ "${VFS_CACHE_MAX_AGE_CHECK}" == "d" ]]; then
+      VFS_CACHE_MAX_AGE_CHANGE=$($(which echo) "${VFS_CACHE_MAX_AGE::-1}")
+      VFS_CACHE_MAX_AGE_NS=$(( ${VFS_CACHE_MAX_AGE_CHANGE} * 86400000000000 ))
+   else
+      VFS_CACHE_MAX_AGE_NS="${VFS_CACHE_MAX_AGE}"
+   fi
+
+   #### VFS_DIR_CACHE_TIME to nanoseconds ####
+   VFS_DIR_CACHE_TIME_CHECK=$($(which echo) "${VFS_DIR_CACHE_TIME:0-1}")
+
+   if [[ "${VFS_DIR_CACHE_TIME_CHECK}" == "s" ]]; then
+      VFS_DIR_CACHE_TIME_CHANGE=$($(which echo) "${VFS_DIR_CACHE_TIME::-1}")
+      VFS_DIR_CACHE_TIME_NS=$(( ${VFS_DIR_CACHE_TIME_CHANGE} * 1000000000 ))
+   elif [[ "${VFS_DIR_CACHE_TIME_CHECK}" == "m" ]]; then
+      VFS_DIR_CACHE_TIME_CHANGE=$($(which echo) "${VFS_DIR_CACHE_TIME::-1}")
+      VFS_DIR_CACHE_TIME_NS=$(( ${VFS_DIR_CACHE_TIME_CHANGE} * 60000000000 ))
+   elif [[ "${VFS_DIR_CACHE_TIME_CHECK}" == "h" ]]; then
+      VFS_DIR_CACHE_TIME_CHANGE=$($(which echo) "${VFS_DIR_CACHE_TIME::-1}")
+      VFS_DIR_CACHE_TIME_NS=$(( ${VFS_DIR_CACHE_TIME_CHANGE} * 3600000000000 ))
+   elif [[ "${VFS_DIR_CACHE_TIME_CHECK}" == "d" ]]; then
+      VFS_DIR_CACHE_TIME_CHANGE=$($(which echo) "${VFS_DIR_CACHE_TIME::-1}")
+      VFS_DIR_CACHE_TIME_NS=$(( ${VFS_DIR_CACHE_TIME_CHANGE} * 86400000000000 ))
+   else
+      VFS_DIR_CACHE_TIME_NS="${VFS_DIR_CACHE_TIME}"
+   fi
+
 $(which cat) > "/tmp/rclone.sh" << EOF; $(echo)
 #!/command/with-contenv bash
 # shellcheck shell=bash
@@ -226,7 +264,7 @@ $(which sleep) 10
 
 ### SET MAJOR OPTIONS FOR MOUNT : $(which rclone) rc options/set options/set --json 
 $(which rclone) rc options/set --json {'"main": { "TPSLimitBurst": ${TPSBURST}, "TPSLimit": ${TPSLIMIT}, "Checkers": 6, "Transfers": 6, "BufferSize": "${BUFFER_SIZE}", "TrackRenames": true, "TrackRenamesStrategy":"modtime,leaf", "NoUpdateModTime": true, "UserAgent": "${UAGENT}", "CutoffMode":"hard", "Progress":true, "UseMmap":true, "HumanReadable":true}'} &>/dev/null
-$(which rclone) rc options/set --json {'"vfs": { "GID": '${PGID}', "UID": '${PUID}', "Umask": '${UMASK}', "CacheMode": 3, "CacheMaxSize": "${VFS_CACHE_MAX_SIZE}", "CacheMaxAge": ${VFS_CACHE_MAX_AGE}, "CachePollInterval": 120000000000, "PollInterval": 60000000000, "ChunkSize": "${VFS_READ_CHUNK_SIZE}", "ChunkSizeLimit": "${VFS_READ_CHUNK_SIZE_LIMIT}", "DirCacheTime": ${VFS_DIR_CACHE_TIME}, "NoModTime": true,"NoChecksum": true}'} &>/dev/null
+$(which rclone) rc options/set --json {'"vfs": { "GID": '${PGID}', "UID": '${PUID}', "Umask": '${UMASK}', "CacheMode": 3, "CacheMaxSize": "${VFS_CACHE_MAX_SIZE}", "CacheMaxAge": ${VFS_CACHE_MAX_AGE_NS}, "CachePollInterval": 120000000000, "PollInterval": 60000000000, "ChunkSize": "${VFS_READ_CHUNK_SIZE}", "ChunkSizeLimit": "${VFS_READ_CHUNK_SIZE_LIMIT}", "DirCacheTime": ${VFS_DIR_CACHE_TIME_NS}, "NoModTime": true,"NoChecksum": true}'} &>/dev/null
 $(which rclone) rc options/set --json {'"mount": { "AllowNonEmpty": true, "AllowOther": true, "AsyncRead": true, "WritebackCache": true}'} &>/dev/null
 $(which sleep) 5
 
