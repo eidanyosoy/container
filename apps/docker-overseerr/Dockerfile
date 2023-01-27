@@ -22,7 +22,7 @@ LABEL org.opencontainers.image.source="https://github.com/dockserver/container"
 ARG TARGETPLATFORM
 ARG BUILDPLATFORM
 
-ARG VERSION="1.32.1"
+ARG VERSION="1.32.2"
 ARG BRANCH=""
 
 ENV HOME="/config"
@@ -34,7 +34,7 @@ RUN \
     ln -s /usr/bin/python3 /usr/bin/python && \
   echo "**** install runtime packages ****" && \
     apk add -U --update --no-cache yarn && \
-    export COMMIT_TAG="v1.32.1" && \
+    export COMMIT_TAG="v1.32.2" && \
   echo "**** install 'docker-overseerr' ****" && \
     mkdir -p /app/overseerr && \
     curl -fsSL "https://github.com/sct/overseerr/archive/refs/tags/v${VERSION}.tar.gz" | tar xzf - -C /app/overseerr --strip-components=1 && \
