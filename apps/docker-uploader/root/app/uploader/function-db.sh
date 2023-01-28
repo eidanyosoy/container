@@ -234,8 +234,10 @@ function rcloneupload() {
       PROXY="null"
    fi
    if [[ "${PROXY}" != "null" ]]; then
+      export no_proxy="localhost,127.0.0.0/8"
       export http_proxy="${PROXY}"
       export https_proxy="${PROXY}"
+      export NO_PROXY="localhost,127.0.0.0/8"
       export HTTP_PROXY="${PROXY}"
       export HTTPS_PROXY="${PROXY}"
    fi
