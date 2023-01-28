@@ -315,7 +315,7 @@ function rcloneupload() {
       --log-level="${LOG_LEVEL}" \
       --user-agent="${USERAGENT}" ${BWLIMIT} \
       --log-file="${LOGFILE}/${FILE}.txt" \
-      --tpslimit=10 &>/dev/null
+      --tpslimit=20 &>/dev/null
    #### END TIME UPLOAD ####
    ENDZ=$($(which date) +%s)
    #### SEND TO AUTOSCAN DOCKER ####
