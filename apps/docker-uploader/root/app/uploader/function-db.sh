@@ -311,11 +311,11 @@ function rcloneupload() {
    $(which rclone) moveto "${DLFOLDER}/${DIR}/${FILE}" "DB${CRYPTED}:/${DIR}/${FILE}" \
       --config="${CONFIG}" \
       --stats=1s --checkers=4 \
-      --dropbox-chunk-size=128M \
+      --dropbox-chunk-size=128M --use-mmap \
       --log-level="${LOG_LEVEL}" \
       --user-agent="${USERAGENT}" ${BWLIMIT} \
       --log-file="${LOGFILE}/${FILE}.txt" \
-      --tpslimit 20 &>/dev/null
+      --tpslimit=10 &>/dev/null
    #### END TIME UPLOAD ####
    ENDZ=$($(which date) +%s)
    #### SEND TO AUTOSCAN DOCKER ####
