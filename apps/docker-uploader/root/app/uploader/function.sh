@@ -258,6 +258,16 @@ function rcloneupload() {
    SIZEBYTES="${UPP[4]}"
    SIZE=$($(which echo) "${UPP[4]}" | $(which numfmt) --to=iec-i --suffix=B)
 
+   #### SET PROXY IF AVAILABLE ####
+   if [[ "${PROXY}" == "" ]]; then
+      PROXY="null"
+   fi
+   if [[ "${PROXY}" != "null" ]]; then
+      export http_proxy="${PROXY}"
+      export https_proxy="${PROXY}"
+      export HTTP_PROXY="${PROXY}"
+      export HTTPS_PROXY="${PROXY}"
+   fi
    #### CHECK IS FILE AVAILABLE ####
    if [[ ! -f "${DLFOLDER}/${DIR}/${FILE}" ]]; then
       sqlite3write "DELETE FROM uploads WHERE filebase = \"${FILE}\";" &>/dev/null
