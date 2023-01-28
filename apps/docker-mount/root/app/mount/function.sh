@@ -238,6 +238,17 @@ function rcmount() {
       VFS_DIR_CACHE_TIME_NS="${VFS_DIR_CACHE_TIME}"
    fi
 
+   #### SET PROXY IF AVAILABLE ####
+   if [[ "${PROXY}" == "" ]]; then
+      PROXY="null"
+   fi
+   if [[ "${PROXY}" != "null" ]]; then
+      export http_proxy="${PROXY}"
+      export https_proxy="${PROXY}"
+      export HTTP_PROXY="${PROXY}"
+      export HTTPS_PROXY="${PROXY}"
+   fi
+
 $(which cat) > "/tmp/rclone.sh" << EOF; $(echo)
 #!/command/with-contenv bash
 # shellcheck shell=bash
