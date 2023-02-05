@@ -22,7 +22,7 @@ LABEL org.opencontainers.image.source="https://github.com/dockserver/container"
 ARG TARGETPLATFORM
 ARG BUILDPLATFORM
 
-ARG VERSION="32bd5a4ccafddf2595ea9544b9b27547b40237c7"
+ARG VERSION="5315eeb26bbe993089150b7a14d76a8b972e7798"
 ARG BRANCH="develop"
 ARG UNRAR_VERSION=6.1.4
 
