@@ -1,0 +1,3 @@
+# min   hour    day     month   weekday command
+# restic
+0 2 * * * bash -c ". /app/restic/restic.sh; resticbackup" > /proc/1/fd/1
