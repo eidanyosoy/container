@@ -29,7 +29,7 @@ RUN \
   echo "**** install build packages ****" && \
     apk add -U --update --no-cache bash ca-certificates shadow musl findutils linux-headers coreutils apk-tools busybox && \
   echo "**** set alpine version ****" && \
-    echo -e "3.17.1" > /etc/alpine-release && \
+    echo -e "" > /etc/alpine-release && \
   echo "*** cleanup system ****" && \
     apk del --quiet --clean-protected --no-progress && \
     rm -f /var/cache/apk/*
