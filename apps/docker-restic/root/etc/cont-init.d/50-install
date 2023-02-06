@@ -1,0 +1,129 @@
+#!/command/with-contenv bash
+# shellcheck shell=bash
+#####################################
+# All rights reserved.              #
+# started from Zero                 #
+# Docker owned dockserver           #
+# Docker Maintainer dockserver      #
+#####################################
+# THIS DOCKER IS UNDER LICENSE      #
+# NO CUSTOMIZING IS ALLOWED         #
+# NO REBRANDING IS ALLOWED          #
+# NO CODE MIRRORING IS ALLOWED      #
+#####################################
+
+function log() {
+  $(which echo) "[Restic] ${1}"
+}
+
+#SETTINGS
+ENVA=/config/restic/restic.env
+SAMPLE=/app/sample/.sample.restic.env
+
+#FOLDER
+APP=/app/restic
+CONFIG=/config/restic
+
+log "**** update system packages ****" && \
+   apk --quiet --no-progress update && \
+   apk --quiet --no-progress upgrade
+
+log "**** install build packages from requirements ****" && \
+   $(which cat) /app/requirements.txt | while IFS=$'\n' read -ra myArray; do
+      apk add --quiet --no-progress --update "${myArray[@]}"
+   done
+
+log "**** install restic ****"
+   apk add --quiet --no-progress --update restic --repository=https://dl-cdn.alpinelinux.org/alpine/edge/community &>/dev/null
+
+log "**** install pip packages ****"
+   pip3 install --no-cache-dir -U apprise &>/dev/null
+
+log "**** install rclone ****"
+   $(which wget) -qO- https://rclone.org/install.sh | bash &>/dev/null
+
+log "**** creating folders ****"
+   $(which mkdir) -p /config/{crontabs,rclone,restic} &>/dev/null
+
+if [[ -f "${ENVA}" ]]; then
+   source "${ENVA}"
+else
+   source "${SAMPLE}"
+fi
+
+$(which echo) -e "#-------------------------------------------------------
+#   RESTIC ENVIROMENTS
+#-------------------------------------------------------
+
+## USER VALUES
+PUID=${PUID:-1000}
+PGID=${PGID:-1000}
+TIMEZONE=${TZ:-UTC}
+
+## RESTIC - SETTINGS
+RESTIC_JOBS=${RESTIC_JOBS:-1}
+RESTIC_HOST=${RESTIC_HOST:-Restic}
+RESTIC_REPOSITORY=\"${RESTIC_REPOSITORY:-null}\"
+RESTIC_PASSWORD=${RESTIC_PASSWORD:-null}
+RESTIC_TAG=${RESTIC_TAG:-appdata}
+RESTIC_PACK_SIZE=${RESTIC_PACK_SIZE:-32}
+RESTIC_CACHE_DIR=\"${RESTIC_CACHE_DIR:-/config/.cache}\"
+RESTIC_FOLDER=\"${RESTIC_FOLDER:-/opt/appdata}\"
+
+## NOTIFICATION - SETTINGS
+NOTIFICATION_URL=${NOTIFICATION_URL:-null}
+NOTIFICATION_LEVEL=${NOTIFICATION_LEVEL:-ALL}
+NOTIFICATION_SERVERNAME=${NOTIFICATION_SERVERNAME:-null}
+
+#-------------------------------------------------------
+#   RESTIC ENVIROMENTS
+#-------------------------------------------------------" > "${ENVA}"
+
+if [[ "${RESTIC_REPOSITORY}" == "null" ]] || [[ "${RESTIC_REPOSITORY}" == "" ]]; then
+   log "-> Set RESTIC_REPOSITORY <-" && sleep infinity
+fi
+
+if [[ "${RESTIC_PASSWORD}" == "null" ]] || [[ "${RESTIC_PASSWORD}" == "" ]]; then
+   log "-> Set RESTIC_PASSWORD <-" && sleep infinity
+fi
+
+log "**** initialize repository ****"
+mapfile -t "FILE" < <($(which find) "${CONFIG}" -type f -name "*.env")
+for ENVREP in "${FILE[@]}"; do 
+   source "${ENVREP}"
+   #### CHECK REPOSITORY ####
+   $(which restic) snapshots --quiet --repo "${RESTIC_REPOSITORY}" --password-command "$(which echo) ${RESTIC_PASSWORD}" --option rclone.args="serve restic --stdio --checkers=16 --drive-chunk-size=32M --drive-use-trash=false --fast-list --config=/config/rclone/rclone.conf" &>/dev/null
+   if [[ "$?" -gt "0" ]]; then
+      $(which restic) init --quiet --repo "${RESTIC_REPOSITORY}" --password-command "$(which echo) ${RESTIC_PASSWORD}" --option rclone.args="serve restic --stdio --checkers=16 --drive-chunk-size=32M --drive-use-trash=false --fast-list --config=/config/rclone/rclone.conf" &>/dev/null
+      if [[ "$?" == "0" ]]; then
+         log "-> Restic Repsoitory initialize successful for ${RESTIC_TAG} <-"
+      elif [[ "$?" -gt "0" ]]; then
+         log "-> Restic Repsoitory initialize failed for ${RESTIC_TAG} <-"
+      fi
+   fi
+done
+
+if [[ "${RESTIC_JOBS}" -gt "1" ]]; then
+   i=1
+   while (( i++ < "${RESTIC_JOBS}" )); do
+     $(which cp) "${APP}/restic.sh" "${APP}/restic$i.sh" &>/dev/null
+     $(which cp) -n "${ENVA}" "${CONFIG}/restic$i.env" &>/dev/null
+     $(which sed) -i "s/restic.env/restic$i.env/" "${APP}/restic$i.sh" &>/dev/null
+     $(which echo) "0 2 * * * bash -c \". ${APP}/restic$i.sh; resticbackup\" > /proc/1/fd/1" >> /defaults/root
+   done
+fi
+
+log "**** install cronjob ****"
+if [[ ! -f "/config/crontabs/root" ]]; then
+   $(which cp) "/defaults/root" "/config/crontabs/root" &>/dev/null
+fi
+$(which cp) "/config/crontabs/root" "/etc/crontabs/root" &>/dev/null
+
+log "**** cleannup ****"
+$(which rm) -rf /var/cache/apk/* \
+       /var/run/s6/etc/cont-init.d/90-custom-folders \
+       /var/run/s6/etc/cont-init.d/99-custom-files \
+       /etc/cont-init.d/90-custom-folders \
+       /etc/cont-init.d/99-custom-files
+
+#### END OF FILE ####

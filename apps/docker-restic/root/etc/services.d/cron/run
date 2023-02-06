@@ -1,0 +1,16 @@
+#!/command/with-contenv bash
+#####################################
+# All rights reserved.              #
+# started from Zero                 #
+# Docker owned dockserver           #
+# Docker Maintainer dockserver      #
+#####################################
+# THIS DOCKER IS UNDER LICENSE      #
+# NO CUSTOMIZING IS ALLOWED         #
+# NO REBRANDING IS ALLOWED          #
+# NO CODE MIRRORING IS ALLOWED      #
+#####################################
+
+bash /app/cron/cron.sh root
+
+/usr/sbin/crond -f -S -l 0 -c /etc/crontabs
