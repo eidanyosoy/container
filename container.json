@@ -53,10 +53,10 @@ apps docker-cloudflared
    "appname": "docker-cloudflared",
    "apppic": "./images/docker-cloudflared.png",
    "appfolder": "./apps/docker-cloudflared",
-   "newversion": "2023.1.0",
+   "newversion": "2023.2.1",
    "baseimage": "alpine",
    "description": "Cloudflare Tunnel client (formerly Argo Tunnel)",
-   "body": "Upgrading docker-cloudflared to 2023.1.0",
+   "body": "Upgrading docker-cloudflared to 2023.2.1",
    "user": "github-actions[bot]"
 }
 
@@ -65,10 +65,10 @@ apps docker-crunchy
    "appname": "docker-crunchy",
    "apppic": "./images/docker-crunchy.png",
    "appfolder": "./apps/docker-crunchy",
-   "newversion": "23.04",
+   "newversion": "rolling",
    "baseimage": "ubuntu",
    "description": "Docker image  for docker-crunchy",
-   "body": "Upgrading docker-crunchy to baseimage: ubuntu:23.04",
+   "body": "Upgrading docker-crunchy to baseimage: ubuntu:rolling",
    "user": "dockserver image update[bot]"
 }
 
@@ -90,11 +90,11 @@ apps docker-dash
    "appname": "docker-dash",
    "apppic": "",
    "appfolder": "./apps/docker-dash",
-   "newversion": "4.8.2",
+   "newversion": "4.8.4",
    "baseimage": "alpine",
    "baseversion": "3.17.1",
    "description": "A simple, modern server dashboard, primarily used by smaller private servers",
-   "body": "Upgrading docker-dash to 4.8.2",
+   "body": "Upgrading docker-dash to 4.8.4",
    "user": "dockserver-image[bot]"
 }
 
@@ -194,10 +194,10 @@ apps docker-gdsa
    "appname": "docker-gdsa",
    "apppic": "./images/docker-gdsa.png",
    "appfolder": "./apps/docker-gdsa",
-   "newversion": "414.0.0-alpine",
+   "newversion": "416.0.0-alpine",
    "baseimage": "gcr.io/google.com/cloudsdktool/cloud-sdk",
    "description": "Docker for Creating GDSA keys",
-   "body": "Upgrading docker-gdsa to 414.0.0-alpine",
+   "body": "Upgrading docker-gdsa to 416.0.0-alpine",
    "user": "dockserver-actions[bot]"
 }
 
@@ -206,11 +206,11 @@ apps docker-jackett
    "appname": "docker-jackett",
    "apppic": "./images/docker-jackett.png",
    "appfolder": "./apps/docker-jackett",
-   "newversion": "0.20.2767",
+   "newversion": "0.20.2930",
    "appbranch": "master",
    "baseimage": "ghcr.io/linuxserver/baseimage-ubuntu:bionic",
    "description": "API Support for your favorite torrent trackers",
-   "body": "Upgrading docker-jackett to 0.20.2767",
+   "body": "Upgrading docker-jackett to 0.20.2930",
    "user": "github-actions[bot]"
 }
 
@@ -245,11 +245,11 @@ apps docker-jellyseerr
    "appname": "docker-jellyseerr",
    "apppic": "./images/docker-jellyseerr.png",
    "appfolder": "./apps/docker-jellyseerr",
-   "newversion": "1.4.0",
+   "newversion": "1.4.1",
    "appbranch": "",
    "baseimage": "ghcr.io/dockserver/docker-alpine:latest",
    "description": "fork of overseerr for jellyfin support",
-   "body": "Upgrading docker-jellyseerr to 1.4.0",
+   "body": "Upgrading docker-jellyseerr to 1.4.1",
    "user": "github-actions[bot]"
 }
 
@@ -352,11 +352,11 @@ apps docker-overseerr
    "appname": "docker-overseerr",
    "apppic": "./images/docker-overseerr.png",
    "appfolder": "./apps/docker-overseerr",
-   "newversion": "1.32.4",
+   "newversion": "1.32.5",
    "appbranch": "",
    "baseimage": "ghcr.io/dockserver/docker-alpine:latest",
    "description": "Request management and media discovery tool for the Plex ecosystem",
-   "body": "Upgrading docker-overseerr to 1.32.4",
+   "body": "Upgrading docker-overseerr to 1.32.5",
    "user": "github-actions[bot]"
 }
 
@@ -365,11 +365,11 @@ apps docker-plex
    "appname": "docker-plex",
    "apppic": "./images/docker-plex.png",
    "appfolder": "./apps/docker-plex",
-   "newversion": "1.30.2.6563-3d4dc0cce",
+   "newversion": "1.31.0.6654-02189b09f",
    "appbranch": "master",
    "baseimage": "ghcr.io/linuxserver/baseimage-ubuntu:jammy",
    "description": "Docker Container for Plex Media Server || PLEX PASS",
-   "body": "Upgrading docker-plex to 1.30.2.6563-3d4dc0cce",
+   "body": "Upgrading docker-plex to 1.31.0.6654-02189b09f",
    "user": "dockserver image update[bot]"
 }
 
@@ -378,11 +378,11 @@ apps docker-prowlarr
    "appname": "docker-prowlarr",
    "apppic": "./images/docker-prowlarr.png",
    "appfolder": "./apps/docker-prowlarr",
-   "newversion": "1.1.2.2447",
+   "newversion": "1.2.0.2525",
    "appbranch": "nightly",
    "baseimage": "ghcr.io/dockserver/docker-alpine:latest",
    "description": "null",
-   "body": "Upgrading docker-prowlarr to 1.1.2.2447",
+   "body": "Upgrading docker-prowlarr to 1.2.0.2525",
    "user": "github-actions[bot]"
 }
 
@@ -418,11 +418,11 @@ apps docker-readarr
    "appname": "docker-readarr",
    "apppic": "./images/docker-readarr.png",
    "appfolder": "./apps/docker-readarr",
-   "newversion": "0.1.2.1544",
+   "newversion": "0.1.3.1573",
    "appbranch": "nightly",
    "baseimage": "ghcr.io/dockserver/docker-alpine:latest",
    "description": "null",
-   "body": "Upgrading docker-readarr to 0.1.2.1544",
+   "body": "Upgrading docker-readarr to 0.1.3.1573",
    "user": "github-actions[bot]"
 }
 
@@ -431,10 +431,10 @@ apps docker-rollarr
    "appname": "docker-rollarr",
    "apppic": "./images/docker-rollarr.png",
    "appfolder": "./apps/docker-rollarr",
-   "newversion": "23.04",
+   "newversion": "rolling",
    "baseimage": "ubuntu",
    "description": "This is the new and improved Automatic Pre-roll script with a GUI for Plex now called Rollarr!",
-   "body": "Upgrading docker-rollarr to 23.04",
+   "body": "Upgrading docker-rollarr to rolling",
    "user": "github-actions[bot]"
 }
 
@@ -455,10 +455,10 @@ apps docker-sabnzbd
    "appname": "docker-sabnzbd",
    "apppic": "./images/docker-sabnzbd.png",
    "appfolder": "./apps/docker-sabnzbd",
-   "newversion": "3.7.1",
+   "newversion": "3.7.2",
    "appbranch": "master",
    "description": "SABnzbd - The automated Usenet download tool",
-   "body": "Upgrading docker-sabnzbd to 3.7.1",
+   "body": "Upgrading docker-sabnzbd to 3.7.2",
    "user": "github-actions[bot]"
 }
 
@@ -544,8 +544,8 @@ apps docker-wiki
    "appfolder": "./apps/docker-wiki",
    "appbranch": "master",
    "newversion": "3.17.1",
-   "appversion": "1.4.39",
-   "wikiversion": "9.0.9",
+   "appversion": "1.4.42",
+   "wikiversion": "9.0.11",
    "baseimage": "alpine",
    "description": "Docker + Traefik with Authelia and Cloudflare Protection",
    "body": "Upgrading docker-wiki to 3.17.1",
@@ -734,11 +734,11 @@ nightly docker-radarr-nightly
    "appname": "docker-radarr-nightly",
    "apppic": "./images/docker-radarr-nightly.png",
    "appfolder": "./nightly/docker-radarr-nightly",
-   "newversion": "nightly-4.4.1.6918-ls442",
+   "newversion": "nightly-4.4.2.6942-ls448",
    "appbranch": "nightly",
    "baseimage": "",
    "description": "A fork of Sonarr to work with movies à la Couchpotato.",
-   "body": "Upgrading docker-radarr-nightly to nightly-4.4.1.6918-ls442",
+   "body": "Upgrading docker-radarr-nightly to nightly-4.4.2.6942-ls448",
    "user": "dockserver image update[bot]"
 }
 
@@ -747,10 +747,10 @@ nightly docker-sabnzbd-nightly
    "appname": "docker-sabnzbd-nightly",
    "apppic": "./images/docker-sabnzbd-nightly.png",
    "appfolder": "./nightly/docker-sabnzbd-nightly",
-   "newversion": "5e58fdf82141fcec6b7b379c957909d82aae3e51",
+   "newversion": "5315eeb26bbe993089150b7a14d76a8b972e7798",
    "appbranch": "develop",
    "description": "SABnzbd - The automated Usenet download tool",
-   "body": "Upgrading docker-sabnzbd-nightly to 5e58fdf82141fcec6b7b379c957909d82aae3e51",
+   "body": "Upgrading docker-sabnzbd-nightly to 5315eeb26bbe993089150b7a14d76a8b972e7798",
    "user": "dockserver image update[bot]"
 }
 
@@ -759,10 +759,10 @@ nightly docker-sonarr-nightly
    "appname": "docker-sonarr-nightly",
    "apppic": "./images/docker-sonarr-nightly.png",
    "appfolder": "./nightly/docker-sonarr-nightly",
-   "newversion": "develop-4.0.0.362-ls393",
+   "newversion": "develop-4.0.0.369-ls396",
    "appbranch": "develop",
    "description": "Smart PVR for newsgroup and bittorrent users.",
-   "body": "Upgrading docker-sonarr-nightly to develop-4.0.0.362-ls393",
+   "body": "Upgrading docker-sonarr-nightly to develop-4.0.0.369-ls396",
    "user": "dockserver image update[bot]"
 }
 
