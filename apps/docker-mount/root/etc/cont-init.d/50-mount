@@ -266,6 +266,13 @@ if [[ -f "${ENDFILE}" && "${ARRAY}" -ge "1" ]]; then
    done
 fi
 
+# DUMMY
+DUMMYCHECK=$($(which rclone) config dump --config="${ENDCONFIG}" | $(which jq) -r 'to_entries | (.[] | select(.value)) | .key' | $(which wc) -l)
+if [[ "${DUMMYCHECK}" == "1" ]]; then
+   $(which mkdir) -p /dummy &>/dev/null
+   $(which rclone) config create "dummy" alias remote="/dummy" --config="${ENDCONFIG}" &>/dev/null
+fi
+
 # RCLONE UNION PART
 TMPUNION=/tmp/rcunion.union
 IFS=$'\n'
