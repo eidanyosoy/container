@@ -2,9 +2,9 @@
    "appname": "alpine",
    "apppic": "",
    "appfolder": "./base/alpine",
-   "newversion": "3.17.1",
+   "newversion": "20230208",
    "baseimage": "alpine",
    "description": "Official Alpine Linux Docker image. Win at minimalism!",
-   "body": "Upgrading alpine to 3.17.1",
+   "body": "Upgrading alpine to 20230208",
    "user": "github-actions[bot]"
 }
