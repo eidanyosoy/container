@@ -24,7 +24,7 @@ TOKEN=$4
 APPLINK="https://api.github.com/repos/dockserver/dockserver"
 BUILDVERSION=$(curl -sX GET "https://registry.hub.docker.com/v2/repositories/library/alpine/tags" \
    | jq -r 'select(.results != null) | .results[]["name"]' \
-   | sort -t "." -k1,1n -k2,2n -k3,3n | tail -n1)
+   | sort -t "." -k1,1n -k2,2n -k3,3n | grep "\." | tail -n1)
 BUILDVERSION="${BUILDVERSION#*v}"
 BUILDVERSION="${BUILDVERSION#*release-}"
 BUILDVERSION="${BUILDVERSION}"
