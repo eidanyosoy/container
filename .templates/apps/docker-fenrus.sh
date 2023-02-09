@@ -25,7 +25,7 @@ APPLINK="https://api.github.com/repos/revenz/Fenrus"
 
 NEWVERSION=$(curl -sX GET "https://registry.hub.docker.com/v2/repositories/library/alpine/tags" \
    | jq -r 'select(.results != null) | .results[]["name"]' \
-   | sort -t "." -k1,1n -k2,2n -k3,3n | tail -n1)
+   | sort -t "." -k1,1n -k2,2n -k3,3n | grep "\." | tail -n1)
 NEWVERSION="${NEWVERSION#*v}"
 NEWVERSION="${NEWVERSION#*release-}"
 NEWVERSION="${NEWVERSION}"
