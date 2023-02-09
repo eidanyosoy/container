@@ -2,9 +2,9 @@
    "appname": "docker-auto-replyarr",
    "apppic": "",
    "appfolder": "./apps/docker-auto-replyarr",
-   "newversion": "20230208",
+   "newversion": "3.17.1",
    "baseimage": "alpine",
    "description": "Official Alpine Linux Docker image. Win at minimalism!",
-   "body": "Upgrading docker-auto-replyarr to 20230208",
+   "body": "Upgrading docker-auto-replyarr to 3.17.1",
    "user": "github-actions[bot]"
 }
