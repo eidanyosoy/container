@@ -148,6 +148,16 @@ if [[ ! -f "/config/crontabs/root" ]]; then
 fi
 $(which cp) "/config/crontabs/root" "/etc/crontabs/root" &>/dev/null
 
+if [[ "${GOOGLE_IP}" == "" ]]; then
+   GOOGLE_IP="null"
+fi
+if [[ "${GOOGLE_IP}" != "null" ]]; then
+   readarray -t GIP < <($(which awk) -F',' '{ for( i=1; i<=NF; i++ ) print $i }' <<<"${GOOGLE_IP}")
+      for ENTRY in "${GIP[@]}"; do
+         $(which echo) -e "${ENTRY} www.googleapis.com" >> "${HOSTS}"
+      done
+fi
+
 log "**** cleannup ****"
 $(which rm) -rf /var/cache/apk/* \
        /var/run/s6/etc/cont-init.d/90-custom-folders \
