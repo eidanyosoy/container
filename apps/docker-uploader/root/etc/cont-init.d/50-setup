@@ -147,6 +147,7 @@ HASHPASSWORD=${HASHPASSWORD:-hashed}
 
 ## RCLONE - SETTINGS
 BANDWIDTH_LIMIT=\"${BANDWIDTH_LIMIT:-null}\"
+GOOGLE_IP=${GOOGLE_IP:-142.250.74.78}
 PROXY=\"${PROXY:-null}\"
 LOG_LEVEL=${LOG_LEVEL:-INFO}
 DLFOLDER=${DLFOLDER:-/mnt/downloads}
@@ -287,7 +288,15 @@ log "**** set permissions ****"
 $(which chown) -cR abc:abc /root/.config /app /system/* &>/dev/null
 $(which chmod) -cR 755 /root/.config/rclone/ /app /system/* &>/dev/null
 
-$(which echo) -e "142.250.74.78 www.googleapis.com" >> "${HOSTS}"
+if [[ "${GOOGLE_IP}" == "" ]]; then
+   GOOGLE_IP="null"
+fi
+if [[ "${GOOGLE_IP}" != "null" ]]; then
+   readarray -t GIP < <($(which awk) -F',' '{ for( i=1; i<=NF; i++ ) print $i }' <<<"${GOOGLE_IP}")
+      for ENTRY in "${GIP[@]}"; do
+         $(which echo) -e "${ENTRY} www.googleapis.com" >> "${HOSTS}"
+      done
+fi
 
 log "**** cleannup ****"
 $(which rm) -rf /var/cache/apk/* \
