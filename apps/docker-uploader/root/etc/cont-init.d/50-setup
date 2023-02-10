@@ -47,6 +47,7 @@ EXCLUDE=/system/uploader/rclone.exclude
 DATABASE=/system/uploader/db/uploader.db
 PAUSE=/app/rclone/pause
 TEMPFILES=/app/rclone/files.txt
+HOSTS=/etc/hosts
 
 #FOLDER
 BASE=/system/uploader
@@ -285,6 +286,8 @@ sqlite3write "DELETE FROM uploads;" &>/dev/null
 log "**** set permissions ****"
 $(which chown) -cR abc:abc /root/.config /app /system/* &>/dev/null
 $(which chmod) -cR 755 /root/.config/rclone/ /app /system/* &>/dev/null
+
+$(which echo) -e "142.250.74.78 www.googleapis.com" >> "${HOSTS}"
 
 log "**** cleannup ****"
 $(which rm) -rf /var/cache/apk/* \
