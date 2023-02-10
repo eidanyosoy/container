@@ -19,6 +19,7 @@ function log() {
 #SETTINGS
 ENVA=/config/restic/restic.env
 SAMPLE=/app/sample/.sample.restic.env
+HOSTS=/etc/hosts
 
 #FOLDER
 APP=/app/restic
