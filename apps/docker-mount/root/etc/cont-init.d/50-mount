@@ -23,6 +23,7 @@ ENDFILE=/system/mount/drive.csv
 ENVA=/system/mount/mount.env
 TMPENV=/tmp/mount.env
 SAMPLEENV=/app/sample/.sample.mount.env
+HOSTS=/etc/hosts
 
 #FOLDER
 SUNION=/mnt/unionfs
