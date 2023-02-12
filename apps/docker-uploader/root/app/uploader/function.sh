@@ -191,8 +191,7 @@ function loopcsv() {
    $(which mkdir) -p "${CUSTOM}"
    if [[ -f "${CSV}" ]]; then
       #### ECHO CORRECT FOLDER FROM LOG FILE ####
-      FILE="${UPP[3]}"
-      DRIVE=$($(which echo) "${UPP[1]}" | $(which sed) 's/-//g')
+      DRIVE=$($(which echo) "${DRIVE}" | $(which sed) 's/-//g')
       #### USE FILE NAME AS RCLONE CONF ####
       CUSTOMCONFIG="${CUSTOM}/${FILE}.conf"
       KEY=$(sqlite3read "SELECT key FROM upload_keys WHERE active = 1;" 2>/dev/null)
@@ -250,13 +249,9 @@ function reset-used() {
 
 function rcloneupload() {
    source /system/uploader/uploader.env
-   FILE="${UPP[3]}"
    FILETYPE="${FILE##*.}"
-   DIR="${UPP[2]}"
-   SETDIR=$($(which echo) "${UPP[2]}" | $(which cut) -d/ -f-"${FOLDER_DEPTH}")
-   DRIVE="${UPP[1]}"
-   SIZEBYTES="${UPP[4]}"
-   SIZE=$($(which echo) "${UPP[4]}" | $(which numfmt) --to=iec-i --suffix=B)
+   SETDIR=$($(which echo) "${DIR}" | $(which cut) -d/ -f-"${FOLDER_DEPTH}")
+   SIZE=$($(which echo) "${SIZEBYTES}" | $(which numfmt) --to=iec-i --suffix=B)
 
    #### SET PROXY IF AVAILABLE ####
    if [[ "${PROXY}" == "" ]]; then
@@ -418,7 +413,7 @@ function transfercheck() {
       fi
       if [[ "${ACTIVETRANSFERS}" -lt "${TRANSFERS}" ]]; then
          #### CREATE DATABASE ENTRY ####
-         sqlite3write "DELETE FROM upload_queue WHERE filebase = \"${UPP[3]}\"; INSERT INTO uploads (filebase) VALUES (\"${UPP[3]}\");" &>/dev/null
+         sqlite3write "DELETE FROM upload_queue WHERE filebase = \"${FILE}\"; INSERT INTO uploads (filebase) VALUES (\"${FILE}\");" &>/dev/null
          $(which sleep) 2 && break
       else
          $(which sleep) 10
@@ -473,9 +468,12 @@ function startuploader() {
          else
             SEARCHSTRING="ORDER BY time"
          fi
-         sqlite3read "SELECT * FROM upload_queue ${SEARCHSTRING} LIMIT 1;" 2>/dev/null | while IFS='|' read -ra UPP; do
+         FILE=$(sqlite3read "SELECT filebase FROM upload_queue ${SEARCHSTRING} LIMIT 1;" 2>/dev/null)
+         DIR=$(sqlite3read "SELECT filedir FROM upload_queue WHERE filebase = \"${FILE}\";" 2>/dev/null)
+         DRIVE=$(sqlite3read "SELECT drive FROM upload_queue WHERE filebase = \"${FILE}\";" 2>/dev/null)
+         SIZEBYTES=$(sqlite3read "SELECT filesize FROM upload_queue WHERE filebase = \"${FILE}\";" 2>/dev/null)
             #### TO CHECK IS IT A FILE OR NOT ####
-            if [[ -f "${DLFOLDER}/${UPP[2]}/${UPP[3]}" ]]; then
+            if [[ -f "${DLFOLDER}/${DIR}/${FILE}" ]]; then
                #### REPULL SOURCE FILE FOR LIVE EDITS ####
                source /system/uploader/uploader.env
                #### RUN TRANSFERS CHECK ####
@@ -494,7 +492,7 @@ function startuploader() {
                fi
             else
                #### WHEN NOT THEN DELETE ENTRY ####
-               sqlite3write "DELETE FROM upload_queue WHERE filebase = \"${UPP[3]}\";" &>/dev/null
+               sqlite3write "DELETE FROM upload_queue WHERE filebase = \"${FILE}\";" &>/dev/null
                $(which sleep) 2
             fi
          done
