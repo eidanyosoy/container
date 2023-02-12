@@ -495,7 +495,6 @@ function startuploader() {
                sqlite3write "DELETE FROM upload_queue WHERE filebase = \"${FILE}\";" &>/dev/null
                $(which sleep) 2
             fi
-         done
          #### CLEANUP COMPLETED HISTORY ####
          cleanuplog
       else
