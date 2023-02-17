@@ -38,10 +38,10 @@ UPCOMMAND="apk --quiet --no-cache --no-progress update && \\
   apk --quiet --no-cache --no-progress upgrade"
 
 INSTCOMMAND="apk add -U --update --no-cache"
-PACKAGES="tar curl git jq py3-openssl py3-setuptools python3"
+PACKAGES="tar curl git jq python3"
 VIRTUEL="--virtual=build-dependencies g++ gcc make py3-pip python3-dev"
 
-PIPPACKAGES="python3 -m pip install --upgrade pip && pip3 install --no-cache-dir -U mock plexapi pycryptodomex"
+PIPPACKAGES="python3 -m ensurepip && pip3 install --no-cache-dir -U pip wheel cryptography pycryptodomex pyopenssl mock plexapi pycryptodomex"
 
 CLEANUP="apk del --purge build-dependencies && \\
      apk del --quiet --clean-protected --no-progress && \\
