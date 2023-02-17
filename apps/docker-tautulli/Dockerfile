@@ -32,11 +32,11 @@ RUN \
      apk --quiet --no-cache --no-progress update && \
   apk --quiet --no-cache --no-progress upgrade && \
    echo "**** install virtual packages ****" && \
-     apk add -U --update --no-cache --virtual=build-dependencies g++ gcc make py3-pip python3-dev && \
+     apk add -U --update --no-cache --virtual=build-dependencies build-base cargo && \
    echo "**** install build packages ****" && \
      apk add -U --update --no-cache tar curl git jq python3 && \
    echo "**** install pip packages ****" && \
-     python3 -m ensurepip && pip3 install --no-cache-dir -U pip wheel cryptography pycryptodomex pyopenssl mock plexapi pycryptodomex && \
+     python3 -m ensurepip && pip3 install --no-cache-dir -U pip wheel && pip3 install --no-cache-dir -U cryptography pycryptodomex pyopenssl && \
    echo "**** install app ****" && \
      mkdir -p /app/tautulli && \
      curl -fsSL "https://github.com/Tautulli/Tautulli/archive/v${VERSION}.tar.gz" | tar xzf - -C /app/tautulli --strip-components=1 && \
