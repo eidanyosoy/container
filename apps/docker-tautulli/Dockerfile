@@ -34,9 +34,9 @@ RUN \
    echo "**** install virtual packages ****" && \
      apk add -U --update --no-cache --virtual=build-dependencies g++ gcc make py3-pip python3-dev && \
    echo "**** install build packages ****" && \
-     apk add -U --update --no-cache tar curl git jq py3-openssl py3-setuptools python3 && \
+     apk add -U --update --no-cache tar curl git jq python3 && \
    echo "**** install pip packages ****" && \
-     python3 -m pip install --upgrade pip && pip3 install --no-cache-dir -U mock plexapi pycryptodomex && \
+     python3 -m ensurepip && pip3 install --no-cache-dir -U pip wheel cryptography pycryptodomex pyopenssl mock plexapi pycryptodomex && \
    echo "**** install app ****" && \
      mkdir -p /app/tautulli && \
      curl -fsSL "https://github.com/Tautulli/Tautulli/archive/v${VERSION}.tar.gz" | tar xzf - -C /app/tautulli --strip-components=1 && \
