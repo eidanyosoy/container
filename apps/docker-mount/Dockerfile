@@ -34,10 +34,6 @@ RUN \
     apk add -U --update --no-cache --quiet bash wget unzip git fuse libattr libstdc++ autoconf \
       automake libtool gettext-dev attr-dev linux-headers make \
       build-base libattr libstdc++ tar curl && \
-  echo "**** install mergerfs ****" && \
-    mkdir -p /tmp/mergerfs && \
-    curl -fsSL "https://github.com/trapexit/mergerfs/releases/download/${MERGERFS_VERSION}/mergerfs-${MERGERFS_VERSION}.tar.gz" | tar xzf - -C /tmp/mergerfs --strip-components=1 && \
-    cd /tmp/mergerfs && make STATIC=1 LTO=1 && make install && \
   echo "**** install rclone ****" && \
     wget -qO- https://rclone.org/install.sh | bash && \
   echo "*** cleanup build dependencies ****" && \
@@ -65,6 +61,8 @@ RUN \
   apk --quiet --no-cache --no-progress upgrade && \
   echo "**** install build packages ****" && \
     apk add -U --update --no-cache --quiet bash jq musl findutils linux-headers apk-tools busybox coreutils procps shadow && \
+  echo "**** install mergerfs ****" && \
+    apk add -U --update --no-cache --quiet mergerfs --repository=https://dl-cdn.alpinelinux.org/alpine/edge/testing && \
   echo "**** set alpine version ****" && \
     echo -e "3.17.2" > /etc/alpine-release && \
   echo "*** cleanup system ****" && \
@@ -73,9 +71,6 @@ RUN \
 
 COPY --chown=abc --chmod=755 ./apps/docker-mount/root/ /
 
-COPY --from=builder --chown=abc --chmod=755 /usr/local/bin/mergerfs /usr/local/bin/mergerfs
-COPY --from=builder --chown=abc --chmod=755 /usr/local/bin/mergerfs-fusermount /usr/local/bin/mergerfs-fusermount
-COPY --from=builder --chown=abc --chmod=755 /sbin/mount.mergerfs /sbin/mount.mergerfs
 COPY --from=builder --chown=abc --chmod=755 /usr/bin/rclone /usr/local/bin/rclone
 
 VOLUME /system
