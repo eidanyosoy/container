@@ -53,8 +53,7 @@ BUILDPACK="bash wget unzip git fuse libattr libstdc++ autoconf \\
 
 ## MERGERFS
 MGVERSION="$(curl -u $USERNAME:$TOKEN -sX GET "https://api.github.com/repos/trapexit/mergerfs/releases/latest" | jq --raw-output '.tag_name')"
-MKFOLDER="mkdir -p /tmp/mergerfs"
-MAKEMG="cd /tmp/mergerfs && make STATIC=1 LTO=1 && make install"
+MKINSTALL="mergerfs --repository=https://dl-cdn.alpinelinux.org/alpine/edge/testing"
 
 ## RCLONE
 RCINSTALL="wget -qO- https://rclone.org/install.sh | bash"
@@ -67,10 +66,7 @@ S6_STAGE_VERSION="$(curl -u $USERNAME:$TOKEN -sX GET "https://api.github.com/rep
 FINALPACKAGES="bash jq musl findutils linux-headers apk-tools busybox coreutils procps shadow"
 
 ## ENDSTAGE
-BUILDSTAGE="COPY --from=builder --chown=abc --chmod=755 /usr/local/bin/mergerfs /usr/local/bin/mergerfs
-COPY --from=builder --chown=abc --chmod=755 /usr/local/bin/mergerfs-fusermount /usr/local/bin/mergerfs-fusermount
-COPY --from=builder --chown=abc --chmod=755 /sbin/mount.mergerfs /sbin/mount.mergerfs
-COPY --from=builder --chown=abc --chmod=755 /usr/bin/rclone /usr/local/bin/rclone"
+BUILDSTAGE="COPY --from=builder --chown=abc --chmod=755 /usr/bin/rclone /usr/local/bin/rclone"
 
 CLEANUP="apk del --quiet --clean-protected --no-progress && \\
     rm -rf /var/cache/apk/* /tmp/*"
@@ -122,10 +118,6 @@ RUN \
     '"${UPCOMMAND}"' && \
   echo "'"**** install build packages ****"'" && \
     '"${INSTCOMMAND}"' '"${BUILDPACK}"' && \
-  echo "'"**** install mergerfs ****"'" && \
-    '"${MKFOLDER}"' && \
-    curl -fsSL "'"https://github.com/trapexit/mergerfs/releases/download/"'${MERGERFS_VERSION}'"/mergerfs-"'${MERGERFS_VERSION}'".tar.gz"'" | tar xzf - -C /tmp/mergerfs --strip-components=1 && \
-    '"${MAKEMG}"' && \
   echo "'"**** install rclone ****"'" && \
     '"${RCINSTALL}"' && \
   echo "'"*** cleanup build dependencies ****"'" && \
@@ -149,6 +141,8 @@ RUN \
     '"${UPCOMMAND}"' && \
   echo "'"**** install build packages ****"'" && \
     '"${INSTCOMMAND}"' '"${FINALPACKAGES}"' && \
+  echo "'"**** install mergerfs ****"'" && \
+    '"${INSTCOMMAND}"' '"${MKINSTALL}"' && \
   echo "'"**** set alpine version ****"'" && \
     echo -e "'"${BUILDVERSION}"'" > /etc/alpine-release && \
   echo "'"*** cleanup system ****"'" && \
