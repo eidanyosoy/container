@@ -2,9 +2,9 @@
    "appname": "docker-create",
    "apppic": "./images/docker-create.png",
    "appfolder": "./base/docker-create",
-   "newversion": "",
+   "newversion": "3.17.2",
    "baseimage": "alpine",
    "description": " !!! DEVERLOP STATUS !!! DO NOT TRY TO PULL THE IMAGE YOU NEED ACCESS TO THE REPOSITORY",
-   "body": "Upgrading docker-create to ",
+   "body": "Upgrading docker-create to 3.17.2",
    "user": "github-actions[bot]"
 }
