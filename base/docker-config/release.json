@@ -2,9 +2,9 @@
    "appname": "docker-config",
    "apppic": "./images/docker-config.png",
    "appfolder": "./base/docker-config",
-   "newversion": "3.17.2",
+   "newversion": "",
    "baseimage": "alpine",
    "description": " !!! DEVERLOP STATUS !!! DO NOT TRY TO PULL THE IMAGE YOU NEED ACCESS TO THE REPOSITORY",
-   "body": "Upgrading docker-config to 3.17.2",
+   "body": "Upgrading docker-config to ",
    "user": "github-actions[bot]"
 }
