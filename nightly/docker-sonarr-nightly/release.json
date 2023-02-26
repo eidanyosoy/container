@@ -2,9 +2,9 @@
    "appname": "docker-sonarr-nightly",
    "apppic": "./images/docker-sonarr-nightly.png",
    "appfolder": "./nightly/docker-sonarr-nightly",
-   "newversion": "",
+   "newversion": "develop-4.0.0.391-ls414",
    "appbranch": "develop",
    "description": "Smart PVR for newsgroup and bittorrent users.",
-   "body": "Upgrading docker-sonarr-nightly to ",
+   "body": "Upgrading docker-sonarr-nightly to develop-4.0.0.391-ls414",
    "user": "dockserver image update[bot]"
 }
