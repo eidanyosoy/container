@@ -8,7 +8,7 @@
   "startup": {
     "uploadergdsa": "-> Starting Uploader - GDSA <-",
     "uploaderdb": "-> Starting Uploader - DB <-",
-    "nginx": "-> Starting Nginx <-",
+    "caddy": "-> Starting Caddy <-",
     "php": "-> Starting PHP-FPM <-"
   },
   "limit": {
