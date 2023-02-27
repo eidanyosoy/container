@@ -408,7 +408,7 @@ function nzbcleanup() {
 
 function testsuccessfull() {
    source /system/mount/mount.env
-   rlog && $(which sleep) 10
+   $(which sleep) 10
    if [[ "$($(which ls) -1p ${SREMOTES})" ]] && [[ "$($(which ls) -1p ${SUNION})" ]]; then
       MSG="${startupmountend}" && notification
    else
@@ -418,7 +418,7 @@ function testsuccessfull() {
 
 function testrun() {
    #### FORCE START SLEEPING TO FETCH OPTIONS ####
-   rlog && $(which sleep) 5
+   $(which sleep) 5
    #### FINAL LOOP ####
    while true; do
       source /system/mount/mount.env
