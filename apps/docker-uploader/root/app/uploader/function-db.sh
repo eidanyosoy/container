@@ -158,7 +158,7 @@ ${TIMESPENT}" && notification
 function lang() {
    source /system/uploader/uploader.env
    startupuploader=$($(which jq) ".startup.uploaderdb" "${LFOLDER}/${LANGUAGE}.json" | $(which sed) 's/"\|,//g')
-   startupnginx=$($(which jq) ".startup.nginx" "${LFOLDER}/${LANGUAGE}.json" | $(which sed) 's/"\|,//g')
+   startupcaddy=$($(which jq) ".startup.caddy" "${LFOLDER}/${LANGUAGE}.json" | $(which sed) 's/"\|,//g')
    startupphp=$($(which jq) ".startup.php" "${LFOLDER}/${LANGUAGE}.json" | $(which sed) 's/"\|,//g')
    limitused=$($(which jq) ".limit.used" "${LFOLDER}/${LANGUAGE}.json" | $(which sed) 's/"\|,//g')
    uploaderstart=$($(which jq) ".uploader.start" "${LFOLDER}/${LANGUAGE}.json" | $(which sed) 's/"\|,//g')
