@@ -98,7 +98,7 @@ function rotate() {
       done
       $(which sleep) 5
       $(which rclone) rc core/stats-reset &>/dev/null
-      $(which truncate) -s 0 ${LOGS}/*.log &>/dev/null
+      $(which logrotate) /etc/logrotate.conf &>/dev/null
       if [[ "$($(which ls) -1p ${SREMOTES})" ]] && [[ "$($(which ls) -1p ${SUNION})" ]]; then
          KEYNOTI=$($(which sed) -n 1p "${JSONUSED}" | $(which awk) -F '.' '{print $1}')
          MSG="-> Rotate to next Service 🔑 "${KEYNOTI}" done <-" && notification
@@ -387,7 +387,7 @@ function drivecheck() {
       if [[ "$($(which ls) -1p ${SUNION})" ]] && [[ "$($(which ls) -1p ${SREMOTES})" ]]; then
          if [[ "${VFS_REFRESH_ENABLE}" == "true" ]]; then
             rcclean && refreshVFS
-            $(which truncate) -s 0 "${RLOG}" &>/dev/null
+            $(which logrotate) /etc/logrotate.conf &>/dev/null
          else
             rcclean
          fi
