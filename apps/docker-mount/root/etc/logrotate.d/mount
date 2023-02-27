@@ -1,0 +1,11 @@
+/system/mount/logs/*.log {
+  size 1
+  rotate 3
+  maxage 7
+  copytruncate
+  missingok
+  notifempty
+  nodateext
+  nocompress
+  su abc abc
+}

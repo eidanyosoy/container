@@ -64,14 +64,11 @@ function notification() {
 }
 
 function checkban() {
-   MLOGARRAY=$($(which cat) "${MLOG}" | $(which wc) -l)
-   if [[ "${MLOGARRAY}" -gt "0" ]]; then
-      $(which tail) -n 25 "${MLOG}" | $(which grep) -e "downloadQuotaExceeded"
-      if [[ "$?" = "0" ]]; then
-         MSG="${startuphitlimit}" && notification
-         if [[ "${ARRAY}" -gt "0" ]]; then
-            rotate
-         fi
+   CHECKBAN=$($(which tail) -n 25 "${MLOG}" | $(which grep) -qE "downloadQuotaExceeded" && echo true || echo false)
+   if [[ "${CHECKBAN}" = "true" ]]; then
+      MSG="${startuphitlimit}" && notification
+      if [[ "${ARRAY}" -gt "0" ]]; then
+         rotate
       fi
    fi
 }
@@ -101,7 +98,7 @@ function rotate() {
       done
       $(which sleep) 5
       $(which rclone) rc core/stats-reset &>/dev/null
-      $(which truncate) -s 0 ${LOGS}/*.log &>/dev/null
+      $(which logrotate) /etc/logrotate.conf &>/dev/null
       if [[ "$($(which ls) -1p ${SREMOTES})" ]] && [[ "$($(which ls) -1p ${SUNION})" ]]; then
          KEYNOTI=$($(which sed) -n 1p "${JSONUSED}" | $(which awk) -F '.' '{print $1}')
          MSG="-> Rotate to next Service 🔑 "${KEYNOTI}" done <-" && notification
@@ -155,18 +152,10 @@ function lang() {
    failedunmountremotes=$($(which jq) ".failed.unmountremotes" "${LFOLDER}/${LANGUAGE}.json" | $(which sed) 's/"\|,//g')
 }
 
-function rlog() {
-   SIZE=$($(which du) "${LOGS}" | $(which cut) -f 1)
-   ## 50MB max size of file
-   if [[ "${SIZE}" -gt "50000" ]]; then
-      $(which truncate) -s 0 ${LOGS}/*.log &>/dev/null
-   fi
-}
-
 function folderunmount() {
    source /system/mount/mount.env
-   $(which mountpoint) -q "${SUNION}" || $(which fusermount) -uzq "${SUNION}" && log "${killunmountremote}" || log "${failedunmountremote}"
-   $(which mountpoint) -q "${SREMOTES}" || $(which fusermount) -uzq "${SREMOTES}" && log "${killunmountremotes}" || log "${failedunmountremotes}"
+   $(which mountpoint) -q "${SUNION}" || $(which fusermount3) -uzq "${SUNION}" && log "${killunmountremote}" || log "${failedunmountremote}"
+   $(which mountpoint) -q "${SREMOTES}" || $(which fusermount3) -uzq "${SREMOTES}" && log "${killunmountremotes}" || log "${failedunmountremotes}"
 }
 
 function rcmount() {
@@ -261,8 +250,8 @@ if [[ -f "/tmp/rclone.running" ]]; then
    $(which rm) -f "/tmp/rclone.running"
 fi
 
-$(which fusermount) -uzq "${SUNION}"
-$(which fusermount) -uzq "${SREMOTES}"
+$(which fusermount3) -uzq "${SUNION}"
+$(which fusermount3) -uzq "${SREMOTES}"
 
 ### START WEBUI
 $(which rclone) rcd \\
@@ -390,7 +379,7 @@ function drivecheck() {
       if [[ "$($(which ls) -1p ${SUNION})" ]] && [[ "$($(which ls) -1p ${SREMOTES})" ]]; then
          if [[ "${VFS_REFRESH_ENABLE}" == "true" ]]; then
             rcclean && refreshVFS
-            $(which truncate) -s 0 "${RLOG}" &>/dev/null
+            $(which logrotate) /etc/logrotate.conf &>/dev/null
          else
             rcclean
          fi
@@ -419,7 +408,7 @@ function nzbcleanup() {
 
 function testsuccessfull() {
    source /system/mount/mount.env
-   rlog && $(which sleep) 10
+   $(which sleep) 10
    if [[ "$($(which ls) -1p ${SREMOTES})" ]] && [[ "$($(which ls) -1p ${SUNION})" ]]; then
       MSG="${startupmountend}" && notification
    else
@@ -429,16 +418,16 @@ function testsuccessfull() {
 
 function testrun() {
    #### FORCE START SLEEPING TO FETCH OPTIONS ####
-   rlog && $(which sleep) 5
+   $(which sleep) 5
    #### FINAL LOOP ####
    while true; do
       source /system/mount/mount.env
       if [[ "$($(which ls) -1p ${SREMOTES})" ]] && [[ "$($(which ls) -1p ${SUNION})" ]]; then
-         log "${startupmountworks}" && $(which sleep) 360
+         log "${startupmountworks}"
       else
          rckill && rcmergerfskill && folderunmount && rcmount && rcmergerfs && rcclean
       fi
-      rlog && envrenew && lang && checkban && $(which sleep) 360
+      envrenew && lang && checkban && $(which sleep) 360
    done
 }
 
