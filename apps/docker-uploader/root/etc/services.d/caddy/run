@@ -18,20 +18,8 @@ function log() {
    $(which echo) -e "${GRAY}[$($(which date) +'%Y/%m/%d %H:%M:%S')]${BLUE} [Uploader]${NC} ${1}"
 }
 
-if pgrep -f "[n]ginx:" > /dev/null; then
-    echo "Zombie nginx processes detected, sending SIGTERM"
-    pkill -ef [n]ginx:
-    $(which sleep) 1
-fi
-
-if pgrep -f "[n]ginx:" > /dev/null; then
-    echo "Zombie nginx processes still active, sending SIGKILL"
-    pkill -9 -ef [n]ginx:
-    $(which sleep) 1
-fi
-
 source /app/uploader/function.sh && lang
 
-log "${startupnginx}"
+log "${startupcaddy}"
 
-exec /usr/sbin/nginx -c /etc/nginx/nginx.conf
+exec s6-setuidgid abc /usr/sbin/caddy run --config /conf/Caddyfile &>/dev/null
