@@ -162,8 +162,8 @@ function rlog() {
 
 function folderunmount() {
    source /system/mount/mount.env
-   $(which mountpoint) -q "${SUNION}" || $(which fusermount) -uzq "${SUNION}" && log "${killunmountremote}" || log "${failedunmountremote}"
-   $(which mountpoint) -q "${SREMOTES}" || $(which fusermount) -uzq "${SREMOTES}" && log "${killunmountremotes}" || log "${failedunmountremotes}"
+   $(which mountpoint) -q "${SUNION}" || $(which fusermount3) -uzq "${SUNION}" && log "${killunmountremote}" || log "${failedunmountremote}"
+   $(which mountpoint) -q "${SREMOTES}" || $(which fusermount3) -uzq "${SREMOTES}" && log "${killunmountremotes}" || log "${failedunmountremotes}"
 }
 
 function rcmount() {
@@ -258,8 +258,8 @@ if [[ -f "/tmp/rclone.running" ]]; then
    $(which rm) -f "/tmp/rclone.running"
 fi
 
-$(which fusermount) -uzq "${SUNION}"
-$(which fusermount) -uzq "${SREMOTES}"
+$(which fusermount3) -uzq "${SUNION}"
+$(which fusermount3) -uzq "${SREMOTES}"
 
 ### START WEBUI
 $(which rclone) rcd \\
