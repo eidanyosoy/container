@@ -64,14 +64,11 @@ function notification() {
 }
 
 function checkban() {
-   MLOGARRAY=$($(which cat) "${MLOG}" | $(which wc) -l)
-   if [[ "${MLOGARRAY}" -gt "0" ]]; then
-      $(which tail) -n 25 "${MLOG}" | $(which grep) -e "downloadQuotaExceeded"
-      if [[ "$?" = "0" ]]; then
-         MSG="${startuphitlimit}" && notification
-         if [[ "${ARRAY}" -gt "0" ]]; then
-            rotate
-         fi
+   CHECKBAN=$($(which tail) -n 25 "${MLOG}" | $(which grep) -qE "downloadQuotaExceeded" && echo true || echo false)
+   if [[ "${CHECKBAN}" = "true" ]]; then
+      MSG="${startuphitlimit}" && notification
+      if [[ "${ARRAY}" -gt "0" ]]; then
+         rotate
       fi
    fi
 }
@@ -434,7 +431,7 @@ function testrun() {
    while true; do
       source /system/mount/mount.env
       if [[ "$($(which ls) -1p ${SREMOTES})" ]] && [[ "$($(which ls) -1p ${SUNION})" ]]; then
-         log "${startupmountworks}" && $(which sleep) 360
+         log "${startupmountworks}"
       else
          rckill && rcmergerfskill && folderunmount && rcmount && rcmergerfs && rcclean
       fi
