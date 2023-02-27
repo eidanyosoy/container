@@ -181,12 +181,11 @@ if [[ ! -d "${TMPRCLONE}" ]]; then $(which mkdir) -p "${TMPRCLONE}" && $(which c
 if [[ ! -d "${SUNION}" ]]; then $(which mkdir) -p "${SUNION}" && $(which chown) -hR abc:abc "${SUNION}" && $(which chmod) -R 775 "${SUNION}" &>/dev/null; fi
 if [[ ! -d "${SREMOTES}" ]]; then $(which mkdir) -p "${SREMOTES}" && $(which chown) -hR abc:abc "${SREMOTES}" && $(which chmod) -R 775 "${SREMOTES}" &>/dev/null; fi
 if [[ ! -d "${SDOWN}" ]]; then $(which mkdir) -p "${SDOWN}" && $(which chown) -hR abc:abc "${SDOWN}" && $(which chmod) -R 775 "${SDOWN}" &>/dev/null; fi
-if [[ -d "${TMPRCLONE}" ]]; then $(which fusermount) -uzq "${TMPRCLONE}" &>/dev/null; fi
-if [[ -d "${SUNION}" ]]; then $(which fusermount) -uzq "${SUNION}" &>/dev/null; fi
-if [[ -d "${SREMOTES}" ]]; then $(which fusermount) -uzq "${SREMOTES}" &>/dev/null; fi
+if [[ -d "${TMPRCLONE}" ]]; then $(which fusermount3) -uzq "${TMPRCLONE}" &>/dev/null; fi
+if [[ -d "${SUNION}" ]]; then $(which fusermount3) -uzq "${SUNION}" &>/dev/null; fi
+if [[ -d "${SREMOTES}" ]]; then $(which fusermount3) -uzq "${SREMOTES}" &>/dev/null; fi
 if [[ -f "${ENDCONFIG}" ]]; then $(which rm) -f "${ENDCONFIG}" &>/dev/null; fi
 $(which sed) -i 's/UMASK=022/UMASK=18/' "${ENVA}" &>/dev/null
-$(which truncate) -s 0 ${LOGS}/*.log &>/dev/null
 
 # CHECK MOUNT KEYS ARE NOT UPLOADER KEYS
 if [[ "${ARRAY}" -ge "1" ]]; then
@@ -325,6 +324,8 @@ $(which chmod) -cR 777 \
    /root \
    $(which rclone) \
    $(which mergerfs) &>/dev/null
+
+$(which chmod) -cR 644 /etc/logrotate.d &>/dev/null
 
 $(which chown) -cR abc:abc \
    /system \
