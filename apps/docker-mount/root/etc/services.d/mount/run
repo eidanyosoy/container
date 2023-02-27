@@ -23,7 +23,7 @@ source /app/mount/function.sh && lang
 
 MSG="${startupmount}" && notification
 $(which sleep) 1
-rlog && log "${startuplogrotate}" || { log "${failedlog}"; exit 1; }
+$(which logrotate) /etc/logrotate.conf &>/dev/null
 rcmount && log "${startuprclone}" || { log "${failedrclone}"; exit 1; }
 $(which sleep) 10
 rcmergerfs && log "${startupmergerfs}" || { log "${failedmergerfs}"; exit 1; }
