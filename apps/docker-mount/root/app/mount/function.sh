@@ -152,14 +152,6 @@ function lang() {
    failedunmountremotes=$($(which jq) ".failed.unmountremotes" "${LFOLDER}/${LANGUAGE}.json" | $(which sed) 's/"\|,//g')
 }
 
-function rlog() {
-   SIZE=$($(which du) "${LOGS}" | $(which cut) -f 1)
-   ## 50MB max size of file
-   if [[ "${SIZE}" -gt "50000" ]]; then
-      $(which truncate) -s 0 ${LOGS}/*.log &>/dev/null
-   fi
-}
-
 function folderunmount() {
    source /system/mount/mount.env
    $(which mountpoint) -q "${SUNION}" || $(which fusermount3) -uzq "${SUNION}" && log "${killunmountremote}" || log "${failedunmountremote}"
@@ -435,7 +427,7 @@ function testrun() {
       else
          rckill && rcmergerfskill && folderunmount && rcmount && rcmergerfs && rcclean
       fi
-      rlog && envrenew && lang && checkban && $(which sleep) 360
+      envrenew && lang && checkban && $(which sleep) 360
    done
 }
 
