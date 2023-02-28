@@ -173,6 +173,9 @@ NOTIFICATION_URL=${NOTIFICATION_URL:-null}
 NOTIFICATION_LEVEL=${NOTIFICATION_LEVEL:-ALL}
 NOTIFICATION_SERVERNAME=${NOTIFICATION_SERVERNAME:-null}
 
+## STRIPARR - SETTINGS
+STRIPARR_URL=${STRIPARR_URL:-null}
+
 ## LANGUAGE MESSAGES
 LANGUAGE=${LANGUAGE:-en}
 
@@ -197,7 +200,7 @@ function sqlite3read() {
 # CREATE UPLOADER DATABASE
 if [[ ! -f "${DATABASE}" ]]; then
    sqlite3write "CREATE TABLE upload_keys(time DATETIME DEFAULT (datetime('now','localtime')), key TEXT, used NUMERIC, active INTEGER);" &>/dev/null
-   sqlite3write "CREATE TABLE upload_queue(time DATETIME DEFAULT (datetime('now','localtime')), drive TEXT, filedir TEXT, filebase TEXT PRIMARY KEY, filesize TEXT);" &>/dev/null
+   sqlite3write "CREATE TABLE upload_queue(time DATETIME DEFAULT (datetime('now','localtime')), drive TEXT, filedir TEXT, filebase TEXT PRIMARY KEY, filesize TEXT, metadata INTEGER);" &>/dev/null
    sqlite3write "CREATE TABLE uploads(drive TEXT, filedir TEXT, filebase TEXT PRIMARY KEY, filesize TEXT, logfile TEXT, gdsa TEXT);" &>/dev/null
    sqlite3write "CREATE TABLE completed_uploads(drive TEXT, filedir TEXT, filebase TEXT, filesize TEXT, gdsa TEXT, starttime NUMERIC, endtime NUMERIC, status NUMERIC, error TEXT);" &>/dev/null
    sqlite3write "CREATE INDEX idx_completed_endtime ON completed_uploads (endtime);" &>/dev/null
@@ -206,6 +209,12 @@ fi
 
 # UPDATE UPLOADER DATEBASE
 sqlite3write "CREATE TABLE IF NOT EXISTS upload_keys(time DATETIME DEFAULT (datetime('now','localtime')), key TEXT, used NUMERIC, active INTEGER);" &>/dev/null
+
+DATABASEMETA=$(sqlite3read "PRAGMA table_info('upload_queue')" 2>/dev/null | $(which grep) -qE "metadata"  && echo true || echo false)
+if [[ "${DATABASEMETA}" == "false" ]]; then
+   sqlite3write "DROP TABLE upload_queue" &>/dev/null
+   sqlite3write "CREATE TABLE upload_queue(time DATETIME DEFAULT (datetime('now','localtime')), drive TEXT, filedir TEXT, filebase TEXT PRIMARY KEY, filesize TEXT, metadata INTEGER);" &>/dev/null
+fi
 
 # UPLOADER KEYS
 CHECKKEYS=$(sqlite3read "SELECT COUNT(*) FROM upload_keys;" 2>/dev/null)
