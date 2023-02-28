@@ -56,8 +56,7 @@ function refreshVFS() {
       for ENTRY in "${VFSMOUNT[@]}"; do
          STATUSCODE=$($(which curl) --silent --output /dev/null --write-out "%{http_code}" "${ENTRY}")
          if [[ "${STATUSCODE}" == "200" ]]; then
-            $(which curl) -fs -X POST "${ENTRY}/vfs/forget?dir=${DIR}&_async=true" &>/dev/null
-            $(which curl) -fs -X POST "${ENTRY}/vfs/refresh?dir=${DIR}&recursive=true&_async=true" &>/dev/null
+            $(which curl) -fs -X POST "${ENTRY}/vfs/forget?dir="'"${DIR}"'"&_async=true" &>/dev/null
          fi
       done
    fi
