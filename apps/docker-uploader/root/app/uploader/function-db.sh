@@ -56,7 +56,7 @@ function refreshVFS() {
       for ENTRY in "${VFSMOUNT[@]}"; do
          STATUSCODE=$($(which curl) -s -o /dev/null -w "%{http_code}" "${ENTRY}")
          if [[ "${STATUSCODE}" == "200" ]]; then
-            $(which curl) -sfG -X POST -d "dir=${DIR}" -d "_async=true" "${ENTRY}/vfs/forget" &>/dev/null
+            $(which curl) -sfG -X POST --data-urlencode "dir=${DIR}" --data-urlencode "_async=true" "${ENTRY}/vfs/forget" &>/dev/null
          fi
       done
    fi
@@ -72,9 +72,9 @@ function autoscan() {
          STATUSCODE=$($(which curl) -s -o /dev/null -w "%{http_code}" -u "${AUTOSCAN_USER}:${AUTOSCAN_PASS}" "${AUTOSCAN_URL}/triggers/manual")
             if [[ "${STATUSCODE}" == "200" ]]; then
                if [[ "${AUTOSCAN_USER}" == "null" ]]; then
-                  $(which curl) -sfG -X POST -d "dir=${SUNION}/${DIR}" "${AUTOSCAN_URL}/triggers/manual"
+                  $(which curl) -sfG -X POST --data-urlencode "dir=${SUNION}/${DIR}" "${AUTOSCAN_URL}/triggers/manual"
                else
-                  $(which curl) -sfG -X POST -u "${AUTOSCAN_USER}:${AUTOSCAN_PASS}" -d "dir=${SUNION}/${DIR}" "${AUTOSCAN_URL}/triggers/manual"
+                  $(which curl) -sfG -X POST -u "${AUTOSCAN_USER}:${AUTOSCAN_PASS}" --data-urlencode "dir=${SUNION}/${DIR}" "${AUTOSCAN_URL}/triggers/manual"
                fi
             fi
       fi
