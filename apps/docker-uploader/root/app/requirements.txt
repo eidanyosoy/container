@@ -1,6 +1,7 @@
 caddy
 curl
 cronie
+exiftool
 jq
 php8
 php8-fpm
