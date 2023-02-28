@@ -375,10 +375,44 @@ function listfiles() {
       LISTDIR=$($(which dirname) "${NAME}")
       LISTDRIVE=$($(which echo) "${LISTDIR}" | $(which cut) -d/ -f-"${FOLDER_DEPTH}" | $(which xargs) -I {} $(which basename) {})
       LISTSIZE=$($(which stat) -c %s "${DLFOLDER}/${NAME}" 2>/dev/null)
-      sqlite3write "INSERT OR IGNORE INTO upload_queue (drive,filedir,filebase,filesize) SELECT \"${LISTDRIVE}\",\"${LISTDIR}\",\"${LISTFILE}\",\"${LISTSIZE}\" WHERE NOT EXISTS (SELECT 1 FROM uploads WHERE filebase = \"${LISTFILE}\");" &>/dev/null
+      CHECKMETA=$($(which exiftool) -m -q -q -Title "${DLFOLDER}/${NAME}" 2>/dev/null | $(which grep) -qE "Title" && echo 1 || echo 0)
+      if [[ "${STRIPARR_URL}" == "" ]]; then
+         STRIPARR_URL="null"
+      fi
+      if [[ "${STRIPARR_URL}" == "null" ]]; then
+         sqlite3write "INSERT OR IGNORE INTO upload_queue (drive,filedir,filebase,filesize,metadata) SELECT \"${LISTDRIVE}\",\"${LISTDIR}\",\"${LISTFILE}\",\"${LISTSIZE}\","0" WHERE NOT EXISTS (SELECT 1 FROM uploads WHERE filebase = \"${LISTFILE}\");" &>/dev/null
+      else
+         if [[ "${CHECKMETA}" == "1" ]]; then
+            sqlite3write "INSERT OR IGNORE INTO upload_queue (drive,filedir,filebase,filesize,metadata) SELECT \"${LISTDRIVE}\",\"${LISTDIR}\",\"${LISTFILE}\",\"${LISTSIZE}\",\"${CHECKMETA}\" WHERE NOT EXISTS (SELECT 1 FROM uploads WHERE filebase = \"${LISTFILE}\");" &>/dev/null
+            $(which curl) -sf -X POST -H "Content-Type: application/json" -d '{"eventType": "Download", "series": {"path": "'"${DLFOLDER}/${LISTDIR}"'"}, "episodeFile": {"relativePath": "'"${LISTFILE}"'"}}' "${STRIPARR_URL}"
+         else
+            sqlite3write "INSERT OR IGNORE INTO upload_queue (drive,filedir,filebase,filesize,metadata) SELECT \"${LISTDRIVE}\",\"${LISTDIR}\",\"${LISTFILE}\",\"${LISTSIZE}\",\"${CHECKMETA}\" WHERE NOT EXISTS (SELECT 1 FROM uploads WHERE filebase = \"${LISTFILE}\");" &>/dev/null
+         fi
+      fi
    done
    sqlite3write "COMMIT;" &>/dev/null
    $(which rm) "${TEMPFILES}"
+}
+
+function checkmeta() {
+   source /system/uploader/uploader.env
+   METAFILES=$(sqlite3read "SELECT COUNT(*) FROM upload_queue WHERE metadata = 1;")
+   if [[ "${METAFILES}" -ge "1" ]]; then
+      METAFILE=$(sqlite3read "SELECT filebase FROM upload_queue WHERE metadata = 1 ORDER BY time LIMIT 1;" 2>/dev/null)
+      METADIR=$(sqlite3read "SELECT filedir FROM upload_queue WHERE filebase = \"${METAFILE}\";" 2>/dev/null)
+      METACHECK=$($(which exiftool) -m -q -q -Title "${DLFOLDER}/${METADIR}/${METAFILE}" | $(which grep) -qE "Title" && echo 1 || echo 0)
+      if [[ "${METACHECK}" == "0" ]]; then
+         METAOLD=60
+         METACUR=$($(which date) +%s)
+         METATIME=$($(which stat) -c %Z "${DLFOLDER}/${METADIR}/${METAFILE}" 2>/dev/null)
+         METADIFF=$($(which expr) "${METACUR}" - "${METATIME}")
+         if [[ "${METADIFF}" -gt "${METAOLD}" ]]; then
+            METASIZE=$($(which stat) -c %s "${DLFOLDER}/${METADIR}/${METAFILE}" 2>/dev/null)
+            sqlite3write "UPDATE upload_queue SET filesize = \"${METASIZE}\", metadata = \"${METACHECK}\" WHERE filebase = \"${METAFILE}\";" &>/dev/null
+            checkmeta
+         fi
+      fi
+   fi
 }
 
 function checkspace() {
@@ -445,9 +479,11 @@ function startuploader() {
       checkspace
       #### RUN LIST FILES ####
       listfiles
+      #### RUN META CHECK ####
+      checkmeta
       #### START UPLOAD ####
       source /system/uploader/uploader.env
-      CHECKFILES=$(sqlite3read "SELECT COUNT(*) FROM upload_queue;")
+      CHECKFILES=$(sqlite3read "SELECT COUNT(*) FROM upload_queue WHERE metadata = 0;")
       if [[ "${CHECKFILES}" -ge "1" ]]; then
          # shellcheck disable=SC2086
          #### CHECK FOLDER PRIORITY ####
@@ -467,7 +503,7 @@ function startuploader() {
          else
             SEARCHSTRING="ORDER BY time"
          fi
-         FILE=$(sqlite3read "SELECT filebase FROM upload_queue ${SEARCHSTRING} LIMIT 1;" 2>/dev/null)
+         FILE=$(sqlite3read "SELECT filebase FROM upload_queue WHERE metadata = 0 ${SEARCHSTRING} LIMIT 1;" 2>/dev/null)
          DIR=$(sqlite3read "SELECT filedir FROM upload_queue WHERE filebase = \"${FILE}\";" 2>/dev/null)
          DRIVE=$(sqlite3read "SELECT drive FROM upload_queue WHERE filebase = \"${FILE}\";" 2>/dev/null)
          SIZEBYTES=$(sqlite3read "SELECT filesize FROM upload_queue WHERE filebase = \"${FILE}\";" 2>/dev/null)
