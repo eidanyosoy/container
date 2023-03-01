@@ -344,7 +344,12 @@ function listfiles() {
       LISTDIR=$($(which dirname) "${NAME}")
       LISTDRIVE=$($(which echo) "${LISTDIR}" | $(which cut) -d/ -f-"${FOLDER_DEPTH}" | $(which xargs) -I {} $(which basename) {})
       LISTSIZE=$($(which stat) -c %s "${DLFOLDER}/${NAME}" 2>/dev/null)
-      CHECKMETA=$($(which exiftool) -m -q -q -Title "${DLFOLDER}/${NAME}" 2>/dev/null | $(which grep) -qE "Title" && echo 1 || echo 0)
+      LISTTYPE="${NAME##*.}"
+      if [[ "${LISTTYPE}" == "mkv" ]] || [[ "${LISTTYPE}" == "mp4" ]] || [[ "${LISTTYPE}" == "avi" ]] || [[ "${LISTTYPE}" == "mov" ]] || [[ "${LISTTYPE}" == "mpeg" ]] || [[ "${LISTTYPE}" == "mpegts" ]] || [[ "${LISTTYPE}" == "ts" ]] || [[ "${LISTTYPE}" == "wmv" ]]; then
+         CHECKMETA=$($(which exiftool) -m -q -q -Title "${DLFOLDER}/${NAME}" 2>/dev/null | $(which grep) -qE "Title" && echo 1 || echo 0)
+      else
+         CHECKMETA="0"
+      fi
       if [[ "${STRIPARR_URL}" == "" ]]; then
          STRIPARR_URL="null"
       fi
