@@ -127,7 +127,6 @@ function lang() {
    startuplogrotate=$($(which jq) ".startup.logrotate" "${LFOLDER}/${LANGUAGE}.json" | $(which sed) 's/"\|,//g')
    startuprclone=$($(which jq) ".startup.rclone" "${LFOLDER}/${LANGUAGE}.json" | $(which sed) 's/"\|,//g')
    startupmergerfs=$($(which jq) ".startup.mergerfs" "${LFOLDER}/${LANGUAGE}.json" | $(which sed) 's/"\|,//g')
-   startupvfs=$($(which jq) ".startup.vfs" "${LFOLDER}/${LANGUAGE}.json" | $(which sed) 's/"\|,//g')
    startupnzb=$($(which jq) ".startup.nzb" "${LFOLDER}/${LANGUAGE}.json" | $(which sed) 's/"\|,//g')
    startuphitlimit=$($(which jq) ".startup.hitlimit" "${LFOLDER}/${LANGUAGE}.json" | $(which sed) 's/"\|,//g')
    startupnewchanges=$($(which jq) ".startup.newchanges" "${LFOLDER}/${LANGUAGE}.json" | $(which sed) 's/"\|,//g')
@@ -284,7 +283,7 @@ $(which sleep) 10
 
 ### SET MAJOR OPTIONS FOR MOUNT : $(which rclone) rc options/set options/set --json 
 $(which rclone) rc options/set --json {'"main": { "TPSLimitBurst": ${TPSBURST}, "TPSLimit": ${TPSLIMIT}, "Checkers": 6, "Transfers": 6, "BufferSize": "${BUFFER_SIZE}", "TrackRenames": true, "TrackRenamesStrategy":"modtime,leaf", "NoUpdateModTime": true, "UserAgent": "${UAGENT}", "CutoffMode":"hard", "Progress":true, "UseMmap":true, "HumanReadable":true}'} &>/dev/null
-$(which rclone) rc options/set --json {'"vfs": { "GID": '${PGID}', "UID": '${PUID}', "Umask": '${UMASK}', "CacheMode": 3, "CacheMaxSize": "${VFS_CACHE_MAX_SIZE}", "CacheMaxAge": ${VFS_CACHE_MAX_AGE_NS}, "CachePollInterval": 120000000000, "PollInterval": 60000000000, "ChunkSize": "${VFS_READ_CHUNK_SIZE}", "ChunkSizeLimit": "${VFS_READ_CHUNK_SIZE_LIMIT}", "DirCacheTime": ${VFS_DIR_CACHE_TIME_NS}, "NoModTime": true,"NoChecksum": true}'} &>/dev/null
+$(which rclone) rc options/set --json {'"vfs": { "GID": '${PGID}', "UID": '${PUID}', "Umask": '${UMASK}', "CacheMode": 3, "CacheMaxSize": "${VFS_CACHE_MAX_SIZE}", "CacheMaxAge": ${VFS_CACHE_MAX_AGE_NS}, "CachePollInterval": 60000000000, "PollInterval": 30000000000, "ChunkSize": "${VFS_READ_CHUNK_SIZE}", "ChunkSizeLimit": "${VFS_READ_CHUNK_SIZE_LIMIT}", "DirCacheTime": ${VFS_DIR_CACHE_TIME_NS}, "NoModTime": true,"NoChecksum": true}'} &>/dev/null
 $(which rclone) rc options/set --json {'"mount": { "AllowNonEmpty": true, "AllowOther": true, "AsyncRead": true, "WritebackCache": true}'} &>/dev/null
 $(which sleep) 5
 
@@ -326,17 +325,6 @@ function rcmergerfs() {
    fi
 }
 
-function refreshVFS() {
-   source /system/mount/mount.env
-   log "${rclonevfs}"
-   for FOLD in ${SREMOTES}/*; do
-      FOLDER=$($(which basename) "${FOLD}")
-      $(which rclone) rc vfs/forget dir="${FOLDER}" --fast-list _async=true --drive-pacer-burst 200 --drive-pacer-min-sleep 10ms --timeout 30m &>/dev/null
-      $(which sleep) 1
-      $(which rclone) rc vfs/refresh dir="${FOLDER}" --fast-list _async=true &>/dev/null
-   done
-}
-
 function rckill() {
    source /system/mount/mount.env
    log "${killrclone}"
@@ -371,21 +359,6 @@ function rcstats() {
    source /system/mount/mount.env
    log "${rclonestats}"
    $(which rclone) rc core/stats
-}
-
-function drivecheck() {
-   while true; do
-      source /system/mount/mount.env
-      if [[ "$($(which ls) -1p ${SUNION})" ]] && [[ "$($(which ls) -1p ${SREMOTES})" ]]; then
-         if [[ "${VFS_REFRESH_ENABLE}" == "true" ]]; then
-            rcclean && refreshVFS
-            $(which logrotate) /etc/logrotate.conf &>/dev/null
-         else
-            rcclean
-         fi
-      fi
-      $(which sleep) "${VFS_REFRESH}"
-   done
 }
 
 function nzbcleanup() {
