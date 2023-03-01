@@ -10,7 +10,6 @@
     "logrotate": "-> Starting Logrotate <-",
     "rclone": "-> Starting Rclone <-",
     "mergerfs": "-> Starting MergerFS <-",
-    "vfs": "-> Starting VFS Refresh <-",
     "nzb": "-> Starting NZB Cleanup <-",
     "hitlimit": "-> Beware you have hit the Google API-Limits <-",
     "newchanges": "-> Changes in mount.env found || Restarting Rclone <-",
