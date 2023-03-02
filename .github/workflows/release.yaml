@@ -113,10 +113,6 @@ jobs:
       with:
         platforms: ${{ steps.prep.outputs.platformout }}
 
-    - name: Install cosign
-      if: ${{ steps.prep.outputs.version != '' }}
-      uses: sigstore/cosign-installer@main
-
     - name: Login in Registry || major
       if: ${{ steps.prep.outputs.version != '' }}
       uses: docker/login-action@v2.1.0
@@ -192,15 +188,6 @@ jobs:
     - name: Image digest
       if: ${{ steps.prep.outputs.version != '' }}
       run: echo ${{ steps.docker_build.outputs.digest }}
-
-    - name: Sign the digest image
-      if: ${{ steps.prep.outputs.version != '' }}
-      env:
-        COSIGN_EXPERIMENTAL: "true"
-      shell: bash
-      run: |
-        echo ${{ steps.docker_build.outputs.digest }} && \
-        cosign sign ${{ secrets.DOCKER_REGISTRY }}/${{ github.repository_owner }}/${{ matrix.container }}@${{ steps.build-and-push.outputs.digest }}
 
     - name: Send notification
       if: ${{ steps.prep.outputs.version != '' }}
