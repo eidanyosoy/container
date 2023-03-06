@@ -23,4 +23,6 @@ source /app/uploader/function.sh && lang
 
 log "${startupphp}"
 
-exec /usr/sbin/php-fpm81 -F
+$(which chmod) -v 1777 /tmp /var/tmp &>/dev/null
+
+exec s6-setuidgid root php-fpm8 -F
