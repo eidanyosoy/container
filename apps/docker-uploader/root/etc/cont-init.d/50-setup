@@ -84,8 +84,8 @@ if [[ "${ARRAY}" -lt "1" && "${DROPBOX}" == "" ]]; then
 fi
 
 log "**** copy dependencies ****"
-   $(which cp) -r /conf/fpm-pool.conf /etc/php8/php-fpm.d/www.conf
-   $(which cp) -r /conf/php.j2 /etc/php8/conf.d/custom.ini
+   $(which cp) -r /conf/fpm-pool.conf /etc/php81/php-fpm.d/www.conf
+   $(which cp) -r /conf/php.j2 /etc/php81/conf.d/custom.ini
 
 log "**** creating folders ****"
    $(which mkdir) -p /system/uploader/{logs,db,sample} \
