@@ -3,11 +3,11 @@ curl
 cronie
 exiftool
 jq
-php8
-php8-fpm
-php8-json
-php8-opcache
-php8-sqlite3
+php81
+php81-fpm
+php81-json
+php81-opcache
+php81-sqlite3
 py-pip
 python3
 sqlite
