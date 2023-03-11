@@ -64,8 +64,6 @@ echo '{
    "newversion": "'${BUILDVERSION}'",
    "baseimage": "'${BUILDIMAGE}'",
    "baseversion": "'${ALPINEVERSION}'",
-   "s6_stage": "'${S6_STAGE_VERSION}'",
-   "description": "'${DESCRIPTION}'",
    "body": "Upgrading '${APP}' to '${NEWVERSION}'",
    "user": "dockserver image update[bot]"
 }' > "./$FOLDER/$APP/release.json"
