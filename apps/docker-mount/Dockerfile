@@ -16,7 +16,7 @@
 #####################################
 # shellcheck disable=SC2086
 # shellcheck disable=SC2046
-FROM alpine:3.17.2 as builder
+FROM alpine: as builder
 
 LABEL org.opencontainers.image.source="https://github.com/dockserver/container"
 
@@ -50,8 +50,8 @@ FROM ghcr.io/dockserver/docker-alpine-v3:latest
 ARG TARGETPLATFORM
 ARG BUILDPLATFORM
 
-ARG BASE_VERSION=3.17.2
-ARG ALPINE_VERSION=3.17.2
+ARG BASE_VERSION=
+ARG ALPINE_VERSION=
 ARG MERGERFS_VERSION=2.34.1
 ARG RCLONE_VERSION=v1.61.1
 
@@ -64,7 +64,7 @@ RUN \
   echo "**** install mergerfs ****" && \
     apk add -U --update --no-cache --quiet mergerfs --repository=https://dl-cdn.alpinelinux.org/alpine/edge/testing && \
   echo "**** set alpine version ****" && \
-    echo -e "3.17.2" > /etc/alpine-release && \
+    echo -e "" > /etc/alpine-release && \
   echo "*** cleanup system ****" && \
     apk del --quiet --clean-protected --no-progress && \
     rm -rf /var/cache/apk/* /tmp/*
