@@ -3,7 +3,7 @@ appdirs==1.4.4
 certifi==2020.12.5
 cfscrape==2.1.1
 charset-normalizer==2.0.7
-cloudscraper==1.2.66
+cloudscraper==1.2.69
 colorama==0.4.4
 contextlib2==21.6.0
 distlib==0.3.3
