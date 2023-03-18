@@ -91,7 +91,7 @@ function resticbackup() {
    if [[ "${NOTIFICATION_LEVEL}" == "ALL" ]]; then
       log "-> Backup for ${RESTIC_TAG} is started <-"
    fi
-   $(which restic) backup --quiet --tag "${RESTIC_TAG}" --repo "${RESTIC_REPOSITORY}" --password-command "$(which echo) ${RESTIC_PASSWORD}" --host "${RESTIC_HOST}" --cache-dir "${RESTIC_CACHE_DIR}" --cleanup-cache --pack-size "${RESTIC_PACK_SIZE}" --option rclone.args="serve restic --stdio --checkers=16 --drive-chunk-size=32M --drive-use-trash=false --fast-list --config=/config/rclone/rclone.conf" "${RESTIC_FOLDER}" &>/dev/null
+   $(which restic) backup --quiet --tag "${RESTIC_TAG}" --repo "${RESTIC_REPOSITORY}" --password-command "$(which echo) ${RESTIC_PASSWORD}" --host "${RESTIC_HOST}" --cache-dir "${RESTIC_CACHE_DIR}" --cleanup-cache --pack-size "${RESTIC_PACK_SIZE}" --exclude-file "${RESTIC_EXCLUDES}" --option rclone.args="serve restic --stdio --checkers=16 --drive-chunk-size=32M --drive-use-trash=false --fast-list --config=/config/rclone/rclone.conf" "${RESTIC_FOLDER}" &>/dev/null
    if [[ "$?" == "0" ]]; then
       if [[ "${NOTIFICATION_LEVEL}" == "ALL" ]]; then
          MSG="-> ✅ Backup successful for ${RESTIC_TAG} <-" && notification
