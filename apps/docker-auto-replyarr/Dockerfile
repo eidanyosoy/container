@@ -1,7 +1,7 @@
 #####################################
 # Original coder Xaritomi -SBOX     #
 #####################################
-FROM alpine:3.15.0 as buildstage
+FROM alpine:3.17.2 as buildstage
 
 RUN \
    echo "**** install packages ****" && \

@@ -4,7 +4,7 @@
 # Docker owned dockserver           #
 # Docker Maintainer dockserver      #
 #####################################
-FROM alpine:3.14
+FROM alpine:3.17
 ARG TARGETPLATFORM
 ARG BUILDPLATFORM
 
