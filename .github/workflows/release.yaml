@@ -174,7 +174,7 @@ jobs:
 
     - name: Build and Push Image
       id: build-and-push
-      uses: docker/build-push-action@v2.7.0
+      uses: docker/build-push-action@v2.10.0
       with:
         build-args: VERSION=${{ steps.prep.outputs.version }}
         context: .
