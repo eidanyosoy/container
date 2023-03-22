@@ -1,6 +1,6 @@
 # Buildstage
 ARG VERSION
-FROM ghcr.io/linuxserver/baseimage-alpine:3.14 as buildstage
+FROM ghcr.io/linuxserver/baseimage-alpine:3.17 as buildstage
 
 RUN \
   echo "**** install build packages ****" && \
@@ -50,7 +50,7 @@ RUN \
 
 # Runtime Stage
 ARG VERSION
-FROM ghcr.io/linuxserver/baseimage-alpine:3.14
+FROM ghcr.io/linuxserver/baseimage-alpine:3.17
 
 RUN \
   echo "**** install build packages ****" && \
