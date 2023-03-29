@@ -34,66 +34,6 @@
 > Don't use the images / dockers on other projects
 > This should not work for you.
 
----
-
-## Notice Alpine Builds
-
-1. radarr
-1. sonarr
-1. sabnzbd
-1. lidarr
-1. readarr
-1. bazarr
-1. duplicati
-1. And many more......
-
-More and more dockers will use **alpine** as base image
-
-
-## What that's all ?!
-
-Nope... we have build our own **CI/CD PIPLINE**
-
-It's runs inside of a isolated Container environment 
-
-*(isolated **docker-based** github runner)*
-
----
-
-The docker-mount and docker-uploader used now
-multi-stage builds from our own 
-**ALPINE s6-overlay V3 image**
-
-We moved more and more apps in the next few days to S6-overlay V3
-
-
----
-
-## Some hidden Updates are pushed
-
-We provide as next some hidden scripts to build
-
-the docker images based of a json / shell file 
-
-Also we have added a new layer for check of any breaches.
-
-
-
-Next what is also added :
-
-one dependencies script to pull the latest versions of every dependencies what is used inside of the docker
-
-----
-
-## push to public ?!  And show the code ??
-
-No way ..... 
-
-We didn't show them , 
-since I know some other are stealing here,
-
-Without given any credits or respect
-
 
 --- 
 
@@ -106,18 +46,6 @@ This repository is heavily based on
 All Containers have some additional edits just for dockserver.io
 
 Please check before you run it on other systems
-
----
-
-And the best is 
-
-Fuck XOXO SBOX stealing code to get your product up and running is a bitch move
-
----
-
-SOME fancy stats 
-
-![metrics](./github-metrics.svg)
 
 ---
 
