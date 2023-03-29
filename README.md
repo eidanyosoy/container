@@ -14,26 +14,16 @@
     <noscript><a href="https://liberapay.com/dockserver/donate"><img alt="Donate using Liberapay" src="https://liberapay.com/assets/widgets/donate.svg"></a></noscript>
 </p>
 
----
-> **Note**:
-> All Dockefiles are automatically generated 
+## Repo is public now.
 
-> **Note**:
-> Do not try to change anything live on the repository
-
-> **Note**:
-> All changes are made from our own CI Pipline ( unpublic ) 
+Since many people have contacted us regarding access to the repo, we have now made it publicly available.
 
 ---
-
-> **Info**:
-> All Containers can be used without breaking.
-> You can use all with dockserver
+> **Note**:
+> All Dockefiles are automatically generated
 
 > **Warning**:
-> Don't use the images / dockers on other projects
-> This should not work for you.
-
+> Please don't use the images / dockers on other projects it could break things on those systems.
 
 --- 
 
