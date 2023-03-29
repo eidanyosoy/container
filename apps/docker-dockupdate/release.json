@@ -2,9 +2,9 @@
    "appname": "docker-dockupdate",
    "apppic": "./images/docker-dockupdate.png",
    "appfolder": "./apps/docker-dockupdate",
-   "newversion": "3.17.2",
+   "newversion": "3.17.3",
    "baseimage": "alpine",
    "description": "Automatically keep your docker services and your docker containers up-to-date with the latest version",
-   "body": "Upgrading docker-dockupdate to 3.17.2",
+   "body": "Upgrading docker-dockupdate to 3.17.3",
    "user": "github-actions[bot]"
 }
