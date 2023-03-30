@@ -131,7 +131,7 @@ ADDITIONAL_MOUNT=${ADDITIONAL_MOUNT:-null}
 ADDITIONAL_MOUNT_PERMISSION=${ADDITIONAL_MOUNT_PERMISSION:-RW}
 
 ## RCLONE - SETTINGS
-GOOGLE_IP=${GOOGLE_IP:-142.250.74.78}
+GOOGLE_IP=${GOOGLE_IP:-142.250.201.202}
 PROXY=\"${PROXY:-null}\"
 UMASK=${UMASK:-18}
 DRIVETRASH=${DRIVETRASH:-false}
@@ -291,6 +291,7 @@ if [[ "${GOOGLE_IP}" == "" ]]; then
    GOOGLE_IP="null"
 fi
 if [[ "${GOOGLE_IP}" != "null" ]]; then
+   $(which sed) -i '/www.googleapis.com/d' "${HOSTS}"
    readarray -t GIP < <($(which awk) -F',' '{ for( i=1; i<=NF; i++ ) print $i }' <<<"${GOOGLE_IP}")
       for ENTRY in "${GIP[@]}"; do
          $(which echo) -e "${ENTRY} www.googleapis.com" >> "${HOSTS}"
