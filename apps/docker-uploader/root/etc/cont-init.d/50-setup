@@ -297,6 +297,7 @@ if [[ "${GOOGLE_IP}" == "" ]]; then
    GOOGLE_IP="null"
 fi
 if [[ "${GOOGLE_IP}" != "null" ]]; then
+   $(which sed) -i '/www.googleapis.com/d' "${HOSTS}"
    readarray -t GIP < <($(which awk) -F',' '{ for( i=1; i<=NF; i++ ) print $i }' <<<"${GOOGLE_IP}")
       for ENTRY in "${GIP[@]}"; do
          $(which echo) -e "${ENTRY} www.googleapis.com" >> "${HOSTS}"
