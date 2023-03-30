@@ -23,6 +23,7 @@ ENDFILE=/system/mount/drive.csv
 ENVA=/system/mount/mount.env
 TMPENV=/tmp/mount.env
 SAMPLEENV=/app/sample/.sample.mount.env
+TMPHOSTS=/tmp/hosts
 HOSTS=/etc/hosts
 
 #FOLDER
@@ -291,7 +292,9 @@ if [[ "${GOOGLE_IP}" == "" ]]; then
    GOOGLE_IP="null"
 fi
 if [[ "${GOOGLE_IP}" != "null" ]]; then
-   $(which sed) -i '/www.googleapis.com/d' "${HOSTS}"
+   $(which cp) "${HOSTS}" "${TMPHOSTS}" &>/dev/null
+   $(which sed) -i '/www.googleapis.com/d' "${TMPHOSTS}" &>/dev/null
+   $(which cp) -f "${TMPHOSTS}" "${HOSTS}" &>/dev/null
    readarray -t GIP < <($(which awk) -F',' '{ for( i=1; i<=NF; i++ ) print $i }' <<<"${GOOGLE_IP}")
       for ENTRY in "${GIP[@]}"; do
          $(which echo) -e "${ENTRY} www.googleapis.com" >> "${HOSTS}"
