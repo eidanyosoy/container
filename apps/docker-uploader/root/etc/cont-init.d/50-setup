@@ -250,7 +250,7 @@ if [[ ! -f "${ENDFILE}" && -f "${SOURCECONFIG}" ]]; then
       else
          $(which rclone) config create DB dropbox server_side_across_configs=true token="${TOKEN}" --config="${ENDCONFIG}" --non-interactive &>/dev/null
          $(which cat) "${ENDCONFIG}"
-         $(which rclone) config create DBC crypt remote=DB:/encrypt filename_encryption=standard directory_name_encryption=true password="${GETP}" password2="${GETS}" --config="${ENDCONFIG}" 2>/dev/null
+         $(which rclone) config create DBC crypt remote=DB:/encrypt filename_encryption=standard filename_encoding=base32768 directory_name_encryption=true password="${GETP}" password2="${GETS}" --config="${ENDCONFIG}" 2>/dev/null
       fi
    else
       KEY=$(sqlite3read "SELECT key FROM upload_keys WHERE active = 1;" 2>/dev/null)
