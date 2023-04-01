@@ -119,6 +119,19 @@ if [[ "${RESTIC_PASSWORD}" == "null" ]] || [[ "${RESTIC_PASSWORD}" == "" ]]; the
    log "-> Set RESTIC_PASSWORD <-" && sleep infinity
 fi
 
+if [[ "${GOOGLE_IP}" == "" ]]; then
+   GOOGLE_IP="null"
+fi
+if [[ "${GOOGLE_IP}" != "null" ]]; then
+   $(which cp) "${HOSTS}" "${TMPHOSTS}" &>/dev/null
+   $(which sed) -i '/www.googleapis.com/d' "${TMPHOSTS}" &>/dev/null
+   $(which cp) -f "${TMPHOSTS}" "${HOSTS}" &>/dev/null
+   readarray -t GIP < <($(which awk) -F',' '{ for( i=1; i<=NF; i++ ) print $i }' <<<"${GOOGLE_IP}")
+      for ENTRY in "${GIP[@]}"; do
+         $(which echo) -e "${ENTRY} www.googleapis.com" >> "${HOSTS}"
+      done
+fi
+
 log "**** initialize repository ****"
 mapfile -t "FILE" < <($(which find) "${CONFIG}" -type f -name "*.env")
 for ENVREP in "${FILE[@]}"; do 
@@ -151,24 +164,5 @@ if [[ ! -f "/config/crontabs/root" ]]; then
 fi
 $(which cp) "/config/crontabs/root" "/etc/crontabs/root" &>/dev/null
 
-if [[ "${GOOGLE_IP}" == "" ]]; then
-   GOOGLE_IP="null"
-fi
-if [[ "${GOOGLE_IP}" != "null" ]]; then
-   $(which cp) "${HOSTS}" "${TMPHOSTS}" &>/dev/null
-   $(which sed) -i '/www.googleapis.com/d' "${TMPHOSTS}" &>/dev/null
-   $(which cp) -f "${TMPHOSTS}" "${HOSTS}" &>/dev/null
-   readarray -t GIP < <($(which awk) -F',' '{ for( i=1; i<=NF; i++ ) print $i }' <<<"${GOOGLE_IP}")
-      for ENTRY in "${GIP[@]}"; do
-         $(which echo) -e "${ENTRY} www.googleapis.com" >> "${HOSTS}"
-      done
-fi
-
 log "**** cleannup ****"
-$(which rm) -rf /var/cache/apk/* \
-       /var/run/s6/etc/cont-init.d/90-custom-folders \
-       /var/run/s6/etc/cont-init.d/99-custom-files \
-       /etc/cont-init.d/90-custom-folders \
-       /etc/cont-init.d/99-custom-files
-
-#### END OF FILE ####
+$(which rm) -rf /var/cache/apk/*
