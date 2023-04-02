@@ -151,7 +151,7 @@ ${UPLOADENDTIME}
 #### Elapsed Time
 ${TIMESPENT}" && notification
       fi
-   fi 
+   fi
 }
 
 function lang() {
