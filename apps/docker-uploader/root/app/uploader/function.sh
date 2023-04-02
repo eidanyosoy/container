@@ -209,7 +209,7 @@ function loopcsv() {
                  ENC_SALT="${UPPDIR[3]}"
               fi
               $(which rclone) config create GDSA drive scope=drive server_side_across_configs=true team_drive="${UPPDIR[1]}" service_account_file="${JSONDIR}/${KEY}" --config="${CUSTOMCONFIG}" &>/dev/null
-              $(which rclone) config create GDSAC crypt remote=GDSA:/encrypt filename_encryption=standard directory_name_encryption=true password="${ENC_PASSWORD}" password2="${ENC_SALT}" --config="${CUSTOMCONFIG}" &>/dev/null
+              $(which rclone) config create GDSAC crypt remote=GDSA:/${GDSA_NAME} filename_encryption=standard directory_name_encryption=true password="${ENC_PASSWORD}" password2="${ENC_SALT}" --config="${CUSTOMCONFIG}" &>/dev/null
            fi
            done
          fi
