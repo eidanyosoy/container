@@ -151,7 +151,7 @@ ${UPLOADENDTIME}
 #### Elapsed Time
 ${TIMESPENT}" && notification
       fi
-   fi
+   fi 
 }
 
 function lang() {
@@ -187,6 +187,7 @@ function cleanuplog() {
 }
 
 function loopcsv() {
+   source /system/uploader/uploader.env
    $(which mkdir) -p "${CUSTOM}"
    if [[ -f "${CSV}" ]]; then
       #### ECHO CORRECT FOLDER FROM LOG FILE ####
