@@ -187,6 +187,7 @@ function cleanuplog() {
 }
 
 function loopcsv() {
+   source /system/uploader/uploader.env
    $(which mkdir) -p "${CUSTOM}"
    if [[ -f "${CSV}" ]]; then
       #### ECHO CORRECT FOLDER FROM LOG FILE ####
@@ -209,7 +210,7 @@ function loopcsv() {
                  ENC_SALT="${UPPDIR[3]}"
               fi
               $(which rclone) config create DB dropbox scope=drive server_side_across_configs=true token="${TOKEN}" --config="${CUSTOMCONFIG}" --non-interactive &>/dev/null
-              $(which rclone) config create DBC crypt remote=DB:/encrypt filename_encryption=standard directory_name_encryption=true password="${ENC_PASSWORD}" password2="${ENC_SALT}" --config="${CUSTOMCONFIG}" &>/dev/null
+              $(which rclone) config create DBC crypt remote=DB:/${DB_NAME} filename_encryption=standard filename_encoding=base32768 directory_name_encryption=true password="${ENC_PASSWORD}" password2="${ENC_SALT}" --config="${CUSTOMCONFIG}" &>/dev/null
            fi
            done
          fi
