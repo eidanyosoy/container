@@ -252,7 +252,7 @@ if [[ ! -f "${ENDFILE}" && -f "${SOURCECONFIG}" ]]; then
       else
          $(which rclone) config create DB dropbox server_side_across_configs=true token="${TOKEN}" --config="${ENDCONFIG}" --non-interactive &>/dev/null
          $(which cat) "${ENDCONFIG}"
-         $(which rclone) config create DBC crypt remote=DB:/encrypt filename_encryption=standard filename_encoding=base32768 directory_name_encryption=true password="${GETP}" password2="${GETS}" --config="${ENDCONFIG}" 2>/dev/null
+         $(which rclone) config create DBC crypt remote=DB:/${DB_NAME} filename_encryption=standard filename_encoding=base32768 directory_name_encryption=true password="${GETP}" password2="${GETS}" --config="${ENDCONFIG}" 2>/dev/null
       fi
    else
       KEY=$(sqlite3read "SELECT key FROM upload_keys WHERE active = 1;" 2>/dev/null)
@@ -263,7 +263,7 @@ if [[ ! -f "${ENDFILE}" && -f "${SOURCECONFIG}" ]]; then
          $(which rclone) config create GDSA drive scope=drive server_side_across_configs=true team_drive="${TDID}" service_account_file="${JSONDIR}/${KEY}" --config="${ENDCONFIG}" 2>/dev/null
       else
          $(which rclone) config create GDSA drive scope=drive server_side_across_configs=true team_drive="${TDID}" service_account_file="${JSONDIR}/${KEY}" --config="${ENDCONFIG}" 2>/dev/null
-         $(which rclone) config create GDSAC crypt remote=GDSA:/encrypt filename_encryption=standard directory_name_encryption=true password="${GETP}" password2="${GETS}" --config="${ENDCONFIG}" 2>/dev/null
+         $(which rclone) config create GDSAC crypt remote=GDSA:/${GDSA_NAME} filename_encryption=standard directory_name_encryption=true password="${GETP}" password2="${GETS}" --config="${ENDCONFIG}" 2>/dev/null
       fi
    fi
 fi
@@ -283,7 +283,7 @@ if [[ -f "${ENDFILE}" ]]; then
             ENC_SALT="${DRIVE[3]}"
          fi
          $(which rclone) config create GDSA drive scope=drive server_side_across_configs=true team_drive="${DRIVE[1]}" service_account_file="${JSONDIR}/${KEY}" --config="${ENDCONFIG}" 2>/dev/null
-         $(which rclone) config create GDSAC crypt remote=GDSA:/encrypt filename_encryption=standard directory_name_encryption=true password="${ENC_PASSWORD}" password2="${ENC_SALT}" --config="${ENDCONFIG}" 2>/dev/null
+         $(which rclone) config create GDSAC crypt remote=GDSA:/${GDSA_NAME} filename_encryption=standard directory_name_encryption=true password="${ENC_PASSWORD}" password2="${ENC_SALT}" --config="${ENDCONFIG}" 2>/dev/null
       fi
    done
 fi
