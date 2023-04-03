@@ -247,7 +247,7 @@ fi
 
 # DRIVE.CSV
 if [[ -f "${ENDFILE}" && "${ARRAY}" -ge "1" ]]; then
-   ${which rm} "${ENDCONFIG}"
+   $(which rm) "${ENDCONFIG}"
    $(which awk) '$1~search {p=1} NF==0 {p=0}; p' search="DB|DBC" "${SOURCECONFIG}" >> "${ENDCONFIG}"
    $(which awk) '$1~search {p=1} NF==0 {p=0}; p' search="gdrive|gcrypt" "${SOURCECONFIG}" >> "${ENDCONFIG}"
    KEY=$($(which sed) -n 1p "${JSONUSED}")
