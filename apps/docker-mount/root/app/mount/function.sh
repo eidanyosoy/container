@@ -283,7 +283,7 @@ $(which sleep) 10
 
 ### SET MAJOR OPTIONS FOR MOUNT : $(which rclone) rc options/set options/set --json 
 $(which rclone) rc options/set --json {'"main": { "TPSLimitBurst": ${TPSBURST}, "TPSLimit": ${TPSLIMIT}, "Checkers": 6, "Transfers": 6, "BufferSize": "${BUFFER_SIZE}", "TrackRenames": true, "TrackRenamesStrategy":"modtime,leaf", "NoUpdateModTime": true, "UserAgent": "${UAGENT}", "CutoffMode":"hard", "Progress":true, "UseMmap":true, "HumanReadable":true}'} &>/dev/null
-$(which rclone) rc options/set --json {'"vfs": { "GID": '${PGID}', "UID": '${PUID}', "Umask": '${UMASK}', "CacheMode": 3, "CacheMaxSize": "${VFS_CACHE_MAX_SIZE}", "CacheMaxAge": ${VFS_CACHE_MAX_AGE_NS}, "CachePollInterval": 60000000000, "PollInterval": 30000000000, "ChunkSize": "${VFS_READ_CHUNK_SIZE}", "ChunkSizeLimit": "${VFS_READ_CHUNK_SIZE_LIMIT}", "DirCacheTime": ${VFS_DIR_CACHE_TIME_NS}, "NoModTime": true,"NoChecksum": true}'} &>/dev/null
+$(which rclone) rc options/set --json {'"vfs": { "GID": '${PGID}', "UID": '${PUID}', "Umask": '${UMASK}', "CacheMode": 3, "CacheMaxSize": "${VFS_CACHE_MAX_SIZE}", "CacheMaxAge": ${VFS_CACHE_MAX_AGE_NS}, "CachePollInterval": 60000000000, "PollInterval": 30000000000, "ChunkSize": "${VFS_READ_CHUNK_SIZE}", "ChunkSizeLimit": "${VFS_READ_CHUNK_SIZE_LIMIT}", "DirCacheTime": ${VFS_DIR_CACHE_TIME_NS}, "FastFingerprint": true,"NoChecksum": true}'} &>/dev/null
 $(which rclone) rc options/set --json {'"mount": { "AllowNonEmpty": true, "AllowOther": true, "AsyncRead": true, "WritebackCache": true}'} &>/dev/null
 $(which sleep) 5
 
