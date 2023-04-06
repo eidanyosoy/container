@@ -312,7 +312,8 @@ function rcloneupload() {
       --log-level="${LOG_LEVEL}" \
       --user-agent="${USERAGENT}" ${BWLIMIT} \
       --log-file="${LOGFILE}/${FILE}.txt" \
-      --tpslimit=20 &>/dev/null
+      --tpslimit=10 --tpslimit-burst=10 \
+      --dropbox-batch-mode=sync &>/dev/null
    #### END TIME UPLOAD ####
    ENDZ=$($(which date) +%s)
    #### SEND TO AUTOSCAN DOCKER ####
