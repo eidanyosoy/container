@@ -3,3 +3,4 @@ database/Library/Application Support/Plex Media Server/Cache/Transcode
 database/Library/Application Support/Plex Media Server/Cache
 *.db-shm
 *.db-wal
+config.cache-journal
