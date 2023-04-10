@@ -460,10 +460,10 @@ apps docker-rutorrent
    "appname": "docker-rutorrent",
    "apppic": "",
    "appfolder": "./apps/docker-rutorrent",
-   "newversion": "4.0.3",
+   "newversion": "4.0.4",
    "baseimage": "alpine",
    "description": "Yet another web front-end for rTorrent",
-   "body": "Upgrading docker-rutorrent to 4.0.3",
+   "body": "Upgrading docker-rutorrent to 4.0.4",
    "user": "dockserver[bot]"
 }
 
