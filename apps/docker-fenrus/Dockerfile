@@ -16,7 +16,7 @@
 #####################################
 # shellcheck disable=SC2086
 # shellcheck disable=SC2046
-FROM alpine:3.17.3 as buildstage
+FROM alpine: as buildstage
 LABEL org.opencontainers.image.source="https://github.com/dockserver/container"
 
 ARG TARGETPLATFORM
@@ -30,7 +30,7 @@ RUN \
     git clone https://github.com/revenz/Fenrus.git /app && \
     rm -rf /app/Dockerfile ./.git
 
-FROM alpine:3.17.3
+FROM alpine:
 
 COPY --from=buildstage /app /app
 
@@ -39,7 +39,7 @@ WORKDIR /app
 ARG TARGETPLATFORM
 ARG BUILDPLATFORM
 
-ARG VERSION="b269e094505538d93d6b2b9eb5df10ada4dc83f8"
+ARG VERSION="d4a54bf00ae5d9e2f7cb4b1dce91aa55716c1238"
 ARG BRANCH="master"
 
 WORKDIR /app
