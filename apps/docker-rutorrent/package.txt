@@ -9,8 +9,8 @@ apr-util-1.6.3-r0
 argon2-libs-20190702-r1
 autoconf-2.71-r0
 bash-5.1.16-r0
-bind-libs-9.16.37-r0
-bind-tools-9.16.37-r0
+bind-libs-9.16.39-r0
+bind-tools-9.16.39-r0
 binutils-2.37-r3
 blkid-2.37.4-r0
 brotli-1.0.9-r5
@@ -21,8 +21,8 @@ ca-certificates-20220614-r0
 ca-certificates-bundle-20211220-r0
 cfdisk-2.37.4-r0
 coreutils-9.0-r2
-curl-7.80.0-r6
-curl-dev-7.80.0-r6
+curl-8.0.1-r0
+curl-dev-8.0.1-r0
 dhclient-4.4.3_p1-r1
 expat-2.5.0-r0
 ffmpeg-4.4.1-r2
@@ -69,7 +69,7 @@ libc-utils-0.7.2-r3
 libcap-ng-0.8.2-r1
 libcom_err-1.46.6-r0
 libcrypto1.1-1.1.1t-r3
-libcurl-7.80.0-r6
+libcurl-8.0.1-r0
 libdav1d-0.9.2-r0
 libdrm-2.4.109-r0
 libeconf-0.4.2-r0
