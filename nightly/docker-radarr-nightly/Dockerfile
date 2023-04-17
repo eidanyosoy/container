@@ -2,6 +2,6 @@
 ##
 ## Do not changes any lines here
 ##
-FROM lscr.io/linuxserver/radarr:nightly-4.5.0.7071-ls460
+FROM lscr.io/linuxserver/radarr:nightly-4.5.0.7075-ls460
 COPY --chown=abc ./apps/docker-radarr/root/ /
 ##EOF
