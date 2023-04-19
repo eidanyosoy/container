@@ -14,10 +14,6 @@
     <noscript><a href="https://liberapay.com/dockserver/donate"><img alt="Donate using Liberapay" src="https://liberapay.com/assets/widgets/donate.svg"></a></noscript>
 </p>
 
-## Repo is public now.
-
-Since many people have contacted us regarding access to the repo, we have now made it publicly available.
-
 ---
 > **Note**:
 > All Dockefiles are automatically generated
