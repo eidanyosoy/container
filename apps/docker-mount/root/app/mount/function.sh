@@ -385,7 +385,7 @@ function testsuccessfull() {
    if [[ "$($(which ls) -1p ${SREMOTES})" ]] && [[ "$($(which ls) -1p ${SUNION})" ]]; then
       MSG="${startupmountend}" && notification
    else
-      rckill && rcmergerfskill && folderunmount && rcmount && rcmergerfs && rcclean
+      rckill && rcmergerfskill && folderunmount && rcmount && rcmergerfs
    fi
 }
 
@@ -398,7 +398,7 @@ function testrun() {
       if [[ "$($(which ls) -1p ${SREMOTES})" ]] && [[ "$($(which ls) -1p ${SUNION})" ]]; then
          log "${startupmountworks}"
       else
-         rckill && rcmergerfskill && folderunmount && rcmount && rcmergerfs && rcclean
+         rckill && rcmergerfskill && folderunmount && rcmount && rcmergerfs
       fi
       envrenew && lang && checkban && $(which sleep) 360
    done
