@@ -22,7 +22,7 @@ LABEL org.opencontainers.image.source="https://github.com/dockserver/container"
 ARG TARGETPLATFORM
 ARG BUILDPLATFORM
 
-ARG VERSION="1.32.0.6950-8521b7d99"
+ARG VERSION="1.32.1.6954-56a60573f"
 ARG BRANCH="master"
 
 ENV NVIDIA_DRIVER_CAPABILITIES="compute,video,utility" \
