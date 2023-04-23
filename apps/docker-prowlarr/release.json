@@ -2,10 +2,10 @@
    "appname": "docker-prowlarr",
    "apppic": "./images/docker-prowlarr.png",
    "appfolder": "./apps/docker-prowlarr",
-   "newversion": "1.3.3.3221",
+   "newversion": "1.3.3.3224",
    "appbranch": "nightly",
    "baseimage": "ghcr.io/dockserver/docker-alpine:latest",
    "description": "null",
-   "body": "Upgrading docker-prowlarr to 1.3.3.3221",
+   "body": "Upgrading docker-prowlarr to 1.3.3.3224",
    "user": "github-actions[bot]"
 }
