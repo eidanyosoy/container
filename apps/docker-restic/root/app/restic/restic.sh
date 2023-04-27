@@ -45,32 +45,32 @@ function notification() {
 function resticsnapshots() {
    source ${ENVA}
    #### CHECK SNAPSHOTS ####
-   $(which restic) snapshots --quiet --repo "${RESTIC_REPOSITORY}" --password-command "$(which echo) ${RESTIC_PASSWORD}" --option rclone.args="serve restic --stdio --checkers=16 --drive-chunk-size=32M --drive-use-trash=false --fast-list --config=/config/rclone/rclone.conf"
+   $(which restic) snapshots --quiet --repo "${RESTIC_REPOSITORY}" --password-command "$(which echo) ${RESTIC_PASSWORD}" --option rclone.args="serve restic --stdio --checkers=16 --tpslimit 10 --drive-chunk-size=32M --dropbox-chunk-size=32M --drive-use-trash=false --fast-list --config=/config/rclone/rclone.conf"
 }
 
 function resticforget() {
    source ${ENVA}
    #### DELETE OLD BACKUPS ####
-   $(which restic) forget --quiet --tag "${RESTIC_TAG}" --repo "${RESTIC_REPOSITORY}" --password-command "$(which echo) ${RESTIC_PASSWORD}" --option rclone.args="serve restic --stdio --checkers=16 --drive-chunk-size=32M --drive-use-trash=false --fast-list --config=/config/rclone/rclone.conf" --keep-within-daily 14d --keep-within-weekly 1m --keep-within-monthly 1y --keep-within-yearly 2y --prune &>/dev/null
+   $(which restic) forget --quiet --tag "${RESTIC_TAG}" --repo "${RESTIC_REPOSITORY}" --password-command "$(which echo) ${RESTIC_PASSWORD}" --option rclone.args="serve restic --stdio --checkers=16 --tpslimit 10 --drive-chunk-size=32M --dropbox-chunk-size=32M --drive-use-trash=false --fast-list --config=/config/rclone/rclone.conf" --keep-within-daily 14d --keep-within-weekly 1m --keep-within-monthly 1y --keep-within-yearly 2y --prune &>/dev/null
 }
 
 function resticrestore() {
    source ${ENVA}
    #### RESTORE SINGLE APP ####
-   $(which restic) restore latest --repo "${RESTIC_REPOSITORY}" --password-command "$(which echo) ${RESTIC_PASSWORD}" --target "/" --tag "${RESTIC_TAG}" --option rclone.args="serve restic --stdio --checkers=16 --drive-chunk-size=32M --drive-use-trash=false --fast-list --config=/config/rclone/rclone.conf" --include "${RESTIC_FOLDER}/$@"
+   $(which restic) restore latest --repo "${RESTIC_REPOSITORY}" --password-command "$(which echo) ${RESTIC_PASSWORD}" --target "/" --tag "${RESTIC_TAG}" --option rclone.args="serve restic --stdio --checkers=16 --tpslimit 10 --drive-chunk-size=32M --dropbox-chunk-size=32M --drive-use-trash=false --fast-list --config=/config/rclone/rclone.conf" --include "${RESTIC_FOLDER}/$@"
 }
 
 function resticrestore-full() {
    source ${ENVA}
    #### RESTORE FULL APPDATA ####
-   $(which restic) restore latest --repo "${RESTIC_REPOSITORY}" --password-command "$(which echo) ${RESTIC_PASSWORD}" --target "/" --tag "${RESTIC_TAG}" --option rclone.args="serve restic --stdio --checkers=16 --drive-chunk-size=32M --drive-use-trash=false --fast-list --config=/config/rclone/rclone.conf"
+   $(which restic) restore latest --repo "${RESTIC_REPOSITORY}" --password-command "$(which echo) ${RESTIC_PASSWORD}" --target "/" --tag "${RESTIC_TAG}" --option rclone.args="serve restic --stdio --checkers=16 --tpslimit 10 --drive-chunk-size=32M --dropbox-chunk-size=32M --drive-use-trash=false --fast-list --config=/config/rclone/rclone.conf"
 }
 
 function resticmount() {
    source ${ENVA}
    #### MOUNT BACKUP ####
    $(which mkdir) -p /mnt/restic
-   $(which restic) mount --repo "${RESTIC_REPOSITORY}" --password-command "$(which echo) ${RESTIC_PASSWORD}" --tag "${RESTIC_TAG}" --option rclone.args="serve restic --stdio --checkers=16 --drive-chunk-size=32M --drive-use-trash=false --fast-list --config=/config/rclone/rclone.conf" /mnt/restic
+   $(which restic) mount --repo "${RESTIC_REPOSITORY}" --password-command "$(which echo) ${RESTIC_PASSWORD}" --tag "${RESTIC_TAG}" --option rclone.args="serve restic --stdio --checkers=16 --tpslimit 10 --drive-chunk-size=32M --dropbox-chunk-size=32M --drive-use-trash=false --fast-list --config=/config/rclone/rclone.conf" /mnt/restic
 }
 
 function resticbackup() {
@@ -91,7 +91,7 @@ function resticbackup() {
    if [[ "${NOTIFICATION_LEVEL}" == "ALL" ]]; then
       log "-> Backup for ${RESTIC_TAG} is started <-"
    fi
-   $(which restic) backup --quiet --tag "${RESTIC_TAG}" --repo "${RESTIC_REPOSITORY}" --password-command "$(which echo) ${RESTIC_PASSWORD}" --host "${RESTIC_HOST}" --cache-dir "${RESTIC_CACHE_DIR}" --cleanup-cache --pack-size "${RESTIC_PACK_SIZE}" --exclude-file "${RESTIC_EXCLUDES}" --option rclone.args="serve restic --stdio --checkers=16 --drive-chunk-size=32M --drive-use-trash=false --fast-list --config=/config/rclone/rclone.conf" "${RESTIC_FOLDER}" &>/dev/null
+   $(which restic) backup --quiet --tag "${RESTIC_TAG}" --repo "${RESTIC_REPOSITORY}" --password-command "$(which echo) ${RESTIC_PASSWORD}" --host "${RESTIC_HOST}" --cache-dir "${RESTIC_CACHE_DIR}" --cleanup-cache --pack-size "${RESTIC_PACK_SIZE}" --exclude-file "${RESTIC_EXCLUDES}" --option rclone.args="serve restic --stdio --checkers=16 --tpslimit 10 --drive-chunk-size=32M --dropbox-chunk-size=32M --drive-use-trash=false --fast-list --config=/config/rclone/rclone.conf" "${RESTIC_FOLDER}" &>/dev/null
    if [[ "$?" == "0" ]]; then
       if [[ "${NOTIFICATION_LEVEL}" == "ALL" ]]; then
          MSG="-> ✅ Backup successful for ${RESTIC_TAG} <-" && notification
