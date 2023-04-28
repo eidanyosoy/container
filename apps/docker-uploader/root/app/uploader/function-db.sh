@@ -194,13 +194,19 @@ function loopcsv() {
       DRIVE=$($(which echo) "${DRIVE}" | $(which sed) 's/-//g')
       #### USE FILE NAME AS RCLONE CONF ####
       CUSTOMCONFIG="${CUSTOM}/${FILE}.conf"
-      TOKEN=$($(which rclone) config dump --config="${SOURCECONFIG}" | $(which jq) -r 'to_entries | (.[] | select(.value.type=="dropbox")) | .value.token' | $(which head) -n 1)
+      TOKEN=$($(which rclone) config dump --config="${ENDCONFIG}" 2>/dev/null | $(which jq) -r 'to_entries | (.[] | select(.value.type=="dropbox")) | .value.token' | $(which head) -n 1)
+      GETCI=$($(which rclone) config dump --config="${ENDCONFIG}" 2>/dev/null | $(which jq) -r 'to_entries | (.[] | select(.value.type=="dropbox")) | .value.client_id' | $(which head) -n 1)
+      GETCS=$($(which rclone) config dump --config="${ENDCONFIG}" 2>/dev/null | $(which jq) -r 'to_entries | (.[] | select(.value.type=="dropbox")) | .value.client_secret' | $(which head) -n 1)
       #### TEST IS FOLDER AND CSV CORRECT ####
       $(which cat) "${CSV}" | $(which sed) '/^\s*#.*$/d' | $(which grep) -Ew "${DRIVE}" | while IFS=$'|' read -ra CHECKDIR; do
          if [[ ${CHECKDIR[0]} == ${DRIVE} ]]; then
            $(which cat) "${CSV}" | $(which sed) '/^\s*#.*$/d' | $(which grep) -Ew "${DRIVE}" | while IFS=$'|' read -ra UPPDIR; do
            if [[ "${UPPDIR[2]}" == "" && "${UPPDIR[3]}" == "" ]]; then
-              $(which rclone) config create DB dropbox scope=drive server_side_across_configs=true token="${TOKEN}" --config="${CUSTOMCONFIG}" --non-interactive &>/dev/null
+              if [[ "${GETCI}" == "" && "${GETCS}" == "" ]]; then
+                 $(which rclone) config create DB dropbox server_side_across_configs=true token="${TOKEN}" --config="${CUSTOMCONFIG}" --non-interactive &>/dev/null
+              else
+                 $(which rclone) config create DB dropbox server_side_across_configs=true client_id="${GETCI}" client_secret="${GETCS}" token="${TOKEN}" --config="${CUSTOMCONFIG}" --non-interactive &>/dev/null
+              fi
            else
               if [[ "${HASHPASSWORD}" == "plain" && "${HASHPASSWORD}" != "hashed" ]]; then
                  ENC_PASSWORD=$($(which rclone) obscure "${UPPDIR[2]}" | $(which tail) -n1)
@@ -209,8 +215,13 @@ function loopcsv() {
                  ENC_PASSWORD="${UPPDIR[2]}"
                  ENC_SALT="${UPPDIR[3]}"
               fi
-              $(which rclone) config create DB dropbox scope=drive server_side_across_configs=true token="${TOKEN}" --config="${CUSTOMCONFIG}" --non-interactive &>/dev/null
-              $(which rclone) config create DBC crypt remote=DB:/${DB_NAME} filename_encryption=standard filename_encoding=base32768 directory_name_encryption=true password="${ENC_PASSWORD}" password2="${ENC_SALT}" --config="${CUSTOMCONFIG}" &>/dev/null
+              if [[ "${GETCI}" == "" && "${GETCS}" == "" ]]; then
+                 $(which rclone) config create DB dropbox server_side_across_configs=true token="${TOKEN}" --config="${CUSTOMCONFIG}" --non-interactive &>/dev/null
+                 $(which rclone) config create DBC crypt remote=DB:/${UPPDIR[1]} filename_encryption=standard filename_encoding=base32768 directory_name_encryption=true password="${ENC_PASSWORD}" password2="${ENC_SALT}" --config="${CUSTOMCONFIG}" 2>/dev/null
+              else
+                 $(which rclone) config create DB dropbox server_side_across_configs=true client_id="${GETCI}" client_secret="${GETCS}" token="${TOKEN}" --config="${CUSTOMCONFIG}" --non-interactive &>/dev/null
+                 $(which rclone) config create DBC crypt remote=DB:/${UPPDIR[1]} filename_encryption=standard filename_encoding=base32768 directory_name_encryption=true password="${ENC_PASSWORD}" password2="${ENC_SALT}" --config="${CUSTOMCONFIG}" 2>/dev/null
+              fi
            fi
            done
          fi
@@ -489,9 +500,9 @@ function startuploader() {
                #### RUN TRANSFERS CHECK ####
                transfercheck
                #### CHECK IS CSV AVAILABLE AND LOOP TO CORRECT DRIVE ####
-               #if [[ -f "${CSV}" ]]; then 
-               #   loopcsv
-               #fi
+               if [[ -f "${CSV}" ]]; then 
+                  loopcsv
+               fi
                #### UPLOAD FUNCTIONS STARTUP ####
                if [[ "${TRANSFERS}" -eq "1" ]]; then 
                   #### SINGLE UPLOAD ####
