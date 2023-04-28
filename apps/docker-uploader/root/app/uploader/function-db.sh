@@ -204,8 +204,10 @@ function loopcsv() {
            if [[ "${UPPDIR[2]}" == "" && "${UPPDIR[3]}" == "" ]]; then
               if [[ "${GETCI}" == "" && "${GETCS}" == "" ]]; then
                  $(which rclone) config create DB dropbox server_side_across_configs=true token="${TOKEN}" --config="${CUSTOMCONFIG}" --non-interactive &>/dev/null
+                 $(which rclone) config create DBA alias remote=DB:/${UPPDIR[1]} --config="${CUSTOMCONFIG}" &>/dev/null
               else
                  $(which rclone) config create DB dropbox server_side_across_configs=true client_id="${GETCI}" client_secret="${GETCS}" token="${TOKEN}" --config="${CUSTOMCONFIG}" --non-interactive &>/dev/null
+                 $(which rclone) config create DBA alias remote=DB:/${UPPDIR[1]} --config="${CUSTOMCONFIG}" &>/dev/null
               fi
            else
               if [[ "${HASHPASSWORD}" == "plain" && "${HASHPASSWORD}" != "hashed" ]]; then
@@ -217,10 +219,10 @@ function loopcsv() {
               fi
               if [[ "${GETCI}" == "" && "${GETCS}" == "" ]]; then
                  $(which rclone) config create DB dropbox server_side_across_configs=true token="${TOKEN}" --config="${CUSTOMCONFIG}" --non-interactive &>/dev/null
-                 $(which rclone) config create DBC crypt remote=DB:/${UPPDIR[1]} filename_encryption=standard filename_encoding=base32768 directory_name_encryption=true password="${ENC_PASSWORD}" password2="${ENC_SALT}" --config="${CUSTOMCONFIG}" 2>/dev/null
+                 $(which rclone) config create DBC crypt remote=DB:/${UPPDIR[1]} filename_encryption=standard filename_encoding=base32768 directory_name_encryption=true password="${ENC_PASSWORD}" password2="${ENC_SALT}" --config="${CUSTOMCONFIG}" &>/dev/null
               else
                  $(which rclone) config create DB dropbox server_side_across_configs=true client_id="${GETCI}" client_secret="${GETCS}" token="${TOKEN}" --config="${CUSTOMCONFIG}" --non-interactive &>/dev/null
-                 $(which rclone) config create DBC crypt remote=DB:/${UPPDIR[1]} filename_encryption=standard filename_encoding=base32768 directory_name_encryption=true password="${ENC_PASSWORD}" password2="${ENC_SALT}" --config="${CUSTOMCONFIG}" 2>/dev/null
+                 $(which rclone) config create DBC crypt remote=DB:/${UPPDIR[1]} filename_encryption=standard filename_encoding=base32768 directory_name_encryption=true password="${ENC_PASSWORD}" password2="${ENC_SALT}" --config="${CUSTOMCONFIG}" &>/dev/null
               fi
            fi
            done
@@ -288,10 +290,13 @@ function rcloneupload() {
    fi
    #### CRYPTED HACK ####
    CHECKCRYPTED=$($(which rclone) config dump --config="${CONFIG}" | $(which jq) -r 'to_entries | (.[] | select(.value.type=="crypt")) | .key')
-   if [[ "${CHECKCRYPTED}" == "" ]]; then
-      CRYPTED=""
-   else
+   CHECKALIAS=$($(which rclone) config dump --config="${CONFIG}" | $(which jq) -r 'to_entries | (.[] | select(.value.type=="alias")) | .key')
+   if [[ "${CHECKCRYPTED}" != "" ]]; then
       CRYPTED="C"
+   elif [[ "${CHECKALIAS}" != "" ]]; then
+      CRYPTED="A"
+   else
+      CRYPTED=""
    fi
    #### CHECK USED KEY ####
    KEYNOTI="DB"
