@@ -2,10 +2,10 @@
    "appname": "docker-dash",
    "apppic": "",
    "appfolder": "./apps/docker-dash",
-   "newversion": "5.2.0",
+   "newversion": "5.2.1",
    "baseimage": "alpine",
    "baseversion": "3.17.3",
    "description": "A simple, modern server dashboard, primarily used by smaller private servers",
-   "body": "Upgrading docker-dash to 5.2.0",
+   "body": "Upgrading docker-dash to 5.2.1",
    "user": "dockserver-image[bot]"
 }
