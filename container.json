@@ -697,11 +697,11 @@ base docker-ui
    "appname": "docker-ui",
    "apppic": "",
    "appfolder": "./base/docker-ui",
-   "newversion": "3.17.3",
-   "appversion": "3.17.3",
+   "newversion": "",
+   "appversion": "",
    "baseimage": "alpine",
    "description": " !!! DEVERLOP STATUS !!! DO NOT TRY TO PULL THE IMAGE YOU NEED ACCESS TO THE REPOSITORY",
-   "body": "Upgrading docker-ui to 3.17.3",
+   "body": "Upgrading docker-ui to ",
    "user": "github-actions[bot]"
 }
 
