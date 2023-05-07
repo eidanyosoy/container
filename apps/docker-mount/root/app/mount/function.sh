@@ -349,10 +349,9 @@ function rcmountkill() {
    $(which rclone) rc mount/unmountall &>/dev/null
 }
 
-function rcclean() {
+function rcrefresh() {
    source /system/mount/mount.env
-   log "${rcloneclean}"
-   $(which rclone) rc fscache/clear --fast-list _async=true &>/dev/null
+   $(which rclone) rc vfs/refresh recursive=true _async=true &>/dev/null
 }
 
 function rcstats() {
@@ -384,6 +383,7 @@ function testsuccessfull() {
    $(which sleep) 10
    if [[ "$($(which ls) -1p ${SREMOTES})" ]] && [[ "$($(which ls) -1p ${SUNION})" ]]; then
       MSG="${startupmountend}" && notification
+      rcrefresh
    else
       rckill && rcmergerfskill && folderunmount && rcmount && rcmergerfs
    fi
