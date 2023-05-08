@@ -49,7 +49,7 @@ rebulk==3.2.0
 requests-oauthlib==1.3.1
 requests==2.29.0
 retrying==1.3.3
-sabctools==7.0.1
+sabctools==7.0.2
 sgmllib3k==1.0.0
 six==1.16.0
 tempora==5.2.2
