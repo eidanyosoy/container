@@ -2,9 +2,9 @@
    "appname": "docker-ubuntu-jammy",
    "apppic": "./images/docker-ubuntu-jammy.png",
    "appfolder": "./base/docker-ubuntu-jammy",
-   "newversion": "3.17.3",
+   "newversion": "3.18.0",
    "baseimage": "alpine",
    "description": "Docker image  for docker-ubuntu-jammy",
-   "body": "Upgrading docker-ubuntu-jammy to baseimage: alpine:3.17.3",
+   "body": "Upgrading docker-ubuntu-jammy to baseimage: alpine:3.18.0",
    "user": "dockserver image update[bot]"
 }

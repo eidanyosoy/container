@@ -2,9 +2,9 @@
    "appname": "docker-backup",
    "apppic": "./images/docker-backup.png",
    "appfolder": "./apps/docker-backup",
-   "newversion": "3.17.3",
+   "newversion": "3.18.0",
    "baseimage": "alpine",
    "description": "Official Alpine Linux Docker image. Win at minimalism!",
-   "body": "Upgrading docker-backup to 3.17.3",
+   "body": "Upgrading docker-backup to 3.18.0",
    "user": "github-actions[bot]"
 }
