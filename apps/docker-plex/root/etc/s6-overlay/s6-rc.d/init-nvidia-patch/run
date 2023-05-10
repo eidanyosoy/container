@@ -1,12 +1,19 @@
 #!/usr/bin/with-contenv bash
 # shellcheck shell=bash
 
+function log() {
+   GRAY="\033[0;37m"
+   BLUE="\033[0;34m"
+   NC="\033[0m"
+   $(which echo) -e "${GRAY}[$($(which date) +'%Y/%m/%d %H:%M:%S')]${BLUE} [Plex]${NC} ${1}"
+}
+
 if [ -n "${NVIDIA_VISIBLE_DEVICES}" ]; then
-   echo "Patching nvidia..."
+   log "-> Patching nvidia"
    curl --url https://raw.githubusercontent.com/keylase/nvidia-patch/master/docker-entrypoint.sh -o /usr/local/bin/docker-entrypoint.sh
    curl --url https://raw.githubusercontent.com/keylase/nvidia-patch/master/patch.sh -o /usr/local/bin/patch.sh
    chmod +x /usr/local/bin/docker-entrypoint.sh
    chmod +x /usr/local/bin/patch.sh
    /usr/local/bin/docker-entrypoint.sh
-   echo "Patched nvidia"
+   log "-> Patched nvidia"
 fi
