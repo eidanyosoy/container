@@ -47,8 +47,8 @@ VIRTUEL="--virtual=build-dependencies build-base gcc jq libffi-dev openssl-dev p
 UNRAR="cd /tmp/unrar && make && install -v -m755 unrar /usr/local/bin"
 
 PYTHON3="python3 -m pip install --upgrade pip && \\
-    pip3 install -U --no-cache-dir --find-links https://wheel-index.linuxserver.io/alpine-3.15/ wheel apprise pynzb requests && \\
-    pip3 install -U --no-cache-dir --find-links https://wheel-index.linuxserver.io/alpine-3.15/ -r /app/sabnzbd/requirements.txt"
+    pip3 install -U --no-cache-dir --find-links https://wheel-index.linuxserver.io/alpine-3.17/ wheel apprise pynzb requests && \\
+    pip3 install -U --no-cache-dir --find-links https://wheel-index.linuxserver.io/alpine-3.17/ -r /app/sabnzbd/requirements.txt"
 
 CLEANUP="ln -s /usr/bin/python3 /usr/bin/python && \\
     apk del --purge build-dependencies && \\

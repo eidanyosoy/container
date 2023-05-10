@@ -34,16 +34,16 @@ BASEIMAGE="ghcr.io/dockserver/docker-alpine-v3:latest"
 
 INSTCOMMAND="apk add -U --update --no-cache"
 PACKAGES="yarn"
-VIRTUEL="--virtual=build-dependencies curl g++ jq curl wget tar make python3"
+VIRTUEL="--virtual=build-dependencies build-base python3"
 LINKED="ln -s /usr/bin/python3 /usr/bin/python"
 
 YARN="cd /app/jellyseerr && \\
     export NODE_OPTIONS=--max_old_space_size=2048 && \\
-    yarn --frozen-lockfile --network-timeout 1000000 && \\
+    CYPRESS_INSTALL_BINARY=0 yarn --frozen-lockfile --network-timeout 1000000 && \\
     yarn build && yarn install --production --ignore-scripts --prefer-offline && \\
     yarn cache clean"
 
-LEFTOVER="rm -rf /app/overseerr/src /app/jellyseerr/server /app/jellyseerr/Dockerfile"
+LEFTOVER="rm -rf /app/jellyseerr/src /app/jellyseerr/server /app/jellyseerr/Dockerfile"
 
 LINK2="rm -rf /app/jellyseerr/config && \\
     ln -s /config /app/jellyseerr/config && \\
