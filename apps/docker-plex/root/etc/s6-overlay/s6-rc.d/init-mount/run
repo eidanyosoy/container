@@ -1,0 +1,14 @@
+#!/usr/bin/with-contenv bash
+# shellcheck shell=bash
+
+echo "-> Checking Mount <-"
+
+APP="${HOSTNAME}"
+if [[ -d "/mnt/unionfs" ]]; then
+   while [ -z "`ls /mnt/unionfs`" ]
+   do
+      echo "-> Wait Mount /mnt/unionfs <-" && sleep 10
+   done
+   echo "-> Mount working! ${APP} starting <-"
+   echo "-> Starting ${APP} <-"
+fi
