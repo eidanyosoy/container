@@ -3,5 +3,5 @@
 ## Do not changes any lines here
 ##
 FROM scratch
-COPY --chown=abc ./apps/docker-mod-healthcheck/root/ /
+COPY ./apps/docker-mod-healthcheck/root/ /
 ##EOF
