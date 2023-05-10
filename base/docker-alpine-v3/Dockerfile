@@ -52,6 +52,7 @@ RUN \
          apk-tools \
          procps \
          findutils \
+         tzdata \
          linux-headers
 
     ### S6 overlay installation
