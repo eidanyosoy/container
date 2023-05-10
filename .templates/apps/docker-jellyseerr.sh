@@ -35,7 +35,6 @@ BASEIMAGE="ghcr.io/dockserver/docker-alpine-v3:latest"
 INSTCOMMAND="apk add -U --update --no-cache"
 PACKAGES="yarn"
 VIRTUEL="--virtual=build-dependencies build-base python3"
-LINKED="ln -s /usr/bin/python3 /usr/bin/python"
 
 YARN="cd /app/jellyseerr && \\
     export NODE_OPTIONS=--max_old_space_size=2048 && \\
@@ -92,8 +91,6 @@ ENV HOME="'"/config"'"
 RUN \
   echo "'"**** install packages ****"'" && \
     '"${INSTCOMMAND}"' '"${VIRTUEL}"' && \
-  echo "'"**** symlink python3 for compatibility ****"'" && \
-    '"${LINKED}"' && \
   echo "'"**** install runtime packages ****"'" && \
     '"${INSTCOMMAND}"' '"${PACKAGES}"' && \
     export COMMIT_TAG="'"v${NEWVERSION}"'" && \

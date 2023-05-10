@@ -42,7 +42,6 @@ BASEIMAGE="ghcr.io/dockserver/docker-alpine-v3:latest"
 INSTCOMMAND="apk add -U --update --no-cache"
 PACKAGES="jq yarn curl wget tar"
 VIRTUEL="--virtual=build-dependencies build-base python3"
-LINKED="ln -s /usr/bin/python3 /usr/bin/python"
 YARN="cd /app/overseerr && \\
     export NODE_OPTIONS=--max_old_space_size=2048 && \\
     CYPRESS_INSTALL_BINARY=0 yarn --frozen-lockfile --network-timeout 1000000 && \\
@@ -98,8 +97,6 @@ ENV HOME="'"/config"'"
 RUN \
   echo "'"**** install packages ****"'" && \
     '"${INSTCOMMAND}"' '"${VIRTUEL}"' && \
-  echo "'"**** symlink python3 for compatibility ****"'" && \
-    '"${LINKED}"' && \
   echo "'"**** install runtime packages ****"'" && \
     '"${INSTCOMMAND}"' '"${PACKAGES}"' && \
     export COMMIT_TAG="${VERSION}" && \
