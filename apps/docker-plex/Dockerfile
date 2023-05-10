@@ -2,66 +2,6 @@
 ##
 ## Do not changes any lines here
 ##
-####################################
-# All rights reserved.              #
-# started from Zero                 #
-# Docker owned dockserver           #
-# Docker Maintainer dockserver      #
-#####################################
-#####################################
-# THIS DOCKER IS UNDER LICENSE      #
-# NO CUSTOMIZING IS ALLOWED         #
-# NO REBRANDING IS ALLOWED          #
-# NO CODE MIRRORING IS ALLOWED      #
-#####################################
-# shellcheck disable=SC2086
-# shellcheck disable=SC2046
-FROM ghcr.io/linuxserver/baseimage-ubuntu:jammy
-LABEL org.opencontainers.image.source="https://github.com/dockserver/container"
-
-ARG TARGETPLATFORM
-ARG BUILDPLATFORM
-
-ARG VERSION="1.32.2.7002-86cfcc10c"
-ARG BRANCH="master"
-
-ENV NVIDIA_DRIVER_CAPABILITIES="compute,video,utility" \
-    DEBIAN_FRONTEND="noninteractive" \
-    PLEX_DOWNLOAD="https://downloads.plex.tv/plex-media-server-new" \
-    PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR="/config/Library/Application Support" \
-    PLEX_MEDIA_SERVER_HOME="/usr/lib/plexmediaserver" \
-    PLEX_MEDIA_SERVER_MAX_PLUGIN_PROCS="6" \
-    PLEX_MEDIA_SERVER_USER="abc" \
-    PLEX_MEDIA_SERVER_INFO_VENDOR="Docker" \
-    PLEX_MEDIA_SERVER_INFO_DEVICE="Docker Container" \
-    S6_CMD_WAIT_FOR_SERVICES_MAXTIME="0"
-
-RUN \
-   apt-get update -yqq && apt-get install gnupg2 wget ca-certificates lsb-release software-properties-common -yqq && \
-   case $TARGETPLATFORM in \
-    'linux/amd64') \
-         export ARCH=amd64 && \
-      echo "**** install runtime packages ****" && \
-         apt-get update -yqq && \
-      echo "**** install Intel packages ****" && \
-         apt-get install -yqq intel-opencl-icd intel-gpu-tools i965-va-driver-shaders va-driver-all mesa-vulkan-drivers gpg-agent libmfx1 ocl-icd-libopencl1; \
-    ;; \
-    'linux/arm64') export ARCH=arm64 && unset NVIDIA_DRIVER_CAPABILITIES ;; \
-   esac \
-   && \
-   echo "**** install runtime packages ****" && \
-     apt-get update -yqq && \
-   echo "**** install packages ****" && \
-     apt-get install -yqq aria2 uuid-runtime udev jq wget curl unzip unrar gpg-agent software-properties-common && \
-   echo "**** install plex ****" && \
-     aria2c -d /tmp -o plex.deb "https://downloads.plex.tv/plex-media-server-new/${VERSION}/debian/plexmediaserver_${VERSION}_${ARCH}.deb" && \
-     dpkg -i --force-confold /tmp/plex.deb && \
-   echo "**** set permissions ****" && \
-     usermod -d /app abc && \
-   echo "**** cleanup ****" && \
-     apt-get clean -yqq && \
-   rm -rf /etc/default/plexmediaserver /tmp/* /var/lib/apt/lists/* /var/tmp/*
-
+FROM lscr.io/linuxserver/plex:1.32.1.6999-91e1e2e2c-ls167
 COPY --chown=abc ./apps/docker-plex/root/ /
-
 ##EOF
