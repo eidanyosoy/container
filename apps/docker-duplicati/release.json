@@ -4,7 +4,7 @@
    "appfolder": "./apps/docker-duplicati",
    "newversion": "2.0.6.106",
    "appbranch": "master",
-   "baseimage": "ghcr.io/dockserver/docker-alpine:latest",
+   "baseimage": "ghcr.io/dockserver/docker-alpine-v3:latest",
    "description": "null",
    "body": "Upgrading docker-duplicati to 2.0.6.106",
    "user": "github-actions[bot]"

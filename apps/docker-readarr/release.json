@@ -4,7 +4,7 @@
    "appfolder": "./apps/docker-readarr",
    "newversion": "0.1.5.1782",
    "appbranch": "nightly",
-   "baseimage": "ghcr.io/dockserver/docker-alpine:latest",
+   "baseimage": "ghcr.io/dockserver/docker-alpine-v3:latest",
    "description": "null",
    "body": "Upgrading docker-readarr to 0.1.5.1782",
    "user": "github-actions[bot]"

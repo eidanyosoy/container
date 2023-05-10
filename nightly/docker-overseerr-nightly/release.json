@@ -4,7 +4,7 @@
    "appfolder": "./nightly/docker-overseerr-nightly",
    "newversion": "77a33cb74d744bb747b791785799b632af8c7862",
    "appbranch": "develop",
-   "baseimage": "ghcr.io/dockserver/docker-alpine:latest",
+   "baseimage": "ghcr.io/dockserver/docker-alpine-v3:latest",
    "description": "Request management and media discovery tool for the Plex ecosystem",
    "body": "Upgrading docker-overseerr-nightly to 77a33cb74d744bb747b791785799b632af8c7862",
    "user": "dockserver image update[bot]"

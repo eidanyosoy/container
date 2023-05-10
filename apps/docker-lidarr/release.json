@@ -4,7 +4,7 @@
    "appfolder": "./apps/docker-lidarr",
    "newversion": "1.1.4.3027",
    "appbranch": "master",
-   "baseimage": "ghcr.io/dockserver/docker-alpine:latest",
+   "baseimage": "ghcr.io/dockserver/docker-alpine-v3:latest",
    "description": "Looks and smells like Sonarr but made for music.",
    "body": "Upgrading docker-lidarr to 1.1.4.3027",
    "user": "github-actions[bot]"
