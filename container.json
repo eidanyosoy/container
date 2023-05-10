@@ -279,6 +279,14 @@ apps docker-lidarr
    "user": "github-actions[bot]"
 }
 
+apps docker-mod-healthcheck
+{
+   "appname": "docker-mod-healthcheck",
+   "apppic": "./images/docker-mod-healthcheck.png",
+   "appfolder": "./apps/docker-mod-healthcheck",
+   "user": "github-actions[bot]"
+}
+
 apps docker-mount
 {
    "appname": "docker-mount",
