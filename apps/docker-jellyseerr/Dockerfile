@@ -28,7 +28,7 @@ ENV HOME="/config"
 
 RUN \
   echo "**** install packages ****" && \
-    apk add -U --update --no-cache --virtual=build-dependencies curl g++ jq curl wget tar make python3 && \
+    apk add -U --update --no-cache --virtual=build-dependencies build-base python3 && \
   echo "**** symlink python3 for compatibility ****" && \
     ln -s /usr/bin/python3 /usr/bin/python && \
   echo "**** install runtime packages ****" && \
@@ -39,10 +39,10 @@ RUN \
     curl -fsSL "https://github.com/Fallenbagel/jellyseerr/archive/refs/tags/v${VERSION}.tar.gz" | tar xzf - -C /app/jellyseerr --strip-components=1 && \
     cd /app/jellyseerr && \
     export NODE_OPTIONS=--max_old_space_size=2048 && \
-    yarn --frozen-lockfile --network-timeout 1000000 && \
+    CYPRESS_INSTALL_BINARY=0 yarn --frozen-lockfile --network-timeout 1000000 && \
     yarn build && yarn install --production --ignore-scripts --prefer-offline && \
     yarn cache clean && \
-    rm -rf /app/overseerr/src /app/jellyseerr/server /app/jellyseerr/Dockerfile && \
+    rm -rf /app/jellyseerr/src /app/jellyseerr/server /app/jellyseerr/Dockerfile && \
   echo "{\"commitTag\": \"${COMMIT_TAG}\"}" > committag.json && \
     rm -rf /app/jellyseerr/config && \
     ln -s /config /app/jellyseerr/config && \

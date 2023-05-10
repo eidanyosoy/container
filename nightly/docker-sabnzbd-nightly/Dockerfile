@@ -41,8 +41,8 @@ RUN \
     mkdir -p /app/sabnzbd && \
     curl -fsSL "https://github.com/sabnzbd/sabnzbd/archive/"${VERSION}".tar.gz" | tar xzf - -C /app/sabnzbd --strip-components=1 && \
     python3 -m pip install --upgrade pip && \
-    pip3 install -U --no-cache-dir --find-links https://wheel-index.linuxserver.io/alpine-3.15/ wheel apprise pynzb requests && \
-    pip3 install -U --no-cache-dir --find-links https://wheel-index.linuxserver.io/alpine-3.15/ -r /app/sabnzbd/requirements.txt && \
+    pip3 install -U --no-cache-dir --find-links https://wheel-index.linuxserver.io/alpine-3.17/ wheel apprise pynzb requests && \
+    pip3 install -U --no-cache-dir --find-links https://wheel-index.linuxserver.io/alpine-3.17/ -r /app/sabnzbd/requirements.txt && \
   echo "**** cleanup ****" && \
     ln -s /usr/bin/python3 /usr/bin/python && \
     apk del --purge build-dependencies && \

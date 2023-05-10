@@ -29,7 +29,7 @@ ENV HOME="/config"
 
 RUN \
   echo "**** install packages ****" && \
-    apk add -U --update --no-cache --virtual=build-dependencies curl g++ jq curl wget tar make python3 && \
+    apk add -U --update --no-cache --virtual=build-dependencies build-base python3 && \
   echo "**** symlink python3 for compatibility ****" && \
     ln -s /usr/bin/python3 /usr/bin/python && \
   echo "**** install runtime packages ****" && \
@@ -40,7 +40,7 @@ RUN \
     curl -fsSL "https://github.com/sct/overseerr/archive/refs/tags/v${VERSION}.tar.gz" | tar xzf - -C /app/overseerr --strip-components=1 && \
     cd /app/overseerr && \
     export NODE_OPTIONS=--max_old_space_size=2048 && \
-    yarn --frozen-lockfile --network-timeout 1000000 && \
+    CYPRESS_INSTALL_BINARY=0 yarn --frozen-lockfile --network-timeout 1000000 && \
     yarn build && yarn install --production --ignore-scripts --prefer-offline && \
     yarn cache clean && \
     rm -rf /app/overseerr/src /app/overseerr/server /app/overseerr/Dockerfile && \
