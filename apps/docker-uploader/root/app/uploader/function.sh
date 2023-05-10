@@ -65,7 +65,6 @@ function refreshVFS() {
    fi
 }
 
-
 function autoscan() {
    source /system/uploader/uploader.env
    #### TRIGGER AUTOSCAN ####
