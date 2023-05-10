@@ -44,7 +44,6 @@ RUN \
     pip3 install -U --no-cache-dir --find-links https://wheel-index.linuxserver.io/alpine-3.17/ wheel apprise pynzb requests && \
     pip3 install -U --no-cache-dir --find-links https://wheel-index.linuxserver.io/alpine-3.17/ -r /app/sabnzbd/requirements.txt && \
   echo "**** cleanup ****" && \
-    ln -s /usr/bin/python3 /usr/bin/python && \
     apk del --purge build-dependencies && \
     rm -rf /var/cache/apk/* /tmp/* /config/.cache
 

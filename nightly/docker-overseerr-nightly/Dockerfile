@@ -30,8 +30,6 @@ ENV HOME="/config"
 RUN \
   echo "**** install packages ****" && \
     apk add -U --update --no-cache --virtual=build-dependencies build-base python3 && \
-  echo "**** symlink python3 for compatibility ****" && \
-    ln -s /usr/bin/python3 /usr/bin/python && \
   echo "**** install runtime packages ****" && \
     apk add -U --update --no-cache jq yarn curl wget tar && \
     export COMMIT_TAG="${VERSION}" && \
