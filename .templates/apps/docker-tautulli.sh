@@ -31,7 +31,7 @@ DESCRIPTION="$(curl -u $USERNAME:$TOKEN -sX GET "$APPLINK" | jq -r '.description
 HEADLINE="$(cat ./.templates/headline.txt)"
 
 BASEIMAGE="ghcr.io/dockserver/docker-alpine"
-##BASEIMAGE="ghcr.io/dockserver/docker-alpine:latest"
+##BASEIMAGE="ghcr.io/dockserver/docker-alpine-v3:latest"
 PICTURE="./images/$APP.png"
 
 UPCOMMAND="apk --quiet --no-cache --no-progress update && \\

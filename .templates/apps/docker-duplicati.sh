@@ -38,7 +38,7 @@ APPVERSION="${APPVERSION}"
 
 DESCRIPTION="$(curl -u $USERNAME:$TOKEN -sX GET "$APPLINK" | jq -r '.description')"
 HEADLINE="$(cat ./.templates/headline.txt)"
-BASEIMAGE="ghcr.io/dockserver/docker-alpine:latest"
+BASEIMAGE="ghcr.io/dockserver/docker-alpine-v3:latest"
 
 INSTCOMMAND="apk add -U --update --no-cache"
 PACKAGES="unzip jq openssl curl tar sqlite-libs"

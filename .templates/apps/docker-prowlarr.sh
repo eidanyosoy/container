@@ -30,7 +30,7 @@ NEWVERSION="${NEWVERSION}"
 
 DESCRIPTION="$(curl -u $USERNAME:$TOKEN -sX GET "$APPLINK" | jq -r '.description')"
 HEADLINE="$(cat ./.templates/headline.txt)"
-BASEIMAGE="ghcr.io/dockserver/docker-alpine:latest"
+BASEIMAGE="ghcr.io/dockserver/docker-alpine-v3:latest"
 
 INSTCOMMAND="apk add -U --update --no-cache"
 PACKAGES="jq curl openssl tar sqlite-libs libintl icu-libs"
