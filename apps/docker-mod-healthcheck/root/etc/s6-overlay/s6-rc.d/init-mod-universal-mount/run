@@ -1,0 +1,31 @@
+#!/usr/bin/with-contenv bash
+# shellcheck shell=bash
+#####################################
+# All rights reserved.              #
+# started from Zero                 #
+# Docker owned dockserver           #
+# Docker Maintainer dockserver      #
+#####################################
+# THIS DOCKER IS UNDER LICENSE      #
+# NO CUSTOMIZING IS ALLOWED         #
+# NO REBRANDING IS ALLOWED          #
+# NO CODE MIRRORING IS ALLOWED      #
+#####################################
+
+HEALTHCHECK="/mnt/unionfs/.healthcheck/test"
+APP="${HOSTNAME^}"
+
+function log() {
+   GRAY="\033[0;37m"
+   BLUE="\033[0;34m"
+   NC="\033[0m"
+   $(which echo) -e "${GRAY}[$($(which date) +'%Y/%m/%d %H:%M:%S')]${BLUE} [${APP}]${NC} ${1}"
+}
+
+log "-> Checking Mount <-"
+
+while [[ ! -f "${HEALTHCHECK}" ]]; do
+   log "-> Wait Mount <-" && sleep 10
+done
+
+log "-> Mount working! ${APP} starting <-"

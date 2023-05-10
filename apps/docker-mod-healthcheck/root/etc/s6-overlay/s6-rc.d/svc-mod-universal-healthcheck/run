@@ -1,0 +1,36 @@
+#!/usr/bin/with-contenv bash
+# shellcheck shell=bash
+#####################################
+# All rights reserved.              #
+# started from Zero                 #
+# Docker owned dockserver           #
+# Docker Maintainer dockserver      #
+#####################################
+# THIS DOCKER IS UNDER LICENSE      #
+# NO CUSTOMIZING IS ALLOWED         #
+# NO REBRANDING IS ALLOWED          #
+# NO CODE MIRRORING IS ALLOWED      #
+#####################################
+
+HEALTHCHECK="/mnt/unionfs/.healthcheck/test"
+APP="${HOSTNAME^}"
+SERVICE=$($(which ls) /var/run/service/ | $(which grep) -Ewiv "s6-linux-init-shutdownd|s6rc-fdholder|s6rc-oneshot-runner|svc-cron|svc-nzb|svc-mod-universal-healthcheck" | $(which head) -n1)
+START="s6-svc -u /var/run/service/${SERVICE}"
+STOP="s6-svc -d /var/run/service/${SERVICE}"
+
+function log() {
+   GRAY="\033[0;37m"
+   BLUE="\033[0;34m"
+   NC="\033[0m"
+   $(which echo) -e "${GRAY}[$($(which date) +'%Y/%m/%d %H:%M:%S')]${BLUE} [${APP}]${NC} ${1}"
+}
+
+if [[ ! -f "${HEALTHCHECK}" ]]; then
+   log "-> Kill ${APP} | Mount Offline <-" & ${STOP}
+   while [[ ! -f "${HEALTHCHECK}" ]]; do
+      $(which sleep) 30
+   done
+   log "-> Start ${APP} | Mount Online <-" & ${START}
+fi
+
+$(which sleep) 120
