@@ -1,4 +1,4 @@
-#!/command/with-contenv bash
+#!/usr/bin/with-contenv bash
 # shellcheck shell=bash
 #####################################
 # All rights reserved.              #
@@ -16,27 +16,6 @@ function log() {
    $(which echo) "[Uploader] ${1}"
 }
 
-addgroup -S abc &>/dev/null
-adduser -S abc -G abc &>/dev/null
-PGID=${PGID:-1000}
-PUID=${PUID:-1000}
-groupmod -o -g "$PGID" abc &>/dev/null
-usermod -o -u "$PUID" abc &>/dev/null
-
-if [[ -f /donate.txt ]]; then
-   $(which cat) /donate.txt
-fi
-
-$(which echo) '
--------------------------------------
-GID/UID
--------------------------------------'
-echo "
-User uid:    $(id -u abc)
-User gid:    $(id -g abc)
--------------------------------------
-"
-
 #SETTINGS
 ENDCONFIG=/app/rclone/rclone.conf
 SOURCECONFIG=/system/servicekeys/rclonegdsa.conf
@@ -45,6 +24,7 @@ ENVA=/system/uploader/uploader.env
 SAMPLE=/app/sample/.sample.uploader.env
 EXCLUDE=/system/uploader/rclone.exclude
 DATABASE=/system/uploader/db/uploader.db
+CRON=/etc/periodic/midnight/reset
 PAUSE=/app/rclone/pause
 TEMPFILES=/app/rclone/files.txt
 TMPHOSTS=/tmp/hosts
@@ -57,9 +37,7 @@ USEDDIR=/system/uploader/.keys
 JSONOLD=/system/uploader/json
 ARRAY=$($(which ls) -A "${JSONDIR}" | $(which wc) -l)
 
-   $(which cat) > /etc/apk/repositories << EOF; $(echo)
-http://dl-cdn.alpinelinux.org/alpine/v$(cat /etc/alpine-release | cut -d'.' -f1,2)/main
-http://dl-cdn.alpinelinux.org/alpine/v$(cat /etc/alpine-release | cut -d'.' -f1,2)/community
+   $(which cat) >> /etc/apk/repositories << EOF; $(echo)
 http://dl-cdn.alpinelinux.org/alpine/edge/testing
 EOF
 

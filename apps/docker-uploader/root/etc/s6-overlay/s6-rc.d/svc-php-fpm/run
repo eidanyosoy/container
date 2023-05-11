@@ -1,4 +1,5 @@
-#!/command/with-contenv bash
+#!/usr/bin/with-contenv bash
+# shellcheck shell=bash
 #####################################
 # All rights reserved.              #
 # started from Zero                 #
@@ -10,10 +11,6 @@
 # NO REBRANDING IS ALLOWED          #
 # NO CODE MIRRORING IS ALLOWED      #
 #####################################
-# RCLONE CONFIG
-ENDCONFIG=/app/rclone/rclone.conf
-CHECKTYPE=$($(which rclone) config dump --config="${ENDCONFIG}" | $(which jq) -r 'to_entries | (.[] | select(.value.type)) | .value.type' | $(which head) -n 1)
-
 function log() {
    GRAY="\033[0;37m"
    BLUE="\033[0;34m"
@@ -22,12 +19,8 @@ function log() {
 }
 umask 022
 
-if [[ "${CHECKTYPE}" == "dropbox" ]]; then
-   source /app/uploader/function-db.sh && lang
-else
-   source /app/uploader/function.sh && lang
-fi
+source /app/uploader/function.sh && lang
 
-log "${startupuploader}"
+log "${startupphp}"
 
-startuploader
+exec /usr/sbin/php-fpm81 -F
