@@ -1,6 +1,5 @@
 #!/usr/bin/with-contenv bash
-# shellcheck shell=bash
-# shellcheck disable=SC2086
+
 echo
 echo "-----------------------"
 echo "| Traktarr run options |"
@@ -91,13 +90,11 @@ echo '[ Checking first run options ]'
 if [ "$RUNNOW" == "yes" ] || [ "$RUNNOW" == "Yes" ]; then
   echo '==> Running script now on first-run'
   echo
-  cd /traktarr || return
-  s6-setuidgid abc /usr/bin/python3 traktarr.py run $SORT_OPTION $DELAY_OPTION $NOSEARCH_OPTION $NO_NOTIFICATIONS_OPTION $IGNORE_BLACKLIST --run-now
+  s6-setuidgid abc /usr/bin/python3 /usr/bin/traktarr run $SORT_OPTION $DELAY_OPTION $NOSEARCH_OPTION $NO_NOTIFICATIONS_OPTION $IGNORE_BLACKLIST --run-now
 else
   echo '==> Set to run on next schedule'
   echo
-  cd /traktarr || return
-  s6-setuidgid abc /usr/bin/python3 traktarr.py run $SORT_OPTION $DELAY_OPTION $NOSEARCH_OPTION $NO_NOTIFICATIONS_OPTION $IGNORE_BLACKLIST
+  s6-setuidgid abc /usr/bin/python3 /usr/bin/traktarr run $SORT_OPTION $DELAY_OPTION $NOSEARCH_OPTION $NO_NOTIFICATIONS_OPTION $IGNORE_BLACKLIST
 fi
 echo 'for more info on the above run options: https://hub.docker.com/r/eafxx/traktarr'
 echo

@@ -1,0 +1,60 @@
+#!/usr/bin/with-contenv bash
+# shellcheck shell=bash
+#####################################
+# All rights reserved.              #
+# started from Zero                 #
+# Docker owned dockserver           #
+# Docker Maintainer dockserver      #
+#####################################
+# THIS DOCKER IS UNDER LICENSE      #
+# NO CUSTOMIZING IS ALLOWED         #
+# NO REBRANDING IS ALLOWED          #
+# NO CODE MIRRORING IS ALLOWED      #
+#####################################
+
+function log() {
+  echo "[Traktarr] ${1}"
+}
+
+log "**** update system ****"
+   apk --quiet --no-cache --no-progress update
+   apk --quiet --no-cache --no-progress upgrade
+   apk --quiet --no-cache --no-progress fix
+
+log "**** install build packages from requirements ****" && \
+   $(which cat) /app/requirements.txt | while IFS=$'\n' read -ra myArray; do
+      apk add --quiet --no-progress --update "${myArray[@]}"
+   done
+
+log "**** install packages ****"
+   apk add --quiet --no-cache --no-progress python3=~3.8 --repository=https://dl-cdn.alpinelinux.org/alpine/v3.13/main &>/dev/null
+
+wget -q -O /tmp/get-pip.py "https://bootstrap.pypa.io/get-pip.py" && \
+python3 /tmp/get-pip.py pip==20.3.4 &>/dev/null
+
+log "**** install traktarr ****"
+if [ -z ${TRAKTARR_BRANCH+x} ]; then
+   log "**** branch is unset ****"
+   log "**** default branch is master ****"
+   TRAKTARR_BRANCH=master
+else
+   log "**** branch is set to master ****"
+fi
+
+if [[ ! -d ${TRAKTARR_DIR}/.git ]]; then
+  git clone -q -b $TRAKTARR_BRANCH https://github.com/l3uddz/traktarr ${TRAKTARR_DIR}
+  ln -s ${TRAKTARR_DIR}/traktarr.py /usr/bin/traktarr
+elif [[ -d ${TRAKTARR_DIR}/.git ]]; then  
+  if [[ "$SKIPUPDATE" == "yes" ]] || [[ "$SKIPUPDATE" == "Yes" ]] || [[ "$SKIPUPDATE" == "YES" ]]; then
+    log "**** skip update ****"
+  else
+    cd ${TRAKTARR_DIR} || return
+    git reset --hard origin/$TRAKTARR_BRANCH && git pull origin $TRAKTARR_BRANCH
+  fi
+fi
+
+log "**** install pip packages ****"
+   pip3 install --quiet --no-cache-dir --no-deps -U -r /app/pip-requirements.txt &>/dev/null
+
+log "**** cleannup ****"
+   $(which rm) -rf /var/cache/apk/*
