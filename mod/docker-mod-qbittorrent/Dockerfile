@@ -3,5 +3,5 @@
 ## Do not changes any lines here
 ##
 FROM scratch
-COPY ./mod/docker-mod-healthcheck/root/ /
+COPY ./mod/docker-mod-qbittorrent/root/ /
 ##EOF

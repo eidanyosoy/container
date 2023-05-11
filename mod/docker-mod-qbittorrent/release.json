@@ -1,6 +1,6 @@
 {
-   "appname": "docker-mod-healthcheck",
-   "apppic": "./images/docker-mod-healthcheck.png",
-   "appfolder": "./mod/docker-mod-healthcheck",
+   "appname": "docker-mod-qbittorrent",
+   "apppic": "./images/docker-mod-qbittorrent.png",
+   "appfolder": "./mod/docker-mod-qbittorrent",
    "user": "github-actions[bot]"
 }

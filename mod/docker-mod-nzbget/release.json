@@ -1,6 +1,6 @@
 {
-   "appname": "docker-mod-healthcheck",
-   "apppic": "./images/docker-mod-healthcheck.png",
-   "appfolder": "./mod/docker-mod-healthcheck",
+   "appname": "docker-mod-nzbget",
+   "apppic": "./images/docker-mod-nzbget.png",
+   "appfolder": "./mod/docker-mod-nzbget",
    "user": "github-actions[bot]"
 }
