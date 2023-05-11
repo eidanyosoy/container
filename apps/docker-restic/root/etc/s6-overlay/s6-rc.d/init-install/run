@@ -1,4 +1,4 @@
-#!/command/with-contenv bash
+#!/usr/bin/with-contenv bash
 # shellcheck shell=bash
 #####################################
 # All rights reserved.              #
@@ -26,34 +26,10 @@ HOSTS=/etc/hosts
 APP=/app/restic
 CONFIG=/config/restic
 
-## ADD USER
-addgroup -S abc &>/dev/null
-adduser -S abc -G abc &>/dev/null
-PGID=${PGID:-1000} &>/dev/null
-PUID=${PUID:-1000} &>/dev/null
-
-groupmod -o -g "$PGID" abc &>/dev/null
-usermod -o -u "$PUID" abc &>/dev/null
-
-if [[ -f /donate.txt ]]; then
-   $(which cat) /donate.txt
-fi
-
-echo "----------------------------------------------------
-     GID/UID
-----------------------------------------------------
-     User uid:    ${PUID}
-     User gid:    ${PGID}
-----------------------------------------------------"
-
-   cat > /etc/apk/repositories << EOF; $(echo)
-http://dl-cdn.alpinelinux.org/alpine/v$(cat /etc/alpine-release | cut -d'.' -f1,2)/main
-http://dl-cdn.alpinelinux.org/alpine/v$(cat /etc/alpine-release | cut -d'.' -f1,2)/community
-EOF
-
-log "**** update system packages ****" && \
-   apk --quiet --no-progress update && \
-   apk --quiet --no-progress upgrade
+log "**** update system ****"
+   apk --quiet --no-cache --no-progress update
+   apk --quiet --no-cache --no-progress upgrade
+   apk --quiet --no-cache --no-progress fix
 
 log "**** install build packages from requirements ****" && \
    $(which cat) /app/requirements.txt | while IFS=$'\n' read -ra myArray; do
@@ -99,7 +75,7 @@ RESTIC_CACHE_DIR=\"${RESTIC_CACHE_DIR:-/config/.cache}\"
 RESTIC_FOLDER=\"${RESTIC_FOLDER:-/opt/appdata}\"
 
 ## RCLONE - SETTINGS
-GOOGLE_IP=${GOOGLE_IP:-142.250.201.202}
+GOOGLE_IP=${GOOGLE_IP:-142.250.74.78}
 PROXY=\"${PROXY:-null}\"
 
 ## NOTIFICATION - SETTINGS
@@ -165,4 +141,5 @@ fi
 $(which cp) "/config/crontabs/root" "/etc/crontabs/root" &>/dev/null
 
 log "**** cleannup ****"
-$(which rm) -rf /var/cache/apk/*
+   $(which rm) -rf /var/cache/apk/* \
+                   /tmp/*

@@ -30,8 +30,8 @@ BUILDVERSION="${BUILDVERSION#*release-}"
 BUILDVERSION="${BUILDVERSION}"
 
 BUILDIMAGE="alpine"
-FINALIMAGE="ghcr.io/dockserver/docker-alpine-v3"
-ALPINEVERSION="${BUILDVERSION}"
+FINALIMAGE="ghcr.io/linuxserver/baseimage-alpine"
+ALPINEVERSION=$(curl -u $USERNAME:$TOKEN -sX GET "https://api.github.com/repos/linuxserver/docker-baseimage-alpine/releases/latest" | jq --raw-output '.tag_name')
 
 HEADLINE="$(cat ./.templates/headline.txt)"
 PICTURE="./images/$APP.png"
@@ -119,7 +119,7 @@ RUN \
   echo "'"*** cleanup build system ****"'" && \
     '"${CLEANUP}"'
 
-FROM '"${FINALIMAGE}"':latest
+FROM '"${FINALIMAGE}"':'"${ALPINEVERSION}"'
 
 ARG TARGETPLATFORM
 ARG BUILDPLATFORM
@@ -133,8 +133,6 @@ RUN \
     '"${UPCOMMAND}"' && \
   echo "'"**** install build packages ****"'" && \
     '"${INSTCOMMAND}"' '"${FINALPACKAGES}"' && \
-  echo "'"**** set alpine version ****"'" && \
-    echo -e "'"${BUILDVERSION}"'" > /etc/alpine-release && \
   echo "'"*** cleanup system ****"'" && \
     '"${CLEANUP}"'
 
