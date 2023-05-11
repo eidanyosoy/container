@@ -86,7 +86,7 @@ find /mnt/unionfs/nzb/ -type d -name "*_FAILED*" -exec rm -rf \;
 [[ ! -d "/config/scripts" ]] && \
    mkdir /config/scripts && \
    git clone --quiet --depth 1  https://github.com/clinton-hall/nzbToMedia.git /config/scripts/ && \
-   rm -rf /config/scripts/.gi*  &>/dev/null
+   rm -rf /config/scripts/.gi* &>/dev/null
 
 lsiown -R abc:abc "/config/scripts" &>/dev/null
 
