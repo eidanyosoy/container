@@ -30,8 +30,8 @@ BUILDVERSION="${BUILDVERSION#*release-}"
 BUILDVERSION="${BUILDVERSION}"
 
 BUILDIMAGE="alpine"
-FINALIMAGE="ghcr.io/dockserver/docker-alpine-v3"
-ALPINEVERSION="${BUILDVERSION}"
+FINALIMAGE="ghcr.io/linuxserver/baseimage-alpine"
+ALPINEVERSION=$(curl -u $USERNAME:$TOKEN -sX GET "https://api.github.com/repos/linuxserver/docker-baseimage-alpine/releases/latest" | jq --raw-output '.tag_name')
 
 HEADLINE="$(cat ./.templates/headline.txt)"
 PICTURE="./images/$APP.png"
@@ -63,7 +63,7 @@ RCVERSION="$(curl -u $USERNAME:$TOKEN -sX GET "https://api.github.com/repos/rclo
 S6_STAGE_VERSION="$(curl -u $USERNAME:$TOKEN -sX GET "https://api.github.com/repos/just-containers/s6-overlay/releases/latest" | jq --raw-output '.tag_name')"
 
 ## FINAL IMAGE
-FINALPACKAGES="bash jq musl findutils linux-headers apk-tools busybox coreutils procps shadow"
+FINALPACKAGES="bash curl bc findutils coreutils"
 
 ## ENDSTAGE
 BUILDSTAGE="COPY --from=builder --chown=abc --chmod=755 /usr/bin/rclone /usr/local/bin/rclone"
@@ -126,7 +126,7 @@ RUN \
   echo "'"*** cleanup build system ****"'" && \
     '"${CLEANUP}"'
 
-FROM '"${FINALIMAGE}"':latest
+FROM '"${FINALIMAGE}"':'"${ALPINEVERSION}"'
 
 ARG TARGETPLATFORM
 ARG BUILDPLATFORM
@@ -143,8 +143,6 @@ RUN \
     '"${INSTCOMMAND}"' '"${FINALPACKAGES}"' && \
   echo "'"**** install mergerfs ****"'" && \
     '"${INSTCOMMAND}"' '"${MKINSTALL}"' && \
-  echo "'"**** set alpine version ****"'" && \
-    echo -e "'"${BUILDVERSION}"'" > /etc/alpine-release && \
   echo "'"*** cleanup system ****"'" && \
     '"${CLEANUP}"'
 

@@ -1,4 +1,4 @@
-#!/command/with-contenv bash
+#!/usr/bin/with-contenv bash
 # shellcheck shell=bash
 #####################################
 # All rights reserved.              #
@@ -11,6 +11,7 @@
 # NO REBRANDING IS ALLOWED          #
 # NO CODE MIRRORING IS ALLOWED      #
 #####################################
+
 function log() {
    GRAY="\033[0;37m"
    BLUE="\033[0;34m"
@@ -19,14 +20,11 @@ function log() {
 }
 umask 022
 
+source /system/mount/mount.env
 source /app/mount/function.sh && lang
 
-MSG="${startupmount}" && notification
-$(which sleep) 1
-$(which logrotate) /etc/logrotate.conf &>/dev/null
-rcmount && log "${startuprclone}" || { log "${failedrclone}"; exit 1; }
-$(which sleep) 10
-rcmergerfs && log "${startupmergerfs}" || { log "${failedmergerfs}"; exit 1; }
-testsuccessfull && $(which sleep) 360
-
-testrun
+if [[ "${NZBCLEANUP}" != "false" ]]; then
+  log "${startupnzb}" && nzbcleanup
+else
+  $(which sleep) infinity
+fi
