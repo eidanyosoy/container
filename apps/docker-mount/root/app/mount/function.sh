@@ -15,7 +15,9 @@ source /system/mount/mount.env
 #SETTINGS
 ENDCONFIG=/app/rclone/rclone.conf
 ENVA=/system/mount/mount.env
+HEALTHCHECK=/mnt/unionfs/.healthcheck/test
 TMPENV=/tmp/mount.env
+TMPMERGER=/tmp/mergerfs.txt
 
 #FOLDER
 SUNION=/mnt/unionfs
@@ -30,9 +32,7 @@ ARRAY=$($(which ls) -A "${JSONDIR}" | $(which wc) -l)
 
 #LOG
 LOGS=/system/mount/logs
-MLOG=/system/mount/logs/rclone-union.log
-RLOG=/system/mount/logs/vfs-refresh.log
-CLOG=/system/mount/logs/vfs-clean.log
+RLOG=/system/mount/logs/rclone.log
 
 #########################################
 # From here on out, you probably don't  #
@@ -64,7 +64,7 @@ function notification() {
 }
 
 function checkban() {
-   CHECKBAN=$($(which tail) -n 25 "${MLOG}" | $(which grep) -qE "downloadQuotaExceeded" && echo true || echo false)
+   CHECKBAN=$($(which tail) -n 25 "${RLOG}" | $(which grep) -qE "downloadQuotaExceeded" && echo true || echo false)
    if [[ "${CHECKBAN}" = "true" ]]; then
       MSG="${startuphitlimit}" && notification
       if [[ "${ARRAY}" -gt "0" ]]; then
@@ -154,20 +154,17 @@ function lang() {
 function folderunmount() {
    source /system/mount/mount.env
    $(which mountpoint) -q "${SUNION}" || $(which fusermount3) -uzq "${SUNION}" && log "${killunmountremote}" || log "${failedunmountremote}"
-   $(which mountpoint) -q "${SREMOTES}" || $(which fusermount3) -uzq "${SREMOTES}" && log "${killunmountremotes}" || log "${failedunmountremotes}"
+   mapfile -t fod < <($(which ls) -d ${SREMOTES}/* 2>/dev/null)
+   for FOLDER in ${fod[@]}; do
+      $(which mountpoint) -q "${FOLDER}" || $(which fusermount3) -uzq "${FOLDER}" && log "${killunmountremotes}" || log "${failedunmountremotes}"
+   done
 }
+
 
 function rcmount() {
    source /system/mount/mount.env
    if [[ -f "/tmp/rclone.sh" ]]; then
       $(which rm) -f "/tmp/rclone.sh"
-   fi
-   if [[ "$($(which ls) -1p ${SREMOTES})" ]]; then
-      log "${rclonecache}"
-      $(which rm) -rf "${TMPRCLONE}/*"
-      if [[ "$?" -gt "0" ]]; then 
-         log "${rclonecachesuccessful}"
-      fi
    fi
 
    #### VFS_CACHE_MAX_AGE to nanoseconds ####
@@ -244,81 +241,85 @@ $(which cat) > "/tmp/rclone.sh" << EOF; $(echo)
 # shellcheck shell=bash
 # auto generated
 
-## remove test file
-if [[ -f "/tmp/rclone.running" ]]; then
-   $(which rm) -f "/tmp/rclone.running"
-fi
-
 $(which fusermount3) -uzq "${SUNION}"
-$(which fusermount3) -uzq "${SREMOTES}"
+mapfile -t fod < <($(which ls) -d ${SREMOTES}/* 2>/dev/null)
+for FOLDER in \${fod[@]}; do
+   $(which fusermount3) -uzq "\${FOLDER}"
+done
 
-### START WEBUI
+#### START RCLONE ####
 $(which rclone) rcd \\
   --config="${ENDCONFIG}" \\
-  --log-file="${MLOG}" \\
+  --log-file="${RLOG}" \\
   --log-level="${LOG_LEVEL}" \\
-  --timeout=1h \\
-  --use-mmap \\
   --ignore-errors \\
-  --user-agent="${UAGENT}" \\
   --cache-dir="${TMPRCLONE}" \\
-  --human-readable \\
-  --track-renames \\
-  --track-renames-strategy modtime,leaf \\
   --drive-use-trash="${DRIVETRASH}" \\
-  --drive-stop-on-upload-limit \\
   --drive-server-side-across-configs \\
   --drive-acknowledge-abuse \\
-  --drive-chunk-size="${DRIVE_CHUNK_SIZE}" \\
-  --buffer-size="${BUFFER_SIZE}" \\
   --rc-no-auth \\
   --rc-allow-origin=* \\
   --rc-addr=:5572 \\
   --rc-web-gui \\
   --rc-web-gui-force-update \\
   --rc-web-gui-no-open-browser &
-  ### \\--rc-web-fetch-url=https://api.github.com/repos/controlol/rclone-webui/releases/latest &
 
 $(which sleep) 10
 
-### SET MAJOR OPTIONS FOR MOUNT : $(which rclone) rc options/set options/set --json 
-$(which rclone) rc options/set --json {'"main": { "TPSLimitBurst": ${TPSBURST}, "TPSLimit": ${TPSLIMIT}, "Checkers": 6, "Transfers": 6, "BufferSize": "${BUFFER_SIZE}", "TrackRenames": true, "TrackRenamesStrategy":"modtime,leaf", "NoUpdateModTime": true, "UserAgent": "${UAGENT}", "CutoffMode":"hard", "Progress":true, "UseMmap":true, "HumanReadable":true}'} &>/dev/null
-$(which rclone) rc options/set --json {'"vfs": { "GID": '${PGID}', "UID": '${PUID}', "Umask": '${UMASK}', "CacheMode": 3, "CacheMaxSize": "${VFS_CACHE_MAX_SIZE}", "CacheMaxAge": ${VFS_CACHE_MAX_AGE_NS}, "CachePollInterval": 60000000000, "PollInterval": 30000000000, "ChunkSize": "${VFS_READ_CHUNK_SIZE}", "ChunkSizeLimit": "${VFS_READ_CHUNK_SIZE_LIMIT}", "DirCacheTime": ${VFS_DIR_CACHE_TIME_NS}, "NoModTime": true, "FastFingerprint": true, "NoChecksum": true}'} &>/dev/null
-$(which rclone) rc options/set --json {'"mount": { "AllowNonEmpty": true, "AllowOther": true, "AsyncRead": true, "WritebackCache": true}'} &>/dev/null
+#### SET OPTIONS FOR MOUNT ####
+$(which rclone) rc options/set --json {'"main": { "TPSLimitBurst": ${TPSBURST}, "TPSLimit": ${TPSLIMIT}, "BufferSize": "${BUFFER_SIZE}", "UserAgent": "${UAGENT}", "UseMmap":true}'} &>/dev/null
+$(which rclone) rc options/set --json {'"vfs": { "GID": '${PGID}', "UID": '${PUID}', "Umask": '${UMASK}', "CacheMode": 3, "CacheMaxSize": "${VFS_CACHE_MAX_SIZE}", "CacheMaxAge": ${VFS_CACHE_MAX_AGE_NS}, "CachePollInterval": 60000000000, "PollInterval": 30000000000, "ChunkSize": "${VFS_READ_CHUNK_SIZE}", "ChunkSizeLimit": "${VFS_READ_CHUNK_SIZE_LIMIT}", "DirCacheTime": ${VFS_DIR_CACHE_TIME_NS}, "FastFingerprint": true, "NoModTime": true}'} &>/dev/null
+$(which rclone) rc options/set --json {'"mount": { "AllowNonEmpty": true, "AllowOther": true}'} &>/dev/null
 $(which sleep) 5
 
-## SIMPLE START MOUNT
-$(which rclone) rc mount/mount \\
-  fs=remote: mountPoint="${SREMOTES}" mountType=mount &>/dev/null
+#### START MOUNT ####
+if [[ "${RUNION}" == "true" ]]; then
+   $(which rclone) rc mount/mount fs=remote: mountPoint="${SREMOTES}" mountType=mount &>/dev/null
+else
+   mapfile -t mounts < <($(which rclone) config dump --config="${ENDCONFIG}" | $(which jq) -r 'to_entries | (.[] | select(.value)) | .key')
+   for REMOTE in \${mounts[@]}; do
+      CHECKCRYPT=\$($(which echo) "$(which rclone) config dump --config="${ENDCONFIG}" | $(which jq) -r 'to_entries | (.[] | select(.value.remote | index(\\"\${REMOTE}\\"))) | .key'" | bash -)
+      if [[ "\${CHECKCRYPT}" == "" ]]; then
+         if [[ ! -d "${SREMOTES}/\${REMOTE}" ]]; then $(which mkdir) -p "${SREMOTES}/\${REMOTE}" && $(which chown) -hR abc:abc "${SREMOTES}/\${REMOTE}" && $(which chmod) -R 775 "${SREMOTES}/\${REMOTE}" &>/dev/null; fi
+         $(which rclone) rc mount/mount fs="\${REMOTE}:" mountPoint="${SREMOTES}/\${REMOTE}" mountType=mount &>/dev/null
+      fi
+   done
+fi
 
-$(which touch) "/tmp/rclone.running"
 EOF
 
-   $(which echo) $(date) > "/tmp/rclone.running"
    #### SET PERMISSIONS ####
    if [[ -f "/tmp/rclone.sh" ]]; then
       $(which chmod) 755 "/tmp/rclone.sh" &>/dev/null
       $(which bash) "/tmp/rclone.sh"
    fi
 
-   while true; do
-     if [[ "$($(which ls) -1p ${SREMOTES})" ]]; then
-        break
-     else 
-        $(which sleep) 5
-     fi
-   done
 }
 
 function rcmergerfs() {
    source /system/mount/mount.env
-   if [[ -d "${ADDITIONAL_MOUNT}" ]]; then
-      UFSPATH="${SDOWN}=RW:${ADDITIONAL_MOUNT}=${ADDITIONAL_MOUNT_PERMISSION}:${SREMOTES}=NC"
+   if [[ "${RUNION}" == "true" ]]; then
+      if [[ -d "${ADDITIONAL_MOUNT}" ]]; then
+         UFSPATH="${SDOWN}=RW:${ADDITIONAL_MOUNT}=${ADDITIONAL_MOUNT_PERMISSION}:${SREMOTES}=NC"
+      else
+         UFSPATH="${SDOWN}=RW:${SREMOTES}=NC"
+      fi
    else
-      UFSPATH="${SDOWN}=RW:${SREMOTES}=NC"
+      if [[ -f "${TMPMERGER}" ]]; then rm -rf "${TMPMERGER}"; fi
+      mapfile -t mergerfs < <($(which ls) -d ${SREMOTES}/* 2>/dev/null)
+      for REMOTE in ${mergerfs[@]}; do
+         $(which echo) -n "${REMOTE}=NC:" >> "${TMPMERGER}"
+      done
+      $(which sed) -i 's/.$//' "${TMPMERGER}"
+      TMPMERGERFILE=$($(which cat) "${TMPMERGER}")
+      if [[ -d "${ADDITIONAL_MOUNT}" ]]; then
+         UFSPATH="${SDOWN}=RW:${ADDITIONAL_MOUNT}=${ADDITIONAL_MOUNT_PERMISSION}:${TMPMERGERFILE}"
+      else
+         UFSPATH="${SDOWN}=RW:${TMPMERGERFILE}"
+      fi
    fi
 
-   MGFS="allow_other,rw,async_read=true,statfs_ignore=nc,use_ino,func.getattr=newest,category.action=all,category.create=mspmfs,cache.writeback=true,cache.symlinks=true,cache.files=auto-full,dropcacheonclose=true,nonempty,minfreespace=0,fsname=mergerfs"
+   MGFS="rw,use_ino,allow_other,statfs_ignore=nc,func.getattr=newest,category.action=all,category.create=ff,cache.files=auto-full,dropcacheonclose=true,fsname=mergerfs"
    #### TO RUN JUST ONCE ####
    if ! $(which pgrep) -x "mergerfs" > /dev/null; then
       $(which mergerfs) -o "${MGFS}" "${UFSPATH}" "${SUNION}" &>/dev/null
@@ -354,6 +355,16 @@ function rcrefresh() {
    $(which rclone) rc vfs/refresh recursive=true _async=true &>/dev/null
 }
 
+function rctest() {
+   mapfile -t "MOUNTS" < <($(which rclone) rc mount/listmounts | jq -r '.[]' | $(which jq) -r 'to_entries | (.[] | select(.value)) | .value.Fs')
+   for FS in ${MOUNTS[@]}; do
+      $(which rclone) lsf "${FS}:/.healthcheck/test" &>/dev/null
+	  if [[ "$?" -gt "0" ]]; then
+         $(which rclone) touch "${FS}:/.healthcheck/test" --config="${ENDCONFIG}" &>/dev/null
+	  fi
+   done
+}
+
 function rcstats() {
    source /system/mount/mount.env
    log "${rclonestats}"
@@ -380,8 +391,8 @@ function nzbcleanup() {
 
 function testsuccessfull() {
    source /system/mount/mount.env
-   $(which sleep) 10
-   if [[ "$($(which ls) -1p ${SREMOTES})" ]] && [[ "$($(which ls) -1p ${SUNION})" ]]; then
+   $(which sleep) 10 && rctest
+   if [[ -f "${HEALTHCHECK}" ]]; then
       MSG="${startupmountend}" && notification
       rcrefresh
    else
@@ -395,7 +406,7 @@ function testrun() {
    #### FINAL LOOP ####
    while true; do
       source /system/mount/mount.env
-      if [[ "$($(which ls) -1p ${SREMOTES})" ]] && [[ "$($(which ls) -1p ${SUNION})" ]]; then
+      if [[ -f "${HEALTHCHECK}" ]]; then
          log "${startupmountworks}"
       else
          rckill && rcmergerfskill && folderunmount && rcmount && rcmergerfs

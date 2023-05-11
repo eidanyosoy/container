@@ -65,12 +65,7 @@ http://dl-cdn.alpinelinux.org/alpine/v$(cat /etc/alpine-release | cut -d'.' -f1,
 http://dl-cdn.alpinelinux.org/alpine/edge/testing
 EOF
 
-cat > /etc/fuse.conf << EOF; $(echo)
-# Set the maximum number of FUSE mounts allowed to non-root users.
-mount_max = 20
-# mount options.
-user_allow_other
-EOF
+$(which sed) -i 's/#user_allow_other/user_allow_other/' "/etc/fuse.conf" &>/dev/null
 
 log "**** update system packages ****" && \
    apk --quiet --no-progress update && \
@@ -86,7 +81,7 @@ log "**** install pip packages ****"
 
 log "**** creating folders ****"
    $(which mkdir) -p /system/mount/.keys \
-           /system/mount/{logs,env,rclone,keys} \
+           /system/mount/{logs,keys} \
            /app/rclone \
            /root/.config/rclone/ &>/dev/null
 
@@ -136,19 +131,19 @@ GOOGLE_IP=${GOOGLE_IP:-142.250.201.202}
 PROXY=\"${PROXY:-null}\"
 UMASK=${UMASK:-18}
 DRIVETRASH=${DRIVETRASH:-false}
-DRIVE_CHUNK_SIZE=${DRIVE_CHUNK_SIZE:-128M}
 BUFFER_SIZE=${BUFFER_SIZE:-32M}
 TMPRCLONE=${TMPRCLONE:-/mnt/rclone_cache}
 UAGENT=${UAGENT}
 TPSLIMIT=${TPSLIMIT:-10}
-TPSBURST=${TPSBURST:-10}
+TPSBURST=${TPSBURST:-0}
+RUNION=${RUNION:-true}
 
 ## VFS - SETTINGS
 VFS_READ_CHUNK_SIZE=${VFS_READ_CHUNK_SIZE:-128M}
 VFS_READ_CHUNK_SIZE_LIMIT=${VFS_READ_CHUNK_SIZE_LIMIT:-4096M}
 VFS_CACHE_MAX_SIZE=${VFS_CACHE_MAX_SIZE}
 VFS_CACHE_MAX_AGE=${VFS_CACHE_MAX_AGE:-6h}
-VFS_DIR_CACHE_TIME=${VFS_DIR_CACHE_TIME:-12h}
+VFS_DIR_CACHE_TIME=${VFS_DIR_CACHE_TIME:-9999h}
 
 ## LOG - SETTINGS
 LOG_LEVEL=${LOG_LEVEL:-INFO}
@@ -182,8 +177,13 @@ if [[ ! -d "${SREMOTES}" ]]; then $(which mkdir) -p "${SREMOTES}" && $(which cho
 if [[ ! -d "${SDOWN}" ]]; then $(which mkdir) -p "${SDOWN}" && $(which chown) -hR abc:abc "${SDOWN}" && $(which chmod) -R 775 "${SDOWN}" &>/dev/null; fi
 if [[ -d "${TMPRCLONE}" ]]; then $(which fusermount3) -uzq "${TMPRCLONE}" &>/dev/null; fi
 if [[ -d "${SUNION}" ]]; then $(which fusermount3) -uzq "${SUNION}" &>/dev/null; fi
+mapfile -t fod < <($(which ls) -d ${SREMOTES}/* 2>/dev/null)
+for FOLDER in ${fod[@]}; do
+   $(which fusermount3) -uzq "${FOLDER}"
+done
 if [[ -d "${SREMOTES}" ]]; then $(which fusermount3) -uzq "${SREMOTES}" &>/dev/null; fi
 if [[ -f "${ENDCONFIG}" ]]; then $(which rm) -f "${ENDCONFIG}" &>/dev/null; fi
+$(which find) "${SREMOTES}" -mindepth 1 -type d -empty -delete
 $(which sed) -i 's/UMASK=022/UMASK=18/' "${ENVA}" &>/dev/null
 
 # CHECK MOUNT KEYS ARE NOT UPLOADER KEYS
@@ -268,22 +268,28 @@ if [[ -f "${ENDFILE}" && "${ARRAY}" -ge "1" ]]; then
 fi
 
 # DUMMY
-DUMMYCHECK=$($(which rclone) config dump --config="${ENDCONFIG}" | $(which jq) -r 'to_entries | (.[] | select(.value)) | .key' | $(which wc) -l)
-if [[ "${DUMMYCHECK}" == "1" ]]; then
-   $(which mkdir) -p /dummy &>/dev/null
-   $(which rclone) config create "dummy" alias remote="/dummy" --config="${ENDCONFIG}" &>/dev/null
+if [[ "${RUNION}" == "true" ]]; then
+   DUMMYCHECK=$($(which rclone) config dump --config="${ENDCONFIG}" | $(which jq) -r 'to_entries | (.[] | select(.value)) | .key' | $(which wc) -l)
+   if [[ "${DUMMYCHECK}" == "1" ]]; then
+      $(which mkdir) -p /dummy &>/dev/null
+      $(which rclone) config create "dummy" alias remote="/dummy" --config="${ENDCONFIG}" &>/dev/null
+   fi
 fi
 
 # RCLONE UNION PART
-TMPUNION=/tmp/rcunion.union
-IFS=$'\n'
-if [[ -f "${TMPUNION}" ]]; then rm -rf "${TMPUNION}"; fi
-mapfile -t mounts < <($(which rclone) config dump --config="${ENDCONFIG}" | $(which jq) -r 'to_entries | (.[] | select(.value)) | .key')
-for REMOTE in ${mounts[@]}; do
-   $(which echo) -n "${REMOTE}: " >> "${TMPUNION}"
-done
-TMPUNIONFILE=$($(which cat) "${TMPUNION}")
-$(which rclone) config create remote union upstreams "${TMPUNIONFILE}" action_policy 'all' create_policy 'all' search_policy 'all' cache_time 120 --config="${ENDCONFIG}"
+if [[ "${RUNION}" == "true" ]]; then
+   TMPUNION=/tmp/rcunion.union
+   if [[ -f "${TMPUNION}" ]]; then rm -rf "${TMPUNION}"; fi
+   mapfile -t mounts < <($(which rclone) config dump --config="${ENDCONFIG}" | $(which jq) -r 'to_entries | (.[] | select(.value)) | .key')
+   for REMOTE in ${mounts[@]}; do
+      CHECKCRYPT=$($(which echo) "$(which rclone) config dump --config="${ENDCONFIG}" | $(which jq) -r 'to_entries | (.[] | select(.value.remote | index(\"${REMOTE}\"))) | .key'" | bash -)
+      if [[ "${CHECKCRYPT}" == "" ]]; then
+         $(which echo) -n "${REMOTE}: " >> "${TMPUNION}"
+      fi
+   done
+   TMPUNIONFILE=$($(which cat) "${TMPUNION}")
+   $(which rclone) config create remote union upstreams "${TMPUNIONFILE}" action_policy 'all' create_policy 'all' search_policy 'all' cache_time 120 --config="${ENDCONFIG}"
+fi
 
 mount --bind /app/rclone/ /root/.config/rclone/
 
@@ -339,5 +345,8 @@ $(which chown) -cR abc:abc \
 
 $(which chmod) u+s $(which rclone) &>/dev/null
 $(which chmod) u+s $(which mergerfs) &>/dev/null
+
+log "**** cleannup ****"
+   $(which rm) -rf /var/cache/apk/*
 
 #### END OF FILE ####

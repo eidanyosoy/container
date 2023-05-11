@@ -27,11 +27,11 @@ function log() {
 
 while true; do
    if [[ ! -f "${HEALTHCHECK}" ]]; then
-      log "-> Kill ${APP} | Mount Offline <-" & ${STOP}
+      log "-> Kill ${APP} | Mount Offline <-" && ${STOP}
       while [[ ! -f "${HEALTHCHECK}" ]]; do
          $(which sleep) 30
       done
-      log "-> Start ${APP} | Mount Online <-" & ${START}
+      log "-> Start ${APP} | Mount Online <-" && ${START}
    fi
    $(which sleep) 120
 done
