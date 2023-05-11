@@ -1,4 +1,4 @@
-#!/usr/bin/with-contenv bash
+#!/command/with-contenv bash
 # shellcheck shell=bash
 #####################################
 # All rights reserved.              #
@@ -43,7 +43,7 @@ fi
 
 if [[ ! -d ${TRAKTARR_DIR}/.git ]]; then
   git clone -q -b $TRAKTARR_BRANCH https://github.com/l3uddz/traktarr ${TRAKTARR_DIR}
-  ln -s ${TRAKTARR_DIR}/traktarr.py /usr/bin/traktarr
+  ln -s ${TRAKTARR_DIR}/traktarr.py /command/traktarr
 elif [[ -d ${TRAKTARR_DIR}/.git ]]; then  
   if [[ "$SKIPUPDATE" == "yes" ]] || [[ "$SKIPUPDATE" == "Yes" ]] || [[ "$SKIPUPDATE" == "YES" ]]; then
     log "**** skip update ****"
