@@ -74,8 +74,8 @@ LABEL org.opencontainers.image.source="'"https://github.com/dockserver/container
 ARG TARGETPLATFORM
 ARG BUILDPLATFORM
 
-ARG VERSION="'"${NEWVERSION}"'"
-ARG BRANCH="'"${APPBRANCH}"'"
+ARG VERSION='"${NEWVERSION}"'
+ARG BRANCH='"${APPBRANCH}"'
 ARG ALPINE_VERSION='"${ALPINEVERSION}"'
 
 RUN \
