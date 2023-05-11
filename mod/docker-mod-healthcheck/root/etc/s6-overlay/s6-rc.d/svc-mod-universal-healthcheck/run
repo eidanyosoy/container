@@ -14,7 +14,7 @@
 
 HEALTHCHECK="/mnt/unionfs/.healthcheck/test"
 APP="${HOSTNAME^}"
-SERVICE=$($(which ls) /var/run/service/ | $(which grep) -Ewiv "s6-linux-init-shutdownd|s6rc-fdholder|s6rc-oneshot-runner|svc-cron|svc-nzb|svc-mod-universal-healthcheck" | $(which head) -n1)
+SERVICE=$($(which ls) /var/run/service/ | $(which grep) -Ewiv "s6-linux-init-shutdownd|s6rc-fdholder|s6rc-oneshot-runner|svc-cron|svc-nzb|svc-caddy|svc-mod-universal-healthcheck" | $(which head) -n1)
 START="s6-svc -u /var/run/service/${SERVICE}"
 STOP="s6-svc -d /var/run/service/${SERVICE}"
 
