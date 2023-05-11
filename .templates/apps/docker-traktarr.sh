@@ -39,13 +39,12 @@ APPFOLDER="./$FOLDER/$APP"
 INSTCOMMAND="apk add -U --update --no-cache --quiet"
 CLEAN="apk del --purge --quiet"
 VOLUMEN="VOLUME /config"
-EPOINT="ENTRYPOINT /init"
 
 UPCOMMAND="apk --quiet --no-cache --no-progress update && \\
     apk --quiet --no-cache --no-progress upgrade"
 
 INSTCOMMAND="apk add -U --update --no-cache"
-PACKAGES="add bash curl bc jq findutils coreutils"
+PACKAGES="bash curl bc jq findutils coreutils"
 
 CLEANUP="apk del --quiet --clean-protected --no-progress && \\
     rm -f /var/cache/apk/*"
@@ -101,5 +100,5 @@ RUN \
 
 COPY '"${APPFOLDER}"'/root/ /
 
-'"${EPOINT}"'
+'"${VOLUMEN}"'
 ##EOF' > ./$FOLDER/$APP/Dockerfile
