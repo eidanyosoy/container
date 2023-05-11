@@ -33,11 +33,10 @@ HEADLINE="$(cat ./.templates/headline.txt)"
 
 ##DESCRIPTION="$(curl -u $USERNAME:$TOKEN -sX GET "$APPLINK" | jq -r '.description')"
 DESCRIPTION="Whisparr is an adult movie collection manager for Usenet and BitTorrent users."
-BASEIMAGE="ghcr.io/dockserver/docker-alpine-v3:latest"
+BASEIMAGE="ghcr.io/linuxserver/baseimage-alpine:3.18"
 
 INSTCOMMAND="apk add -U --update --no-cache"
-PACKAGES="--repository http://dl-cdn.alpinelinux.org/alpine/edge/main jq openssl curl icu-libs wget tar sqlite-libs ffmpeg mediainfo tinyxml2"
-APPSPEC="--repository http://dl-cdn.alpinelinux.org/alpine/edge/community libmediainfo "
+PACKAGES="icu-libs sqlite-libs"
 CLEANUP="rm -rf /app/whisparr/bin/Whisparr.Update"
 PICTURE="./images/$APP.png"
 
@@ -76,18 +75,13 @@ ARG BUILDPLATFORM
 ARG VERSION="'"${NEWVERSION}"'"
 ARG BRANCH="'"${APPBRANCH}"'"
 
-ENV XDG_CONFIG_HOME="'"/config/xdg"'"
-
 RUN \
   echo "'"**** install build packages ****"'" && \
     '"${INSTCOMMAND}"' '"${PACKAGES}"' && \
-  echo "'"**** install app packages ****"'" && \
-    '"${INSTCOMMAND}"' '"${APPSPEC}"' && \
   echo "'"**** install '"${APP}"' ****"'" && \
     mkdir -p /app/whisparr/bin && \
     curl -fsSL "'"https://whisparr.servarr.com/v1/update/"'${BRANCH}'"/updatefile?version="'${VERSION}'"&os=linuxmusl&runtime=netcore&arch=x64"'" | tar xzf - -C /app/whisparr/bin --strip-components=1 && \
   echo -e "'"UpdateMethod=docker\nBranch="'${BRANCH}'"\nPackageVersion="'${VERSION}'"\nPackageAuthor=[dockserver.io](https://dockserver.io)"'" > /app/whisparr/package_info && \
-    echo -e "'"3.15.2"'" > /etc/alpine-release && \
   echo "'"**** cleanup ****"'" && \
     '"${CLEANUP}"'
 
