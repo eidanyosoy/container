@@ -12,5 +12,8 @@
 # NO CODE MIRRORING IS ALLOWED      #
 #####################################
 
+#### INSTALL PACKAGES
+apk add --quiet -no-progress --update wget
+
 #### INSTALL RCLONE
 $(which wget) -qO- https://rclone.org/install.sh | bash &>/dev/null
