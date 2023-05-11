@@ -14,9 +14,6 @@
 
 HEALTHCHECK="/mnt/unionfs/.healthcheck/test"
 APP="${HOSTNAME^}"
-SERVICE=$($(which ls) /var/run/service/ | $(which grep) -Ewiv "s6-linux-init-shutdownd|s6rc-fdholder|s6rc-oneshot-runner|svc-cron|svc-nzb|svc-caddy|svc-mod-universal-healthcheck" | $(which head) -n1)
-START="s6-svc -u /var/run/service/${SERVICE}"
-STOP="s6-svc -d /var/run/service/${SERVICE}"
 
 function log() {
    GRAY="\033[0;37m"
@@ -27,11 +24,16 @@ function log() {
 
 while true; do
    if [[ ! -f "${HEALTHCHECK}" ]]; then
-      log "-> Kill ${APP} | Mount Offline <-" && ${STOP}
-      while [[ ! -f "${HEALTHCHECK}" ]]; do
-         $(which sleep) 30
+      log "-> Kill ${APP} | Mount Offline <-"
+      mapfile -t "SERVICES" < <($(which ls) /var/run/service/ | $(which grep) -Ewiv "s6-linux-init-shutdownd|s6rc-fdholder|s6rc-oneshot-runner|svc-cron|svc-mod-universal-healthcheck")
+      for SERVICE in ${SERVICES[@]}; do
+         s6-svc -d /var/run/service/${SERVICE}
+         while [[ ! -f "${HEALTHCHECK}" ]]; do
+            $(which sleep) 30
+         done
+         s6-svc -u /var/run/service/${SERVICE}
       done
-      log "-> Start ${APP} | Mount Online <-" && ${START}
+      log "-> Start ${APP} | Mount Online <-"
    fi
    $(which sleep) 120
 done
