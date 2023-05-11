@@ -1,6 +1,6 @@
 {
    "appname": "docker-mod-healthcheck",
    "apppic": "./images/docker-mod-healthcheck.png",
-   "appfolder": "./apps/docker-mod-healthcheck",
+   "appfolder": "./mod/docker-mod-healthcheck",
    "user": "github-actions[bot]"
 }

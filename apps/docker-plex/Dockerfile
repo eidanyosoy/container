@@ -2,6 +2,6 @@
 ##
 ## Do not changes any lines here
 ##
-FROM lscr.io/linuxserver/plex:1.32.1.6999-91e1e2e2c-ls167
+FROM ghcr.io/linuxserver/plex:1.32.1.6999-91e1e2e2c-ls167
 COPY --chown=abc ./apps/docker-plex/root/ /
 ##EOF
