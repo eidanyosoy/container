@@ -1,4 +1,4 @@
-#!/usr/bin/with-contenv bash
+#!/command/with-contenv bash
 # shellcheck shell=bash
 #####################################
 # All rights reserved.              #
@@ -237,7 +237,7 @@ function rcmount() {
    fi
 
 $(which cat) > "/tmp/rclone.sh" << EOF; $(echo)
-#!/usr/bin/with-contenv bash
+#!/command/with-contenv bash
 # shellcheck shell=bash
 # auto generated
 
