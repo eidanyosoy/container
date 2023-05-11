@@ -43,13 +43,13 @@ RUN \
     apk del --quiet --clean-protected --no-progress && \
     rm -rf /var/cache/apk/* /tmp/*
 
-FROM ghcr.io/dockserver/docker-alpine-v3:latest
+FROM ghcr.io/linuxserver/baseimage-alpine:3.18-a2ffcb28-ls1
 
 ARG TARGETPLATFORM
 ARG BUILDPLATFORM
 
 ARG BASE_VERSION=3.18.0
-ARG ALPINE_VERSION=3.18.0
+ARG ALPINE_VERSION=3.18-a2ffcb28-ls1
 ARG RCLONE_VERSION=v1.62.2
 
 RUN \
@@ -58,8 +58,6 @@ RUN \
   apk --quiet --no-cache --no-progress upgrade && \
   echo "**** install build packages ****" && \
     apk add -U --update --no-cache --quiet bash jq musl findutils linux-headers apk-tools busybox coreutils procps shadow && \
-  echo "**** set alpine version ****" && \
-    echo -e "3.18.0" > /etc/alpine-release && \
   echo "*** cleanup system ****" && \
     apk del --quiet --clean-protected --no-progress && \
     rm -rf /var/cache/apk/* /tmp/*
