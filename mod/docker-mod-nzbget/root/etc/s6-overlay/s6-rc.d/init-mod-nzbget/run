@@ -1,0 +1,57 @@
+#!/usr/bin/with-contenv bash
+# shellcheck shell=bash
+#####################################
+# All rights reserved.              #
+# started from Zero                 #
+# Docker owned dockserver           #
+# Docker Maintainer dockserver      #
+#####################################
+# THIS DOCKER IS UNDER LICENSE      #
+# NO CUSTOMIZING IS ALLOWED         #
+# NO REBRANDING IS ALLOWED          #
+# NO CODE MIRRORING IS ALLOWED      #
+#####################################
+
+APP="${HOSTNAME^}"
+
+function log() {
+   GRAY="\033[0;37m"
+   BLUE="\033[0;34m"
+   NC="\033[0m"
+   $(which echo) -e "${GRAY}[$($(which date) +'%Y/%m/%d %H:%M:%S')]${BLUE} [${APP}]${NC} ${1}"
+}
+
+mkdir -p \
+    /mnt/unionfs/nzb \
+    /mnt/unionfs/nzb/incomplete \
+    /mnt/unionfs/nzb/watch \
+    /mnt/unionfs/nzb/backup
+
+lsiown abc:abc \
+    /mnt/unionfs/nzb \
+    /mnt/unionfs/nzb/incomplete \
+    /mnt/unionfs/nzb/watch \
+    /mnt/unionfs/nzb/backup
+
+# check if config file exists in /config
+[[ ! -f /config/nzbget.conf ]] && \
+    cp /app/nzbget/share/nzbget/nzbget.conf /config/nzbget.conf
+
+## NEDD PART TO CHANGE OR INJECTION THE EDITS
+[[ -f /config/nzbget.conf ]] && \
+     log "Change Values ... "
+     dlfolder="/mnt/unionfs/nzb/"
+     infolder="/mnt/unionfs/nzb/incomplete"
+     wtnzb="/mnt/unionfs/nzb/backup"
+     wtn2="/mnt/unionfs/nzb/watch"
+
+     sed -i -e "s/^DestDir\s*=.*$/DestDir=${dlfolder}/g" /config/nzbget.conf
+     sed -i -e "s/^InterDir\s*=.*$/InterDir=${infolder}/g" /config/nzbget.conf
+     sed -i -e "s/^NzbDir\s*=.*$/NzbDir=${wtnzb}/g" /config/nzbget.conf
+     sed -i -e "s/^MainDir\s*=.*$/MainDir=/config/g" /config/nzbget.conf
+     sed -i -e "s/^ScriptDir\s*=.*$/ScriptDir=${MainDir}/scripts/g" /config/nzbget.conf
+     sed -i -e "s/^ControlUsername\s*=.*$/ControlUsername=/g" /config/nzbget.conf
+     sed -i -e "s/^ControlPassword\s*=.*$/ControlPassword=/g" /config/nzbget.conf
+     sed -i -e "s/^DirectUnpack\s*=.*$/DirectUnpack=yes/g" /config/nzbget.conf
+     sed -i -e "s/^HealthCheck\s*=.*$/HealthCheck=Delete/g" /config/nzbget.conf
+     sed -i -e "s/^DiskSpace\s*=.*$/DiskSpace=25000/g" /config/nzbget.conf

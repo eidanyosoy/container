@@ -1,0 +1,56 @@
+#!/usr/bin/with-contenv bash
+# shellcheck shell=bash
+#####################################
+# All rights reserved.              #
+# started from Zero                 #
+# Docker owned dockserver           #
+# Docker Maintainer dockserver      #
+#####################################
+# THIS DOCKER IS UNDER LICENSE      #
+# NO CUSTOMIZING IS ALLOWED         #
+# NO REBRANDING IS ALLOWED          #
+# NO CODE MIRRORING IS ALLOWED      #
+#####################################
+
+APP="${HOSTNAME^}"
+
+function log() {
+   GRAY="\033[0;37m"
+   BLUE="\033[0;34m"
+   NC="\033[0m"
+   $(which echo) -e "${GRAY}[$($(which date) +'%Y/%m/%d %H:%M:%S')]${BLUE} [${APP}]${NC} ${1}"
+}
+
+if [ -z `command -v git` ]; then
+   log "**** installing git ****" && \
+   apk --no-cache add git
+fi
+
+SCRIPTS_DIR=/app/tautulli/scripts
+SCRIPTS_LINK=https://github.com/blacktwin/JBOPS
+
+if [[ ! -d "${SCRIPTS_DIR}/.git" ]]; then
+   log "**** no scripts found, cloning. ****" && \
+   git clone --depth 1 ${SCRIPTS_LINK} ${SCRIPTS_DIR} &> /dev/null
+   pip3 install --no-cache-dir -U ${SCRIPTS_DIR}/requirements.txt
+else
+   log "**** scripts found, pulling latest. ****" && \
+   git -C ${SCRIPTS_DIR} pull &> /dev/null
+   pip3 install --no-cache-dir -U ${SCRIPTS_DIR}/requirements.txt
+fi
+
+SCRIPTS_DIR=/app/tautulli/scripts
+DIR_OWNER=`stat -c "%U:%G" ${SCRIPTS_DIR}`
+if [[ ${DIR_OWNER} != "abc:abc" ]]; then
+    log "chowning ${SCRIPTS_DIR} please be patient" && \
+    lsiown -R abc:abc ${SCRIPTS_DIR} &> /dev/null
+fi
+
+chmod -R +x ${SCRIPTS_DIR}/*/*.py &> /dev/null
+CHOWN_DIR=/config
+DIR_OWNER=`stat -c "%U:%G" $CHOWN_DIR`
+
+if [[ ${DIR_OWNER} != "abc:abc" ]]; then
+    log "chowning ${CHOWN_DIR} please be patient" && \
+    lsiown -R abc:abc ${CHOWN_DIR} &> /dev/null
+fi

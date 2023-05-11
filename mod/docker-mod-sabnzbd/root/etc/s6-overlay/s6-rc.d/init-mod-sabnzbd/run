@@ -1,0 +1,97 @@
+#!/usr/bin/with-contenv bash
+# shellcheck shell=bash
+#####################################
+# All rights reserved.              #
+# started from Zero                 #
+# Docker owned dockserver           #
+# Docker Maintainer dockserver      #
+#####################################
+# THIS DOCKER IS UNDER LICENSE      #
+# NO CUSTOMIZING IS ALLOWED         #
+# NO REBRANDING IS ALLOWED          #
+# NO CODE MIRRORING IS ALLOWED      #
+#####################################
+
+APP="${HOSTNAME^}"
+
+function log() {
+   GRAY="\033[0;37m"
+   BLUE="\033[0;34m"
+   NC="\033[0m"
+   $(which echo) -e "${GRAY}[$($(which date) +'%Y/%m/%d %H:%M:%S')]${BLUE} [${APP}]${NC} ${1}"
+}
+
+mkdir -p \
+    /mnt/unionfs/nzb \
+    /mnt/unionfs/nzb/incomplete \
+    /mnt/unionfs/nzb/watch \
+    /mnt/unionfs/nzb/backup
+
+lsiown abc:abc \
+    /mnt/unionfs/nzb \
+    /mnt/unionfs/nzb/incomplete \
+    /mnt/unionfs/nzb/watch \
+    /mnt/unionfs/nzb/backup
+
+if [[ ! -f "/config/sabnzbd.ini" ]]; then
+     log "Copying over default configuration ... "
+     mkdir -p /config/sabnzbd && cp /app/sabnzbd/sabnzbd.ini /config/sabnzbd.ini
+
+     log "Creating api keys ... "
+     api_key=$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 32 | head -n 1)
+     nzb_key=$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 32 | head -n 1)
+     log "Change Values ... "
+     dlfolder="/mnt/unionfs/nzb/"
+     infolder="/mnt/unionfs/nzb/incomplete"
+     wtnzb="/mnt/unionfs/nzb/backup"
+     cfree="50G"
+     wtn2="/mnt/unionfs/nzb/watch"
+     sed -i -e "s/^api_key *=.*$/api_key = ${api_key}/g" /config/sabnzbd.ini
+     sed -i -e "s/^nzb_key *=.*$/nzb_key = ${nzb_key}/g" /config/sabnzbd.ini
+     sed -i -e "s/^download_dir *=.*$/download_dir = ${dlfolder}/g" /config/sabnzbd.ini
+     sed -i -e "s/^complete_dir *=.*$/complete_dir = ${infolder}/g" /config/sabnzbd.ini
+     sed -i -e "s/^nzb_backup_dir *=.*$/nzb_backup_dir = ${wtnzb}/g" /config/sabnzbd.ini
+     sed -i -e "s/^complete_free *=.*$/complete_free = ${cfree}/g" /config/sabnzbd.ini
+     sed -i -e "s/^dirscan_dir *=.*$/dirscan_dir = ${wtn2}/g" /config/sabnzbd.ini
+     sed -i -e "s/^download_free *=.*$/download_free = ${cfree}/g" /config/sabnzbd.ini
+else
+     dlfolder="/mnt/unionfs/nzb/"
+     infolder="/mnt/unionfs/nzb/incomplete"
+     wtnzb="/mnt/unionfs/nzb/backup"
+     cfree="50G"
+     wtn2="/mnt/unionfs/nzb/watch"
+     sed -i -e "s/^download_dir *=.*$/download_dir = ${dlfolder}/g" /config/sabnzbd.ini
+     sed -i -e "s/^complete_dir *=.*$/complete_dir = ${infolder}/g" /config/sabnzbd.ini
+     sed -i -e "s/^nzb_backup_dir *=.*$/nzb_backup_dir = ${wtnzb}/g" /config/sabnzbd.ini
+     sed -i -e "s/^complete_free *=.*$/complete_free = ${cfree}/g" /config/sabnzbd.ini
+     sed -i -e "s/^dirscan_dir *=.*$/dirscan_dir = ${wtn2}/g" /config/sabnzbd.ini
+     sed -i -e "s/^download_free *=.*$/download_free = ${cfree}/g" /config/sabnzbd.ini
+fi
+
+if [[ -n ${HOSTENTRIES} ]]; then
+    log "Updating host_whitelist setting ... " && \
+    sed -i -e "s/^host_whitelist *=.*$/host_whitelist = ${HOSTNAME}, ${HOSTNAME}.${HOSTENTRIES}/g" /config/sabnzbd.ini
+fi
+
+find /mnt/unionfs/nzb/backup -type f -name "*nzb*" -exec rm -rf \;
+find /mnt/unionfs/nzb/ -type d -name "*_FAILED*" -exec rm -rf \;
+
+[[ -e `command -v apt` ]] && \
+    log "**** installing packages ****" && \
+    apt-get install --no-install-recommends -y ffmpeg curl wget git
+
+[[ -d "/config/scripts" ]] && \
+   rm -rf /config/scripts
+
+[[ ! -d "/config/scripts" ]] && \
+   mkdir /config/scripts && \
+   git clone --quiet --depth 1  https://github.com/clinton-hall/nzbToMedia.git /config/scripts/ && \
+   rm -rf /config/scripts/.gi*
+
+lsiown -R abc:abc "/config/scripts" &>/dev/null
+lsiown -R abc:abc "/timer/"
+chmod 755 /timer/*
+
+for i in `ls /config/scripts/`; do
+    chmod a+x /config/scripts/$i &>/dev/null
+done
