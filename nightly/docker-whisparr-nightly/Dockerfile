@@ -16,7 +16,7 @@
 #####################################
 # shellcheck disable=SC2086
 # shellcheck disable=SC2046
-FROM ghcr.io/dockserver/docker-alpine-v3:latest
+FROM ghcr.io/linuxserver/baseimage-alpine:3.18
 LABEL org.opencontainers.image.source="https://github.com/dockserver/container"
 
 ARG TARGETPLATFORM
@@ -25,18 +25,13 @@ ARG BUILDPLATFORM
 ARG VERSION="2.0.0.155"
 ARG BRANCH="nightly"
 
-ENV XDG_CONFIG_HOME="/config/xdg"
-
 RUN \
   echo "**** install build packages ****" && \
-    apk add -U --update --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/main jq openssl curl icu-libs wget tar sqlite-libs ffmpeg mediainfo tinyxml2 && \
-  echo "**** install app packages ****" && \
-    apk add -U --update --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/community libmediainfo  && \
+    apk add -U --update --no-cache icu-libs sqlite-libs && \
   echo "**** install 'docker-whisparr-nightly' ****" && \
     mkdir -p /app/whisparr/bin && \
     curl -fsSL "https://whisparr.servarr.com/v1/update/${BRANCH}/updatefile?version=${VERSION}&os=linuxmusl&runtime=netcore&arch=x64" | tar xzf - -C /app/whisparr/bin --strip-components=1 && \
   echo -e "UpdateMethod=docker\nBranch=${BRANCH}\nPackageVersion=${VERSION}\nPackageAuthor=[dockserver.io](https://dockserver.io)" > /app/whisparr/package_info && \
-    echo -e "3.15.2" > /etc/alpine-release && \
   echo "**** cleanup ****" && \
     rm -rf /app/whisparr/bin/Whisparr.Update
 
