@@ -739,6 +739,14 @@ base ubuntu
    "user": "github-actions[bot]"
 }
 
+mod docker-mod-rclone
+{
+   "appname": "docker-mod-rclone",
+   "apppic": "./images/docker-mod-rclone.png",
+   "appfolder": "./mod/docker-mod-rclone",
+   "user": "github-actions[bot]"
+}
+
 nightly docker-overseerr-nightly
 {
    "appname": "docker-overseerr-nightly",

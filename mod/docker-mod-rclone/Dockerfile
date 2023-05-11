@@ -3,5 +3,5 @@
 ## Do not changes any lines here
 ##
 FROM scratch
-COPY ./apps/docker-mod-healthcheck/root/ /
+COPY ./mod/docker-mod-rclone/root/ /
 ##EOF
