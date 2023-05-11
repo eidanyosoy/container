@@ -25,17 +25,17 @@ mkdir -p \
     /mnt/unionfs/nzb \
     /mnt/unionfs/nzb/incomplete \
     /mnt/unionfs/nzb/watch \
-    /mnt/unionfs/nzb/backup
+    /mnt/unionfs/nzb/backup &>/dev/null
 
 lsiown abc:abc \
     /mnt/unionfs/nzb \
     /mnt/unionfs/nzb/incomplete \
     /mnt/unionfs/nzb/watch \
-    /mnt/unionfs/nzb/backup
+    /mnt/unionfs/nzb/backup &>/dev/null
 
 if [[ ! -f "/config/sabnzbd.ini" ]]; then
      log "Copying over default configuration ... "
-     mkdir -p /config/sabnzbd && cp /app/sabnzbd/sabnzbd.ini /config/sabnzbd.ini
+     mkdir -p /config/sabnzbd && cp /app/sabnzbd/sabnzbd.ini /config/sabnzbd.ini &>/dev/null
 
      log "Creating api keys ... "
      api_key=$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 32 | head -n 1)
@@ -46,51 +46,49 @@ if [[ ! -f "/config/sabnzbd.ini" ]]; then
      wtnzb="/mnt/unionfs/nzb/backup"
      cfree="50G"
      wtn2="/mnt/unionfs/nzb/watch"
-     sed -i -e "s/^api_key *=.*$/api_key = ${api_key}/g" /config/sabnzbd.ini
-     sed -i -e "s/^nzb_key *=.*$/nzb_key = ${nzb_key}/g" /config/sabnzbd.ini
-     sed -i -e "s/^download_dir *=.*$/download_dir = ${dlfolder}/g" /config/sabnzbd.ini
-     sed -i -e "s/^complete_dir *=.*$/complete_dir = ${infolder}/g" /config/sabnzbd.ini
-     sed -i -e "s/^nzb_backup_dir *=.*$/nzb_backup_dir = ${wtnzb}/g" /config/sabnzbd.ini
-     sed -i -e "s/^complete_free *=.*$/complete_free = ${cfree}/g" /config/sabnzbd.ini
-     sed -i -e "s/^dirscan_dir *=.*$/dirscan_dir = ${wtn2}/g" /config/sabnzbd.ini
-     sed -i -e "s/^download_free *=.*$/download_free = ${cfree}/g" /config/sabnzbd.ini
+     sed -i -e "s/^api_key *=.*$/api_key = ${api_key}/g" /config/sabnzbd.ini &>/dev/null
+     sed -i -e "s/^nzb_key *=.*$/nzb_key = ${nzb_key}/g" /config/sabnzbd.ini &>/dev/null
+     sed -i -e "s/^download_dir *=.*$/download_dir = ${dlfolder}/g" /config/sabnzbd.ini &>/dev/null
+     sed -i -e "s/^complete_dir *=.*$/complete_dir = ${infolder}/g" /config/sabnzbd.ini &>/dev/null
+     sed -i -e "s/^nzb_backup_dir *=.*$/nzb_backup_dir = ${wtnzb}/g" /config/sabnzbd.ini &>/dev/null
+     sed -i -e "s/^complete_free *=.*$/complete_free = ${cfree}/g" /config/sabnzbd.ini &>/dev/null
+     sed -i -e "s/^dirscan_dir *=.*$/dirscan_dir = ${wtn2}/g" /config/sabnzbd.ini &>/dev/null
+     sed -i -e "s/^download_free *=.*$/download_free = ${cfree}/g" /config/sabnzbd.ini &>/dev/null
 else
      dlfolder="/mnt/unionfs/nzb/"
      infolder="/mnt/unionfs/nzb/incomplete"
      wtnzb="/mnt/unionfs/nzb/backup"
      cfree="50G"
      wtn2="/mnt/unionfs/nzb/watch"
-     sed -i -e "s/^download_dir *=.*$/download_dir = ${dlfolder}/g" /config/sabnzbd.ini
-     sed -i -e "s/^complete_dir *=.*$/complete_dir = ${infolder}/g" /config/sabnzbd.ini
-     sed -i -e "s/^nzb_backup_dir *=.*$/nzb_backup_dir = ${wtnzb}/g" /config/sabnzbd.ini
-     sed -i -e "s/^complete_free *=.*$/complete_free = ${cfree}/g" /config/sabnzbd.ini
-     sed -i -e "s/^dirscan_dir *=.*$/dirscan_dir = ${wtn2}/g" /config/sabnzbd.ini
-     sed -i -e "s/^download_free *=.*$/download_free = ${cfree}/g" /config/sabnzbd.ini
+     sed -i -e "s/^download_dir *=.*$/download_dir = ${dlfolder}/g" /config/sabnzbd.ini &>/dev/null
+     sed -i -e "s/^complete_dir *=.*$/complete_dir = ${infolder}/g" /config/sabnzbd.ini &>/dev/null
+     sed -i -e "s/^nzb_backup_dir *=.*$/nzb_backup_dir = ${wtnzb}/g" /config/sabnzbd.ini &>/dev/null
+     sed -i -e "s/^complete_free *=.*$/complete_free = ${cfree}/g" /config/sabnzbd.ini &>/dev/null
+     sed -i -e "s/^dirscan_dir *=.*$/dirscan_dir = ${wtn2}/g" /config/sabnzbd.ini &>/dev/null
+     sed -i -e "s/^download_free *=.*$/download_free = ${cfree}/g" /config/sabnzbd.ini &>/dev/null
 fi
 
 if [[ -n ${HOSTENTRIES} ]]; then
     log "Updating host_whitelist setting ... " && \
-    sed -i -e "s/^host_whitelist *=.*$/host_whitelist = ${HOSTNAME}, ${HOSTNAME}.${HOSTENTRIES}/g" /config/sabnzbd.ini
+    sed -i -e "s/^host_whitelist *=.*$/host_whitelist = ${HOSTNAME}, ${HOSTNAME}.${HOSTENTRIES}/g" /config/sabnzbd.ini &>/dev/null
 fi
 
 find /mnt/unionfs/nzb/backup -type f -name "*nzb*" -exec rm -rf \;
 find /mnt/unionfs/nzb/ -type d -name "*_FAILED*" -exec rm -rf \;
 
-[[ -e `command -v apt` ]] && \
-    log "**** installing packages ****" && \
-    apt-get install --no-install-recommends -y ffmpeg curl wget git
+[[ -e `command -v apk` ]] && \
+    echo "**** installing packages ****" && \
+    apk add --quiet --no-progress --update ffmpeg curl wget git
 
 [[ -d "/config/scripts" ]] && \
-   rm -rf /config/scripts
+   rm -rf /config/scripts  &>/dev/null
 
 [[ ! -d "/config/scripts" ]] && \
    mkdir /config/scripts && \
    git clone --quiet --depth 1  https://github.com/clinton-hall/nzbToMedia.git /config/scripts/ && \
-   rm -rf /config/scripts/.gi*
+   rm -rf /config/scripts/.gi*  &>/dev/null
 
 lsiown -R abc:abc "/config/scripts" &>/dev/null
-lsiown -R abc:abc "/timer/"
-chmod 755 /timer/*
 
 for i in `ls /config/scripts/`; do
     chmod a+x /config/scripts/$i &>/dev/null
