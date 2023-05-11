@@ -54,7 +54,7 @@ echo '{
    "newversion": "'${NEWVERSION}'",
    "appbranch": "'${APPBRANCH}'",
    "baseimage": "'${BASEIMAGE}'",
-   "baseversion": "'${ALPINEVERSION}'"
+   "baseversion": "'${ALPINEVERSION}'",
    "description": "'${DESCRIPTION}'",
    "body": "Upgrading '${APP}' to '${NEWVERSION}'",
    "user": "dockserver image update[bot]"
