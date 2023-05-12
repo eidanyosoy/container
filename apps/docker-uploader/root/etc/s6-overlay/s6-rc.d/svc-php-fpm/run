@@ -23,4 +23,4 @@ source /app/uploader/function.sh && lang
 
 log "${startupphp}"
 
-exec /usr/sbin/php-fpm81 -F
+exec /usr/sbin/php-fpm82 -F
