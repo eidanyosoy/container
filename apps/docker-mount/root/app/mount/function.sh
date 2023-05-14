@@ -356,7 +356,7 @@ function rcrefresh() {
 }
 
 function rctest() {
-   mapfile -t "MOUNTS" < <($(which rclone) rc mount/listmounts | jq -r '.[]' | $(which jq) -r 'to_entries | (.[] | select(.value)) | .value.Fs')
+   mapfile -t "MOUNTS" < <($(which rclone) rc mount/listmounts | jq -r '.[]' | $(which jq) -r 'to_entries | (.[] | select(.value)) | .value.Fs' | sed 's/{[^}]*}//g')
    for FS in ${MOUNTS[@]}; do
       $(which rclone) lsf "${FS}/.healthcheck/test" &>/dev/null
       if [[ "$?" -gt "0" ]]; then
