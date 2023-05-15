@@ -56,7 +56,7 @@ function refreshVFS() {
       for ENTRY in "${VFSMOUNT[@]}"; do
          STATUSCODE=$($(which curl) -s -o /dev/null -w "%{http_code}" "${ENTRY}")
          if [[ "${STATUSCODE}" == "200" ]]; then
-            mapfile -t "MOUNTS" < <($(which curl) -sfG -X POST --data-urlencode "json=true" "${ENTRY}/mount/listmounts" | jq -r '.[]' | $(which jq) -r 'to_entries | (.[] | select(.value)) | .value.Fs')
+            mapfile -t "MOUNTS" < <($(which curl) -sfG -X POST --data-urlencode "json=true" "${ENTRY}/mount/listmounts" | jq -r '.[]' | $(which jq) -r 'to_entries | (.[] | select(.value)) | .value.Fs' | sed 's/{[^}]*}//g')
             for FS in ${MOUNTS[@]}; do
                $(which curl) -sfG -X POST --data-urlencode "fs=${FS}" --data-urlencode "dir=${DIR}" --data-urlencode "_async=true" "${ENTRY}/vfs/forget" &>/dev/null
             done
