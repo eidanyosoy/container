@@ -40,5 +40,5 @@ ssl_client-1.35.0-r29
 tar-1.34-r2
 unzip-6.0-r13
 utmps-libs-0.1.2.0-r1
-wget-1.21.3-r2
+wget-1.21.4-r0
 zlib-1.2.13-r0
