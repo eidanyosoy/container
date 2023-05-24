@@ -203,18 +203,18 @@ fi
 
 # CREATE CSV
 if [[ -f "${SOURCECONFIG}" && -f "${ENDFILE}" ]]; then
-   DRIVERC=$($(which rclone) config dump --config="${SOURCECONFIG}" | $(which jq) -r 'to_entries | (.[] | select(.value.team_drive)) | .key' | $(which wc) -l)
+   DRIVERC=$($(which rclone) config dump --config="${SOURCECONFIG}" | $(which jq) -r 'to_entries | (.[] | select(.value.type=="drive")) | .key' | $(which wc) -l)
    DRIVECSV=$($(which cat) "${ENDFILE}" | $(which wc) -l)
    if [[ "${DRIVERC}" -gt "${DRIVECSV}" ]]; then 
       $(which rm) -f "${ENDFILE}"
    fi
 fi
 if [[ ! -f "${ENDFILE}" && -f "${SOURCECONFIG}" && "${ARRAY}" -ge "1" ]]; then
-   mapfile -t mounts < <($(which rclone) config dump --config="${SOURCECONFIG}" | $(which jq) -r 'to_entries | (.[] | select(.value.team_drive)) | .key')
+   mapfile -t mounts < <($(which rclone) config dump --config="${SOURCECONFIG}" | $(which jq) -r 'to_entries | (.[] | select(.value.type=="drive")) | .key')
    for REMOTE in ${mounts[@]}; do
-      TDID=$($(which echo) "$(which rclone) config dump --config="${SOURCECONFIG}" | $(which jq) -r 'to_entries | (.[] | select(.key==\"${REMOTE}\")) | .value.team_drive'" | bash -)
-      GETP=$($(which echo) "$(which rclone) config dump --config="${SOURCECONFIG}" | $(which jq) -r 'to_entries | (.[] | select(.value.remote==\"${REMOTE}:/encrypt\")) | .value.password'" | bash -)
-      GETS=$($(which echo) "$(which rclone) config dump --config="${SOURCECONFIG}" | $(which jq) -r 'to_entries | (.[] | select(.value.remote==\"${REMOTE}:/encrypt\")) | .value.password2'" | bash -)
+      TDID=$($(which rclone) config dump --config="${SOURCECONFIG}" | $(which jq) -r --arg REMOTE "${REMOTE}" 'to_entries | (.[] | select(.key==$REMOTE)) | .value.team_drive')
+      GETP=$($(which rclone) config dump --config="${SOURCECONFIG}" | $(which jq) -r --arg REMOTE "${REMOTE}" 'to_entries | (.[] | select(.value.remote=="'"$REMOTE:/encrypt"'")) | .value.password')
+      GETS=$($(which rclone) config dump --config="${SOURCECONFIG}" | $(which jq) -r --arg REMOTE "${REMOTE}" 'to_entries | (.[] | select(.value.remote=="'"$REMOTE:/encrypt"'")) | .value.password2')
       if [[ "${GETP}" != "" && "${GETS}" != "" ]]; then
          $(which echo) -e "${REMOTE}|${TDID}|${GETP}|${GETS}" >> "${ENDFILE}"
       else
@@ -260,7 +260,7 @@ if [[ "${RUNION}" == "true" ]]; then
    if [[ -f "${TMPUNION}" ]]; then rm -rf "${TMPUNION}"; fi
    mapfile -t mounts < <($(which rclone) config dump --config="${ENDCONFIG}" | $(which jq) -r 'to_entries | (.[] | select(.value)) | .key')
    for REMOTE in ${mounts[@]}; do
-      CHECKCRYPT=$($(which echo) "$(which rclone) config dump --config="${ENDCONFIG}" | $(which jq) -r 'to_entries | (.[] | select(.value.remote | index(\"${REMOTE}\"))) | .key'" | bash -)
+      CHECKCRYPT=$($(which rclone) config dump --config="${ENDCONFIG}" | $(which jq) -r --arg REMOTE "${REMOTE}" 'to_entries | (.[] | select(.value.remote | index($REMOTE))) | .key')
       if [[ "${CHECKCRYPT}" == "" ]]; then
          $(which echo) -n "${REMOTE}: " >> "${TMPUNION}"
       fi

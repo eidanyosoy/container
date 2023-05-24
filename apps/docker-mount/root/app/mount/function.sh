@@ -278,7 +278,7 @@ if [[ "${RUNION}" == "true" ]]; then
 else
    mapfile -t mounts < <($(which rclone) config dump --config="${ENDCONFIG}" | $(which jq) -r 'to_entries | (.[] | select(.value)) | .key')
    for REMOTE in \${mounts[@]}; do
-      CHECKCRYPT=\$($(which echo) "$(which rclone) config dump --config="${ENDCONFIG}" | $(which jq) -r 'to_entries | (.[] | select(.value.remote | index(\\"\${REMOTE}\\"))) | .key'" | bash -)
+      CHECKCRYPT=\$($(which rclone) config dump --config="${ENDCONFIG}" | $(which jq) -r --arg REMOTE "\${REMOTE}" 'to_entries | (.[] | select(.value.remote | index(\$REMOTE))) | .key')
       if [[ "\${CHECKCRYPT}" == "" ]]; then
          if [[ ! -d "${SREMOTES}/\${REMOTE}" ]]; then $(which mkdir) -p "${SREMOTES}/\${REMOTE}" && $(which chown) -hR abc:abc "${SREMOTES}/\${REMOTE}" && $(which chmod) -R 775 "${SREMOTES}/\${REMOTE}" &>/dev/null; fi
          $(which rclone) rc mount/mount fs="\${REMOTE}:" mountPoint="${SREMOTES}/\${REMOTE}" mountType=mount &>/dev/null
