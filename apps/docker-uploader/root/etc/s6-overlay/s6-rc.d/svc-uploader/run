@@ -12,7 +12,7 @@
 #####################################
 # RCLONE CONFIG
 ENDCONFIG=/app/rclone/rclone.conf
-CHECKTYPE=$($(which rclone) config dump --config="${ENDCONFIG}" | $(which jq) -r 'to_entries | (.[] | select(.value.type)) | .value.type' | $(which head) -n 1)
+CHECKTYPE=$($(which rclone) config dump --config="${ENDCONFIG}" 2>/dev/null | $(which jq) -r 'to_entries | (.[] | select(.value.type!="crypt")) | .value.type')
 
 function log() {
    GRAY="\033[0;37m"
