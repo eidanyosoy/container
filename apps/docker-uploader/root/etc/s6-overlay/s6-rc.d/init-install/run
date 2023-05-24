@@ -57,7 +57,8 @@ log "**** install rclone ****"
    $(which wget) -qO- https://rclone.org/install.sh | bash &>/dev/null
 
 DROPBOX=$($(which rclone) config dump --config="${SOURCECONFIG}" 2>/dev/null | $(which jq) -r 'to_entries | (.[] | select(.value.type=="dropbox")) | .value.type')
-if [[ "${ARRAY}" -lt "1" && "${DROPBOX}" == "" ]]; then
+GOOGLE=$($(which rclone) config dump --config="${SOURCECONFIG}" 2>/dev/null | $(which jq) -r 'to_entries | (.[] | select(.value.type=="drive")) | .value.type')
+if [[ "${ARRAY}" -lt "1" && "${GOOGLE}" != "" && "${DROPBOX}" == "" ]]; then
    log "-> No match found of GDSA[01=~100] or [01=~100] <-"
    $(which sleep) infinity
 fi
@@ -237,7 +238,7 @@ if [[ ! -f "${ENDFILE}" && -f "${SOURCECONFIG}" ]]; then
          $(which cat) "${ENDCONFIG}"
          $(which rclone) config create DBC crypt remote=DB:/${DB_NAME} filename_encryption=standard filename_encoding=base32768 directory_name_encryption=true password="${GETP}" password2="${GETS}" --config="${ENDCONFIG}" 2>/dev/null
       fi
-   else
+   elif [[ "${GOOGLE}" == "drive" ]]; then
       KEY=$(sqlite3read "SELECT key FROM upload_keys WHERE active = 1;" 2>/dev/null)
       TDID=$($(which rclone) config dump --config="${SOURCECONFIG}" 2>/dev/null | $(which jq) -r 'to_entries | (.[] | select(.value.team_drive)) | .value.team_drive' | $(which head) -n 1)
       GETP=$($(which rclone) config dump --config="${SOURCECONFIG}" 2>/dev/null | $(which jq) -r 'to_entries | (.[] | select(.value.type=="crypt")) | .value.password' | $(which head) -n 1)
@@ -248,9 +249,11 @@ if [[ ! -f "${ENDFILE}" && -f "${SOURCECONFIG}" ]]; then
          $(which rclone) config create GDSA drive scope=drive server_side_across_configs=true team_drive="${TDID}" service_account_file="${JSONDIR}/${KEY}" --config="${ENDCONFIG}" 2>/dev/null
          $(which rclone) config create GDSAC crypt remote=GDSA:/${GDSA_NAME} filename_encryption=standard directory_name_encryption=true password="${GETP}" password2="${GETS}" --config="${ENDCONFIG}" 2>/dev/null
       fi
+   else
+      $(which cp) -r "${SOURCECONFIG}" "${ENDCONFIG}" &>/dev/null
+      $(which cat) "${ENDCONFIG}"
    fi
 fi
-
 # CREATE RCLONE.CONF FROM DRIVE.CSV
 if [[ -f "${ENDFILE}" ]]; then
    KEY=$(sqlite3read "SELECT key FROM upload_keys WHERE active = 1;" 2>/dev/null)
