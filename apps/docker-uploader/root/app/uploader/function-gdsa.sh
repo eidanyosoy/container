@@ -313,7 +313,7 @@ function rcloneupload() {
    mapfile -t upload < <($(which rclone) config dump --config="${CONFIG}" | $(which jq) -r 'to_entries | (.[] | select(.value)) | .key')
    for REMOTE in ${upload[@]}; do
       CHECKCRYPT=$($(which echo) "$(which rclone) config dump --config="${CONFIG}" | $(which jq) -r 'to_entries | (.[] | select(.value.remote | index(\"${REMOTE}\"))) | .key'" | bash -)
-      if [[ "${CHECKCRYPT}" == "" ]]; then
+      if [[ "${CHECKCRYPT}" != "" ]]; then
          REMOTENAME=${CHECKCRYPT}
       fi
    done
