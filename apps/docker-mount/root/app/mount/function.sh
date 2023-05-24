@@ -361,8 +361,10 @@ function rctest() {
       $(which rclone) lsf "${FS}/.healthcheck/test" &>/dev/null
       if [[ "$?" -gt "0" ]]; then
          $(which rclone) touch "${FS}/.healthcheck/test" --config="${ENDCONFIG}" &>/dev/null
+         $(which rclone) touch "${FS}/.healthcheck/${FS::-1}" --config="${ENDCONFIG}" &>/dev/null
       fi
    done
+   $(which sleep) 10
 }
 
 function rcstats() {
@@ -391,7 +393,7 @@ function nzbcleanup() {
 
 function testsuccessfull() {
    source /system/mount/mount.env
-   $(which sleep) 10 && rctest
+   rctest
    if [[ -f "${HEALTHCHECK}" ]]; then
       MSG="${startupmountend}" && notification
    else
