@@ -394,7 +394,6 @@ function testsuccessfull() {
    $(which sleep) 10 && rctest
    if [[ -f "${HEALTHCHECK}" ]]; then
       MSG="${startupmountend}" && notification
-      rcrefresh
    else
       rckill && rcmergerfskill && folderunmount && rcmount && rcmergerfs
    fi
