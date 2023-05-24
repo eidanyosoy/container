@@ -1,4 +1,4 @@
-#!/command/with-contenv bash
+#!/usr/bin/with-contenv bash
 #####################################
 # All rights reserved.              #
 # started from Zero                 #
@@ -24,6 +24,8 @@ umask 022
 
 if [[ "${CHECKTYPE}" == "dropbox" ]]; then
    source /app/uploader/function-db.sh && lang
+elif [[ "${CHECKTYPE}" == "drive" ]]; then
+   source /app/uploader/function-gdsa.sh && lang
 else
    source /app/uploader/function.sh && lang
 fi

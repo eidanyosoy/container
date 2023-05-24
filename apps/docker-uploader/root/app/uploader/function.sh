@@ -1,4 +1,4 @@
-#!/command/with-contenv bash
+#!/usr/bin/with-contenv bash
 # shellcheck shell=bash
 #####################################
 # All rights reserved.              #
@@ -159,7 +159,7 @@ ${TIMESPENT}" && notification
 
 function lang() {
    source /system/uploader/uploader.env
-   startupuploader=$($(which jq) ".startup.uploadergdsa" "${LFOLDER}/${LANGUAGE}.json" | $(which sed) 's/"\|,//g')
+   startupuploader=$($(which jq) ".startup.uploader" "${LFOLDER}/${LANGUAGE}.json" | $(which sed) 's/"\|,//g')
    startupcaddy=$($(which jq) ".startup.caddy" "${LFOLDER}/${LANGUAGE}.json" | $(which sed) 's/"\|,//g')
    startupphp=$($(which jq) ".startup.php" "${LFOLDER}/${LANGUAGE}.json" | $(which sed) 's/"\|,//g')
    limitused=$($(which jq) ".limit.used" "${LFOLDER}/${LANGUAGE}.json" | $(which sed) 's/"\|,//g')
@@ -187,67 +187,6 @@ function cleanuplog() {
       fi
       sqlite3write "DELETE FROM completed_uploads WHERE endtime NOT IN (SELECT endtime from completed_uploads ORDER BY endtime DESC LIMIT ${LOG_ENTRY});" &>/dev/null
    fi
-}
-
-function loopcsv() {
-   source /system/uploader/uploader.env
-   $(which mkdir) -p "${CUSTOM}"
-   if [[ -f "${CSV}" ]]; then
-      #### ECHO CORRECT FOLDER FROM LOG FILE ####
-      DRIVE=$($(which echo) "${DRIVE}" | $(which sed) 's/-//g')
-      #### USE FILE NAME AS RCLONE CONF ####
-      CUSTOMCONFIG="${CUSTOM}/${FILE}.conf"
-      KEY=$(sqlite3read "SELECT key FROM upload_keys WHERE active = 1;" 2>/dev/null)
-      #### TEST IS FOLDER AND CSV CORRECT ####
-      $(which cat) "${CSV}" | $(which sed) '/^\s*#.*$/d' | $(which grep) -Ew "${DRIVE}" | while IFS=$'|' read -ra CHECKDIR; do
-         if [[ ${CHECKDIR[0]} == ${DRIVE} ]]; then
-           $(which cat) "${CSV}" | $(which sed) '/^\s*#.*$/d' | $(which grep) -Ew "${DRIVE}" | while IFS=$'|' read -ra UPPDIR; do
-           if [[ "${UPPDIR[2]}" == "" && "${UPPDIR[3]}" == "" ]]; then
-              $(which rclone) config create GDSA drive scope=drive server_side_across_configs=true team_drive="${UPPDIR[1]}" service_account_file="${JSONDIR}/${KEY}" --config="${CUSTOMCONFIG}" &>/dev/null
-           else
-              if [[ "${HASHPASSWORD}" == "plain" && "${HASHPASSWORD}" != "hashed" ]]; then
-                 ENC_PASSWORD=$($(which rclone) obscure "${UPPDIR[2]}" | $(which tail) -n1)
-                 ENC_SALT=$($(which rclone) obscure "${UPPDIR[3]}" | $(which tail) -n1)
-              else
-                 ENC_PASSWORD="${UPPDIR[2]}"
-                 ENC_SALT="${UPPDIR[3]}"
-              fi
-              $(which rclone) config create GDSA drive scope=drive server_side_across_configs=true team_drive="${UPPDIR[1]}" service_account_file="${JSONDIR}/${KEY}" --config="${CUSTOMCONFIG}" &>/dev/null
-              $(which rclone) config create GDSAC crypt remote=GDSA:/${GDSA_NAME} filename_encryption=standard directory_name_encryption=true password="${ENC_PASSWORD}" password2="${ENC_SALT}" --config="${CUSTOMCONFIG}" &>/dev/null
-           fi
-           done
-         fi
-      done
-   fi
-}
-
-function replace-used() {
-   #### WAIT BEFORE READ ####
-   $(which sleep) 1
-   #### READ USED VALUE ####
-   USEDUPLOAD=$(sqlite3read "SELECT used FROM upload_keys WHERE active = 1;")
-   if [[ "${USEDUPLOAD}" -gt "700000000000" ]]; then
-      #### SWITCH KEY TO NEXT ####
-      sqlite3write "UPDATE upload_keys SET active = 0;" &>/dev/null
-      sqlite3write "UPDATE upload_keys SET active = 1 WHERE rowid = (SELECT rowid FROM upload_keys AS ActiveKey ORDER BY time, rowid LIMIT 1);" &>/dev/null
-      sqlite3write "UPDATE upload_keys SET used = 0 WHERE active = 1;" &>/dev/null
-      #### UPDATE KEY IN ${ENDCONFIG} AND SET USED TO ZERO ####
-      KEY=$(sqlite3read "SELECT key FROM upload_keys WHERE active = 1;")
-      $(which rclone) config update GDSA service_account_file="${JSONDIR}/${KEY}" --config="${ENDCONFIG}" &>/dev/null
-      USEDUPLOAD="0"
-   fi
-   #### UPDATE USED FILE ####
-   sqlite3write "UPDATE upload_keys SET used = used + \"${SIZEBYTES}\", time = datetime('now', 'localtime') WHERE active = 1;" &>/dev/null
-}
-
-function reset-used() {
-   #### SORT KEYS TO DEFAULT ####
-   sqlite3write "UPDATE upload_keys SET active = 0;" &>/dev/null
-   sqlite3write "UPDATE upload_keys SET active = 1 WHERE rowid = 1;" &>/dev/null
-   #### UPDATE KEY IN ${ENDCONFIG} AND SET USED TO ZERO ####
-   KEY=$(sqlite3read "SELECT key FROM upload_keys WHERE active = 1;" 2>/dev/null)
-   $(which rclone) config update GDSA service_account_file="${JSONDIR}/${KEY}" --config="${ENDCONFIG}" &>/dev/null
-   sqlite3write "UPDATE upload_keys SET used = 0, time = datetime('now', 'localtime') WHERE active = 1;" &>/dev/null
 }
 
 function rcloneupload() {
@@ -302,26 +241,19 @@ function rcloneupload() {
       $(which chmod) 0755 -R "${DLFOLDER}/${DIR}/${FILE}" &>/dev/null
    fi
    #### CHECK IS CUSTOM RCLONE.CONF IS AVAILABLE ####
-   if [[ -f "${CUSTOM}/${FILE}.conf" ]]; then
-      CONFIG="${CUSTOM}/${FILE}.conf"
-   else
-      CONFIG="${ENDCONFIG}"
-   fi
-   #### REPLACED UPLOADED FILESIZE ####
-   replace-used
-   #### CRYPTED HACK ####
-   CHECKCRYPTED=$($(which rclone) config dump --config="${CONFIG}" | $(which jq) -r 'to_entries | (.[] | select(.value.type=="crypt")) | .key')
-   if [[ "${CHECKCRYPTED}" == "" ]]; then
-      CRYPTED=""
-   else
-      CRYPTED="C"
-   fi
-   #### CHECK USED KEY ####
-   KEYNOTI=$(sqlite3read "SELECT key FROM upload_keys WHERE active = 1;" 2>/dev/null | $(which awk) -F '.' '{print $1}')
+   CONFIG="${ENDCONFIG}"
+   #### CHECK REMOTENAME ####
+   mapfile -t upload < <($(which rclone) config dump --config="${CONFIG}" | $(which jq) -r 'to_entries | (.[] | select(.value)) | .key')
+   for REMOTE in ${upload[@]}; do
+      CHECKCRYPT=$($(which echo) "$(which rclone) config dump --config="${CONFIG}" | $(which jq) -r 'to_entries | (.[] | select(.value.remote | index(\"${REMOTE}\"))) | .key'" | bash -)
+      if [[ "${CHECKCRYPT}" == "" ]]; then
+         REMOTENAME=${CHECKCRYPT}
+      fi
+   done
    #### TOUCH LOG FILE FOR UI READING ####
    touch "${LOGFILE}/${FILE}.txt" &>/dev/null
    #### UPDATE DATABASE ENTRY ####
-   sqlite3write "INSERT OR REPLACE INTO uploads (drive,filedir,filebase,filesize,logfile,gdsa) VALUES (\"${DRIVE}\",\"${DIR}\",\"${FILE}\",\"${SIZE}\",\"${LOGFILE}/${FILE}.txt\",\"${KEYNOTI}${CRYPTED}\");" &>/dev/null
+   sqlite3write "INSERT OR REPLACE INTO uploads (drive,filedir,filebase,filesize,logfile,gdsa) VALUES (\"${DRIVE}\",\"${DIR}\",\"${FILE}\",\"${SIZE}\",\"${LOGFILE}/${FILE}.txt\",\"${REMOTENAME}\");" &>/dev/null
    #### READ BWLIMIT ####
    if [[ "${BANDWIDTH_LIMIT}" == "" ]]; then
       BANDWIDTH_LIMIT="null"
@@ -332,21 +264,21 @@ function rcloneupload() {
    #### CHECK IS TRANSFERS GREAT AS 1 TO PREVENT DOUBLE FOLDER ON GOOGLE ####
    if [[ "${TRANSFERS}" -gt "1" ]]; then
       #### MAKE FOLDER ON CORRECT DRIVE #### 
-      $(which rclone) mkdir "GDSA${CRYPTED}:/${DIR}/" --config="${CONFIG}" &>/dev/null
+      $(which rclone) mkdir "${REMOTENAME}:/${DIR}/" --config="${CONFIG}" &>/dev/null
    fi
    #### GENERATE FOR EACH UPLOAD A NRW AGENT ####
    USERAGENT=$($(which cat) /dev/urandom | $(which tr) -dc 'a-zA-Z0-9' | $(which fold) -w 32 | $(which head) -n 1)
    #### START TIME UPLOAD ####
    STARTZ=$($(which date) +%s)
    #### RUN RCLONE UPLOAD COMMAND ####
-   $(which rclone) moveto "${DLFOLDER}/${DIR}/${FILE}" "GDSA${CRYPTED}:/${DIR}/${FILE}" \
+   $(which rclone) moveto "${DLFOLDER}/${DIR}/${FILE}" "${REMOTENAME}:/${DIR}/${FILE}" \
       --config="${CONFIG}" \
       --stats=1s --checkers=4 \
       --drive-chunk-size=32M --use-mmap \
       --log-level="${LOG_LEVEL}" \
       --user-agent="${USERAGENT}" ${BWLIMIT} \
       --log-file="${LOGFILE}/${FILE}.txt" \
-      --tpslimit=20 &>/dev/null
+      --tpslimit=10 &>/dev/null
    #### END TIME UPLOAD ####
    ENDZ=$($(which date) +%s)
    #### SEND TO AUTOSCAN DOCKER ####
@@ -357,7 +289,7 @@ function rcloneupload() {
    checkerror
    #### ECHO END-PARTS FOR UI READING ####
    $(which find) "${DLFOLDER}/${SETDIR}" -mindepth 1 -type d -empty -delete &>/dev/null
-   sqlite3write "INSERT INTO completed_uploads (drive,filedir,filebase,filesize,gdsa,starttime,endtime,status,error) VALUES (\"${DRIVE}\",\"${DIR}\",\"${FILE}\",\"${SIZE}\",\"${KEYNOTI}${CRYPTED}\",\"${STARTZ}\",\"${ENDZ}\",\"${STATUS}\",\"${ERROR}\"); DELETE FROM uploads WHERE filebase = \"${FILE}\";" &>/dev/null
+   sqlite3write "INSERT INTO completed_uploads (drive,filedir,filebase,filesize,gdsa,starttime,endtime,status,error) VALUES (\"${DRIVE}\",\"${DIR}\",\"${FILE}\",\"${SIZE}\",\"${REMOTENAME}\",\"${STARTZ}\",\"${ENDZ}\",\"${STATUS}\",\"${ERROR}\"); DELETE FROM uploads WHERE filebase = \"${FILE}\";" &>/dev/null
    #### END OF MOVE ####
    $(which rm) -rf "${LOGFILE}/${FILE}.txt" &>/dev/null
    #### REMOVE CUSTOM RCLONE.CONF ####
@@ -522,10 +454,6 @@ function startuploader() {
                source /system/uploader/uploader.env
                #### RUN TRANSFERS CHECK ####
                transfercheck
-               #### CHECK IS CSV AVAILABLE AND LOOP TO CORRECT DRIVE ####
-               if [[ -f "${CSV}" ]]; then 
-                  loopcsv
-               fi
                #### UPLOAD FUNCTIONS STARTUP ####
                if [[ "${TRANSFERS}" -eq "1" ]]; then 
                   #### SINGLE UPLOAD ####

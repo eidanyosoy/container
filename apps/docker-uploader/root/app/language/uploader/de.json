@@ -6,6 +6,7 @@
     "packagesend": "-> Paket aktualisierung war erfolgreich <-"
   },
   "startup": {
+    "uploader": "-> Starte Uploader - ALL <-",
     "uploadergdsa": "-> Starte Uploader - GDSA <-",
     "uploaderdb": "-> Starte Uploader - DB <-",
     "caddy": "-> Starte Caddy <-",

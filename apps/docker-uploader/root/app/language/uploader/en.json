@@ -6,6 +6,7 @@
     "packagesend": "-> Packages update was successful <-"
   },
   "startup": {
+    "uploader": "-> Starting Uploader - ALL <-",
     "uploadergdsa": "-> Starting Uploader - GDSA <-",
     "uploaderdb": "-> Starting Uploader - DB <-",
     "caddy": "-> Starting Caddy <-",
