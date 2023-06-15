@@ -121,6 +121,7 @@ TIMEZONE=${TZ:-UTC}
 HASHPASSWORD=${HASHPASSWORD:-hashed}
 GDSA_NAME=${GDSA_NAME:-encrypt}
 DB_NAME=${DB_NAME:-encrypt}
+DB_TEAM=${DB_TEAM:-true}
 
 ## RCLONE - SETTINGS
 BANDWIDTH_LIMIT=\"${BANDWIDTH_LIMIT:-null}\"
@@ -233,9 +234,14 @@ if [[ ! -f "${ENDFILE}" && -f "${SOURCECONFIG}" ]]; then
          $(which rclone) config create DB dropbox server_side_across_configs=true client_id="${GETCI}" client_secret="${GETCS}" token="${TOKEN}" --config="${ENDCONFIG}" --non-interactive &>/dev/null
          $(which cat) "${ENDCONFIG}"
       else
+         if [[ "${DB_TEAM}" == "false" ]]; then
+            DROPBOXTEAM=""
+         else
+            DROPBOXTEAM="/"
+         fi
          $(which rclone) config create DB dropbox server_side_across_configs=true client_id="${GETCI}" client_secret="${GETCS}" token="${TOKEN}" --config="${ENDCONFIG}" --non-interactive &>/dev/null
          $(which cat) "${ENDCONFIG}"
-         $(which rclone) config create DBC crypt remote=DB:/${DB_NAME} filename_encryption=standard filename_encoding=base32768 directory_name_encryption=true password="${GETP}" password2="${GETS}" --config="${ENDCONFIG}" 2>/dev/null
+         $(which rclone) config create DBC crypt remote=DB:${DROPBOXTEAM}${DB_NAME} filename_encryption=standard filename_encoding=base32768 directory_name_encryption=true password="${GETP}" password2="${GETS}" --config="${ENDCONFIG}" 2>/dev/null
       fi
    elif [[ "${CHECKTYPE}" == "drive" ]]; then
       KEY=$(sqlite3read "SELECT key FROM upload_keys WHERE active = 1;" 2>/dev/null)
