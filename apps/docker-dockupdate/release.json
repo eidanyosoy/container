@@ -2,9 +2,9 @@
    "appname": "docker-dockupdate",
    "apppic": "./images/docker-dockupdate.png",
    "appfolder": "./apps/docker-dockupdate",
-   "newversion": "3.18.0",
+   "newversion": "3.18.2",
    "baseimage": "alpine",
    "description": "null",
-   "body": "Upgrading docker-dockupdate to 3.18.0",
+   "body": "Upgrading docker-dockupdate to 3.18.2",
    "user": "github-actions[bot]"
 }
