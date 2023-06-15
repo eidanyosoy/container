@@ -19,7 +19,7 @@
 #####################################
 # Original coder Xaritomi -SBOX     #
 #####################################
-FROM alpine:3.18.0 as buildstage
+FROM alpine:3.18.2 as buildstage
 
 LABEL org.opencontainers.image.source="https://github.com/dockserver/container"
 
