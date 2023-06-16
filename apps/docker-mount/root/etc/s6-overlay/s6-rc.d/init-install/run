@@ -259,12 +259,20 @@ if [[ "${RUNION}" == "true" ]]; then
    TMPUNION=/tmp/rcunion.union
    if [[ -f "${TMPUNION}" ]]; then rm -rf "${TMPUNION}"; fi
    mapfile -t mounts < <($(which rclone) config dump --config="${ENDCONFIG}" | $(which jq) -r 'to_entries | (.[] | select(.value)) | .key')
+   i=0
    for REMOTE in ${mounts[@]}; do
       CHECKCRYPT=$($(which rclone) config dump --config="${ENDCONFIG}" | $(which jq) -r --arg REMOTE "${REMOTE}" 'to_entries | (.[] | select(.value.remote | index($REMOTE))) | .key')
       if [[ "${CHECKCRYPT}" == "" ]]; then
+         ((i=i+1))
          $(which echo) -n "${REMOTE}: " >> "${TMPUNION}"
       fi
    done
+   # DUMMY
+   if [[ "${i}" == "1" ]]; then
+      $(which mkdir) -p /dummy &>/dev/null
+      $(which rclone) config create "dummy" alias remote="/dummy" --config="${ENDCONFIG}" &>/dev/null
+      $(which echo) -n "dummy: " >> "${TMPUNION}"
+   fi
    TMPUNIONFILE=$($(which cat) "${TMPUNION}")
    $(which rclone) config create remote union upstreams "${TMPUNIONFILE}" action_policy 'all' create_policy 'all' search_policy 'all' cache_time 120 --config="${ENDCONFIG}"
 fi
