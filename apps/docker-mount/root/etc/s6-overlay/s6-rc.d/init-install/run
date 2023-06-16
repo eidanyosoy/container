@@ -199,6 +199,7 @@ if [[ -f "${SOURCECONFIG}" && "${ARRAY}" -lt "1" ]]; then
          $(which rclone) config delete "${NAME}" --config="${ENDCONFIG}" &>/dev/null
       done
    fi
+   $(which rclone) config show --config="${ENDCONFIG}"
 fi
 
 # CREATE CSV
@@ -227,6 +228,7 @@ fi
 if [[ -f "${ENDFILE}" && "${ARRAY}" -ge "1" ]]; then
    $(which awk) '$1~search {p=1} NF==0 {p=0}; p' search="DB|DBC" "${SOURCECONFIG}" >> "${ENDCONFIG}"
    $(which awk) '$1~search {p=1} NF==0 {p=0}; p' search="gdrive|gcrypt" "${SOURCECONFIG}" >> "${ENDCONFIG}"
+   $(which rclone) config show --config="${ENDCONFIG}"
    KEY=$($(which sed) -n 1p "${JSONUSED}")
    $(which sed) '/^\s*#.*$/d' "${ENDFILE}" | while IFS=$'|' read -r -a myArray; do
       if [[ "${myArray[2]}" == "" && "${myArray[3]}" == "" ]]; then
