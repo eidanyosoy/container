@@ -271,7 +271,7 @@ if [[ "${RUNION}" == "true" ]]; then
    if [[ "${i}" == "1" ]]; then
       $(which mkdir) -p /dummy &>/dev/null
       $(which rclone) config create "dummy" alias remote="/dummy" --config="${ENDCONFIG}" &>/dev/null
-      $(which echo) -n "dummy: " >> "${TMPUNION}"
+      $(which echo) -n "dummy:ro " >> "${TMPUNION}"
    fi
    TMPUNIONFILE=$($(which cat) "${TMPUNION}")
    $(which rclone) config create remote union upstreams "${TMPUNIONFILE}" action_policy 'all' create_policy 'all' search_policy 'all' cache_time 120 --config="${ENDCONFIG}"
