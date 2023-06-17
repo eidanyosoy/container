@@ -380,7 +380,7 @@ function listfiles() {
    sqlite3read "SELECT filebase FROM upload_queue UNION ALL SELECT filebase FROM uploads;" > "${TEMPFILES}"
    #### FIND NEW FILES ####
    IFS=$'\n'
-   mapfile -t "FILEBASE" < <($(which find) "${DLFOLDER}" -type f -size +0b -cmin +"${MIN_AGE_UPLOAD}" -printf "%P\n" | $(which grep) -Evf "${EXCLUDE}" | $(which grep) -Fvf "${TEMPFILES}")
+   mapfile -t "FILEBASE" < <($(which find) "${DLFOLDER}" -mindepth 2 -type f -size +0b -cmin +"${MIN_AGE_UPLOAD}" -printf "%P\n" | $(which grep) -Evf "${EXCLUDE}" | $(which grep) -Fvf "${TEMPFILES}")
    sqlite3write "BEGIN TRANSACTION;" &>/dev/null
    for NAME in ${FILEBASE[@]}; do
       LISTFILE=$($(which basename) "${NAME}")
