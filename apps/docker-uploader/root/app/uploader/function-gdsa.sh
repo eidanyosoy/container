@@ -419,7 +419,7 @@ function checkmeta() {
       METADIR=$(sqlite3read "SELECT filedir FROM upload_queue WHERE filebase = \"${METAFILE}\";" 2>/dev/null)
       METACHECK=$($(which exiftool) -m -q -q -Title "${DLFOLDER}/${METADIR}/${METAFILE}" | $(which grep) -qE "Title" && echo 1 || echo 0)
       if [[ "${METACHECK}" == "0" ]]; then
-         METAOLD=60
+         METAOLD="60"
          METACUR=$($(which date) +%s)
          METATIME=$($(which stat) -c %Z "${DLFOLDER}/${METADIR}/${METAFILE}" 2>/dev/null)
          METADIFF=$($(which expr) "${METACUR}" - "${METATIME}")
