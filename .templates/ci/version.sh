@@ -64,8 +64,7 @@ if [[ -n $(git status --porcelain) ]]; then
    git config --global user.name 'dockserver-bot[bot]'
    git config --global user.email 'dockserver-bot[bot]@dockserver.io'
    git add -A
-   COMMIT=$(git show -s --format="%H" HEAD)
-   LOG=$(git diff-tree --no-commit-id --name-only -r $COMMIT)
+   LOG=$(git status --porcelain | sed s/^...//)
    git commit -sam "[Auto Generation] Changes : $LOG" || exit 0
    git push --force
 fi
