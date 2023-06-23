@@ -3,10 +3,10 @@ apps docker-auto-replyarr
    "appname": "docker-auto-replyarr",
    "apppic": "",
    "appfolder": "./apps/docker-auto-replyarr",
-   "newversion": "3.18.2",
+   "newversion": "",
    "baseimage": "alpine",
    "description": "Official Alpine Linux Docker image. Win at minimalism!",
-   "body": "Upgrading docker-auto-replyarr to 3.18.2",
+   "body": "Upgrading docker-auto-replyarr to ",
    "user": "github-actions[bot]"
 }
 
@@ -106,7 +106,7 @@ apps docker-restic
    "appname": "docker-restic",
    "apppic": "./images/docker-restic.png",
    "appfolder": "./apps/docker-restic",
-   "newversion": "3.18.2",
+   "newversion": "",
    "rclone": "v1.62.2",
    "baseimage": "alpine",
    "buildimage": "alpine",
