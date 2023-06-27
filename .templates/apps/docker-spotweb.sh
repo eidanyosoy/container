@@ -22,7 +22,7 @@ TOKEN=$4
 ### APP SETTINGS ###
 
 APPLINK="https://api.github.com/repos/spotweb/spotweb"
-NEWVERSION=$(curl -sX GET "https://api.github.com/repos/spotweb/spotweb/releases/latest"| jq --raw-output '.tag_name')
+NEWVERSION=$(curl -u $USERNAME:$TOKEN -sX GET "https://api.github.com/repos/spotweb/spotweb/releases/latest"| jq --raw-output '.tag_name')
 NEWVERSION="${NEWVERSION#*v}"
 NEWVERSION="${NEWVERSION#*release-}"
 NEWVERSION="${NEWVERSION}"
