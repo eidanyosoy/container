@@ -13,8 +13,6 @@ ca-certificates-bundle-20230506-r0
 coreutils-9.3-r1
 curl-8.1.2-r0
 findutils-4.9.0-r5
-fuse-2.9.9-r4
-fuse-common-3.14.1-r2
 jq-1.6-r3
 libacl-2.3.1-r3
 libattr-2.5.1-r4
@@ -32,7 +30,7 @@ libssl3-3.1.1-r1
 libstdc++-12.2.1_git20220924-r10
 libunistring-1.1-r1
 linux-pam-1.5.2-r10
-mergerfs-2.35.1-r0
+mergerfs-2.35.1-r1
 musl-1.2.4-r0
 musl-utils-1.2.4-r0
 ncurses-terminfo-base-6.4_p20230506-r0
