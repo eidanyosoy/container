@@ -267,7 +267,7 @@ $(which rclone) rcd \\
 $(which sleep) 10
 
 #### SET OPTIONS FOR MOUNT ####
-$(which rclone) rc options/set --json {'"main": { "TPSLimitBurst": ${TPSBURST}, "TPSLimit": ${TPSLIMIT}, "BufferSize": "${BUFFER_SIZE}", "UserAgent": "${UAGENT}", "UseMmap":true}'} &>/dev/null
+$(which rclone) rc options/set --json {'"main": { "TPSLimitBurst": ${TPSBURST}, "TPSLimit": ${TPSLIMIT}, "BufferSize": "${BUFFER_SIZE}", "UserAgent": "${UAGENT}", "UseMmap":true, "DefaultTime": "${DEFAULT_TIME}"}'} &>/dev/null
 $(which rclone) rc options/set --json {'"vfs": { "GID": '${PGID}', "UID": '${PUID}', "Umask": '${UMASK}', "CacheMode": 3, "CacheMaxSize": "${VFS_CACHE_MAX_SIZE}", "CacheMaxAge": ${VFS_CACHE_MAX_AGE_NS}, "CachePollInterval": 60000000000, "PollInterval": 30000000000, "ChunkSize": "${VFS_READ_CHUNK_SIZE}", "ChunkSizeLimit": "${VFS_READ_CHUNK_SIZE_LIMIT}", "DirCacheTime": ${VFS_DIR_CACHE_TIME_NS}, "FastFingerprint": true, "NoModTime": true}'} &>/dev/null
 $(which rclone) rc options/set --json {'"mount": { "AllowNonEmpty": true, "AllowOther": true}'} &>/dev/null
 $(which sleep) 5
