@@ -16,13 +16,13 @@
 #####################################
 # shellcheck disable=SC2086
 # shellcheck disable=SC2046
-FROM ghcr.io/linuxserver/baseimage-alpine:3.18-bd2a5b02-ls10
+FROM ghcr.io/linuxserver/baseimage-alpine:3.18-51daca8d-ls11
 LABEL org.opencontainers.image.source="https://github.com/dockserver/container"
 
 ARG TARGETPLATFORM
 ARG BUILDPLATFORM
 
-ARG ALPINE_VERSION=3.18-bd2a5b02-ls10
+ARG ALPINE_VERSION=3.18-51daca8d-ls11
 
 ENV \
   TRAKTARR_DIR=/app/traktarr \
