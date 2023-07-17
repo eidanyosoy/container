@@ -16,7 +16,7 @@
 #####################################
 # shellcheck disable=SC2086
 # shellcheck disable=SC2046
-FROM alpine: as builder
+FROM alpine:3.18.2 as builder
 
 LABEL org.opencontainers.image.source="https://github.com/dockserver/container"
 
@@ -48,7 +48,7 @@ FROM ghcr.io/linuxserver/baseimage-alpine:3.18-51daca8d-ls11
 ARG TARGETPLATFORM
 ARG BUILDPLATFORM
 
-ARG BASE_VERSION=
+ARG BASE_VERSION=3.18.2
 ARG ALPINE_VERSION=3.18-51daca8d-ls11
 ARG RCLONE_VERSION=v1.63.0
 
