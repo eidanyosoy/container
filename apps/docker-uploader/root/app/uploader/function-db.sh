@@ -367,7 +367,7 @@ function listfiles() {
       LISTSIZE=$($(which stat) -c %s "${DLFOLDER}/${NAME}" 2>/dev/null)
       LISTTYPE="${NAME##*.}"
       if [[ "${LISTTYPE}" == "mkv" ]] || [[ "${LISTTYPE}" == "mp4" ]] || [[ "${LISTTYPE}" == "avi" ]] || [[ "${LISTTYPE}" == "mov" ]] || [[ "${LISTTYPE}" == "mpeg" ]] || [[ "${LISTTYPE}" == "mpegts" ]] || [[ "${LISTTYPE}" == "ts" ]]; then
-         CHECKMETA=$($(which exiftool) -m -q -q -Title "${DLFOLDER}/${NAME}" 2>/dev/null | $(which grep) -qE * && echo 1 || echo 0)
+         CHECKMETA=$($(which exiftool) -m -q -q -Title "${DLFOLDER}/${NAME}" 2>/dev/null | $(which grep) -qE '[A-Za-z]' && echo 1 || echo 0)
       else
          CHECKMETA="0"
       fi
@@ -395,7 +395,7 @@ function checkmeta() {
    if [[ "${METAFILES}" -ge "1" ]]; then
       METAFILE=$(sqlite3read "SELECT filebase FROM upload_queue WHERE metadata = 1 ORDER BY time LIMIT 1;" 2>/dev/null)
       METADIR=$(sqlite3read "SELECT filedir FROM upload_queue WHERE filebase = \"${METAFILE}\";" 2>/dev/null)
-      METACHECK=$($(which exiftool) -m -q -q -Title "${DLFOLDER}/${METADIR}/${METAFILE}" 2>/dev/null | $(which grep) -qE * && echo 1 || echo 0)
+      METACHECK=$($(which exiftool) -m -q -q -Title "${DLFOLDER}/${METADIR}/${METAFILE}" 2>/dev/null | $(which grep) -qE '[A-Za-z]' && echo 1 || echo 0)
       if [[ "${METACHECK}" == "0" ]]; then
          METAOLD="60"
          METACUR=$($(which date) +%s)
