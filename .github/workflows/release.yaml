@@ -51,7 +51,8 @@ jobs:
     - id: reduce
       run: |
         CONTAINERS=$(jq --raw-output '.changed_files | fromjson | .[] |= sub("(?<filepath>(?<first_directory>(?<root1>[/]?)[^/]+/)(?<second_directory>(?<root2>[/]?)[^/]+)(?<extra_paths>.+))"; "\(.second_directory)") | unique' changes.json)
-        echo ::set-output name=containers::${CONTAINERS}
+        echo "containers=${CONTAINERS}" >> $GITHUB_OUTPUT
+
   build:
     name: Build Docker
     runs-on: ubuntu-latest
@@ -96,7 +97,7 @@ jobs:
         echo "category=${CATEGORY}" >> $GITHUB_OUTPUT
            VERSION=$(jq -r '.newversion' < ./${CATEGORY}/${{ matrix.container }}/release.json)
         echo "version=${VERSION}" >> $GITHUB_OUTPUT
-           DESCRIPTION=$(jq -r '.description' < ./${CATEGORY}/${{ github.event.inputs.choice }}/release.json)
+           DESCRIPTION=$(jq -r '.description' < ./${CATEGORY}/${{ matrix.container }}/release.json)
         echo "description=${DESCRIPTION}" >> $GITHUB_OUTPUT
         echo "platform=${PLATFORM}" >> $GITHUB_OUTPUT
         echo "shashort=$(echo ${GITHUB_SHA} | cut -c1-8)" >> $GITHUB_OUTPUT
