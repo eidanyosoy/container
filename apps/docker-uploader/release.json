@@ -4,7 +4,7 @@
    "appfolder": "./apps/docker-uploader",
    "newversion": "3.18.3",
    "baseimage": "ghcr.io/linuxserver/baseimage-alpine",
-   "baseversion": "3.18-221a129f-ls15",
+   "baseversion": "3.18-a67812a8-ls17",
    "body": "Upgrading docker-uploader to ",
    "user": "dockserver image update[bot]"
 }
