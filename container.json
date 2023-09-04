@@ -82,10 +82,10 @@ apps docker-mount
    "baseimage": "alpine",
    "buildimage": "alpine",
    "finalimage": "ghcr.io/linuxserver/baseimage-alpine",
-   "baseversion": "3.18-a67812a8-ls17",
+   "baseversion": "3.18-c84a529a-ls18",
    "s6stage": "v3.1.5.0",
    "description": "Docker docker-mount with mergerfs version 2.36.0 and rclone version v1.63.1 include s6-overlay: v3.1.5.0",
-   "body": "Upgrading docker-mount to baseimage: alpine:3.18-a67812a8-ls17 with mergerfs: 2.36.0 and rclone: v1.63.1 include s6-overlay: v3.1.5.0",
+   "body": "Upgrading docker-mount to baseimage: alpine:3.18-c84a529a-ls18 with mergerfs: 2.36.0 and rclone: v1.63.1 include s6-overlay: v3.1.5.0",
    "user": "dockserver image update[bot]"
 }
 
@@ -111,10 +111,10 @@ apps docker-restic
    "baseimage": "alpine",
    "buildimage": "alpine",
    "finalimage": "ghcr.io/linuxserver/baseimage-alpine",
-   "baseversion": "3.18-a67812a8-ls17",
+   "baseversion": "3.18-c84a529a-ls18",
    "s6stage": "v3.1.5.0",
    "description": "Docker docker-restic with rclone version v1.63.1 include s6-overlay: v3.1.5.0",
-   "body": "Upgrading docker-restic to baseimage: alpine:3.18-a67812a8-ls17 with rclone: v1.63.1 include s6-overlay: v3.1.5.0",
+   "body": "Upgrading docker-restic to baseimage: alpine:3.18-c84a529a-ls18 with rclone: v1.63.1 include s6-overlay: v3.1.5.0",
    "user": "dockserver image update[bot]"
 }
 
@@ -149,7 +149,7 @@ apps docker-traktarr
    "appfolder": "./apps/docker-traktarr",
    "newversion": "3.18.3",
    "baseimage": "ghcr.io/linuxserver/baseimage-alpine",
-   "baseversion": "3.18-a67812a8-ls17",
+   "baseversion": "3.18-c84a529a-ls18",
    "body": "Upgrading docker-traktarr to ",
    "user": "dockserver image update[bot]"
 }
@@ -161,7 +161,7 @@ apps docker-uploader
    "appfolder": "./apps/docker-uploader",
    "newversion": "3.18.3",
    "baseimage": "ghcr.io/linuxserver/baseimage-alpine",
-   "baseversion": "3.18-a67812a8-ls17",
+   "baseversion": "3.18-c84a529a-ls18",
    "body": "Upgrading docker-uploader to ",
    "user": "dockserver image update[bot]"
 }
@@ -186,7 +186,7 @@ apps docker-wiki
    "appbranch": "master",
    "newversion": "3.18.3",
    "appversion": "1.4.55",
-   "wikiversion": "9.2.5",
+   "wikiversion": "9.2.8",
    "baseimage": "alpine",
    "description": "Docker + Traefik with Authelia and Cloudflare Protection",
    "body": "Upgrading docker-wiki to 3.18.3",
@@ -388,7 +388,7 @@ nightly docker-whisparr-nightly
    "newversion": "2.0.0.250",
    "appbranch": "nightly",
    "baseimage": "ghcr.io/linuxserver/baseimage-alpine",
-   "baseversion": "3.18-a67812a8-ls17",
+   "baseversion": "3.18-c84a529a-ls18",
    "description": "Whisparr is an adult movie collection manager for Usenet and BitTorrent users.",
    "body": "Upgrading docker-whisparr-nightly to 2.0.0.250",
    "user": "dockserver image update[bot]"
