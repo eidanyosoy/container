@@ -157,7 +157,7 @@ jobs:
     - name: Build and Push Image
       if: ${{ steps.prep.outputs.version != '' }}
       id: build-and-push
-      uses: docker/build-push-action@v4.1.1
+      uses: docker/build-push-action@v4.2.1
       with:
         build-args: VERSION=${{ steps.prep.outputs.version }}
         context: .
