@@ -62,7 +62,7 @@ done
 sleep 5
 if [[ -n $(git status --porcelain) ]]; then
    git config --global user.name 'dockserver-bot[bot]'
-   git config --global user.email 'dockserver-bot[bot]@dockserver.io'
+   git config --global user.email '145536302+dockserver-bot[bot]@users.noreply.github.com'
    git add -A
    LOG=$(git status --porcelain | sed s/^...//)
    git commit -sam "[Auto Generation] Changes : $LOG" || exit 0
