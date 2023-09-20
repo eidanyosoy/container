@@ -35,8 +35,8 @@ done
 
 sleep 5
 if [[ -n $(git status --porcelain) ]]; then
-   git config --global user.name 'github-actions[bot]'
-   git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+   git config --global user.name 'dockserver-bot[bot]'
+   git config --global user.email '145536302+dockserver-bot[bot]@users.noreply.github.com'
    git add -A
    git commit -sam "[Auto Update Depends] Get New Package Versions From Image" || true
    git push --force
