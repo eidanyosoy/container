@@ -15,10 +15,10 @@ apps docker-backup
    "appname": "docker-backup",
    "apppic": "./images/docker-backup.png",
    "appfolder": "./apps/docker-backup",
-   "newversion": "",
+   "newversion": "3.18.3",
    "baseimage": "alpine",
    "description": "Official Alpine Linux Docker image. Win at minimalism!",
-   "body": "Upgrading docker-backup to ",
+   "body": "Upgrading docker-backup to 3.18.3",
    "user": "github-actions[bot]"
 }
 
@@ -64,10 +64,10 @@ apps docker-gdsa
    "appname": "docker-gdsa",
    "apppic": "./images/docker-gdsa.png",
    "appfolder": "./apps/docker-gdsa",
-   "newversion": "",
+   "newversion": "446.0.0-alpine",
    "baseimage": "gcr.io/google.com/cloudsdktool/cloud-sdk",
    "description": "Docker for Creating GDSA keys",
-   "body": "Upgrading docker-gdsa to ",
+   "body": "Upgrading docker-gdsa to 446.0.0-alpine",
    "user": "dockserver-actions[bot]"
 }
 
