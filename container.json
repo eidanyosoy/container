@@ -27,10 +27,10 @@ apps docker-crunchy
    "appname": "docker-crunchy",
    "apppic": "./images/docker-crunchy.png",
    "appfolder": "./apps/docker-crunchy",
-   "newversion": "",
+   "newversion": "23.10",
    "baseimage": "ubuntu",
    "description": "Docker image  for docker-crunchy",
-   "body": "Upgrading docker-crunchy to baseimage: ubuntu:",
+   "body": "Upgrading docker-crunchy to baseimage: ubuntu:23.10",
    "user": "dockserver image update[bot]"
 }
 
@@ -64,10 +64,10 @@ apps docker-gdsa
    "appname": "docker-gdsa",
    "apppic": "./images/docker-gdsa.png",
    "appfolder": "./apps/docker-gdsa",
-   "newversion": "",
+   "newversion": "452.0.0-alpine",
    "baseimage": "gcr.io/google.com/cloudsdktool/cloud-sdk",
    "description": "Docker for Creating GDSA keys",
-   "body": "Upgrading docker-gdsa to ",
+   "body": "Upgrading docker-gdsa to 452.0.0-alpine",
    "user": "dockserver-actions[bot]"
 }
 
@@ -123,10 +123,10 @@ apps docker-rollarr
    "appname": "docker-rollarr",
    "apppic": "./images/docker-rollarr.png",
    "appfolder": "./apps/docker-rollarr",
-   "newversion": "",
+   "newversion": "23.10",
    "baseimage": "ubuntu",
    "description": "This is the new and improved Automatic Pre-roll script with a GUI for Plex now called Rollarr!",
-   "body": "Upgrading docker-rollarr to ",
+   "body": "Upgrading docker-rollarr to 23.10",
    "user": "github-actions[bot]"
 }
 
@@ -147,7 +147,7 @@ apps docker-traktarr
    "appname": "docker-traktarr",
    "apppic": "./images/docker-traktarr.png",
    "appfolder": "./apps/docker-traktarr",
-   "newversion": "",
+   "newversion": "3.18.4",
    "baseimage": "ghcr.io/linuxserver/baseimage-alpine",
    "baseversion": "3.18-458ab886-ls26",
    "body": "Upgrading docker-traktarr to ",
@@ -274,10 +274,10 @@ base docker-ubuntu-focal
    "appname": "docker-ubuntu-focal",
    "apppic": "./images/docker-ubuntu-focal.png",
    "appfolder": "./base/docker-ubuntu-focal",
-   "newversion": "3.18.4",
+   "newversion": "",
    "baseimage": "alpine",
    "description": "Docker image  for docker-ubuntu-focal",
-   "body": "Upgrading docker-ubuntu-focal to baseimage: alpine:3.18.4",
+   "body": "Upgrading docker-ubuntu-focal to baseimage: alpine:",
    "user": "dockserver image update[bot]"
 }
 
@@ -286,10 +286,10 @@ base docker-ubuntu-jammy
    "appname": "docker-ubuntu-jammy",
    "apppic": "./images/docker-ubuntu-jammy.png",
    "appfolder": "./base/docker-ubuntu-jammy",
-   "newversion": "",
+   "newversion": "3.18.4",
    "baseimage": "alpine",
    "description": "Docker image  for docker-ubuntu-jammy",
-   "body": "Upgrading docker-ubuntu-jammy to baseimage: alpine:",
+   "body": "Upgrading docker-ubuntu-jammy to baseimage: alpine:3.18.4",
    "user": "dockserver image update[bot]"
 }
 
