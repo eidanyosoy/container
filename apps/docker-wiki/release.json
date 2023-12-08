@@ -3,11 +3,11 @@
    "apppic": "./images/docker-wiki.png",
    "appfolder": "./apps/docker-wiki",
    "appbranch": "master",
-   "newversion": "3.18.5",
+   "newversion": "3.19.0",
    "appversion": "1.4.65",
    "wikiversion": "9.5.0",
    "baseimage": "alpine",
    "description": "Docker + Traefik with Authelia and Cloudflare Protection",
-   "body": "Upgrading docker-wiki to 3.18.5",
+   "body": "Upgrading docker-wiki to 3.19.0",
    "user": "github-actions[bot]"
 }
