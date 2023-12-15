@@ -1,4 +1,4 @@
-.python-rundeps-20231019.054731
+.python-rundeps-20231205.193742
 alpine-baselayout-3.4.3-r1
 alpine-baselayout-data-3.4.3-r1
 alpine-keys-2.4-r1
@@ -27,7 +27,7 @@ libbz2-1.0.8-r5
 libc-utils-0.7.2-r5
 libcom_err-1.47.0-r2
 libcrypto3-3.1.4-r1
-libcurl-8.4.0-r0
+libcurl-8.5.0-r0
 libedit-20221030.3.1-r1
 libexpat-2.5.0-r1
 libffi-3.4.4-r2
