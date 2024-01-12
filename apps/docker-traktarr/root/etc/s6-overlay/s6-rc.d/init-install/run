@@ -54,7 +54,7 @@ elif [[ -d ${TRAKTARR_DIR}/.git ]]; then
 fi
 
 log "**** install pip packages ****"
-   pip3 install --quiet --no-cache-dir --no-deps -U -r /app/pip-requirements.txt &>/dev/null
+   pip3 install --quiet --no-cache-dir --break-system-packages --no-deps -U -r /app/pip-requirements.txt &>/dev/null
 
 log "**** cleannup ****"
    $(which rm) -rf /var/cache/apk/*

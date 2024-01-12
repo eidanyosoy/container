@@ -40,7 +40,7 @@ log "**** install restic ****"
    apk add --quiet --no-progress --update restic --repository=https://dl-cdn.alpinelinux.org/alpine/edge/community &>/dev/null
 
 log "**** install pip packages ****"
-   pip3 install --no-cache-dir -U apprise &>/dev/null
+   pip3 install --no-cache-dir --break-system-packages -U apprise &>/dev/null
 
 log "**** install rclone ****"
    $(which wget) -qO- https://rclone.org/install.sh | bash &>/dev/null
