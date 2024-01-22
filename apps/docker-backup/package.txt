@@ -16,10 +16,10 @@ libacl-2.3.1-r4
 libattr-2.5.1-r5
 libbsd-0.11.7-r3
 libc-utils-0.7.2-r5
-libcrypto3-3.1.4-r2
+libcrypto3-3.1.4-r3
 libmd-1.1.0-r0
 libncursesw-6.4_p20231125-r0
-libssl3-3.1.4-r2
+libssl3-3.1.4-r3
 linux-pam-1.5.3-r7
 musl-1.2.4_git20230717-r4
 musl-utils-1.2.4_git20230717-r4
