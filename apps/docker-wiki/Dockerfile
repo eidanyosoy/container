@@ -16,13 +16,13 @@
 #####################################
 # shellcheck disable=SC2086
 # shellcheck disable=SC2046
-FROM alpine:3.19.0 as buildstage
+FROM alpine:3.19.1 as buildstage
 LABEL org.opencontainers.image.source="https://github.com/dockserver/container"
 
 ARG TARGETPLATFORM
 ARG BUILDPLATFORM
 
-ARG BASEVERSION="3.19.0"
+ARG BASEVERSION="3.19.1"
 ARG APPVERSION="1.4.65"
 ARG WIKIVERSION="9.5.5"
 ARG BRANCH="master"
