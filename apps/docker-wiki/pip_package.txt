@@ -58,5 +58,5 @@ termcolor==2.4.0
 tinycss2==1.2.1
 urllib3==2.2.1
 watchdog==4.0.0
-wcmatch==8.5
+wcmatch==8.5.1
 webencodings==0.5.1
