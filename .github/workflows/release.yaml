@@ -36,7 +36,7 @@ jobs:
         token: ${{ secrets.CR_PAT }}
         fetch-depth: 0
 
-    - uses: dorny/paths-filter@v2
+    - uses: dorny/paths-filter@v3
       id: filter
       with:
         list-files: json
