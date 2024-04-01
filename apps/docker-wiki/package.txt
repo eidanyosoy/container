@@ -9,8 +9,8 @@ brotli-dev-1.0.9-r14
 brotli-libs-1.0.9-r14
 busybox-1.36.1-r5
 busybox-binsh-1.36.1-r5
-ca-certificates-20230506-r0
-ca-certificates-bundle-20230506-r0
+ca-certificates-20240226-r0
+ca-certificates-bundle-20240226-r0
 cairo-1.17.8-r1
 fontconfig-2.14.2-r3
 freetype-2.13.0-r5
