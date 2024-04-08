@@ -2,7 +2,7 @@ alpine-baselayout-3.4.3-r2
 alpine-baselayout-data-3.4.3-r2
 alpine-keys-2.4-r1
 alpine-release-3.19.1-r0
-apk-tools-2.14.0-r5
+apk-tools-2.14.3-r1
 bash-5.2.21-r0
 bc-1.07.1-r4
 brotli-libs-1.1.0-r1
