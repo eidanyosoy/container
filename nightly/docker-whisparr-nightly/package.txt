@@ -2,7 +2,7 @@ alpine-baselayout-3.4.3-r2
 alpine-baselayout-data-3.4.3-r2
 alpine-keys-2.4-r1
 alpine-release-3.19.1-r0
-apk-tools-2.14.3-r1
+apk-tools-2.14.4-r0
 bash-5.2.21-r0
 brotli-libs-1.1.0-r1
 busybox-1.36.1-r15
@@ -15,6 +15,7 @@ coreutils-env-9.4-r2
 coreutils-fmt-9.4-r2
 coreutils-sha512sum-9.4-r2
 curl-8.5.0-r0
+findutils-4.9.0-r5
 icu-data-en-74.1-r0
 icu-libs-74.1-r0
 jq-1.7.1-r0
