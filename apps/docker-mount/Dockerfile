@@ -45,13 +45,13 @@ RUN \
     apk del --quiet --clean-protected --no-progress && \
     rm -rf /var/cache/apk/* /tmp/*
 
-FROM ghcr.io/linuxserver/baseimage-alpine:3.19-809cfda5-ls17
+FROM ghcr.io/linuxserver/baseimage-alpine:3.19-809cfda5-ls18
 
 ARG TARGETPLATFORM
 ARG BUILDPLATFORM
 
 ARG BASE_VERSION=3.19.1
-ARG ALPINE_VERSION=3.19-809cfda5-ls17
+ARG ALPINE_VERSION=3.19-809cfda5-ls18
 ARG MERGERFS_VERSION=2.40.2
 ARG RCLONE_VERSION=v1.66.0
 
