@@ -10,6 +10,7 @@ busybox-binsh-1.36.1-r15
 c-ares-1.27.0-r0
 ca-certificates-20240226-r0
 ca-certificates-bundle-20240226-r0
+catatonit-0.2.0-r0
 coreutils-9.4-r2
 coreutils-env-9.4-r2
 coreutils-fmt-9.4-r2
