@@ -16,7 +16,7 @@
 #####################################
 # shellcheck disable=SC2086
 # shellcheck disable=SC2046
-FROM alpine:3.19.1
+FROM alpine:3.20.0
 
 LABEL org.opencontainers.image.source="https://github.com/dockserver/container"
 
