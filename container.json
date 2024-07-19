@@ -261,11 +261,11 @@ base docker-dockserver
    "appname": "docker-dockserver",
    "apppic": "",
    "appfolder": "./base/docker-dockserver",
-   "newversion": "",
-   "appversion": "",
+   "newversion": "3.20.1",
+   "appversion": "3.20.1",
    "baseimage": "alpine",
    "description": "Docker + Traefik with Authelia and Cloudflare Protection",
-   "body": "Upgrading docker-dockserver to ",
+   "body": "Upgrading docker-dockserver to 3.20.1",
    "user": "github-actions[bot]"
 }
 
