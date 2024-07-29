@@ -1,7 +1,7 @@
 alpine-baselayout-3.6.5-r0
 alpine-baselayout-data-3.6.5-r0
 alpine-keys-2.4-r1
-alpine-release-3.20.1-r0
+alpine-release-3.20.2-r0
 apk-tools-2.14.4-r0
 bash-5.2.26-r0
 bc-1.07.1-r4
@@ -16,14 +16,14 @@ coreutils-9.5-r1
 coreutils-env-9.5-r1
 coreutils-fmt-9.5-r1
 coreutils-sha512sum-9.5-r1
-curl-8.8.0-r0
+curl-8.9.0-r0
 findutils-4.9.0-r5
 jq-1.7.1-r0
 libacl-2.3.2-r0
 libattr-2.5.2-r0
 libbsd-0.12.2-r0
 libcrypto3-3.3.1-r3
-libcurl-8.8.0-r0
+libcurl-8.9.0-r0
 libidn2-2.3.7-r0
 libintl-0.22.5-r0
 libmd-1.1.0-r0
