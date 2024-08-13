@@ -4,7 +4,7 @@
    "appfolder": "./apps/docker-backup",
    "newversion": "3.20.2",
    "baseimage": "alpine",
-   "description": "null",
+   "description": "Official Alpine Linux Docker image. Win at minimalism!",
    "body": "Upgrading docker-backup to 3.20.2",
    "user": "github-actions[bot]"
 }
