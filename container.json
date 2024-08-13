@@ -5,7 +5,7 @@ apps docker-auto-replyarr
    "appfolder": "./apps/docker-auto-replyarr",
    "newversion": "3.20.2",
    "baseimage": "alpine",
-   "description": "Official Alpine Linux Docker image. Win at minimalism!",
+   "description": "",
    "body": "Upgrading docker-auto-replyarr to 3.20.2",
    "user": "github-actions[bot]"
 }
@@ -17,7 +17,7 @@ apps docker-backup
    "appfolder": "./apps/docker-backup",
    "newversion": "3.20.2",
    "baseimage": "alpine",
-   "description": "Official Alpine Linux Docker image. Win at minimalism!",
+   "description": "null",
    "body": "Upgrading docker-backup to 3.20.2",
    "user": "github-actions[bot]"
 }
@@ -77,15 +77,15 @@ apps docker-mount
    "apppic": "./images/docker-mount.png",
    "appfolder": "./apps/docker-mount",
    "newversion": "3.20.2",
-   "mergerfs": "2.40.2",
-   "rclone": "v1.67.0",
+   "mergerfs": "null",
+   "rclone": "null",
    "baseimage": "alpine",
    "buildimage": "alpine",
    "finalimage": "ghcr.io/linuxserver/baseimage-alpine",
-   "baseversion": "3.20-d6fdb4e3-ls8",
-   "s6stage": "v3.2.0.0",
-   "description": "Docker docker-mount with mergerfs version 2.40.2 and rclone version v1.67.0 include s6-overlay: v3.2.0.0",
-   "body": "Upgrading docker-mount to baseimage: alpine:3.20-d6fdb4e3-ls8 with mergerfs: 2.40.2 and rclone: v1.67.0 include s6-overlay: v3.2.0.0",
+   "baseversion": "",
+   "s6stage": "null",
+   "description": "Docker docker-mount with mergerfs version null and rclone version null include s6-overlay: null",
+   "body": "Upgrading docker-mount to baseimage: alpine: with mergerfs: null and rclone: null include s6-overlay: null",
    "user": "dockserver image update[bot]"
 }
 
@@ -107,14 +107,14 @@ apps docker-restic
    "apppic": "./images/docker-restic.png",
    "appfolder": "./apps/docker-restic",
    "newversion": "3.20.2",
-   "rclone": "v1.67.0",
+   "rclone": "null",
    "baseimage": "alpine",
    "buildimage": "alpine",
    "finalimage": "ghcr.io/linuxserver/baseimage-alpine",
-   "baseversion": "3.20-d6fdb4e3-ls8",
-   "s6stage": "v3.2.0.0",
-   "description": "Docker docker-restic with rclone version v1.67.0 include s6-overlay: v3.2.0.0",
-   "body": "Upgrading docker-restic to baseimage: alpine:3.20-d6fdb4e3-ls8 with rclone: v1.67.0 include s6-overlay: v3.2.0.0",
+   "baseversion": "",
+   "s6stage": "null",
+   "description": "Docker docker-restic with rclone version null include s6-overlay: null",
+   "body": "Upgrading docker-restic to baseimage: alpine: with rclone: null include s6-overlay: null",
    "user": "dockserver image update[bot]"
 }
 
@@ -135,10 +135,10 @@ apps docker-spotweb
    "appname": "docker-spotweb",
    "apppic": "",
    "appfolder": "./apps/docker-spotweb",
-   "newversion": "1.5.4",
+   "newversion": "null",
    "baseimage": "ubuntu:latest",
-   "description": "Decentralized community",
-   "body": "Upgrading docker-spotweb to 1.5.4",
+   "description": "null",
+   "body": "Upgrading docker-spotweb to null",
    "user": "dockserver[bot]"
 }
 
@@ -149,7 +149,7 @@ apps docker-traktarr
    "appfolder": "./apps/docker-traktarr",
    "newversion": "3.20.2",
    "baseimage": "ghcr.io/linuxserver/baseimage-alpine",
-   "baseversion": "3.20-d6fdb4e3-ls8",
+   "baseversion": "null",
    "body": "Upgrading docker-traktarr to ",
    "user": "dockserver image update[bot]"
 }
@@ -161,7 +161,7 @@ apps docker-uploader
    "appfolder": "./apps/docker-uploader",
    "newversion": "3.20.2",
    "baseimage": "ghcr.io/linuxserver/baseimage-alpine",
-   "baseversion": "3.20-d6fdb4e3-ls8",
+   "baseversion": "null",
    "body": "Upgrading docker-uploader to ",
    "user": "dockserver image update[bot]"
 }
@@ -185,10 +185,10 @@ apps docker-wiki
    "appfolder": "./apps/docker-wiki",
    "appbranch": "master",
    "newversion": "3.20.2",
-   "appversion": "1.4.69",
-   "wikiversion": "9.5.31",
+   "appversion": "",
+   "wikiversion": "",
    "baseimage": "alpine",
-   "description": "Docker + Traefik with Authelia and Cloudflare Protection",
+   "description": "null",
    "body": "Upgrading docker-wiki to 3.20.2",
    "user": "github-actions[bot]"
 }
@@ -200,7 +200,7 @@ base alpine
    "appfolder": "./base/alpine",
    "newversion": "3.20.2",
    "baseimage": "alpine",
-   "description": "Official Alpine Linux Docker image. Win at minimalism!",
+   "description": "",
    "body": "Upgrading alpine to 3.20.2",
    "user": "github-actions[bot]"
 }
@@ -226,9 +226,9 @@ base docker-alpine-v3
    "newversion": "3.20.2",
    "baseimage": "alpine",
    "baseversion": "3.20.2",
-   "s6stage": "v3.2.0.0",
-   "description": "Docker docker-alpine-v3 with include s6-overlay: v3.2.0.0",
-   "body": "Upgrading docker-alpine-v3 to baseimage: alpine:3.20.2  with include s6-overlay: v3.2.0.0",
+   "s6stage": "null",
+   "description": "Docker docker-alpine-v3 with include s6-overlay: null",
+   "body": "Upgrading docker-alpine-v3 to baseimage: alpine:3.20.2  with include s6-overlay: null",
    "user": "dockserver image update[bot]"
 }
 
@@ -264,7 +264,7 @@ base docker-dockserver
    "newversion": "3.20.2",
    "appversion": "3.20.2",
    "baseimage": "alpine",
-   "description": "Docker + Traefik with Authelia and Cloudflare Protection",
+   "description": "",
    "body": "Upgrading docker-dockserver to 3.20.2",
    "user": "github-actions[bot]"
 }
@@ -388,7 +388,7 @@ nightly docker-whisparr-nightly
    "newversion": "2.0.0.548",
    "appbranch": "nightly",
    "baseimage": "ghcr.io/linuxserver/baseimage-alpine",
-   "baseversion": "3.20-d6fdb4e3-ls8",
+   "baseversion": "null",
    "description": "Whisparr is an adult movie collection manager for Usenet and BitTorrent users.",
    "body": "Upgrading docker-whisparr-nightly to 2.0.0.548",
    "user": "dockserver image update[bot]"
