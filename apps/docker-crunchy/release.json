@@ -2,9 +2,9 @@
    "appname": "docker-crunchy",
    "apppic": "./images/docker-crunchy.png",
    "appfolder": "./apps/docker-crunchy",
-   "newversion": "22.04",
+   "newversion": "oracular-20240811.1",
    "baseimage": "ubuntu",
    "description": "Docker image  for docker-crunchy",
-   "body": "Upgrading docker-crunchy to baseimage: ubuntu:22.04",
+   "body": "Upgrading docker-crunchy to baseimage: ubuntu:oracular-20240811.1",
    "user": "dockserver image update[bot]"
 }
