@@ -135,10 +135,10 @@ apps docker-spotweb
    "appname": "docker-spotweb",
    "apppic": "",
    "appfolder": "./apps/docker-spotweb",
-   "newversion": "",
+   "newversion": "1.5.4",
    "baseimage": "ubuntu:latest",
-   "description": "",
-   "body": "Upgrading docker-spotweb to ",
+   "description": "Decentralized community",
+   "body": "Upgrading docker-spotweb to 1.5.4",
    "user": "dockserver[bot]"
 }
 
@@ -200,7 +200,7 @@ base alpine
    "appfolder": "./base/alpine",
    "newversion": "3.20.2",
    "baseimage": "alpine",
-   "description": "",
+   "description": "Official Alpine Linux Docker image. Win at minimalism!",
    "body": "Upgrading alpine to 3.20.2",
    "user": "github-actions[bot]"
 }
