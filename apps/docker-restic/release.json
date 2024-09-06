@@ -2,7 +2,7 @@
    "appname": "docker-restic",
    "apppic": "./images/docker-restic.png",
    "appfolder": "./apps/docker-restic",
-   "newversion": "3.20.2",
+   "newversion": "3.20.3",
    "rclone": "v1.67.0",
    "baseimage": "alpine",
    "buildimage": "alpine",
