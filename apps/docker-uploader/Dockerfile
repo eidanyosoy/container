@@ -16,13 +16,13 @@
 #####################################
 # shellcheck disable=SC2086
 # shellcheck disable=SC2046
-FROM ghcr.io/linuxserver/baseimage-alpine:3.20-d7c56cc7-ls12
+FROM ghcr.io/linuxserver/baseimage-alpine:3.20-2b0034c2-ls13
 LABEL org.opencontainers.image.source="https://github.com/dockserver/container"
 
 ARG TARGETPLATFORM
 ARG BUILDPLATFORM
 
-ARG ALPINE_VERSION=3.20-d7c56cc7-ls12
+ARG ALPINE_VERSION=3.20-2b0034c2-ls13
 
 RUN \
   echo "**** update packages ****" && \
