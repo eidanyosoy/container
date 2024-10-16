@@ -2,9 +2,9 @@
    "appname": "docker-rollarr",
    "apppic": "./images/docker-rollarr.png",
    "appfolder": "./apps/docker-rollarr",
-   "newversion": "24.10",
+   "newversion": "24.04",
    "baseimage": "ubuntu",
    "description": "This is the new and improved Automatic Pre-roll script with a GUI for Plex now called Rollarr!",
-   "body": "Upgrading docker-rollarr to 24.10",
+   "body": "Upgrading docker-rollarr to 24.04",
    "user": "github-actions[bot]"
 }
