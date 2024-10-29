@@ -1,5 +1,5 @@
 PlexAPI==4.2.0
-PySimpleGUI==5.0.6
+PySimpleGUI==5.0.7
 certifi==2024.8.30
 charset-normalizer==3.4.0
 idna==3.10
