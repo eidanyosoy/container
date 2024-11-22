@@ -5,7 +5,7 @@ apps docker-auto-replyarr
    "appfolder": "./apps/docker-auto-replyarr",
    "newversion": "3.20.3",
    "baseimage": "alpine",
-   "description": "",
+   "description": "Official Alpine Linux Docker image. Win at minimalism!",
    "body": "Upgrading docker-auto-replyarr to 3.20.3",
    "user": "github-actions[bot]"
 }
@@ -112,9 +112,9 @@ apps docker-restic
    "buildimage": "alpine",
    "finalimage": "ghcr.io/linuxserver/baseimage-alpine",
    "baseversion": "3.20-2a6ecb14-ls14",
-   "s6stage": "",
-   "description": "Docker docker-restic with rclone version v1.68.2 include s6-overlay: ",
-   "body": "Upgrading docker-restic to baseimage: alpine:3.20-2a6ecb14-ls14 with rclone: v1.68.2 include s6-overlay: ",
+   "s6stage": "v3.2.0.2",
+   "description": "Docker docker-restic with rclone version v1.68.2 include s6-overlay: v3.2.0.2",
+   "body": "Upgrading docker-restic to baseimage: alpine:3.20-2a6ecb14-ls14 with rclone: v1.68.2 include s6-overlay: v3.2.0.2",
    "user": "dockserver image update[bot]"
 }
 
@@ -186,9 +186,9 @@ apps docker-wiki
    "appbranch": "master",
    "newversion": "3.20.3",
    "appversion": "1.4.72",
-   "wikiversion": "",
+   "wikiversion": "9.5.45",
    "baseimage": "alpine",
-   "description": "",
+   "description": "Docker + Traefik with Authelia and Cloudflare Protection",
    "body": "Upgrading docker-wiki to 3.20.3",
    "user": "github-actions[bot]"
 }
