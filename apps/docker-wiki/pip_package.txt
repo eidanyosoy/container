@@ -40,7 +40,7 @@ mkdocs-mermaid2-plugin==1.2.1
 mkdocs-minify-plugin==0.6.1
 mkdocs-redirects==1.2.0
 mkdocs-render-swagger-plugin==0.1.2
-mkdocs-rss-plugin==1.16.0
+mkdocs-rss-plugin==1.17.0
 mkdocs==1.6.1
 msgpack==1.1.0
 natsort==8.4.0
@@ -55,7 +55,7 @@ python-dateutil==2.9.0.post0
 pyyaml_env_tag==0.1
 regex==2024.11.6
 requests==2.32.3
-six==1.16.0
+six==1.17.0
 smmap==5.0.1
 soupsieve==2.6
 termcolor==2.5.0
