@@ -2,9 +2,9 @@
    "appname": "docker-crunchy",
    "apppic": "./images/docker-crunchy.png",
    "appfolder": "./apps/docker-crunchy",
-   "newversion": "noble-20241118.1",
+   "newversion": "25.04",
    "baseimage": "ubuntu",
    "description": "Docker image  for docker-crunchy",
-   "body": "Upgrading docker-crunchy to baseimage: ubuntu:noble-20241118.1",
+   "body": "Upgrading docker-crunchy to baseimage: ubuntu:25.04",
    "user": "dockserver image update[bot]"
 }
