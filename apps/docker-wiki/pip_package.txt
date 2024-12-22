@@ -1,6 +1,6 @@
 CacheControl==0.14.1
 CairoSVG==2.7.1
-EditorConfig==0.12.4
+EditorConfig==0.17.0
 GitPython==3.1.43
 Jinja2==3.1.4
 Markdown==3.7
@@ -11,7 +11,7 @@ babel==2.16.0
 beautifulsoup4==4.12.3
 bracex==2.5.post1
 cairocffi==1.7.1
-certifi==2024.8.30
+certifi==2024.12.14
 cffi==1.17.1
 charset-normalizer==3.4.0
 click==8.1.7
