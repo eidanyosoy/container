@@ -13,7 +13,7 @@ bracex==2.5.post1
 cairocffi==1.7.1
 certifi==2024.12.14
 cffi==1.17.1
-charset-normalizer==3.4.0
+charset-normalizer==3.4.1
 click==8.1.8
 colorama==0.4.6
 csscompressor==0.9.5
@@ -50,7 +50,7 @@ pathspec==0.12.1
 pillow==10.4.0
 platformdirs==4.3.6
 pycparser==2.22
-pymdown-extensions==10.12
+pymdown-extensions==10.13
 python-dateutil==2.9.0.post0
 pyyaml_env_tag==0.1
 regex==2024.11.6
@@ -60,7 +60,7 @@ smmap==5.0.1
 soupsieve==2.6
 termcolor==2.5.0
 tinycss2==1.4.0
-urllib3==2.2.3
+urllib3==2.3.0
 watchdog==6.0.0
 wcmatch==10.0
 webencodings==0.5.1
