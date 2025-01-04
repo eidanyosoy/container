@@ -2,11 +2,11 @@
    "appname": "docker-alpine-v3",
    "apppic": "./images/docker-alpine-v3.png",
    "appfolder": "./base/docker-alpine-v3",
-   "newversion": "3.21.0",
+   "newversion": "",
    "baseimage": "alpine",
-   "baseversion": "3.21.0",
+   "baseversion": "",
    "s6stage": "v3.2.0.2",
    "description": "Docker docker-alpine-v3 with include s6-overlay: v3.2.0.2",
-   "body": "Upgrading docker-alpine-v3 to baseimage: alpine:3.21.0  with include s6-overlay: v3.2.0.2",
+   "body": "Upgrading docker-alpine-v3 to baseimage: alpine:  with include s6-overlay: v3.2.0.2",
    "user": "dockserver image update[bot]"
 }
