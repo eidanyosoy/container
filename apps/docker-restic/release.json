@@ -3,13 +3,13 @@
    "apppic": "./images/docker-restic.png",
    "appfolder": "./apps/docker-restic",
    "newversion": "3.21.2",
-   "rclone": "v1.68.2",
+   "rclone": "v1.69.0",
    "baseimage": "alpine",
    "buildimage": "alpine",
    "finalimage": "ghcr.io/linuxserver/baseimage-alpine",
    "baseversion": "3.21-00c9ddba-ls5",
    "s6stage": "v3.2.0.2",
-   "description": "Docker docker-restic with rclone version v1.68.2 include s6-overlay: v3.2.0.2",
-   "body": "Upgrading docker-restic to baseimage: alpine:3.21-00c9ddba-ls5 with rclone: v1.68.2 include s6-overlay: v3.2.0.2",
+   "description": "Docker docker-restic with rclone version v1.69.0 include s6-overlay: v3.2.0.2",
+   "body": "Upgrading docker-restic to baseimage: alpine:3.21-00c9ddba-ls5 with rclone: v1.69.0 include s6-overlay: v3.2.0.2",
    "user": "dockserver image update[bot]"
 }
