@@ -42,7 +42,5 @@ while true; do
 
       log "-> Storage Mounts online again! | Starting ${APP} ... <-"
    fi
-
-   log "-> Checking for Storage Mounts ... <-"
-   sleep 120
+   $(which sleep) 120
 done
