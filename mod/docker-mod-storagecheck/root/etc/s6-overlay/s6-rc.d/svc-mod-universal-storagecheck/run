@@ -25,22 +25,24 @@ function log() {
 
 while true; do
    if [[ ! -f "${STORAGECHECK}" || ! -f "${STORAGECHECK2}" ]]; then
-      log "-> One or more Storage Mounts offline ! | Stopping ${APP} ...  <-"
-      mapfile -t "SERVICES" < <($(which ls) /var/run/service/ | $(which grep) -Ewiv "s6-linux-init-shutdownd|s6rc-fdholder|s6rc-oneshot-runner|svc-cron|svc-mod-universal-storagecheck")
-      for SERVICE in ${SERVICES[@]}; do
+      log "-> One or more Storage Mounts offline! | Stopping ${APP} ... <-"
+      mapfile -t SERVICES < <($(which ls) /var/run/service/ | $(which grep) -Ewiv "s6-linux-init-shutdownd|s6rc-fdholder|s6rc-oneshot-runner|svc-cron|svc-mod-universal-storagecheck")
+      for SERVICE in "${SERVICES[@]}"; do
          s6-svc -d /var/run/service/${SERVICE}
-         while [[ ! -f "${STORAGECHECK}" || ! -f "${STORAGECHECK2}" ]]; do
-            $(which sleep) 30
-         done
+      done
+
+      while [[ ! -f "${STORAGECHECK}" || ! -f "${STORAGECHECK2}" ]]; do
+         log "-> Waiting for Storage Mounts ... <-"
+         sleep 30
+      done
+
+      for SERVICE in "${SERVICES[@]}"; do
          s6-svc -u /var/run/service/${SERVICE}
       done
-      log "-> Storage Mounts online again ! | Starting ${APP} ...<-"
+
+      log "-> Storage Mounts online again! | Starting ${APP} ... <-"
    fi
-   $(which sleep) 120
-log "-> Checking for Storage Mounts ... <-"
 
-while [[ ! -f "${STORAGECHECK}" || ! -f "${STORAGECHECK2}" ]]; do
-   log "-> Waiting for Storage Mounts ... <-" && sleep 10
+   log "-> Checking for Storage Mounts ... <-"
+   sleep 120
 done
-
-log "-> Storage Mounts online ! | Starting ${APP} ... <-"
