@@ -340,14 +340,6 @@ mod docker-mod-healthcheck
    "user": "github-actions[bot]"
 }
 
-mod docker-mod-storagecheck
-{
-   "appname": "docker-mod-storagecheck",
-   "apppic": "./images/docker-mount.png",
-   "appfolder": "./mod/docker-mod-storagecheck",
-   "user": "github-actions[bot]"
-}
-
 mod docker-mod-nzbget
 {
    "appname": "docker-mod-nzbget",
@@ -377,6 +369,14 @@ mod docker-mod-sabnzbd
    "appname": "docker-mod-sabnzbd",
    "apppic": "./images/docker-mod-sabnzbd.png",
    "appfolder": "./mod/docker-mod-sabnzbd",
+   "user": "github-actions[bot]"
+}
+
+mod docker-mod-storagecheck
+{
+   "appname": "docker-mod-storagecheck",
+   "apppic": "./images/docker-mod-storagecheck.png",
+   "appfolder": "./mod/docker-mod-storagecheck",
    "user": "github-actions[bot]"
 }
 
