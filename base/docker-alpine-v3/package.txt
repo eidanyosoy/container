@@ -1,12 +1,12 @@
 alpine-baselayout-3.6.8-r1
 alpine-baselayout-data-3.6.8-r1
 alpine-keys-2.5-r0
-alpine-release-3.21.1-r0
+alpine-release-3.21.2-r0
 apk-tools-2.14.6-r2
 bash-5.2.37-r0
 busybox-1.37.0-r9
 busybox-binsh-1.37.0-r9
-ca-certificates-bundle-20241121-r0
+ca-certificates-bundle-20241121-r1
 libcrypto3-3.3.2-r4
 libncursesw-6.5_p20241006-r3
 libssl3-3.3.2-r4
