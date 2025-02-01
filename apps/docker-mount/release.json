@@ -8,9 +8,9 @@
    "baseimage": "alpine",
    "buildimage": "alpine",
    "finalimage": "ghcr.io/linuxserver/baseimage-alpine",
-   "baseversion": "3.21-7cfed05e-ls7",
+   "baseversion": "3.21-7cfed05e-ls8",
    "s6stage": "v3.2.0.2",
    "description": "Docker docker-mount with mergerfs version 2.40.2 and rclone version v1.69.0 include s6-overlay: v3.2.0.2",
-   "body": "Upgrading docker-mount to baseimage: alpine:3.21-7cfed05e-ls7 with mergerfs: 2.40.2 and rclone: v1.69.0 include s6-overlay: v3.2.0.2",
+   "body": "Upgrading docker-mount to baseimage: alpine:3.21-7cfed05e-ls8 with mergerfs: 2.40.2 and rclone: v1.69.0 include s6-overlay: v3.2.0.2",
    "user": "dockserver image update[bot]"
 }
