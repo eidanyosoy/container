@@ -64,10 +64,10 @@ apps docker-gdsa
    "appname": "docker-gdsa",
    "apppic": "./images/docker-gdsa.png",
    "appfolder": "./apps/docker-gdsa",
-   "newversion": "511.0.0-alpine",
+   "newversion": "512.0.0-alpine",
    "baseimage": "gcr.io/google.com/cloudsdktool/cloud-sdk",
    "description": "Docker for Creating GDSA keys",
-   "body": "Upgrading docker-gdsa to 511.0.0-alpine",
+   "body": "Upgrading docker-gdsa to 512.0.0-alpine",
    "user": "dockserver-actions[bot]"
 }
 
