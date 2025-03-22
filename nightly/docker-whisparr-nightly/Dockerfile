@@ -22,7 +22,7 @@ LABEL org.opencontainers.image.source="https://github.com/dockserver/container"
 ARG TARGETPLATFORM
 ARG BUILDPLATFORM
 
-ARG VERSION=2.0.0.884
+ARG VERSION=2.0.0.891
 ARG BRANCH=nightly
 ARG ALPINE_VERSION=3.21-79f3bc4b-ls10
 
