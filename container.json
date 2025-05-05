@@ -83,9 +83,9 @@ apps docker-mount
    "buildimage": "alpine",
    "finalimage": "ghcr.io/linuxserver/baseimage-alpine",
    "baseversion": "3.21-532ba5e0-ls13",
-   "s6stage": "v3.2.0.2",
-   "description": "Docker docker-mount with mergerfs version 2.40.2 and rclone version v1.69.2 include s6-overlay: v3.2.0.2",
-   "body": "Upgrading docker-mount to baseimage: alpine:3.21-532ba5e0-ls13 with mergerfs: 2.40.2 and rclone: v1.69.2 include s6-overlay: v3.2.0.2",
+   "s6stage": "v3.2.0.3",
+   "description": "Docker docker-mount with mergerfs version 2.40.2 and rclone version v1.69.2 include s6-overlay: v3.2.0.3",
+   "body": "Upgrading docker-mount to baseimage: alpine:3.21-532ba5e0-ls13 with mergerfs: 2.40.2 and rclone: v1.69.2 include s6-overlay: v3.2.0.3",
    "user": "dockserver image update[bot]"
 }
 
@@ -112,9 +112,9 @@ apps docker-restic
    "buildimage": "alpine",
    "finalimage": "ghcr.io/linuxserver/baseimage-alpine",
    "baseversion": "3.21-532ba5e0-ls13",
-   "s6stage": "v3.2.0.2",
-   "description": "Docker docker-restic with rclone version v1.69.2 include s6-overlay: v3.2.0.2",
-   "body": "Upgrading docker-restic to baseimage: alpine:3.21-532ba5e0-ls13 with rclone: v1.69.2 include s6-overlay: v3.2.0.2",
+   "s6stage": "v3.2.0.3",
+   "description": "Docker docker-restic with rclone version v1.69.2 include s6-overlay: v3.2.0.3",
+   "body": "Upgrading docker-restic to baseimage: alpine:3.21-532ba5e0-ls13 with rclone: v1.69.2 include s6-overlay: v3.2.0.3",
    "user": "dockserver image update[bot]"
 }
 
@@ -226,9 +226,9 @@ base docker-alpine-v3
    "newversion": "3.21.3",
    "baseimage": "alpine",
    "baseversion": "3.21.3",
-   "s6stage": "v3.2.0.2",
-   "description": "Docker docker-alpine-v3 with include s6-overlay: v3.2.0.2",
-   "body": "Upgrading docker-alpine-v3 to baseimage: alpine:3.21.3  with include s6-overlay: v3.2.0.2",
+   "s6stage": "v3.2.0.3",
+   "description": "Docker docker-alpine-v3 with include s6-overlay: v3.2.0.3",
+   "body": "Upgrading docker-alpine-v3 to baseimage: alpine:3.21.3  with include s6-overlay: v3.2.0.3",
    "user": "dockserver image update[bot]"
 }
 

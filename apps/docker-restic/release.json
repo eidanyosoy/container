@@ -8,8 +8,8 @@
    "buildimage": "alpine",
    "finalimage": "ghcr.io/linuxserver/baseimage-alpine",
    "baseversion": "3.21-532ba5e0-ls13",
-   "s6stage": "v3.2.0.2",
-   "description": "Docker docker-restic with rclone version v1.69.2 include s6-overlay: v3.2.0.2",
-   "body": "Upgrading docker-restic to baseimage: alpine:3.21-532ba5e0-ls13 with rclone: v1.69.2 include s6-overlay: v3.2.0.2",
+   "s6stage": "v3.2.0.3",
+   "description": "Docker docker-restic with rclone version v1.69.2 include s6-overlay: v3.2.0.3",
+   "body": "Upgrading docker-restic to baseimage: alpine:3.21-532ba5e0-ls13 with rclone: v1.69.2 include s6-overlay: v3.2.0.3",
    "user": "dockserver image update[bot]"
 }
