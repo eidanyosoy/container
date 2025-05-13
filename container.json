@@ -64,10 +64,10 @@ apps docker-gdsa
    "appname": "docker-gdsa",
    "apppic": "./images/docker-gdsa.png",
    "appfolder": "./apps/docker-gdsa",
-   "newversion": "",
+   "newversion": "522.0.0-alpine",
    "baseimage": "gcr.io/google.com/cloudsdktool/cloud-sdk",
    "description": "Docker for Creating GDSA keys",
-   "body": "Upgrading docker-gdsa to ",
+   "body": "Upgrading docker-gdsa to 522.0.0-alpine",
    "user": "dockserver-actions[bot]"
 }
 
@@ -186,7 +186,7 @@ apps docker-wiki
    "appbranch": "master",
    "newversion": "3.21.3",
    "appversion": "1.4.72",
-   "wikiversion": "9.6.13",
+   "wikiversion": "9.6.14",
    "baseimage": "alpine",
    "description": "Docker + Traefik with Authelia and Cloudflare Protection",
    "body": "Upgrading docker-wiki to 3.21.3",
