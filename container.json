@@ -5,7 +5,7 @@ apps docker-auto-replyarr
    "appfolder": "./apps/docker-auto-replyarr",
    "newversion": "3.21.3",
    "baseimage": "alpine",
-   "description": "Official Alpine Linux Docker image. Win at minimalism!",
+   "description": "null",
    "body": "Upgrading docker-auto-replyarr to 3.21.3",
    "user": "github-actions[bot]"
 }
@@ -17,7 +17,7 @@ apps docker-backup
    "appfolder": "./apps/docker-backup",
    "newversion": "3.21.3",
    "baseimage": "alpine",
-   "description": "Official Alpine Linux Docker image. Win at minimalism!",
+   "description": "null",
    "body": "Upgrading docker-backup to 3.21.3",
    "user": "github-actions[bot]"
 }
@@ -77,15 +77,15 @@ apps docker-mount
    "apppic": "./images/docker-mount.png",
    "appfolder": "./apps/docker-mount",
    "newversion": "3.21.3",
-   "mergerfs": "2.40.2",
-   "rclone": "v1.69.3",
+   "mergerfs": "null",
+   "rclone": "null",
    "baseimage": "alpine",
    "buildimage": "alpine",
    "finalimage": "ghcr.io/linuxserver/baseimage-alpine",
-   "baseversion": "3.21-532ba5e0-ls14",
-   "s6stage": "v3.2.1.0",
-   "description": "Docker docker-mount with mergerfs version 2.40.2 and rclone version v1.69.3 include s6-overlay: v3.2.1.0",
-   "body": "Upgrading docker-mount to baseimage: alpine:3.21-532ba5e0-ls14 with mergerfs: 2.40.2 and rclone: v1.69.3 include s6-overlay: v3.2.1.0",
+   "baseversion": "null",
+   "s6stage": "null",
+   "description": "Docker docker-mount with mergerfs version null and rclone version null include s6-overlay: null",
+   "body": "Upgrading docker-mount to baseimage: alpine:null with mergerfs: null and rclone: null include s6-overlay: null",
    "user": "dockserver image update[bot]"
 }
 
@@ -112,9 +112,9 @@ apps docker-restic
    "buildimage": "alpine",
    "finalimage": "ghcr.io/linuxserver/baseimage-alpine",
    "baseversion": "3.21-532ba5e0-ls14",
-   "s6stage": "v3.2.1.0",
-   "description": "Docker docker-restic with rclone version v1.69.3 include s6-overlay: v3.2.1.0",
-   "body": "Upgrading docker-restic to baseimage: alpine:3.21-532ba5e0-ls14 with rclone: v1.69.3 include s6-overlay: v3.2.1.0",
+   "s6stage": "null",
+   "description": "Docker docker-restic with rclone version v1.69.3 include s6-overlay: null",
+   "body": "Upgrading docker-restic to baseimage: alpine:3.21-532ba5e0-ls14 with rclone: v1.69.3 include s6-overlay: null",
    "user": "dockserver image update[bot]"
 }
 
@@ -149,7 +149,7 @@ apps docker-traktarr
    "appfolder": "./apps/docker-traktarr",
    "newversion": "3.21.3",
    "baseimage": "ghcr.io/linuxserver/baseimage-alpine",
-   "baseversion": "3.21-532ba5e0-ls14",
+   "baseversion": "null",
    "body": "Upgrading docker-traktarr to ",
    "user": "dockserver image update[bot]"
 }
@@ -161,7 +161,7 @@ apps docker-uploader
    "appfolder": "./apps/docker-uploader",
    "newversion": "3.21.3",
    "baseimage": "ghcr.io/linuxserver/baseimage-alpine",
-   "baseversion": "3.21-532ba5e0-ls14",
+   "baseversion": "null",
    "body": "Upgrading docker-uploader to ",
    "user": "dockserver image update[bot]"
 }
@@ -185,10 +185,10 @@ apps docker-wiki
    "appfolder": "./apps/docker-wiki",
    "appbranch": "master",
    "newversion": "3.21.3",
-   "appversion": "1.4.72",
-   "wikiversion": "9.6.14",
+   "appversion": "",
+   "wikiversion": "",
    "baseimage": "alpine",
-   "description": "Docker + Traefik with Authelia and Cloudflare Protection",
+   "description": "null",
    "body": "Upgrading docker-wiki to 3.21.3",
    "user": "github-actions[bot]"
 }
@@ -200,7 +200,7 @@ base alpine
    "appfolder": "./base/alpine",
    "newversion": "3.21.3",
    "baseimage": "alpine",
-   "description": "Official Alpine Linux Docker image. Win at minimalism!",
+   "description": "null",
    "body": "Upgrading alpine to 3.21.3",
    "user": "github-actions[bot]"
 }
@@ -226,9 +226,9 @@ base docker-alpine-v3
    "newversion": "3.21.3",
    "baseimage": "alpine",
    "baseversion": "3.21.3",
-   "s6stage": "v3.2.1.0",
-   "description": "Docker docker-alpine-v3 with include s6-overlay: v3.2.1.0",
-   "body": "Upgrading docker-alpine-v3 to baseimage: alpine:3.21.3  with include s6-overlay: v3.2.1.0",
+   "s6stage": "null",
+   "description": "Docker docker-alpine-v3 with include s6-overlay: null",
+   "body": "Upgrading docker-alpine-v3 to baseimage: alpine:3.21.3  with include s6-overlay: null",
    "user": "dockserver image update[bot]"
 }
 
