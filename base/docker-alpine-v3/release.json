@@ -5,8 +5,8 @@
    "newversion": "3.21.3",
    "baseimage": "alpine",
    "baseversion": "3.21.3",
-   "s6stage": "null",
-   "description": "Docker docker-alpine-v3 with include s6-overlay: null",
-   "body": "Upgrading docker-alpine-v3 to baseimage: alpine:3.21.3  with include s6-overlay: null",
+   "s6stage": "v3.2.1.0",
+   "description": "Docker docker-alpine-v3 with include s6-overlay: v3.2.1.0",
+   "body": "Upgrading docker-alpine-v3 to baseimage: alpine:3.21.3  with include s6-overlay: v3.2.1.0",
    "user": "dockserver image update[bot]"
 }
