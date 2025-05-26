@@ -161,7 +161,7 @@ apps docker-uploader
    "appfolder": "./apps/docker-uploader",
    "newversion": "3.21.3",
    "baseimage": "ghcr.io/linuxserver/baseimage-alpine",
-   "baseversion": "null",
+   "baseversion": "3.21-532ba5e0-ls14",
    "body": "Upgrading docker-uploader to ",
    "user": "dockserver image update[bot]"
 }
@@ -185,7 +185,7 @@ apps docker-wiki
    "appfolder": "./apps/docker-wiki",
    "appbranch": "master",
    "newversion": "3.21.3",
-   "appversion": "",
+   "appversion": "1.4.72",
    "wikiversion": "9.6.14",
    "baseimage": "alpine",
    "description": "Docker + Traefik with Authelia and Cloudflare Protection",
