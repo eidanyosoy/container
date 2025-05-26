@@ -161,7 +161,7 @@ apps docker-uploader
    "appfolder": "./apps/docker-uploader",
    "newversion": "3.21.3",
    "baseimage": "ghcr.io/linuxserver/baseimage-alpine",
-   "baseversion": "3.21-532ba5e0-ls14",
+   "baseversion": "null",
    "body": "Upgrading docker-uploader to ",
    "user": "dockserver image update[bot]"
 }
@@ -185,10 +185,10 @@ apps docker-wiki
    "appfolder": "./apps/docker-wiki",
    "appbranch": "master",
    "newversion": "3.21.3",
-   "appversion": "1.4.72",
-   "wikiversion": "",
+   "appversion": "",
+   "wikiversion": "9.6.14",
    "baseimage": "alpine",
-   "description": "null",
+   "description": "Docker + Traefik with Authelia and Cloudflare Protection",
    "body": "Upgrading docker-wiki to 3.21.3",
    "user": "github-actions[bot]"
 }
@@ -200,7 +200,7 @@ base alpine
    "appfolder": "./base/alpine",
    "newversion": "3.21.3",
    "baseimage": "alpine",
-   "description": "null",
+   "description": "Official Alpine Linux Docker image. Win at minimalism!",
    "body": "Upgrading alpine to 3.21.3",
    "user": "github-actions[bot]"
 }
@@ -226,9 +226,9 @@ base docker-alpine-v3
    "newversion": "3.21.3",
    "baseimage": "alpine",
    "baseversion": "3.21.3",
-   "s6stage": "null",
-   "description": "Docker docker-alpine-v3 with include s6-overlay: null",
-   "body": "Upgrading docker-alpine-v3 to baseimage: alpine:3.21.3  with include s6-overlay: null",
+   "s6stage": "v3.2.1.0",
+   "description": "Docker docker-alpine-v3 with include s6-overlay: v3.2.1.0",
+   "body": "Upgrading docker-alpine-v3 to baseimage: alpine:3.21.3  with include s6-overlay: v3.2.1.0",
    "user": "dockserver image update[bot]"
 }
 
