@@ -2,7 +2,7 @@
    "appname": "docker-mount",
    "apppic": "./images/docker-mount.png",
    "appfolder": "./apps/docker-mount",
-   "newversion": "3.21.3",
+   "newversion": "3.22.0",
    "mergerfs": "2.40.2",
    "rclone": "v1.69.3",
    "baseimage": "alpine",
