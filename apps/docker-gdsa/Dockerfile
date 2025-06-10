@@ -21,7 +21,7 @@ LABEL org.opencontainers.image.source="https://github.com/dockserver/container"
 
 ARG TARGETPLATFORM
 ARG BUILDPLATFORM
-ARG VERSION="525.0.0-alpine-20250603"
+ARG VERSION="526.0.0-alpine"
 
 RUN \
   echo "**** update packages ****" && \
