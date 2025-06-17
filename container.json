@@ -5,7 +5,7 @@ apps docker-auto-replyarr
    "appfolder": "./apps/docker-auto-replyarr",
    "newversion": "3.22.0",
    "baseimage": "alpine",
-   "description": "Official Alpine Linux Docker image. Win at minimalism!",
+   "description": "null",
    "body": "Upgrading docker-auto-replyarr to 3.22.0",
    "user": "github-actions[bot]"
 }
@@ -17,7 +17,7 @@ apps docker-backup
    "appfolder": "./apps/docker-backup",
    "newversion": "3.22.0",
    "baseimage": "alpine",
-   "description": "Official Alpine Linux Docker image. Win at minimalism!",
+   "description": "null",
    "body": "Upgrading docker-backup to 3.22.0",
    "user": "github-actions[bot]"
 }
@@ -137,7 +137,7 @@ apps docker-spotweb
    "appfolder": "./apps/docker-spotweb",
    "newversion": "1.5.8",
    "baseimage": "ubuntu:latest",
-   "description": "Decentralized community",
+   "description": "null",
    "body": "Upgrading docker-spotweb to 1.5.8",
    "user": "dockserver[bot]"
 }
@@ -188,7 +188,7 @@ apps docker-wiki
    "appversion": "1.4.72",
    "wikiversion": "9.6.14",
    "baseimage": "alpine",
-   "description": "Docker + Traefik with Authelia and Cloudflare Protection",
+   "description": "null",
    "body": "Upgrading docker-wiki to 3.22.0",
    "user": "github-actions[bot]"
 }
@@ -200,7 +200,7 @@ base alpine
    "appfolder": "./base/alpine",
    "newversion": "3.22.0",
    "baseimage": "alpine",
-   "description": "Official Alpine Linux Docker image. Win at minimalism!",
+   "description": "null",
    "body": "Upgrading alpine to 3.22.0",
    "user": "github-actions[bot]"
 }
@@ -264,7 +264,7 @@ base docker-dockserver
    "newversion": "3.22.0",
    "appversion": "3.22.0",
    "baseimage": "alpine",
-   "description": "Docker + Traefik with Authelia and Cloudflare Protection",
+   "description": "null",
    "body": "Upgrading docker-dockserver to 3.22.0",
    "user": "github-actions[bot]"
 }
