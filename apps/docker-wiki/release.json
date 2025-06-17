@@ -7,7 +7,7 @@
    "appversion": "1.4.72",
    "wikiversion": "9.6.14",
    "baseimage": "alpine",
-   "description": "null",
+   "description": "Docker + Traefik with Authelia and Cloudflare Protection",
    "body": "Upgrading docker-wiki to 3.22.0",
    "user": "github-actions[bot]"
 }
