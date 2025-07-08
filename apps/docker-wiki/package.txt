@@ -1,4 +1,4 @@
-.python-rundeps-20250509.234546
+.python-rundeps-20250604.171240
 alpine-baselayout-3.6.8-r1
 alpine-baselayout-data-3.6.8-r1
 alpine-keys-2.5-r0
@@ -14,7 +14,7 @@ bzip2-dev-1.0.8-r6
 c-ares-1.34.5-r0
 ca-certificates-20241121-r1
 ca-certificates-bundle-20241121-r1
-cairo-1.18.2-r1
+cairo-1.18.4-r0
 fontconfig-2.15.0-r1
 freetype-2.13.3-r0
 freetype-dev-2.13.3-r0
