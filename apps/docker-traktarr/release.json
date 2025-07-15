@@ -2,7 +2,7 @@
    "appname": "docker-traktarr",
    "apppic": "./images/docker-traktarr.png",
    "appfolder": "./apps/docker-traktarr",
-   "newversion": "3.22.0",
+   "newversion": "3.22.1",
    "baseimage": "ghcr.io/linuxserver/baseimage-alpine",
    "baseversion": "3.22-61860f4b-ls4",
    "body": "Upgrading docker-traktarr to ",

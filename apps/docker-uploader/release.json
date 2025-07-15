@@ -2,7 +2,7 @@
    "appname": "docker-uploader",
    "apppic": "./images/docker-uploader.png",
    "appfolder": "./apps/docker-uploader",
-   "newversion": "3.22.0",
+   "newversion": "3.22.1",
    "baseimage": "ghcr.io/linuxserver/baseimage-alpine",
    "baseversion": "3.22-61860f4b-ls4",
    "body": "Upgrading docker-uploader to ",
