@@ -186,7 +186,7 @@ apps docker-wiki
    "appbranch": "master",
    "newversion": "3.22.1",
    "appversion": "1.4.72",
-   "wikiversion": "9.6.15",
+   "wikiversion": "9.6.16",
    "baseimage": "alpine",
    "description": "Docker + Traefik with Authelia and Cloudflare Protection",
    "body": "Upgrading docker-wiki to 3.22.1",
