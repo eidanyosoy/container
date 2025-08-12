@@ -3,10 +3,10 @@ apps docker-auto-replyarr
    "appname": "docker-auto-replyarr",
    "apppic": "",
    "appfolder": "./apps/docker-auto-replyarr",
-   "newversion": "3.22.1",
+   "newversion": "",
    "baseimage": "alpine",
    "description": "Official Alpine Linux Docker image. Win at minimalism!",
-   "body": "Upgrading docker-auto-replyarr to 3.22.1",
+   "body": "Upgrading docker-auto-replyarr to ",
    "user": "github-actions[bot]"
 }
 
@@ -15,10 +15,10 @@ apps docker-backup
    "appname": "docker-backup",
    "apppic": "./images/docker-backup.png",
    "appfolder": "./apps/docker-backup",
-   "newversion": "3.22.1",
+   "newversion": "",
    "baseimage": "alpine",
    "description": "Official Alpine Linux Docker image. Win at minimalism!",
-   "body": "Upgrading docker-backup to 3.22.1",
+   "body": "Upgrading docker-backup to ",
    "user": "github-actions[bot]"
 }
 
@@ -27,10 +27,10 @@ apps docker-crunchy
    "appname": "docker-crunchy",
    "apppic": "./images/docker-crunchy.png",
    "appfolder": "./apps/docker-crunchy",
-   "newversion": "25.04",
+   "newversion": "",
    "baseimage": "ubuntu",
    "description": "Docker image  for docker-crunchy",
-   "body": "Upgrading docker-crunchy to baseimage: ubuntu:25.04",
+   "body": "Upgrading docker-crunchy to baseimage: ubuntu:",
    "user": "dockserver image update[bot]"
 }
 
@@ -52,10 +52,10 @@ apps docker-dockupdate
    "appname": "docker-dockupdate",
    "apppic": "./images/docker-dockupdate.png",
    "appfolder": "./apps/docker-dockupdate",
-   "newversion": "3.22.1",
+   "newversion": "",
    "baseimage": "alpine",
    "description": "null",
-   "body": "Upgrading docker-dockupdate to 3.22.1",
+   "body": "Upgrading docker-dockupdate to ",
    "user": "github-actions[bot]"
 }
 
@@ -64,10 +64,10 @@ apps docker-gdsa
    "appname": "docker-gdsa",
    "apppic": "./images/docker-gdsa.png",
    "appfolder": "./apps/docker-gdsa",
-   "newversion": "533.0.0-alpine",
+   "newversion": "",
    "baseimage": "gcr.io/google.com/cloudsdktool/cloud-sdk",
    "description": "Docker for Creating GDSA keys",
-   "body": "Upgrading docker-gdsa to 533.0.0-alpine",
+   "body": "Upgrading docker-gdsa to ",
    "user": "dockserver-actions[bot]"
 }
 
@@ -76,7 +76,7 @@ apps docker-mount
    "appname": "docker-mount",
    "apppic": "./images/docker-mount.png",
    "appfolder": "./apps/docker-mount",
-   "newversion": "3.22.1",
+   "newversion": "",
    "mergerfs": "2.40.2",
    "rclone": "v1.70.3",
    "baseimage": "alpine",
@@ -106,15 +106,15 @@ apps docker-restic
    "appname": "docker-restic",
    "apppic": "./images/docker-restic.png",
    "appfolder": "./apps/docker-restic",
-   "newversion": "3.22.1",
+   "newversion": "",
    "rclone": "v1.70.3",
    "baseimage": "alpine",
    "buildimage": "alpine",
    "finalimage": "ghcr.io/linuxserver/baseimage-alpine",
    "baseversion": "3.22-6a2f7be2-ls7",
-   "s6stage": "v3.2.1.0",
-   "description": "Docker docker-restic with rclone version v1.70.3 include s6-overlay: v3.2.1.0",
-   "body": "Upgrading docker-restic to baseimage: alpine:3.22-6a2f7be2-ls7 with rclone: v1.70.3 include s6-overlay: v3.2.1.0",
+   "s6stage": "null",
+   "description": "Docker docker-restic with rclone version v1.70.3 include s6-overlay: null",
+   "body": "Upgrading docker-restic to baseimage: alpine:3.22-6a2f7be2-ls7 with rclone: v1.70.3 include s6-overlay: null",
    "user": "dockserver image update[bot]"
 }
 
@@ -123,10 +123,10 @@ apps docker-rollarr
    "appname": "docker-rollarr",
    "apppic": "./images/docker-rollarr.png",
    "appfolder": "./apps/docker-rollarr",
-   "newversion": "25.04",
+   "newversion": "",
    "baseimage": "ubuntu",
    "description": "This is the new and improved Automatic Pre-roll script with a GUI for Plex now called Rollarr!",
-   "body": "Upgrading docker-rollarr to 25.04",
+   "body": "Upgrading docker-rollarr to ",
    "user": "github-actions[bot]"
 }
 
@@ -147,7 +147,7 @@ apps docker-traktarr
    "appname": "docker-traktarr",
    "apppic": "./images/docker-traktarr.png",
    "appfolder": "./apps/docker-traktarr",
-   "newversion": "3.22.1",
+   "newversion": "",
    "baseimage": "ghcr.io/linuxserver/baseimage-alpine",
    "baseversion": "3.22-6a2f7be2-ls7",
    "body": "Upgrading docker-traktarr to ",
@@ -226,9 +226,9 @@ base docker-alpine-v3
    "newversion": "3.22.1",
    "baseimage": "alpine",
    "baseversion": "3.22.1",
-   "s6stage": "v3.2.1.0",
-   "description": "Docker docker-alpine-v3 with include s6-overlay: v3.2.1.0",
-   "body": "Upgrading docker-alpine-v3 to baseimage: alpine:3.22.1  with include s6-overlay: v3.2.1.0",
+   "s6stage": "null",
+   "description": "Docker docker-alpine-v3 with include s6-overlay: null",
+   "body": "Upgrading docker-alpine-v3 to baseimage: alpine:3.22.1  with include s6-overlay: null",
    "user": "dockserver image update[bot]"
 }
 
