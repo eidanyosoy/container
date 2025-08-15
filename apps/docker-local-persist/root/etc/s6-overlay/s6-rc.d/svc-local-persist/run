@@ -1,0 +1,5 @@
+  #!/usr/bin/with-contenv bash
+
+  echo "Starting DockServer Local-Persist Volume Plugin..."
+  exec s6-setuidgid abc /usr/local/bin/local-persist
+  EOF

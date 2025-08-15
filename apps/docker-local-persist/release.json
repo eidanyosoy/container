@@ -1,0 +1,35 @@
+  {
+    "appname": "docker-local-persist",
+    "baseversion": "3.22-6a2f7be2-ls7",
+    "s6stage": "v3.2.1.0"
+  }
+  EOF
+
+  Create package.txt:
+
+  cat > apps/docker-local-persist/package.txt << 'EOF'
+  bash
+  curl
+  jq
+  local-persist
+  EOF
+
+  Create root directory structure:
+
+  mkdir -p apps/docker-local-persist/root/donate.txt
+  mkdir -p apps/docker-local-persist/root/etc/s6-overlay/s6-rc.d/svc-local-persist
+
+  Create donate.txt:
+
+  cat > apps/docker-local-persist/root/donate.txt << 'EOF'
+  #####################################
+  # All rights reserved.              #
+  # started from Zero                 #
+  # Docker owned dockserver           #
+  # Docker Maintainer dockserver      #
+  #####################################
+  # Visit: https://dockserver.io      #
+  # Discord: discord.gg/dockserver    #
+  # Donate: paypal.me/dockserver      #
+  #####################################
+  EOF
